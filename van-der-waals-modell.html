@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Van-der-Waals-Wechselwirkungen – interaktives Modell</title>
+<style>
+  :root{
+    --ink:#06090F;
+    --panel:#0D131E;
+    --panel2:#111A28;
+    --line:#1E2A3C;
+    --txt:#DAE3EF;
+    --dim:#7C8CA4;
+    --neg:#31D8C0;      /* Teilladung negativ */
+    --pos:#FF9E42;      /* Teilladung positiv */
+    --cloud:#7B6BFF;    /* Elektronenwolke */
+    --core:#B9C7DA;     /* Atomrumpf */
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    --sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1200px 700px at 20% -10%, #101A2B 0%, transparent 60%),
+      var(--ink);
+    color:var(--txt);
+    font-family:var(--sans);
+    font-size:15px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1240px;margin:0 auto;padding:20px 18px 56px}
+
+  header{border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:20px}
+  .eyebrow{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--dim);margin:0 0 6px
+  }
+  h1{
+    font-size:clamp(21px,3.4vw,31px);line-height:1.12;margin:0;
+    font-weight:700;letter-spacing:-.02em;
+  }
+  h1 span{color:var(--cloud)}
+  .sub{color:var(--dim);margin:8px 0 0;max-width:66ch;font-size:14px}
+
+  .grid{display:grid;grid-template-columns:1fr;gap:18px}
+  @media(min-width:960px){.grid{grid-template-columns:minmax(0,1fr) 336px}}
+
+  .stage{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    overflow:hidden;position:relative;
+  }
+  #scene{display:block;width:100%;height:auto}
+  .scopewrap{border-top:1px solid var(--line);background:var(--panel2);padding:8px 12px 10px}
+  .scopehead{
+    display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+    font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)
+  }
+  .key{display:flex;gap:12px}
+  .key i{font-style:normal;display:inline-flex;align-items:center;gap:5px}
+  .key b{width:14px;height:2px;display:inline-block;border-radius:2px}
+  #scope{display:block;width:100%;height:auto;margin-top:4px}
+
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:16px;
+  }
+  .panel + .panel{margin-top:14px}
+  .plabel{
+    font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--dim);margin:0 0 12px;
+  }
+  .field{margin-bottom:16px}
+  .field:last-child{margin-bottom:0}
+  .frow{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}
+  .fname{font-size:13.5px}
+  .fval{font-family:var(--mono);font-size:12.5px;color:var(--cloud)}
+
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:3px;background:var(--line);border-radius:3px}
+  input[type=range]::-moz-range-track{height:3px;background:var(--line);border-radius:3px}
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+    background:var(--txt);margin-top:-6.5px;border:3px solid var(--panel);
+    box-shadow:0 0 0 1px var(--line);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:16px;height:16px;border-radius:50%;background:var(--txt);border:3px solid var(--panel);
+    box-shadow:0 0 0 1px var(--line);
+  }
+  input[type=range]:focus-visible{outline:2px solid var(--cloud);outline-offset:4px;border-radius:4px}
+
+  .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .seg button, .steps button, .btn{
+    font:inherit;font-size:12.5px;color:var(--txt);background:var(--panel2);
+    border:1px solid var(--line);border-radius:8px;padding:8px 6px;cursor:pointer;
+    transition:background .15s,border-color .15s,color .15s;text-align:center;
+  }
+  .seg button:hover,.steps button:hover,.btn:hover{border-color:#33445E}
+  .seg button[aria-pressed=true]{background:var(--cloud);border-color:var(--cloud);color:#0B0A1E;font-weight:600}
+  .seg button:disabled{opacity:.32;cursor:not-allowed}
+  .steps{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+  .steps button[aria-pressed=true]{background:var(--txt);border-color:var(--txt);color:var(--ink);font-weight:600}
+  button:focus-visible{outline:2px solid var(--cloud);outline-offset:2px}
+
+  .checks{display:grid;gap:9px}
+  .chk{display:flex;align-items:center;gap:9px;font-size:13.5px;cursor:pointer}
+  .chk input{
+    appearance:none;-webkit-appearance:none;width:17px;height:17px;flex:0 0 17px;
+    border:1px solid #34455E;border-radius:5px;background:var(--panel2);cursor:pointer;position:relative;
+  }
+  .chk input:checked{background:var(--cloud);border-color:var(--cloud)}
+  .chk input:checked::after{
+    content:"";position:absolute;left:5px;top:1.5px;width:4px;height:9px;
+    border:solid #0B0A1E;border-width:0 2px 2px 0;transform:rotate(43deg)
+  }
+  .chk input:focus-visible{outline:2px solid var(--cloud);outline-offset:2px}
+
+  .readout{display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:13px}
+  .readout dt{color:var(--dim)}
+  .readout dd{margin:0;font-family:var(--mono);font-size:12.5px;text-align:right}
+  .bar{grid-column:1/-1;height:6px;background:var(--panel2);border-radius:3px;overflow:hidden;margin:6px 0 2px;border:1px solid var(--line)}
+  .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--cloud),var(--neg));transition:width .3s}
+  .state{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+  .state.gas{color:var(--pos)}
+  .state.cond{color:var(--neg)}
+
+  .explain{
+    background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--cloud);
+    border-radius:10px;padding:13px 14px;margin-top:14px;
+  }
+  .explain h3{margin:0 0 6px;font-size:13.5px;letter-spacing:-.01em}
+  .explain p{margin:0;font-size:13px;color:#B5C2D4}
+
+  footer{margin-top:22px;color:var(--dim);font-size:12px;border-top:1px solid var(--line);padding-top:12px;max-width:80ch}
+  footer code{font-family:var(--mono);font-size:11.5px;color:#95A6BE}
+  .reader{
+    margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+  }
+  .rtabs{display:flex;gap:0;border-bottom:1px solid var(--line);background:var(--panel2)}
+  .rtabs button{
+    flex:1;font:inherit;font-size:12.5px;padding:11px 10px;background:transparent;color:var(--dim);
+    border:0;border-bottom:2px solid transparent;cursor:pointer;transition:color .15s,border-color .15s;
+  }
+  .rtabs button[aria-selected=true]{color:var(--txt);border-bottom-color:var(--cloud);font-weight:600}
+  .rtabs button:focus-visible{outline:2px solid var(--cloud);outline-offset:-3px}
+  .rbody{padding:18px 20px 20px}
+  .prose{max-width:74ch;font-size:14.5px;color:#C3CFDF}
+  .prose.simple{font-size:16px;line-height:1.72;color:#CDD8E6}
+  .prose h4{
+    font-size:11px;font-family:var(--mono);letter-spacing:.18em;text-transform:uppercase;
+    color:var(--dim);margin:22px 0 8px;font-weight:600;
+  }
+  .prose h4:first-child{margin-top:0}
+  .prose p{margin:0 0 11px}
+  .prose ul{margin:0 0 11px;padding-left:19px}
+  .prose li{margin-bottom:6px}
+  .prose b{color:var(--txt);font-weight:600}
+  .prose .neg{color:var(--neg);font-weight:600}
+  .prose .pos{color:var(--pos);font-weight:600}
+  .prose .vio{color:var(--cloud);font-weight:600}
+  .prose .fml{
+    font-family:var(--mono);font-size:13px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:8px;padding:10px 12px;margin:0 0 12px;overflow-x:auto;color:#CBD6E6;
+  }
+  .prose table{border-collapse:collapse;width:100%;font-size:13px;margin:0 0 12px}
+  .prose th,.prose td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}
+  .prose th{color:var(--dim);font-weight:600;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase}
+  .prose td:last-child,.prose th:last-child{text-align:right;font-family:var(--mono)}
+  .rfoot{display:flex;justify-content:flex-end;margin-top:16px}
+  .rfoot button{font:inherit;font-size:12px;color:var(--dim);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 12px;cursor:pointer}
+  .rfoot button:hover{color:var(--txt);border-color:#33445E}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">Zwischenmolekulare Kräfte · Alkane</p>
+  <h1>Van-der-Waals-Wechselwirkungen: <span>momentane und induzierte Dipole</span></h1>
+  <p class="sub">Zwei unpolare Alkanmoleküle stehen nebeneinander. Die Elektronenwolken fluktuieren; ein momentaner Dipol im linken Molekül induziert einen Dipol im rechten. Kettenlänge und Verzweigungsgrad verändern Polarisierbarkeit und Kontaktfläche.</p>
+</header>
+
+<div class="grid">
+
+  <!-- ---------- Bühne ---------- -->
+  <div>
+    <div class="stage">
+      <canvas id="scene" width="1400" height="880" role="img"
+        aria-label="Animation zweier Alkanmoleküle mit fluktuierenden Elektronenwolken und Teilladungen"></canvas>
+
+      <div class="scopewrap">
+        <div class="scopehead">
+          <span>Ladungsverschiebung über die Zeit</span>
+          <span class="key">
+            <i><b style="background:var(--cloud)"></b>Molekül A</i>
+            <i><b style="background:var(--pos)"></b>Molekül B</i>
+          </span>
+        </div>
+        <canvas id="scope" width="1400" height="190"></canvas>
+      </div>
+    </div>
+
+    <div class="explain">
+      <h3 id="exTitle">Freilauf</h3>
+      <p id="exText"></p>
+    </div>
+
+    <div class="reader">
+      <div class="rtabs" role="tablist">
+        <button role="tab" id="tabA" aria-selected="true" aria-controls="txtA">Einfache Sprache</button>
+        <button role="tab" id="tabB" aria-selected="false" aria-controls="txtB">Lehrbuchtext</button>
+      </div>
+      <div class="rbody">
+
+        <!-- ============ EINFACHE SPRACHE ============ -->
+        <div class="prose simple" id="txtA" role="tabpanel" aria-labelledby="tabA">
+          <h4>Was du in der Abbildung siehst</h4>
+          <ul>
+            <li>Die <span class="vio">violetten Wolken</span> sind die Elektronen. Elektronen sind negativ geladen.</li>
+            <li>Die grauen Kugeln in der Mitte sind die Kohlenstoff-Atome. Der Wasserstoff ist nicht gezeichnet.</li>
+            <li><span class="neg">δ−</span> heißt: Diese Seite ist ein bisschen negativ.</li>
+            <li><span class="pos">δ+</span> heißt: Diese Seite ist ein bisschen positiv.</li>
+            <li>Die gestrichelten Linien zeigen die Anziehung zwischen den beiden Molekülen.</li>
+            <li>Die Kurve ganz unten zeigt, wie sich die Ladung mit der Zeit ändert.</li>
+          </ul>
+
+          <h4>Das Problem</h4>
+          <p>Alkane sind <b>unpolar</b>. Das bedeutet: Sie haben keine feste positive Seite und keine feste negative Seite. Eigentlich dürften sie sich also gar nicht anziehen.</p>
+          <p>Trotzdem ist Hexan bei Zimmertemperatur eine Flüssigkeit. Irgendetwas muss die Moleküle also zusammenhalten. Was ist das?</p>
+
+          <h4>Schritt 1: Der temporäre Dipol</h4>
+          <p>Die Elektronen bleiben nicht an einem Ort. Sie bewegen sich ununterbrochen um das Molekül herum.</p>
+          <p>Manchmal sind zufällig mehr Elektronen auf der einen Seite als auf der anderen. Dann ist diese Seite kurz <span class="neg">δ−</span>. Die andere Seite ist gleichzeitig <span class="pos">δ+</span>.</p>
+          <p>Das nennt man einen <b>temporären Dipol</b> oder <b>momentanen Dipol</b>. <i>Temporär</i> bedeutet: nur für einen ganz kurzen Moment.</p>
+          <p>In der Animation siehst du das an Molekül A.</p>
+
+          <h4>Schritt 2: Der induzierte Dipol</h4>
+          <p>Molekül B liegt direkt daneben. Es spürt die Ladung von Molekül A.</p>
+          <p>Gleiche Ladungen stoßen sich ab. Die <span class="neg">δ−</span>-Seite von A drückt deshalb die Elektronen von B weg. Und ungleiche Ladungen ziehen sich an. Die <span class="pos">δ+</span>-Seite von A zieht die Elektronen von B zu sich.</p>
+          <p>So bekommt auch Molekül B eine <span class="neg">δ−</span>-Seite und eine <span class="pos">δ+</span>-Seite. Das nennt man einen <b>induzierten Dipol</b>. <i>Induziert</i> bedeutet: von außen erzeugt.</p>
+          <p>Wichtig: Molekül B kann sich das nicht aussuchen. Die Richtung ist immer so, dass sich <span class="pos">δ+</span> und <span class="neg">δ−</span> gegenüberstehen.</p>
+
+          <h4>Schritt 3: Die Anziehung</h4>
+          <p>Jetzt liegen eine positive und eine negative Teilladung nebeneinander. Sie ziehen sich an. Die Moleküle halten zusammen.</p>
+          <p>Diese Anziehung heißt <b>Van-der-Waals-Wechselwirkung</b>. Ein anderer Name dafür ist <b>London-Kraft</b>.</p>
+
+          <h4>Aber der Dipol verschwindet doch sofort wieder?</h4>
+          <p>Ja. Der Dipol hält nur einen winzigen Augenblick. Aber sofort entsteht ein neuer. Millionen Mal in jeder Sekunde.</p>
+          <p>Und Molekül B macht jedes Mal sofort mit. Deshalb wirkt die Anziehung insgesamt die ganze Zeit.</p>
+
+          <h4>Wann ist die Anziehung stark?</h4>
+          <p>Es gibt zwei Gründe:</p>
+          <ul>
+            <li><b>Viele Elektronen.</b> Ein langes Molekül hat mehr Elektronen. Dann kann sich mehr Ladung verschieben. Die Anziehung wird stärker.</li>
+            <li><b>Große Kontaktfläche.</b> Zwei gerade Ketten liegen aneinander wie zwei Spaghetti. Sie berühren sich auf der ganzen Länge. Ein verzweigtes Molekül ist eher rund wie eine Kugel. Zwei Kugeln berühren sich nur an einem kleinen Punkt.</li>
+          </ul>
+
+          <h4>Was folgt daraus?</h4>
+          <p>Je stärker die Anziehung ist, desto mehr Energie braucht man zum Sieden. Der Siedepunkt wird also höher.</p>
+          <ul>
+            <li>Langes Molekül &rarr; starke Anziehung &rarr; <b>hoher</b> Siedepunkt.</li>
+            <li>Kurzes Molekül &rarr; schwache Anziehung &rarr; <b>niedriger</b> Siedepunkt.</li>
+            <li>Stark verzweigt &rarr; kleine Kontaktfläche &rarr; <b>niedrigerer</b> Siedepunkt als bei der geraden Kette.</li>
+          </ul>
+          <p>Probiere das im Modell aus: Stelle 6 C-Atome ein und wechsle zwischen „unverzweigt“ und „stark“. Die Summenformel bleibt gleich, der Siedepunkt ändert sich trotzdem.</p>
+
+          <div class="rfoot"><button data-copy="txtA">Text kopieren</button></div>
+        </div>
+
+        <!-- ============ LEHRBUCHTEXT ============ -->
+        <div class="prose" id="txtB" role="tabpanel" aria-labelledby="tabB" hidden>
+          <h4>Ausgangsbefund</h4>
+          <p>Alkane besitzen wegen der geringen Elektronegativitätsdifferenz zwischen Kohlenstoff und Wasserstoff (ΔEN ≈ 0,4) und der weitgehend symmetrischen Ladungsverteilung kein permanentes Dipolmoment; ihr resultierendes Dipolmoment ist praktisch null. Dennoch lassen sich Alkane verflüssigen und besitzen definierte Siedetemperaturen, die systematisch mit der Molekülgröße ansteigen. Zwischen den Molekülen müssen folglich anziehende Kräfte wirken, die nicht auf permanenten Dipolen beruhen können. Es handelt sich um <b>London-Dispersionswechselwirkungen</b>, den in unpolaren Systemen allein wirksamen Anteil der <b>Van-der-Waals-Wechselwirkungen</b>. Die beiden übrigen Anteile – die Orientierungswechselwirkung zwischen permanenten Dipolen (Keesom) und die Induktionswechselwirkung zwischen permanentem und induziertem Dipol (Debye) – entfallen hier.</p>
+
+          <h4>Momentanes Dipolmoment</h4>
+          <p>Die Aussage, ein Alkanmolekül sei unpolar, bezieht sich auf das <b>zeitliche Mittel</b> der Elektronendichteverteilung. Betrachtet man dagegen einen einzelnen Zeitpunkt, so fallen die Ladungsschwerpunkte der Elektronenhülle und der Atomrümpfe im Allgemeinen nicht zusammen: Die Elektronendichte fluktuiert auf einer Zeitskala von etwa 10<sup>−16</sup> bis 10<sup>−15</sup> s. Aus dieser Fluktuation resultiert ein <b>momentanes</b> (temporäres) Dipolmoment μ<sub>mom</sub>. Für den zeitlichen Mittelwert gilt zwar ⟨μ⟩ = 0, für das mittlere Quadrat jedoch ⟨μ²⟩ ≠ 0 – und genau diese Größe geht in die Wechselwirkungsenergie ein. Der scheinbare Widerspruch zwischen „unpolar“ und „polarisiert“ löst sich also über die Unterscheidung von Momentan- und Mittelwert auf.</p>
+
+          <h4>Induziertes Dipolmoment</h4>
+          <p>Der momentane Dipol erzeugt ein elektrisches Feld, dessen Betrag mit r<sup>−3</sup> abfällt. Dieses Feld verschiebt die Elektronenhülle eines benachbarten Moleküls gegen dessen Atomrümpfe und erzeugt dort ein <b>induziertes Dipolmoment</b>:</p>
+          <p class="fml">μ<sub>ind</sub> = α · E&nbsp;&nbsp;&nbsp;&nbsp;mit α = Polarisierbarkeit [C·m²·V<sup>−1</sup>]</p>
+          <p>Die Polarisierbarkeit α beschreibt, wie leicht sich die Elektronenhülle verformen lässt. Sie wächst mit der Zahl der Elektronen und mit deren Abstand vom Kern, da kernferne Valenzelektronen schwächer gebunden und damit beweglicher sind.</p>
+          <p>Die <b>Orientierung</b> des induzierten Dipols ist nicht frei wählbar, sondern durch die Geometrie des Feldes festgelegt. Liegen beide Moleküle kollinear zur Dipolachse (Kopf-an-Schwanz), so ist das axiale Feld dem Dipolmoment gleichgerichtet und der induzierte Dipol steht <b>parallel</b> zum induzierenden. Stehen die Moleküle seitlich nebeneinander, wirkt das äquatoriale Feld, das dem Dipolmoment entgegengerichtet ist, und der induzierte Dipol steht <b>antiparallel</b>. In beiden Fällen stehen sich an der Kontaktfläche ungleichnamige Teilladungen gegenüber; beide Anordnungen sind daher anziehend, die kollineare mit etwa doppelt so großem Energiebetrag.</p>
+
+          <h4>Korrelation der Fluktuationen</h4>
+          <p>Entscheidend für das Verständnis ist, dass die Fluktuationen beider Moleküle nicht unabhängig voneinander ablaufen, sondern <b>korreliert</b> sind: Die Elektronenbewegung im zweiten Molekül folgt der des ersten nahezu verzögerungsfrei. Wären beide Fluktuationen unkorreliert, so mittelte sich die Wechselwirkung über die Zeit zu null. Erst die Korrelation führt dazu, dass anziehende Konfigurationen häufiger auftreten als abstoßende und im Mittel eine Nettoanziehung verbleibt. Das Oszillogramm unterhalb der Animation stellt diese Kopplung dar.</p>
+
+          <h4>Wechselwirkungsenergie</h4>
+          <p>Nach London gilt für zwei gleichartige Teilchen näherungsweise:</p>
+          <p class="fml">E<sub>disp</sub> ≈ − (3/4) · I · α² / (4πε<sub>0</sub>)² · r<sup>−6</sup></p>
+          <p>Dabei ist I die Ionisierungsenergie und r der Abstand der Molekülschwerpunkte. Zwei Konsequenzen sind für die Schulchemie zentral: Erstens geht die Polarisierbarkeit <b>quadratisch</b> ein, weshalb die Wechselwirkung mit der Molekülgröße überproportional zunimmt. Zweitens fällt die Energie mit r<sup>−6</sup> ab; Dispersionswechselwirkungen sind damit sehr kurzreichweitig und wirken praktisch nur zwischen unmittelbar benachbarten Molekülsegmenten. Ihr Betrag liegt je Kontakt in der Größenordnung von 0,1 bis 5 kJ·mol<sup>−1</sup> und damit deutlich unter dem einer Wasserstoffbrückenbindung (etwa 10 bis 40 kJ·mol<sup>−1</sup>) und weit unter dem einer kovalenten Bindung (etwa 350 kJ·mol<sup>−1</sup>). Dass Alkane dennoch hohe Siedetemperaturen erreichen können, beruht auf der <b>Additivität</b> vieler solcher Einzelbeiträge entlang der Kette.</p>
+
+          <h4>Struktur-Eigenschafts-Beziehung</h4>
+          <p>Aus der Additivität und der Kurzreichweitigkeit folgt unmittelbar die Abhängigkeit von der Molekülgestalt. Bei homologen unverzweigten Alkanen nehmen sowohl Elektronenzahl als auch mögliche Kontaktfläche mit jeder CH<sub>2</sub>-Gruppe zu; die Siedetemperatur steigt entsprechend an. Bei <b>Konstitutionsisomeren</b> gleicher Summenformel bleibt die Elektronenzahl konstant, die Gestalt ändert sich jedoch: Mit zunehmender Verzweigung nähert sich das Molekül der Kugelform an, das Verhältnis von Oberfläche zu Volumen sinkt, und die Moleküle können einander nur noch auf kleineren Flächenanteilen nahekommen. Die Zahl wirksamer Einzelkontakte sinkt, die Siedetemperatur ebenfalls.</p>
+          <table>
+            <tr><th>Isomer (C<sub>6</sub>H<sub>14</sub>)</th><th>Gestalt</th><th>Sdp. / °C</th></tr>
+            <tr><td>n-Hexan</td><td>langgestreckt</td><td>68,7</td></tr>
+            <tr><td>2-Methylpentan</td><td>einfach verzweigt</td><td>60,0</td></tr>
+            <tr><td>2,2-Dimethylbutan</td><td>nahezu kugelförmig</td><td>49,7</td></tr>
+          </table>
+          <p>Da alle drei Verbindungen dieselbe Summenformel und damit dieselbe molare Masse besitzen, lässt sich der Unterschied ausschließlich auf die Molekülgestalt und die daraus folgende Kontaktfläche zurückführen. Die Masse scheidet als Erklärung aus.</p>
+
+          <h4>Einordnung und Grenzen</h4>
+          <p>Dispersionswechselwirkungen treten zwischen <b>allen</b> Teilchen auf, auch zwischen polaren Molekülen und zwischen Edelgasatomen; bei großen Molekülen können sie die Dipol-Dipol-Wechselwirkung sogar übertreffen. Quantenmechanisch handelt es sich um einen reinen <b>Elektronenkorrelationseffekt</b>: In der Hartree-Fock-Näherung, die jedes Elektron nur im gemittelten Feld der übrigen behandelt, ist die Dispersionswechselwirkung nicht enthalten; sie ergibt sich erst aus einer störungstheoretischen Behandlung zweiter Ordnung. Das hier gezeigte Bild zweier oszillierender Punktdipole ist daher ein anschauliches, aber semiklassisches Modell.</p>
+
+          <div class="rfoot"><button data-copy="txtB">Text kopieren</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- Steuerung ---------- -->
+  <div>
+    <div class="panel">
+      <p class="plabel">Molekül</p>
+
+      <div class="field">
+        <div class="frow"><span class="fname">Kettenlänge (C-Atome)</span><span class="fval" id="vN">6</span></div>
+        <input type="range" id="sN" min="1" max="10" step="1" value="6">
+      </div>
+
+      <div class="field">
+        <div class="frow"><span class="fname">Verzweigung</span></div>
+        <div class="seg" id="segBranch">
+          <button data-b="0" aria-pressed="true">unverzweigt</button>
+          <button data-b="1" aria-pressed="false">einfach</button>
+          <button data-b="2" aria-pressed="false">stark</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="frow"><span class="fname">Anordnung der Dipolachse</span></div>
+        <div class="seg" id="segAxis" style="grid-template-columns:repeat(2,1fr)">
+          <button data-a="quer" aria-pressed="true">Kopf-an-Schwanz</button>
+          <button data-a="laengs" aria-pressed="false">nebeneinander</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <p class="plabel">Ablauf</p>
+      <div class="field">
+        <div class="steps" id="segPhase">
+          <button data-p="0" aria-pressed="true">Freilauf</button>
+          <button data-p="1" aria-pressed="false">1 · Zeitmittel</button>
+          <button data-p="2" aria-pressed="false">2 · Momentaner Dipol</button>
+          <button data-p="3" aria-pressed="false">3 · Induzierter Dipol</button>
+          <button data-p="4" aria-pressed="false" style="grid-column:1/-1">4 · Anziehung</button>
+        </div>
+      </div>
+      <div class="field">
+        <div class="frow"><span class="fname">Tempo der Fluktuation</span><span class="fval" id="vSpeed">1,0×</span></div>
+        <input type="range" id="sSpeed" min="0" max="200" step="1" value="100">
+      </div>
+      <div class="field">
+        <div class="frow"><span class="fname">Temperatur</span><span class="fval" id="vT">20 °C</span></div>
+        <input type="range" id="sT" min="-200" max="220" step="5" value="20">
+      </div>
+    </div>
+
+    <div class="panel">
+      <p class="plabel">Anzeige</p>
+      <div class="checks">
+        <label class="chk"><input type="checkbox" id="cCloud" checked><span>Elektronenwolke</span></label>
+        <label class="chk"><input type="checkbox" id="cCharge" checked><span>Teilladungen δ+ / δ−</span></label>
+        <label class="chk"><input type="checkbox" id="cDipole" checked><span>Dipolpfeile</span></label>
+        <label class="chk"><input type="checkbox" id="cLines" checked><span>Wechselwirkungen im Kontaktbereich</span></label>
+        <label class="chk"><input type="checkbox" id="cLabels" checked><span>Beschriftung A / B</span></label>
+      </div>
+    </div>
+
+    <div class="panel">
+      <p class="plabel">Messwerte</p>
+      <dl class="readout">
+        <dt>Verbindung</dt><dd id="rName">Hexan</dd>
+        <dt>Summenformel</dt><dd id="rFormula">C₆H₁₄</dd>
+        <dt>Elektronen je Molekül</dt><dd id="rEl">50</dd>
+        <dt>Kontaktmaß (Modell)</dt><dd id="rContact">–</dd>
+        <dt>Relative Stärke (Modell)</dt><dd id="rStrength">–</dd>
+        <div class="bar"><i id="rBar" style="width:0%"></i></div>
+        <dt>Siedetemperatur (Literatur)</dt><dd id="rBp">68,7 °C</dd>
+        <dt>Zustand bei dieser Temperatur</dt><dd id="rState" class="state cond">kondensiert</dd>
+      </dl>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <strong>Zur Anordnung:</strong> Ein momentaner Dipol kann jede Orientierung annehmen. Zwei Grenzfälle werden hier gezeigt. Bei <em>Kopf-an-Schwanz</em> liegen die Dipolachsen auf der Verbindungslinie der Moleküle; der induzierte Dipol ist gleichgerichtet (parallel), und die Wechselwirkung ist etwa doppelt so stark. Bei der Anordnung <em>nebeneinander</em> stehen die Dipolachsen senkrecht dazu; der induzierte Dipol ist entgegengerichtet (antiparallel). Beide Fälle sind anziehend – das Vorzeichen der Induktion ist jedoch verschieden, und genau das wird häufig verwechselt.<br><br>
+  <strong>Modellgrenzen:</strong> Die Darstellung ist zweidimensional; CH<sub>3</sub>- und CH<sub>2</sub>-Gruppen sind zu einer Kugel zusammengefasst (vereinfachtes Kalottenmodell), Wasserstoffatome sind nicht gezeichnet. „Relative Stärke“ ist ein rein qualitativer Modellwert aus <code>Elektronenzahl × Kontaktmaß</code>, normiert auf Decan = 100, und keine berechnete Dispersionsenergie. Die Siedetemperaturen sind gerundete Literaturwerte; Werte mit vorangestelltem <code>~</code> sind Näherungen und vor einer Leistungsbewertung zu prüfen.
+</footer>
+</div>
+
+<script>
+(() => {
+"use strict";
+
+/* ========== Stoffdaten ========== */
+const NAMES = {
+  0:[null,"Methan","Ethan","Propan","Butan","Pentan","Hexan","Heptan","Octan","Nonan","Decan"],
+  1:[null,null,null,null,"2-Methylpropan","2-Methylbutan","2-Methylpentan","2-Methylhexan","2-Methylheptan","2-Methyloctan","2-Methylnonan"],
+  2:[null,null,null,null,null,"2,2-Dimethylpropan","2,2-Dimethylbutan","2,2-Dimethylpentan","2,2-Dimethylhexan","2,2-Dimethylheptan","2,2-Dimethyloctan"]
+};
+// Siedetemperaturen in °C; approx:true -> im UI mit "~" markiert
+const BP = {
+  0:[null,-161.5,-88.6,-42.1,-0.5,36.1,68.7,98.4,125.7,150.8,174.1],
+  1:[null,null,null,null,-11.7,27.8,60.0,90.0,117.6,143.3,167.0],
+  2:[null,null,null,null,null,9.5,49.7,79.2,106.8,132.7,155.0]
+};
+const APPROX = { "1-10":true, "2-8":true, "2-9":true, "2-10":true };
+const SUB = {"0":"₀","1":"₁","2":"₂","3":"₃","4":"₄","5":"₅","6":"₆","7":"₇","8":"₈","9":"₉"};
+const sub = n => String(n).split("").map(c=>SUB[c]).join("");
+
+/* ========== Zustand ========== */
+const S = {
+  n: 6, branch: 0, phase: 0, axis: "quer",
+  speed: 1.0, temp: 20,
+  showCloud:true, showCharge:true, showDipole:true, showLines:true, showLabels:true,
+  t: 0, pA: 0, pB: 0, targetA: null, targetB: null,
+  gapExtra: 0, jitterPhase: Math.random()*100
+};
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+if (reduce) S.phase = 1;
+
+const BUF = new Array(600).fill(0);   // Verzögerungspuffer für Molekül A
+let bufIdx = 0;
+const DELAY = 9;                       // Frames Induktionsverzögerung
+const HIST_A = [], HIST_B = [], HIST_MAX = 260;
+const K_IND = 0.82;                    // Induktionsfaktor
+// Kopf-an-Schwanz (axiales Feld): induzierter Dipol PARALLEL zum momentanen Dipol.
+// Nebeneinander (äquatoriales Feld): induzierter Dipol ANTIPARALLEL.
+const indSign = () => (S.axis === "quer") ? +1 : -1;
+
+/* ========== Geometrie ========== */
+function buildMolecule(n, br){
+  const DX = 0.46, DY = 0.88;
+  const atoms = [], bonds = [];
+  const chain = m => {
+    for (let i=0;i<m;i++){
+      atoms.push({x:(i%2)*DX, y:i*DY});
+      if (i>0) bonds.push([i-1,i]);
+    }
+  };
+  if (br === 0 || n < 4){
+    chain(n);
+  } else if (br === 1){
+    const m = n-1; chain(m);
+    const a = atoms[1];
+    atoms.push({x:a.x+0.96, y:a.y-0.34}); bonds.push([1, atoms.length-1]);
+  } else {
+    const m = n-2; chain(m);
+    const a = atoms[1];
+    atoms.push({x:a.x+0.96, y:a.y-0.30}); bonds.push([1, atoms.length-1]);
+    atoms.push({x:a.x-0.96, y:a.y-0.30}); bonds.push([1, atoms.length-1]);
+  }
+  // zentrieren
+  let mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9;
+  for (const a of atoms){ mnx=Math.min(mnx,a.x); mxx=Math.max(mxx,a.x); mny=Math.min(mny,a.y); mxy=Math.max(mxy,a.y); }
+  const cx=(mnx+mxx)/2, cy=(mny+mxy)/2;
+  for (const a of atoms){ a.x-=cx; a.y-=cy; }
+  return {atoms, bonds, w:(mxx-mnx), h:(mxy-mny)};
+}
+
+/* ========== Kennzahlen ========== */
+const LAMBDA = 1.05;   // Reichweite des Kontaktmaßes in Einheiten
+function contactOf(mol, mirrored){
+  // Abstand jedes Atoms zur Kontaktebene (rechter bzw. linker Rand)
+  let edge = -1e9;
+  for (const a of mol.atoms){ const x = mirrored ? -a.x : a.x; edge = Math.max(edge, x); }
+  let sum = 0;
+  for (const a of mol.atoms){
+    const x = mirrored ? -a.x : a.x;
+    sum += Math.exp(-(edge - x)/LAMBDA);
+  }
+  return sum;
+}
+function metrics(n, br){
+  const mol = buildMolecule(n, br);
+  const el = 8*n + 2;
+  const contact = contactOf(mol, false);
+  const raw = el * contact;
+  const ref = (() => { const m = buildMolecule(10,0); return (8*10+2) * contactOf(m,false); })();
+  return {mol, el, contact, strength: 100*raw/ref};
+}
+
+/* ========== DOM ========== */
+const $ = id => document.getElementById(id);
+const scene = $("scene"), sctx = scene.getContext("2d");
+const scope = $("scope"), pctx = scope.getContext("2d");
+
+function fit(cv, ratio){
+  const w = cv.parentElement.clientWidth;
+  const dpr = Math.min(window.devicePixelRatio||1, 2);
+  cv.style.height = Math.round(w/ratio) + "px";
+  cv.width = Math.round(w*dpr); cv.height = Math.round((w/ratio)*dpr);
+  const ctx = cv.getContext("2d");
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {w, h:w/ratio};
+}
+let SZ = {w:800,h:500}, PZ = {w:800,h:110};
+function resize(){
+  SZ = fit(scene, 1.62);
+  PZ = fit(scope, 7.4);
+}
+window.addEventListener("resize", resize);
+
+/* ========== Zeichnen: Szene ========== */
+function draw(){
+  const {w,h} = SZ;
+  const M = metrics(S.n, S.branch);
+  const mol = M.mol;
+
+  sctx.clearRect(0,0,w,h);
+
+  // Skalierung: Decan (9 * 0.88 Einheiten) soll ~72 % der Höhe füllen
+  const scale = Math.min((h*0.66)/(9*0.88), w/17);
+  const midX = w/2;
+
+  const baseGap = (S.axis === "quer" ? 2.6 : 1.45) + S.gapExtra;
+  const halfGapPx = (baseGap/2)*scale;
+
+  // thermische Zitterbewegung
+  const tf = Math.max(0,(S.temp+200)/420);
+  const amp = tf*tf*7*scale/40;
+  const jx = Math.sin(S.t*1.7+S.jitterPhase)*amp*0.5;
+  const jyA = Math.sin(S.t*2.3+S.jitterPhase*1.7)*amp;
+  const jyB = Math.sin(S.t*2.1+S.jitterPhase*0.6+2.2)*amp;
+
+  // Atompositionen in px
+  const place = (mirror, side, jy) => mol.atoms.map(a => {
+    const lx = mirror ? -a.x : a.x;
+    let edge = -1e9;
+    for (const b of mol.atoms){ const bx = mirror ? -b.x : b.x; edge = Math.max(edge, bx); }
+    const px = midX + side*(halfGapPx + (edge - lx)*scale) + side*jx;
+    return {x:px, y:h/2 + a.y*scale + jy, ly:a.y, prox: Math.exp(-(edge-lx)/LAMBDA)};
+  });
+  const A = place(true, -1, jyA);
+  const B = place(false, +1, jyB);
+
+  const shiftA = S.pA * 0.30 * scale;
+  const shiftB = S.pB * 0.30 * scale;
+  const rCore  = 0.30*scale;
+  const rCloud = 0.66*scale;
+
+  // Kontaktbereich (dezenter Hintergrundstreifen)
+  const gradBg = sctx.createLinearGradient(midX-halfGapPx*2.2,0,midX+halfGapPx*2.2,0);
+  gradBg.addColorStop(0,"rgba(123,107,255,0)");
+  gradBg.addColorStop(.5,"rgba(123,107,255,.07)");
+  gradBg.addColorStop(1,"rgba(123,107,255,0)");
+  sctx.fillStyle = gradBg;
+  sctx.fillRect(midX-halfGapPx*2.2, 0, halfGapPx*4.4, h);
+
+  // Wechselwirkungslinien
+  if (S.showLines && S.phase !== 1 && S.phase !== 2){
+    const inten = Math.min(1, Math.abs(S.pA)*1.25);
+    for (let i=0;i<A.length;i++){
+      if (A[i].prox < 0.22) continue;
+      let best=-1, bd=1e9;
+      for (let j=0;j<B.length;j++){
+        if (B[j].prox < 0.22) continue;
+        const d = Math.abs(A[i].y - B[j].y);
+        if (d<bd){bd=d;best=j;}
+      }
+      if (best<0 || bd > 0.75*scale) continue;
+      const al = A[i].prox*B[best].prox*inten*0.85;
+      if (al < 0.03) continue;
+      sctx.strokeStyle = `rgba(49,216,192,${al})`;
+      sctx.lineWidth = 1.4; sctx.setLineDash([4,4]);
+      sctx.beginPath(); sctx.moveTo(A[i].x, A[i].y); sctx.lineTo(B[best].x, B[best].y); sctx.stroke();
+      sctx.setLineDash([]);
+      if (S.phase === 4 || S.phase === 0){
+        arrow(sctx, midX-6, (A[i].y+B[best].y)/2, -1, `rgba(49,216,192,${al*1.2})`);
+        arrow(sctx, midX+6, (A[i].y+B[best].y)/2, +1, `rgba(49,216,192,${al*1.2})`);
+      }
+    }
+  }
+
+  drawMolecule(A, shiftA, S.pA, rCore, rCloud, scale, "A", -1);
+  drawMolecule(B, shiftB, S.pB, rCore, rCloud, scale, "B", +1);
+
+  function drawMolecule(P, shift, p, rc, rl, sc, label, side){
+    const H = (S.axis === "quer");   // Dipolachse längs der Verbindungslinie A–B
+    let mnx=1e9,mxx=-1e9,mny=1e9,mxy=-1e9;
+    for (const a of P){ mnx=Math.min(mnx,a.x); mxx=Math.max(mxx,a.x); mny=Math.min(mny,a.y); mxy=Math.max(mxy,a.y); }
+    const cx=(mnx+mxx)/2, cy=(mny+mxy)/2, halfY=Math.max(1,(mxy-mny)/2);
+    const sx = H ? shift : 0, sy = H ? 0 : shift;
+
+    // Elektronenwolke
+    if (S.showCloud){
+      sctx.save();
+      sctx.globalCompositeOperation = "lighter";
+      for (const a of P){
+        // Bei Kopf-an-Schwanz verschiebt sich die Wolke des ganzen Moleküls starr zur Seite;
+        // längs der Kette entsteht zusätzlich ein Dichtegradient von Ende zu Ende.
+        const dens = H ? 1 : Math.max(0.18, 1 + p*((a.y-cy)/halfY)*0.85);
+        const g = sctx.createRadialGradient(a.x+sx, a.y+sy, rc*0.2, a.x+sx, a.y+sy, rl);
+        g.addColorStop(0, `rgba(123,107,255,${0.42*dens})`);
+        g.addColorStop(0.55, `rgba(110,120,255,${0.20*dens})`);
+        g.addColorStop(1, "rgba(80,90,220,0)");
+        sctx.fillStyle = g;
+        sctx.beginPath(); sctx.arc(a.x+sx, a.y+sy, rl, 0, 6.2832); sctx.fill();
+      }
+      sctx.restore();
+    }
+    // Bindungen
+    sctx.strokeStyle = "rgba(185,199,218,.55)";
+    sctx.lineWidth = Math.max(2, sc*0.10); sctx.lineCap="round";
+    for (const [i,j] of mol.bonds){
+      sctx.beginPath(); sctx.moveTo(P[i].x,P[i].y); sctx.lineTo(P[j].x,P[j].y); sctx.stroke();
+    }
+    // Atomrümpfe
+    for (const a of P){
+      sctx.fillStyle = "#0A1220";
+      sctx.beginPath(); sctx.arc(a.x,a.y,rc,0,6.2832); sctx.fill();
+      sctx.fillStyle = "#B9C7DA";
+      sctx.beginPath(); sctx.arc(a.x,a.y,rc*0.72,0,6.2832); sctx.fill();
+    }
+    // Teilladungen – δ− liegt dort, wohin die Elektronen verschoben sind
+    const al = Math.min(1, Math.abs(p)*1.5);
+    if (S.showCharge && Math.abs(p) > 0.06 && S.phase !== 1){
+      if (H){
+        const xR = mxx + rl*0.80, xL = mnx - rl*0.80, ty = cy + side*sc*0.55;
+        const negRight = p > 0;
+        tag(sctx, xR, ty, negRight ? "δ−" : "δ+", negRight ? "#31D8C0":"#FF9E42", al, sc);
+        tag(sctx, xL, ty, negRight ? "δ+" : "δ−", negRight ? "#FF9E42":"#31D8C0", al, sc);
+      } else {
+        let top=P[0], bot=P[0];
+        for (const a of P){ if (a.y<top.y) top=a; if (a.y>bot.y) bot=a; }
+        const negBottom = p > 0;
+        tag(sctx, top.x + side*rl*0.55, top.y - rl*0.85, negBottom ? "δ+" : "δ−", negBottom ? "#FF9E42":"#31D8C0", al, sc);
+        tag(sctx, bot.x + side*rl*0.55, bot.y + rl*0.85, negBottom ? "δ−" : "δ+", negBottom ? "#31D8C0":"#FF9E42", al, sc);
+      }
+    }
+    // Dipolpfeil: zeigt vom positiven zum negativen Pol, Querstrich am Plus-Ende
+    if (S.showDipole && Math.abs(p) > 0.06 && S.phase !== 1){
+      const a2 = Math.min(1, Math.abs(p)*1.4);
+      const dir = p>0 ? 1 : -1;
+      sctx.strokeStyle = `rgba(218,227,239,${0.75*a2})`; sctx.lineWidth=2;
+      sctx.fillStyle   = `rgba(218,227,239,${0.75*a2})`;
+      if (H){
+        const ay = mxy + sc*0.90;
+        const L = (sc*1.5) * Math.min(1, Math.abs(p)*1.4) + sc*0.4;
+        sctx.beginPath(); sctx.moveTo(cx-dir*L, ay); sctx.lineTo(cx+dir*L, ay); sctx.stroke();
+        sctx.beginPath();
+        sctx.moveTo(cx+dir*L, ay); sctx.lineTo(cx+dir*(L-9), ay-5); sctx.lineTo(cx+dir*(L-9), ay+5);
+        sctx.closePath(); sctx.fill();
+        sctx.strokeStyle = `rgba(218,227,239,${0.55*a2})`;
+        sctx.beginPath(); sctx.moveTo(cx-dir*L, ay-5); sctx.lineTo(cx-dir*L, ay+5); sctx.stroke();
+      } else {
+        const ax = side<0 ? mnx - sc*1.05 : mxx + sc*1.05;
+        const L = Math.min(halfY*0.9, sc*3) * Math.min(1, Math.abs(p)*1.4) + sc*0.35;
+        sctx.beginPath(); sctx.moveTo(ax, cy-dir*L); sctx.lineTo(ax, cy+dir*L); sctx.stroke();
+        sctx.beginPath();
+        sctx.moveTo(ax, cy+dir*L); sctx.lineTo(ax-5, cy+dir*(L-9)); sctx.lineTo(ax+5, cy+dir*(L-9));
+        sctx.closePath(); sctx.fill();
+        sctx.strokeStyle = `rgba(218,227,239,${0.55*a2})`;
+        sctx.beginPath(); sctx.moveTo(ax-5, cy-dir*L); sctx.lineTo(ax+5, cy-dir*L); sctx.stroke();
+      }
+    }
+    // Beschriftung
+    if (S.showLabels){
+      sctx.fillStyle="#7C8CA4";
+      sctx.font=`600 ${Math.max(11,sc*0.42)}px ui-monospace, Menlo, monospace`;
+      sctx.textAlign="center";
+      sctx.fillText("Molekül "+label, cx, mny - sc*1.20);
+    }
+  }
+  updateReadout(M);
+}
+
+function arrow(ctx,x,y,dir,color){
+  ctx.fillStyle=color;
+  ctx.beginPath();
+  ctx.moveTo(x, y); ctx.lineTo(x - dir*7, y-4); ctx.lineTo(x - dir*7, y+4);
+  ctx.closePath(); ctx.fill();
+}
+function tag(ctx,x,y,txt,color,alpha,sc){
+  ctx.font = `700 ${Math.max(12, sc*0.46)}px ui-monospace, Menlo, monospace`;
+  ctx.textAlign="center"; ctx.textBaseline="middle";
+  const wpad = ctx.measureText(txt).width/2 + 6;
+  ctx.fillStyle = `rgba(6,9,15,${0.8*alpha})`;
+  ctx.beginPath();
+  ctx.roundRect ? ctx.roundRect(x-wpad, y-11, wpad*2, 22, 6) : ctx.rect(x-wpad,y-11,wpad*2,22);
+  ctx.fill();
+  ctx.fillStyle = color; ctx.globalAlpha = alpha;
+  ctx.fillText(txt, x, y+1); ctx.globalAlpha = 1;
+  ctx.textBaseline="alphabetic";
+}
+
+/* ========== Zeichnen: Oszillogramm ========== */
+function drawScope(){
+  const {w,h} = PZ;
+  pctx.clearRect(0,0,w,h);
+  pctx.strokeStyle="rgba(30,42,60,.9)"; pctx.lineWidth=1;
+  pctx.beginPath(); pctx.moveTo(0,h/2); pctx.lineTo(w,h/2); pctx.stroke();
+  const line = (arr,color) => {
+    if (arr.length<2) return;
+    pctx.strokeStyle=color; pctx.lineWidth=1.8; pctx.beginPath();
+    for (let i=0;i<arr.length;i++){
+      const x = w*(i/(HIST_MAX-1));
+      const y = h/2 - arr[i]*(h/2-8);
+      i ? pctx.lineTo(x,y) : pctx.moveTo(x,y);
+    }
+    pctx.stroke();
+  };
+  line(HIST_B, "#FF9E42");
+  line(HIST_A, "#7B6BFF");
+}
+
+/* ========== Anzeige der Messwerte ========== */
+function updateReadout(M){
+  const n=S.n, br=S.branch;
+  const name = NAMES[br][n];
+  $("rName").textContent = name || "–";
+  $("rFormula").textContent = `C${sub(n)}H${sub(2*n+2)}`;
+  $("rEl").textContent = M.el;
+  $("rContact").textContent = M.contact.toFixed(2);
+  $("rStrength").textContent = M.strength.toFixed(0);
+  $("rBar").style.width = Math.min(100, M.strength) + "%";
+
+  const bp = BP[br][n];
+  const key = br+"-"+n;
+  $("rBp").textContent = (bp===null||bp===undefined) ? "–"
+    : (APPROX[key] ? "~" : "") + bp.toFixed(1).replace(".",",") + " °C";
+
+  const st = $("rState");
+  if (bp===null||bp===undefined){ st.textContent="–"; st.className="state"; }
+  else if (S.temp > bp){ st.textContent="gasförmig"; st.className="state gas"; }
+  else { st.textContent="kondensiert"; st.className="state cond"; }
+}
+
+/* ========== Physik-Loop ========== */
+const PH = [
+  {t:"Freilauf", x:"Die Elektronenwolken beider Moleküle fluktuieren fortlaufend. Achte auf das Oszillogramm: Molekül B folgt Molekül A mit geringer Verzögerung und entgegengesetztem Vorzeichen. Genau diese Korrelation der Fluktuationen erzeugt die Anziehung."},
+  {t:"1 · Zeitmittel", x:"Alkane sind unpolar: Im zeitlichen Mittel fallen Ladungsschwerpunkte der Elektronen und der Atomrümpfe zusammen. Es existiert kein permanenter Dipol – deshalb sind hier keine Teilladungen eingezeichnet."},
+  {t:"2 · Momentaner (temporärer) Dipol", x:"Die Elektronen bewegen sich statistisch. In einem Augenblick ist die Elektronendichte in Molekül A unsymmetrisch verteilt: Es entsteht ein momentaner Dipol mit einem partiell negativen und einem partiell positiven Molekülende. Molekül B ist zu diesem Zeitpunkt noch unpolarisiert."},
+  {t:"3 · Induzierter Dipol", x:"Das elektrische Feld des momentanen Dipols verschiebt die Elektronen im Nachbarmolekül B. Der induzierte Dipol richtet sich zwangsläufig so aus, dass sich ungleichnamige Teilladungen gegenüberstehen. Je leichter die Elektronenhülle verschiebbar ist – also je größer die Polarisierbarkeit –, desto stärker ist die Induktion."},
+  {t:"4 · Anziehung (London-Dispersionswechselwirkung)", x:"Die Coulomb-Anziehung zwischen den ungleichnamigen Teilladungen überwiegt die Abstoßung der gleichnamigen. Die Wechselwirkung ist umso stärker, je größer die Polarisierbarkeit (Elektronenzahl) und je größer die Kontaktfläche zwischen den Molekülen ist. Vergleiche dazu unverzweigte und verzweigte Isomere gleicher Summenformel."}
+];
+const AXISNOTE = {
+  quer:   " Anordnung Kopf-an-Schwanz: Die Dipolachsen liegen auf der Verbindungslinie A–B. Der induzierte Dipol ist dem momentanen Dipol gleichgerichtet (parallel); an der Kontaktfläche stehen sich δ+ und δ− gegenüber. Diese Anordnung ist energetisch etwa doppelt so günstig wie die seitliche.",
+  laengs: " Anordnung nebeneinander: Die Dipolachsen liegen parallel zur Kohlenstoffkette und damit quer zur Verbindungslinie A–B. Der induzierte Dipol ist dem momentanen Dipol entgegengerichtet (antiparallel); ungleichnamige Teilladungen stehen sich am oberen und am unteren Molekülende gegenüber. Das entspricht der Situation in einer Flüssigkeit mit parallel gelagerten Ketten."
+};
+function setPhaseText(){
+  $("exTitle").textContent = PH[S.phase].t;
+  $("exText").textContent = PH[S.phase].x
+    + ((S.phase === 0 || S.phase >= 3) ? AXISNOTE[S.axis] : "");
+}
+
+function step(){
+  const M = metrics(S.n, S.branch);
+
+  if (S.phase === 0){
+    S.t += 0.016 * S.speed;
+    const p = 0.58*Math.sin(S.t*1.9) + 0.30*Math.sin(S.t*4.3+1.1) + 0.24*Math.sin(S.t*1.1+2.7);
+    S.pA = Math.max(-1, Math.min(1, p/1.05));
+    BUF[bufIdx % BUF.length] = S.pA; bufIdx++;
+    const past = BUF[(bufIdx - 1 - DELAY + BUF.length) % BUF.length];
+    S.pB = indSign() * K_IND * past;
+  } else {
+    const q = indSign()*0.85*K_IND;
+    const targets = {1:[0,0], 2:[0.85,0], 3:[0.85,q], 4:[0.85,q]}[S.phase];
+    S.pA += (targets[0]-S.pA)*0.10;
+    S.pB += (targets[1]-S.pB)*0.10;
+    S.t += 0.016*0.5;
+  }
+
+  // Abstand: über dem Siedepunkt driften die Moleküle auseinander
+  const bp = BP[S.branch][S.n];
+  const wantGas = (bp !== null && bp !== undefined && S.temp > bp);
+  const targetGap = wantGas ? Math.min(4.2, 0.6 + (S.temp - bp)/40) : (S.phase===4 ? -0.18 : 0);
+  S.gapExtra += (targetGap - S.gapExtra)*0.05;
+
+  HIST_A.push(S.pA); HIST_B.push(S.pB);
+  if (HIST_A.length>HIST_MAX){ HIST_A.shift(); HIST_B.shift(); }
+
+  draw(); drawScope();
+  requestAnimationFrame(step);
+}
+
+/* ========== Bedienelemente ========== */
+$("sN").addEventListener("input", e => {
+  S.n = +e.target.value; $("vN").textContent = S.n; syncBranch();
+});
+function syncBranch(){
+  const btns = $("segBranch").querySelectorAll("button");
+  btns.forEach(b => {
+    const lvl = +b.dataset.b;
+    const ok = lvl===0 || (lvl===1 && S.n>=4) || (lvl===2 && S.n>=5);
+    b.disabled = !ok;
+    if (!ok && S.branch===lvl) S.branch = 0;
+  });
+  btns.forEach(b => b.setAttribute("aria-pressed", (+b.dataset.b===S.branch) ? "true":"false"));
+}
+$("segBranch").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b || b.disabled) return;
+  S.branch = +b.dataset.b; syncBranch();
+});
+$("segAxis").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  S.axis = b.dataset.a;
+  $("segAxis").querySelectorAll("button").forEach(x =>
+    x.setAttribute("aria-pressed", (x.dataset.a===S.axis)?"true":"false"));
+  setPhaseText();
+});
+$("segPhase").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  S.phase = +b.dataset.p;
+  $("segPhase").querySelectorAll("button").forEach(x =>
+    x.setAttribute("aria-pressed", (+x.dataset.p===S.phase)?"true":"false"));
+  setPhaseText();
+});
+$("sSpeed").addEventListener("input", e => {
+  S.speed = (+e.target.value)/100;
+  $("vSpeed").textContent = S.speed.toFixed(1).replace(".",",")+"×";
+});
+$("sT").addEventListener("input", e => {
+  S.temp = +e.target.value; $("vT").textContent = S.temp + " °C";
+});
+const bind = (id,key) => $(id).addEventListener("change", e => { S[key] = e.target.checked; });
+bind("cCloud","showCloud"); bind("cCharge","showCharge"); bind("cDipole","showDipole");
+bind("cLines","showLines"); bind("cLabels","showLabels");
+
+/* ========== Lesetexte ========== */
+const tabs = [["tabA","txtA"],["tabB","txtB"]];
+tabs.forEach(([tid,pid]) => {
+  $(tid).addEventListener("click", () => {
+    tabs.forEach(([t,p]) => {
+      const on = (t === tid);
+      $(t).setAttribute("aria-selected", on ? "true":"false");
+      $(p).hidden = !on;
+    });
+  });
+});
+document.querySelectorAll("[data-copy]").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const src = $(btn.dataset.copy).cloneNode(true);
+    src.querySelectorAll(".rfoot").forEach(n => n.remove());
+    const txt = src.innerText.replace(/\n{3,}/g,"\n\n").trim();
+    const old = btn.textContent;
+    try { await navigator.clipboard.writeText(txt); btn.textContent = "Kopiert"; }
+    catch { btn.textContent = "Kopieren nicht möglich"; }
+    setTimeout(() => { btn.textContent = old; }, 1800);
+  });
+});
+
+/* ========== Start ========== */
+resize(); syncBranch(); setPhaseText();
+$("segPhase").querySelectorAll("button").forEach(x =>
+  x.setAttribute("aria-pressed", (+x.dataset.p===S.phase)?"true":"false"));
+requestAnimationFrame(step);
+})();
+</script>
+</body>
+</html>
