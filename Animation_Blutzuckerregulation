@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regulation des Blutzuckerspiegels</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        .no-bold {
+            font-weight: 400 !important;
+        }
+
+        .card-header {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .card-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 500px;
+            transition-timing-function: ease-out;
+        }
+
+        .card-content.open {
+            max-height: 500px;
+        }
+
+        #animation-container {
+            position: relative;
+            height: 350px;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .blood-vessel {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background-color: #fee2e2;
+            transform: translateY(-50%);
+            border-top: 2px dashed #fca5a5;
+            border-bottom: 2px dashed #fca5a5;
+            z-index: 1;
+        }
+
+        .organ-area {
+            position: absolute;
+            padding: 10px;
+            border-radius: 8px;
+            z-index: 2;
+        }
+
+        .pancreas-area {
+            top: 20px;
+            left: 20px;
+            background-color: #fef3c7;
+            border: 1px solid #fcd34d;
+        }
+
+        .liver-muscle-area {
+            bottom: 20px;
+            right: 20px;
+            background-color: #dcfce7;
+            border: 1px solid #86efac;
+            width: 180px;
+            text-align: center;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .glucose { background-color: #fbbf24; width: 8px; height: 8px; }
+        .insulin { background-color: #3b82f6; width: 6px; height: 6px; }
+        .glucagon { background-color: #ef4444; width: 6px; height: 6px; }
+
+        .organ-label {
+            font-size: 0.75rem;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl text-slate-800 mb-2 no-bold">Regulation des Blutzuckerspiegels</h1>
+            <p class="text-slate-600 no-bold">Simulation der hormonellen Steuerung mit verlangsamter Reaktionszeit.</p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div class="lg:col-span-3 space-y-6">
+                <div id="animation-container">
+                    <div class="blood-vessel flex items-center justify-center">
+                        <span class="organ-label opacity-40">Blutbahn</span>
+                    </div>
+                    
+                    <div class="organ-area pancreas-area">
+                        <span class="organ-label">Bauchspeicheldrüse</span>
+                    </div>
+
+                    <div class="organ-area liver-muscle-area">
+                        <span class="organ-label">Leber & Muskeln</span>
+                    </div>
+
+                    <div id="particles-layer" class="absolute inset-0 z-10"></div>
+                    
+                    <div class="absolute top-4 right-4 bg-white p-3 border border-slate-200 rounded shadow-sm z-20">
+                        <div class="text-xs text-slate-500 mb-1 no-bold">Aktueller Blutzucker</div>
+                        <div id="level-indicator" class="h-2 w-32 bg-slate-100 rounded-full overflow-hidden">
+                            <div id="level-bar" class="h-full bg-green-500 transition-all duration-500" style="width: 50%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 border border-slate-200 rounded-xl shadow-sm">
+                    <h2 class="text-sm text-slate-500 mb-2 no-bold">Verlauf (Zeitachse)</h2>
+                    <div class="h-64">
+                        <canvas id="bloodSugarChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-2 justify-center">
+                    <button onclick="triggerEvent('eat')" class="px-4 py-2 bg-amber-100 text-amber-800 border border-amber-200 rounded-lg hover:bg-amber-200 transition-colors no-bold text-sm">
+                        Mahlzeit
+                    </button>
+                    <button onclick="triggerEvent('sport')" class="px-4 py-2 bg-blue-100 text-blue-800 border border-blue-200 rounded-lg hover:bg-blue-200 transition-colors no-bold text-sm">
+                        Sport
+                    </button>
+                    <button onclick="triggerEvent('hyper')" class="px-4 py-2 bg-red-100 text-red-800 border border-red-200 rounded-lg hover:bg-red-200 transition-colors no-bold text-sm">
+                        Überzuckerung
+                    </button>
+                    <button onclick="triggerEvent('hypo')" class="px-4 py-2 bg-rose-100 text-rose-800 border border-rose-200 rounded-lg hover:bg-rose-200 transition-colors no-bold text-sm">
+                        Unterzuckerung
+                    </button>
+                    <button onclick="resetSim()" class="px-4 py-2 bg-slate-100 text-slate-800 border border-slate-200 rounded-lg hover:bg-slate-200 transition-colors no-bold text-sm">
+                        Reset
+                    </button>
+                </div>
+                
+                <div id="status-message" class="text-center text-sm text-slate-500 italic h-6 no-bold">
+                    System bereit...
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                    <div class="card-header p-3 bg-slate-50 hover:bg-slate-100" onclick="toggleCard('card-delay')">
+                        <div class="text-slate-700 text-sm no-bold">Zeitliche Verzögerung</div>
+                    </div>
+                    <div id="card-delay" class="card-content">
+                        <div class="p-3 text-xs leading-relaxed text-slate-600 no-bold">
+                            Die Regulation geschieht nicht sofort. Hormone müssen erst gebildet, über das Blut verteilt und an Rezeptoren gebunden werden. Dies führt zu den charakteristischen Kurvenverläufen.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                    <div class="card-header p-3 bg-slate-50 hover:bg-slate-100" onclick="toggleCard('card-insulin')">
+                        <div class="text-blue-700 text-sm no-bold">Das Hormon Insulin</div>
+                    </div>
+                    <div id="card-insulin" class="card-content">
+                        <div class="p-3 text-xs leading-relaxed text-slate-600 no-bold">
+                            Insulin wird in den Beta-Zellen der Bauchspeicheldrüse produziert. Es wirkt wie ein Schlüssel, der die Körperzellen für Glukose öffnet. Dadurch sinkt die Konzentration des Zuckers im Blut. In der Leber wird überschüssige Glukose als Glykogen gespeichert.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                    <div class="card-header p-3 bg-slate-50 hover:bg-slate-100" onclick="toggleCard('card-glucagon')">
+                        <div class="text-red-700 text-sm no-bold">Das Hormon Glucagon</div>
+                    </div>
+                    <div id="card-glucagon" class="card-content">
+                        <div class="p-3 text-xs leading-relaxed text-slate-600 no-bold">
+                            Glucagon ist der Gegenspieler von Insulin und wird in den Alpha-Zellen der Bauchspeicheldrüse gebildet. Wenn der Blutzuckerspiegel zu niedrig ist, regt es die Leber dazu an, das gespeicherte Glykogen wieder in Glukose umzuwandeln und ins Blut abzugeben.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-rose-100 rounded-xl shadow-sm overflow-hidden">
+                    <div class="card-header p-3 bg-rose-50 hover:bg-rose-100" onclick="toggleCard('card-states')">
+                        <div class="text-rose-800 text-sm no-bold">Gefahrenzustände</div>
+                    </div>
+                    <div id="card-states" class="card-content">
+                        <div class="p-3 text-xs leading-relaxed text-slate-600 no-bold">
+                            Hyperglykämie (Überzuckerung) schädigt langfristig Gefäße und Organe. Hypoglykämie (Unterzuckerung) führt zu Energiemangel im Gehirn, was Zittern oder Bewusstlosigkeit verursachen kann.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let glucoseLevel = 50; 
+        let insulinLevel = 0;
+        let glucagonLevel = 0;
+        const container = document.getElementById('particles-layer');
+        const levelBar = document.getElementById('level-bar');
+        const statusMsg = document.getElementById('status-message');
+        let particles = [];
+        let chart;
+        
+        let glucoseHistory = Array(120).fill(50);
+        let insulinHistory = Array(120).fill(0);
+        let glucagonHistory = Array(120).fill(0);
+        let chartLabels = Array(120).fill('');
+
+        function initChart() {
+            const ctx = document.getElementById('bloodSugarChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartLabels,
+                    datasets: [
+                        {
+                            label: 'Blutzucker',
+                            data: glucoseHistory,
+                            borderColor: '#22c55e',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Insulin',
+                            data: insulinHistory,
+                            borderColor: '#3b82f6',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Glucagon',
+                            data: glucagonHistory,
+                            borderColor: '#ef4444',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { min: 0, max: 100, grid: { color: '#f1f5f9' } },
+                        x: { display: false }
+                    },
+                    plugins: { 
+                        legend: { 
+                            display: true,
+                            labels: { boxWidth: 10, font: { size: 10, family: 'Inter' } }
+                        } 
+                    },
+                    animation: { duration: 0 }
+                }
+            });
+        }
+
+        class Particle {
+            constructor(type) {
+                this.type = type;
+                this.initPosition();
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.speedY = (Math.random() - 0.5) * 0.4;
+                this.element = document.createElement('div');
+                this.element.className = `particle ${type}`;
+                container.appendChild(this.element);
+            }
+
+            initPosition() {
+                if (this.type === 'insulin' || this.type === 'glucagon') {
+                    this.x = 10 + Math.random() * 10;
+                    this.y = 10 + Math.random() * 10;
+                } else {
+                    this.x = Math.random() * 100;
+                    this.y = Math.random() * 100;
+                }
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > 100) this.speedX *= -1;
+                if (this.y < 0 || this.y > 100) this.speedY *= -1;
+                this.element.style.left = `${this.x}%`;
+                this.element.style.top = `${this.y}%`;
+            }
+
+            remove() { this.element.remove(); }
+        }
+
+        function toggleCard(id) {
+            const content = document.getElementById(id);
+            const isOpen = content.classList.contains('open');
+            document.querySelectorAll('.card-content').forEach(c => c.classList.remove('open'));
+            if (!isOpen) content.classList.add('open');
+        }
+
+        function createParticles(type, count) {
+            for (let i = 0; i < count; i++) particles.push(new Particle(type));
+        }
+
+        function updateSimulation() {
+            particles.forEach(p => p.update());
+            
+            let targetInsulin = Math.max(0, (glucoseLevel - 50) * 1.5);
+            let targetGlucagon = Math.max(0, (50 - glucoseLevel) * 1.5);
+
+            insulinLevel += (targetInsulin - insulinLevel) * 0.01;
+            glucagonLevel += (targetGlucagon - glucagonLevel) * 0.01;
+
+            if (glucoseLevel > 50.2) {
+                glucoseLevel -= (insulinLevel * 0.003 + 0.005);
+                if (Math.random() > 0.99) removeRandomParticle('glucose');
+            } else if (glucoseLevel < 49.8) {
+                glucoseLevel += (glucagonLevel * 0.003 + 0.005);
+                if (Math.random() > 0.99) createParticles('glucose', 1);
+            }
+
+            levelBar.style.width = `${glucoseLevel}%`;
+            let color = '#22c55e';
+            if (glucoseLevel > 80 || glucoseLevel < 20) color = '#ef4444';
+            else if (glucoseLevel > 70 || glucoseLevel < 30) color = '#f59e0b';
+            levelBar.style.backgroundColor = color;
+
+            requestAnimationFrame(updateSimulation);
+        }
+
+        setInterval(() => {
+            if (chart) {
+                glucoseHistory.push(glucoseLevel);
+                glucoseHistory.shift();
+                insulinHistory.push(insulinLevel);
+                insulinHistory.shift();
+                glucagonHistory.push(glucagonLevel);
+                glucagonHistory.shift();
+                chart.update();
+            }
+        }, 250);
+
+        function removeRandomParticle(type) {
+            const idx = particles.findIndex(p => p.type === type);
+            if (idx !== -1) {
+                particles[idx].remove();
+                particles.splice(idx, 1);
+            }
+        }
+
+        function clearHormones() {
+            particles = particles.filter(p => {
+                if (p.type === 'insulin' || p.type === 'glucagon') {
+                    p.remove();
+                    return false;
+                }
+                return true;
+            });
+        }
+
+        function triggerEvent(event) {
+            clearHormones();
+            if (event === 'eat') {
+                glucoseLevel = Math.min(95, glucoseLevel + 40);
+                statusMsg.textContent = "Zuckeraufnahme. Das System reagiert langsam auf den Anstieg.";
+                createParticles('glucose', 25);
+            } else if (event === 'sport') {
+                glucoseLevel = Math.max(5, glucoseLevel - 40);
+                statusMsg.textContent = "Hoher Energieverbrauch. Mobilisierung von Reserven wird eingeleitet.";
+                particles = particles.filter(p => {
+                    if (p.type === 'glucose' && Math.random() > 0.5) { p.remove(); return false; }
+                    return true;
+                });
+            } else if (event === 'hyper') {
+                glucoseLevel = 98;
+                statusMsg.textContent = "Anhaltende Überzuckerung.";
+                createParticles('glucose', 40);
+            } else if (event === 'hypo') {
+                glucoseLevel = 5;
+                statusMsg.textContent = "Anhaltende Unterzuckerung.";
+                particles = particles.filter(p => {
+                    if (p.type === 'glucose') { p.remove(); return false; }
+                    return true;
+                });
+                createParticles('glucose', 2);
+            }
+        }
+
+        function resetSim() {
+            particles.forEach(p => p.remove());
+            particles = [];
+            glucoseLevel = 50;
+            insulinLevel = 0;
+            glucagonLevel = 0;
+            glucoseHistory.fill(50);
+            insulinHistory.fill(0);
+            glucagonHistory.fill(0);
+            createParticles('glucose', 20);
+            statusMsg.textContent = "System zurückgesetzt.";
+        }
+
+        window.onload = () => {
+            initChart();
+            createParticles('glucose', 20);
+            updateSimulation();
+        };
+    </script>
+</body>
+</html>
