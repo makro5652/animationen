@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Negative Rückkopplung - Schilddrüsenregelkreis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: sans-serif;
+        }
+        .organ-box {
+            border: 2px solid #64748b;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            background-color: white;
+            text-align: center;
+            width: 200px;
+            position: relative;
+            z-index: 10;
+        }
+        .hormone {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            z-index: 5;
+            pointer-events: none;
+        }
+        .trh { background-color: #ef4444; }
+        .tsh { background-color: #f59e0b; }
+        .t4 { background-color: #3b82f6; }
+        
+        #animation-container {
+            height: 600px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .arrow-line {
+            position: absolute;
+            background-color: #cbd5e1;
+            z-index: 1;
+        }
+        
+        .inhibition-line {
+            position: absolute;
+            border: 2px dashed #ef4444;
+            border-radius: 50% 0 0 50%;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body class="p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-2xl mb-4 text-slate-800">Animation: Negative Rückkopplung der Schilddrüse</h1>
+        
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-6">
+            <p class="text-slate-600 mb-4">
+                Dieses Modell zeigt, wie der Körper die Konzentration von Schilddrüsenhormonen stabil hält. 
+                Steigt der Spiegel von T4 (blau) zu stark an, hemmt dies die Produktion der Steuerhormone im Hypothalamus und in der Hypophyse.
+            </p>
+            
+            <div class="flex gap-4 mb-6">
+                <button onclick="toggleInhibition()" id="btn-toggle" class="px-4 py-2 bg-slate-700 text-white rounded hover:bg-slate-800 transition">
+                    Simulation starten
+                </button>
+                <button onclick="resetSim()" class="px-4 py-2 border border-slate-300 rounded hover:bg-slate-50 transition">
+                    Reset
+                </button>
+            </div>
+        </div>
+
+        <div id="animation-container" class="bg-white rounded-xl border border-slate-200 shadow-inner flex flex-col items-center justify-between py-10">
+            
+            <!-- Hypothalamus -->
+            <div id="hypothalamus" class="organ-box">
+                Hypothalamus
+                <div class="text-xs text-slate-500 mt-1">Produziert TRH</div>
+            </div>
+
+            <!-- Hypophyse -->
+            <div id="hypophyse" class="organ-box">
+                Hypophyse
+                <div class="text-xs text-slate-500 mt-1">Produziert TSH</div>
+            </div>
+
+            <!-- Schilddrüse -->
+            <div id="schilddruese" class="organ-box">
+                Schilddrüse
+                <div class="text-xs text-slate-500 mt-1">Produziert T4</div>
+            </div>
+
+            <!-- Feedback Label -->
+            <div id="feedback-label" class="absolute left-10 top-1/2 -translate-y-1/2 opacity-0 transition-opacity text-red-600 text-sm font-medium">
+                Negative Rückkopplung:<br>T4 hemmt die Ausschüttung
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isActive = false;
+        let animationFrame;
+        const container = document.getElementById('animation-container');
+        const feedbackLabel = document.getElementById('feedback-label');
+        
+        const positions = {
+            hypothalamus: document.getElementById('hypothalamus'),
+            hypophyse: document.getElementById('hypophyse'),
+            schilddruese: document.getElementById('schilddruese')
+        };
+
+        function createHormone(type, startEl, endEl, speed = 2) {
+            const startRect = startEl.getBoundingClientRect();
+            const endRect = endEl.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+
+            const hormone = document.createElement('div');
+            hormone.className = `hormone ${type}`;
+            
+            let startX = (startRect.left + startRect.width / 2) - containerRect.left;
+            let startY = (startRect.bottom) - containerRect.top;
+            let endY = (endRect.top) - containerRect.top;
+
+            // Für T4 Rückkopplung (Schilddrüse -> Hypothalamus)
+            if (type === 't4') {
+                startX = (startRect.left) - containerRect.left;
+                startY = (startRect.top + startRect.height / 2) - containerRect.top;
+                endY = (positions.hypothalamus.getBoundingClientRect().top + 20) - containerRect.top;
+            }
+
+            hormone.style.left = `${startX}px`;
+            hormone.style.top = `${startY}px`;
+            container.appendChild(hormone);
+
+            let currentY = startY;
+            
+            function move() {
+                if (!isActive) {
+                    hormone.remove();
+                    return;
+                }
+
+                if (type === 't4') {
+                    // T4 bewegt sich nach oben und nach links (Rückkopplungsschleife)
+                    currentY -= speed;
+                    const progress = (startY - currentY) / (startY - endY);
+                    const curve = Math.sin(progress * Math.PI) * 100;
+                    hormone.style.left = `${startX - curve}px`;
+                    hormone.style.top = `${currentY}px`;
+
+                    if (currentY <= endY) {
+                        hormone.remove();
+                        triggerInhibitionVisual();
+                    } else {
+                        requestAnimationFrame(move);
+                    }
+                } else {
+                    currentY += speed;
+                    hormone.style.top = `${currentY}px`;
+
+                    if (currentY >= endY) {
+                        hormone.remove();
+                        // Trigger nächstes Hormon
+                        if (type === 'trh') spawnHormone('tsh');
+                        if (type === 'tsh') spawnHormone('t4');
+                    } else {
+                        requestAnimationFrame(move);
+                    }
+                }
+            }
+            requestAnimationFrame(move);
+        }
+
+        let lastT4Time = 0;
+        let inhibitionActive = false;
+
+        function spawnHormone(type) {
+            if (!isActive) return;
+            
+            // Wenn Hemmung aktiv, spawnen TRH und TSH seltener
+            if (inhibitionActive && (type === 'trh' || type === 'tsh')) {
+                if (Math.random() > 0.3) return;
+            }
+
+            if (type === 'trh') createHormone('trh', positions.hypothalamus, positions.hypophyse);
+            if (type === 'tsh') createHormone('tsh', positions.hypophyse, positions.schilddruese);
+            if (type === 't4') createHormone('t4', positions.schilddruese, positions.hypothalamus, 1.5);
+        }
+
+        function triggerInhibitionVisual() {
+            inhibitionActive = true;
+            feedbackLabel.style.opacity = '1';
+            setTimeout(() => {
+                inhibitionActive = false;
+                feedbackLabel.style.opacity = '0';
+            }, 2000);
+        }
+
+        function toggleInhibition() {
+            isActive = !isActive;
+            const btn = document.getElementById('btn-toggle');
+            btn.textContent = isActive ? 'Simulation stoppen' : 'Simulation starten';
+            
+            if (isActive) {
+                mainLoop();
+            }
+        }
+
+        function mainLoop() {
+            if (!isActive) return;
+            spawnHormone('trh');
+            setTimeout(mainLoop, 2000);
+        }
+
+        function resetSim() {
+            isActive = false;
+            inhibitionActive = false;
+            document.getElementById('btn-toggle').textContent = 'Simulation starten';
+            document.querySelectorAll('.hormone').forEach(h => h.remove());
+            feedbackLabel.style.opacity = '0';
+        }
+    </script>
+</body>
+</html>
