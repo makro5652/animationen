@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unterrichts-Animationen Chemie &amp; Biologie</title>
+<style>
+  :root {
+    --ink: #06090F;
+    --panel: #0D131E;
+    --panel2: #111A28;
+    --line: #1E2A3C;
+    --txt: #DAE3EF;
+    --dim: #7C8CA4;
+    --cloud: #7B6BFF;
+    --neg: #31D8C0;
+    --pos: #FF9E42;
+    --bio: #4EBE6D;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: radial-gradient(1200px 700px at 20% -10%, #101A2B 0%, transparent 60%), var(--ink);
+    color: var(--txt);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 40px 20px 60px; }
+  header { border-bottom: 1px solid var(--line); padding-bottom: 20px; margin-bottom: 30px; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .2em;
+    text-transform: uppercase; color: var(--dim); margin: 0 0 8px;
+  }
+  h1 { font-size: clamp(24px, 4vw, 36px); margin: 0 0 10px; font-weight: 700; letter-spacing: -.02em; }
+  h1 span { color: var(--cloud); }
+  .sub { color: var(--dim); margin: 0; max-width: 65ch; font-size: 15px; }
+
+  .section-title {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin: 35px 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    transition: transform .15s ease, border-color .15s ease, background-color .15s ease;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    border-color: #33445E;
+    background: var(--panel2);
+  }
+  .tag {
+    align-self: flex-start;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--neg);
+    background: rgba(49, 216, 192, 0.1);
+    border: 1px solid rgba(49, 216, 192, 0.2);
+    padding: 3px 7px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+  }
+  .tag.atom { color: var(--pos); background: rgba(255, 158, 66, 0.1); border-color: rgba(255, 158, 66, 0.2); }
+  .tag.bio { color: var(--bio); background: rgba(78, 190, 109, 0.1); border-color: rgba(78, 190, 109, 0.2); }
+  .tag.tool { color: var(--cloud); background: rgba(123, 107, 255, 0.1); border-color: rgba(123, 107, 255, 0.2); }
+
+  .card h2 { margin: 0 0 6px; font-size: 16.5px; color: var(--txt); }
+  .card p { margin: 0; color: var(--dim); font-size: 13px; line-height: 1.45; }
+  .card .arrow {
+    margin-top: auto;
+    padding-top: 14px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--cloud);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Sammlung &amp; Materialien</p>
+    <h1>Interaktive <span>Animationen</span></h1>
+    <p class="sub">Interaktive Modelle, Simulationen und Unterrichtswerkzeuge für Chemie und Biologie.</p>
+  </header>
+
+  <div class="section-title">Atommodelle &amp; Bindungskräfte</div>
+  <div class="grid">
+    <a href="schalenmodell.html" class="card">
+      <span class="tag atom">Atomaufbau · PSE</span>
+      <h2>Bohrsches Schalenmodell</h2>
+      <p>Elektronenkonfiguration und Schalenbesetzung der Hauptenergieniveaus.</p>
+      <span class="arrow">Modell öffnen &rarr;</span>
+    </a>
+
+    <a href="Teilchenmodell_Anziehung.html" class="card">
+      <span class="tag">Simulation</span>
+      <h2>Teilchen- &amp; Gitter-Simulation</h2>
+      <p>Modellierung der Anziehungskräfte zwischen Teilchen und Gitterstrukturen.</p>
+      <span class="arrow">Modell öffnen &rarr;</span>
+    </a>
+
+    <a href="van-der-waals-modell.html" class="card">
+      <span class="tag">Bindungskräfte · Alkane</span>
+      <h2>Van-der-Waals-Wechselwirkungen</h2>
+      <p>Momentane und induzierte Dipole, Kettenlänge, Verzweigung und Siedepunkte.</p>
+      <span class="arrow">Modell öffnen &rarr;</span>
+    </a>
+
+    <a href="strukturformel-editor.html" class="card">
+      <span class="tag tool">Werkzeug</span>
+      <h2>Strukturformel-Editor</h2>
+      <p>Interaktiver Editor zum Erstellen und Zeichnen organischer Moleküle.</p>
+      <span class="arrow">Editor öffnen &rarr;</span>
+    </a>
+  </div>
+
+  <div class="section-title">Reaktionsmechanismen &amp; Kinetik</div>
+  <div class="grid">
+    <a href="Stoßtheorie_Animation.html" class="card">
+      <span class="tag">Reaktionskinetik</span>
+      <h2>Stoßtheorie</h2>
+      <p>Wirksame und unwirksame Zusammenstöße von Teilchen sowie Aktivierungsenergie.</p>
+      <span class="arrow">Modell öffnen &rarr;</span>
+    </a>
+  </div>
+
+  <div class="section-title">Redoxreaktionen, Gleichgewicht &amp; Säure-Base</div>
+  <div class="grid">
+    <a href="redox_elektronenuebergang_jgst9_v3.html" class="card">
+      <span class="tag">Redoxreaktion</span>
+      <h2>Redoxreaktion</h2>
+      <p>Elektronenübertragung und Ionenbildung.</p>
+      <span class="arrow">Modell öffnen &rarr;</span>
+    </a>
+
+    <a href="Elektrolyse_klasse9.html" class="card">
+      <span class="tag">Redoxreaktion</span>
+      <h2>Elektrolyse</h2>
+      <p>Erzwungene Redoxreaktion durch Anlegen einer elektrischen Spannung.</p>
+      <span class="arrow">Modell öffnen &rarr;</span>
+    </a>
+
+    <a href="GGW_Veresterung_Stoßtheorie.html" class="card">
+      <span class="tag">Chemisches Gleichgewicht</span>
+      <h2>Veresterung &amp; Gleichgewicht</h2>
+      <p>Veresterungsreaktion auf Teilchenebene und dynamisches Gleichgewicht.</p>
+      <span class="arrow">Modell öffnen &rarr;</span>
+    </a>
+
+    <a href="GGW_Veresterung_Stoßtheorie_Temperatur.html" class="card">
+      <span class="tag">Chemisches Gleichgewicht</span>
+      <h2>Veresterung (Temperaturregler)</h2>
+      <p>Erweiterte Veresterungsreaktion auf Teilchenebene inklusive Temperatursteuerung.</p>
+      <span class="arrow">Modell öffnen &rarr;</span>
+    </a>
+
+    <a href="Animation_Protolyse_HCL_in_Wasser.html" class="card">
+      <span class="tag">Säure-Base</span>
+      <h2>Protolyse: HCl in Wasser</h2>
+      <p>Protonenübertragung und Bildung von Hydronium- und Chlorid-Ionen.</p>
+      <span class="arrow">Modell öffnen &rarr;</span>
+    </a>
+  </div>
+
+  <div class="section-title">Nachweisreaktionen</div>
+  <div class="grid">
+    <a href="Animation_Fehling_Probe.html" class="card">
+      <span class="tag">Organische Analytik</span>
+      <h2>Fehling-Probe</h2>
+      <p>Redoxreaktion zum Nachweis von Aldehyden und reduzierenden Zuckern.</p>
+      <span class="arrow">Modell öffnen &rarr;</span>
+    </a>
+
+    <a href="Animation_Fehling_Probe_v2.html" class="card">
+      <span class="tag">Organische Analytik</span>
+      <h2>Fehling-Probe (Version 2)</h2>
+      <p>Erweiterte bzw. alternative Darstellung der Fehling-Reaktion.</p>
+      <span class="arrow">Modell öffnen &rarr;</span>
+    </a>
+
+    <a href="Animation_Silberspiegel_Tollens_Probe.html" class="card">
+      <span class="tag">Organische Analytik</span>
+      <h2>Tollens-Probe (Silberspiegel)</h2>
+      <p>Silberspiegel-Nachweis von reduzierenden Carbonylverbindungen.</p>
+      <span class="arrow">Modell öffnen &rarr;</span>
+    </a>
+  </div>
+
+  <div class="section-title">Biologie, Cytologie &amp; Regulation</div>
+  <div class="grid">
+    <a href="Membranfluss.html" class="card">
+      <span class="tag bio">Cytologie</span>
+      <h2>Membranfluss</h2>
+      <p>Vesikeltransport, Endozytose, Exozytose und das Zusammenspiel der Zellorganellen (ER, Golgi-Apparat).</p>
+      <span class="arrow">Modell öffnen &rarr;</span>
+    </a>
+
+    <a href="Animation_Blutzuckerregulation.html" class="card">
+      <span class="tag bio">Physiologie</span>
+      <h2>Blutzuckerregulation</h2>
+      <p>Zusammenspiel von Insulin und Glukagon zur Homöostase des Glucosewertes.</p>
+      <span class="arrow">Modell öffnen &rarr;</span>
+    </a>
+
+    <a href="negative_Rückkopplung_full.html" class="card">
+      <span class="tag bio">Regelkreise</span>
+      <h2>Negative Rückkopplung (Full)</h2>
+      <p>Vollständige Darstellung der negativen Rückkopplung.</p>
+      <span class="arrow">Modell öffnen &rarr;</span>
+    </a>
+
+    <a href="negative_Rückkopplung_min.html" class="card">
+      <span class="tag bio">Regelkreise</span>
+      <h2>Negative Rückkopplung (Min)</h2>
+      <p>Kompakte Darstellung der negativen Rückkopplung.</p>
+      <span class="arrow">Modell öffnen &rarr;</span>
+    </a>
+  </div>
+</div>
+</body>
+</html>
