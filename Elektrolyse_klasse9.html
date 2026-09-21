@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elektrolyse einer Natriumchlorid-Schmelze – Selbstlernmodul Chemie 9</title>
+<style>
+:root{
+  --paper:#E9ECF0; --card:#FFFFFF; --ink:#18222E; --muted:#5B6976; --line:#CBD3DB;
+  --stage:#152640; --elec:#F3C551; --accent:#0F6E75; --ok:#1F7A4D; --no:#B03A32;
+  --sans:"Inter","Segoe UI",system-ui,-apple-system,"Helvetica Neue",sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 80px}
+h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.25;margin:0}
+p{margin:0 0 .8em}
+p:last-child{margin-bottom:0}
+
+header{background:var(--stage);color:#EAF0F7;padding:38px 0 30px;margin-bottom:34px;border-bottom:4px solid var(--elec)}
+header .wrap{padding-bottom:0}
+h1{font-size:clamp(28px,4.4vw,40px);color:#fff;max-width:22ch}
+.kurs{font-size:14px;color:#9FB6D2;margin-bottom:10px}
+.ziel{margin-top:16px;max-width:62ch;color:#C6D5E6;font-size:16px}
+.ziel b{color:#fff;font-weight:600}
+
+section{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:26px;margin-bottom:22px}
+.sec-nr{font-family:var(--serif);font-size:15px;color:var(--accent);border-bottom:1px solid var(--line);padding-bottom:6px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.sec-nr span:last-child{color:var(--muted);font-family:var(--sans);font-size:13px}
+h2{font-size:24px;margin-bottom:12px}
+.lede{max-width:66ch}
+.hinweis{color:var(--muted);font-size:15px;max-width:66ch}
+
+.frage{margin-top:18px;max-width:70ch}
+.frage>p{font-weight:600;margin-bottom:10px}
+.opt{display:block;width:100%;text-align:left;font:inherit;color:inherit;background:#F7F9FB;border:1px solid var(--line);border-radius:5px;padding:11px 14px;margin-bottom:8px;cursor:pointer}
+.opt:hover{border-color:var(--accent);background:#F1F6F7}
+.opt:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.opt[disabled]{cursor:default}
+.opt.gewaehlt{border-color:var(--accent);background:#E7F1F2}
+.opt.richtig{border-color:var(--ok);background:#E9F4EE}
+.opt.falsch{border-color:var(--no);background:#FAEDEC}
+.echo{margin-top:10px;font-size:16px;padding:11px 14px;border-radius:5px;display:none}
+.echo.an{display:block}
+.echo.gut{background:#E9F4EE;border-left:4px solid var(--ok)}
+.echo.schlecht{background:#FAEDEC;border-left:4px solid var(--no)}
+.echo.neutral{background:#EEF1F4;border-left:4px solid var(--muted)}
+
+.buehne-raster{display:grid;grid-template-columns:1.4fr 1fr;gap:22px;margin-top:18px}
+@media(max-width:880px){.buehne-raster{grid-template-columns:1fr}}
+.buehne{background:var(--stage);border-radius:6px;overflow:hidden}
+svg{display:block;width:100%;height:auto}
+.steuerung{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px;background:#0F1E33}
+button.st{font:inherit;font-size:15px;color:#0F1E33;background:var(--elec);border:none;border-radius:4px;padding:9px 16px;cursor:pointer;font-weight:600}
+button.st.leise{background:#2E466B;color:#DCE7F4}
+button.st:hover{filter:brightness(1.08)}
+button.st:focus-visible{outline:3px solid var(--elec);outline-offset:2px}
+button.st[disabled]{opacity:.4;cursor:default;filter:none}
+.zaehler{color:#9FB6D2;font-size:14px;margin-left:auto;padding-right:4px}
+.schrittleiste{display:flex;gap:4px;padding:0 12px 12px;background:#0F1E33;flex-wrap:wrap}
+.schrittleiste button{font:inherit;font-size:13px;background:transparent;color:#7C96B8;border:1px solid #2E466B;border-radius:3px;padding:4px 9px;cursor:pointer}
+.schrittleiste button[aria-current="step"]{background:var(--elec);color:#0F1E33;border-color:var(--elec);font-weight:600}
+.schrittleiste button:focus-visible{outline:2px solid var(--elec);outline-offset:2px}
+
+.erklaerung{display:flex;flex-direction:column;gap:16px}
+.karte{border:1px solid var(--line);border-radius:5px;padding:16px 18px}
+.karte h3{font-size:19px;margin-bottom:8px}
+.karte p{font-size:16px}
+.symbolkarte{background:#F7F9FB}
+.gl{font-family:var(--serif);font-size:17px;margin:0 0 10px;opacity:.22;transition:opacity .5s;line-height:1.5}
+.gl.an{opacity:1}
+.gl small{display:block;font-family:var(--sans);font-size:13px;color:var(--muted)}
+.gl b{font-weight:600}
+.merk{background:#F1F6F7;border-left:4px solid var(--accent);border-radius:0 5px 5px 0;padding:14px 16px;opacity:.25;transition:opacity .5s}
+.merk.an{opacity:1}
+.merk strong{display:block;font-family:var(--serif);font-size:17px;margin-bottom:4px}
+.merk span{font-weight:600}
+
+.genauer{margin-top:16px;padding:12px 15px;background:#F1F6F7;border-left:4px solid var(--accent);border-radius:0 5px 5px 0;font-size:16px}
+
+details.wort,details.loesung{border:1px solid var(--line);border-radius:5px;background:#F7F9FB;margin-top:18px}
+details.wort summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:16px;list-style:none;display:flex;justify-content:space-between}
+details.wort summary::-webkit-details-marker{display:none}
+details.wort summary::after{content:"+";color:var(--accent);font-size:20px;line-height:1}
+details.wort[open] summary::after{content:"–"}
+details.wort .inhalt,details.loesung .inhalt{padding:0 16px 16px}
+dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:16px}
+dt{font-weight:600}
+dd{margin:0;color:var(--muted)}
+.bausteine{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.bausteine ul{margin:6px 0 0;padding-left:20px}
+.bausteine li{margin-bottom:5px;font-size:16px}
+
+textarea{width:100%;min-height:110px;font:inherit;font-size:16px;padding:12px;border:1px solid var(--line);border-radius:5px;background:#F7F9FB;color:var(--ink);resize:vertical}
+textarea:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+details.loesung{border:none;border-left:4px solid var(--accent);background:#F1F6F7;border-radius:0 5px 5px 0;margin-top:12px}
+details.loesung summary{cursor:pointer;padding:11px 14px;font-weight:600}
+details.loesung .gl{opacity:1;margin-bottom:6px}
+
+footer{color:var(--muted);font-size:14px;text-align:center;margin-top:34px}
+sup,sub{font-size:.72em}
+.ladung,.deposit-txt,.blase{transition:opacity .5s}
+.teilchen{transition:transform .9s ease-in-out}
+.efluss{transition:transform .9s ease-in-out, opacity .4s}
+@media (prefers-reduced-motion: reduce){*{transition-duration:.001ms !important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="kurs">Chemie · Jahrgangsstufe 9 · Selbstlernmodul</div>
+    <h1>Elektrolyse: eine Reaktion, die erzwungen wird</h1>
+    <p class="ziel">Wenn Natrium und Chlor zu Kochsalz reagieren, wird Energie frei. Bei der Elektrolyse läuft diese Reaktion <b>rückwärts</b> — aber nur, solange elektrische Energie zugeführt wird. Am Ende kannst du erklären, <b>wo</b> Oxidation und Reduktion stattfinden, <b>in welche Richtung</b> sich die Elektronen bewegen und <b>wie</b> die Ladung durch die Schmelze transportiert wird.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section>
+  <div class="sec-nr"><span>Schritt 1 von 4</span><span>Vorwissen</span></div>
+  <h2>Drei Fragen vorab</h2>
+  <p class="lede">Beantworte alle drei Fragen aus deinem Vorwissen. Die Auflösung erscheint erst nach dem letzten Animationsschritt.</p>
+
+  <div class="frage" id="f1">
+    <p>1. Festes Kochsalz leitet den elektrischen Strom nicht, geschmolzenes Kochsalz aber sehr gut. Woran liegt das?</p>
+    <button class="opt" data-v="a">In der Schmelze entstehen neue Elektronen.</button>
+    <button class="opt" data-v="b">In der Schmelze sind die Ionen frei beweglich.</button>
+    <button class="opt" data-v="c">Die Hitze macht das Salz zu einem Metall.</button>
+    <div class="echo" id="e1"></div>
+  </div>
+
+  <div class="frage" id="f2">
+    <p>2. Wie wird die elektrische Ladung <em>innerhalb</em> der Schmelze weitertransportiert?</p>
+    <button class="opt" data-v="a">Durch Elektronen, die durch die Schmelze schwimmen.</button>
+    <button class="opt" data-v="b">Durch Ionen, die sich zu den Elektroden bewegen.</button>
+    <button class="opt" data-v="c">Gar nicht — die Ladung springt durch die Luft.</button>
+    <div class="echo" id="e2"></div>
+  </div>
+
+  <div class="frage" id="f3">
+    <p>3. In welche Richtung bewegen sich die Elektronen in den Leitungen, sobald eine Spannung anliegt?</p>
+    <button class="opt" data-v="a">Vom Pluspol zum Minuspol.</button>
+    <button class="opt" data-v="b">Vom Minuspol zum Pluspol.</button>
+    <button class="opt" data-v="c">Gar nicht — sie bleiben an ihrem Platz.</button>
+    <div class="echo" id="e3"></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-nr"><span>Schritt 2 von 4</span><span>Die Elektrolysezelle</span></div>
+  <h2>Was in der Zelle geschieht</h2>
+  <p class="lede">Sechs Schritte. Gehe langsam vor und achte besonders darauf, wo sich Elektronen bewegen und wo sich Ionen bewegen — das ist nicht dasselbe.</p>
+
+  <div class="buehne-raster">
+    <div>
+      <div class="buehne">
+        <svg viewBox="0 0 640 470" role="img" aria-labelledby="svgt">
+          <title id="svgt">Elektrolysezelle mit Natriumchlorid-Schmelze: Natrium-Ionen bewegen sich zur Kathode und werden reduziert, Chlorid-Ionen bewegen sich zur Anode und werden oxidiert.</title>
+
+          <!-- Spannungsquelle -->
+          <g>
+            <rect x="262" y="26" width="116" height="40" rx="5" fill="#1E3352" stroke="#3D5C87" stroke-width="2"/>
+            <text x="320" y="52" text-anchor="middle" font-size="14" fill="#C6D5E6" font-family="Inter,sans-serif">Spannungsquelle</text>
+            <text x="250" y="52" text-anchor="middle" font-size="22" fill="#F3C551" font-family="Georgia,serif">–</text>
+            <text x="392" y="52" text-anchor="middle" font-size="22" fill="#F3C551" font-family="Georgia,serif">+</text>
+          </g>
+
+          <!-- Leitungen -->
+          <path id="pfadL" d="M255,46 H150 V126 H193 V150" fill="none" stroke="#3D5C87" stroke-width="4"/>
+          <path id="pfadR" d="M447,150 V126 H490 V46 H387" fill="none" stroke="#3D5C87" stroke-width="4"/>
+
+          <!-- Gefäß + Schmelze -->
+          <path d="M112,168 V400 Q112,416 128,416 H512 Q528,416 528,400 V168" fill="#1B3253" stroke="#4E6E96" stroke-width="3"/>
+          <line x1="112" y1="182" x2="528" y2="182" stroke="#4E6E96" stroke-width="2" stroke-dasharray="6 5"/>
+          <text x="520" y="406" text-anchor="end" font-size="13" fill="#7C96B8" font-family="Inter,sans-serif">Natriumchlorid-Schmelze, über 800 °C</text>
+
+          <!-- Elektroden -->
+          <rect x="180" y="150" width="26" height="220" rx="3" fill="#6E7A85" stroke="#8C99A5" stroke-width="1.5"/>
+          <rect x="434" y="150" width="26" height="220" rx="3" fill="#6E7A85" stroke="#8C99A5" stroke-width="1.5"/>
+          <text x="193" y="440" text-anchor="middle" font-size="14" fill="#C6D5E6" font-family="Inter,sans-serif">Kathode</text>
+          <text x="447" y="440" text-anchor="middle" font-size="14" fill="#C6D5E6" font-family="Inter,sans-serif">Anode</text>
+          <g id="polK" opacity="0" class="ladung">
+            <circle cx="193" cy="168" r="15" fill="#7FB6DE"/>
+            <text x="193" y="175" text-anchor="middle" font-size="20" font-family="Georgia,serif" fill="#0F1E33">–</text>
+          </g>
+          <g id="polA" opacity="0" class="ladung">
+            <circle cx="447" cy="168" r="15" fill="#F3C551"/>
+            <text x="447" y="174" text-anchor="middle" font-size="18" font-family="Georgia,serif" fill="#152640">+</text>
+          </g>
+
+          <!-- Elektronen in den Leitungen (schrittweise) -->
+          <g id="draht">
+            <g id="wl1" class="efluss" opacity="0" transform="translate(230,46)"><circle r="7" fill="#F3C551"/></g>
+            <g id="wl2" class="efluss" opacity="0" transform="translate(180,46)"><circle r="7" fill="#F3C551"/></g>
+            <g id="wl3" class="efluss" opacity="0" transform="translate(150,90)"><circle r="7" fill="#F3C551"/></g>
+            <g id="wr1" class="efluss" opacity="0" transform="translate(447,132)"><circle r="7" fill="#F3C551"/></g>
+            <g id="wr2" class="efluss" opacity="0" transform="translate(490,100)"><circle r="7" fill="#F3C551"/></g>
+            <g id="wr3" class="efluss" opacity="0" transform="translate(440,46)"><circle r="7" fill="#F3C551"/></g>
+          </g>
+
+          <!-- Dauerstrom (letzter Schritt) -->
+          <g id="fluss" style="display:none">
+            <circle r="7" fill="#F3C551"><animateMotion dur="3s" repeatCount="indefinite" begin="0s"><mpath href="#pfadL"/></animateMotion></circle>
+            <circle r="7" fill="#F3C551"><animateMotion dur="3s" repeatCount="indefinite" begin="-1s"><mpath href="#pfadL"/></animateMotion></circle>
+            <circle r="7" fill="#F3C551"><animateMotion dur="3s" repeatCount="indefinite" begin="-2s"><mpath href="#pfadL"/></animateMotion></circle>
+            <circle r="7" fill="#F3C551"><animateMotion dur="3s" repeatCount="indefinite" begin="0s"><mpath href="#pfadR"/></animateMotion></circle>
+            <circle r="7" fill="#F3C551"><animateMotion dur="3s" repeatCount="indefinite" begin="-1s"><mpath href="#pfadR"/></animateMotion></circle>
+            <circle r="7" fill="#F3C551"><animateMotion dur="3s" repeatCount="indefinite" begin="-2s"><mpath href="#pfadR"/></animateMotion></circle>
+          </g>
+
+          <!-- Ionen -->
+          <g id="na1" class="teilchen" transform="translate(255,225)"><circle r="17" fill="#B7A6D0" stroke="#8B78A8" stroke-width="2"/><text y="6" text-anchor="middle" font-family="Georgia,serif" font-size="16" fill="#152640">Na</text><g class="ladung"><circle cx="15" cy="-14" r="9" fill="#F3C551"/><text x="15" y="-9" text-anchor="middle" font-size="12" font-family="Georgia,serif" fill="#152640">+</text></g></g>
+          <g id="na2" class="teilchen" transform="translate(335,300)"><circle r="17" fill="#B7A6D0" stroke="#8B78A8" stroke-width="2"/><text y="6" text-anchor="middle" font-family="Georgia,serif" font-size="16" fill="#152640">Na</text><g class="ladung"><circle cx="15" cy="-14" r="9" fill="#F3C551"/><text x="15" y="-9" text-anchor="middle" font-size="12" font-family="Georgia,serif" fill="#152640">+</text></g></g>
+          <g id="na3" class="teilchen" transform="translate(392,360)"><circle r="17" fill="#B7A6D0" stroke="#8B78A8" stroke-width="2"/><text y="6" text-anchor="middle" font-family="Georgia,serif" font-size="16" fill="#152640">Na</text><g class="ladung"><circle cx="15" cy="-14" r="9" fill="#F3C551"/><text x="15" y="-9" text-anchor="middle" font-size="12" font-family="Georgia,serif" fill="#152640">+</text></g></g>
+          <g id="na4" class="teilchen" transform="translate(272,378)"><circle r="17" fill="#B7A6D0" stroke="#8B78A8" stroke-width="2"/><text y="6" text-anchor="middle" font-family="Georgia,serif" font-size="16" fill="#152640">Na</text><g class="ladung"><circle cx="15" cy="-14" r="9" fill="#F3C551"/><text x="15" y="-9" text-anchor="middle" font-size="12" font-family="Georgia,serif" fill="#152640">+</text></g></g>
+
+          <g id="cl1" class="teilchen" transform="translate(388,222)"><circle r="19" fill="#7BAE4E" stroke="#547E30" stroke-width="2"/><text y="6" text-anchor="middle" font-family="Georgia,serif" font-size="16" fill="#122008">Cl</text><g class="ladung"><circle cx="-16" cy="-15" r="9" fill="#7FB6DE"/><text x="-16" y="-10" text-anchor="middle" font-size="12" font-family="Georgia,serif" fill="#0F1E33">–</text></g></g>
+          <g id="cl2" class="teilchen" transform="translate(252,305)"><circle r="19" fill="#7BAE4E" stroke="#547E30" stroke-width="2"/><text y="6" text-anchor="middle" font-family="Georgia,serif" font-size="16" fill="#122008">Cl</text><g class="ladung"><circle cx="-16" cy="-15" r="9" fill="#7FB6DE"/><text x="-16" y="-10" text-anchor="middle" font-size="12" font-family="Georgia,serif" fill="#0F1E33">–</text></g></g>
+          <g id="cl3" class="teilchen" transform="translate(430,262)"><circle r="19" fill="#7BAE4E" stroke="#547E30" stroke-width="2"/><text y="6" text-anchor="middle" font-family="Georgia,serif" font-size="16" fill="#122008">Cl</text><g class="ladung"><circle cx="-16" cy="-15" r="9" fill="#7FB6DE"/><text x="-16" y="-10" text-anchor="middle" font-size="12" font-family="Georgia,serif" fill="#0F1E33">–</text></g></g>
+          <g id="cl4" class="teilchen" transform="translate(330,380)"><circle r="19" fill="#7BAE4E" stroke="#547E30" stroke-width="2"/><text y="6" text-anchor="middle" font-family="Georgia,serif" font-size="16" fill="#122008">Cl</text><g class="ladung"><circle cx="-16" cy="-15" r="9" fill="#7FB6DE"/><text x="-16" y="-10" text-anchor="middle" font-size="12" font-family="Georgia,serif" fill="#0F1E33">–</text></g></g>
+
+          <!-- Übertragene Elektronen -->
+          <g id="tk1" class="efluss" opacity="0" transform="translate(208,232)"><circle r="7" fill="#F3C551"/></g>
+          <g id="tk2" class="efluss" opacity="0" transform="translate(208,300)"><circle r="7" fill="#F3C551"/></g>
+          <g id="ta1" class="efluss" opacity="0" transform="translate(430,232)"><circle r="7" fill="#F3C551"/></g>
+          <g id="ta2" class="efluss" opacity="0" transform="translate(430,300)"><circle r="7" fill="#F3C551"/></g>
+
+          <!-- Chlorgas-Blase -->
+          <g id="blase" class="blase" opacity="0" transform="translate(404,204)">
+            <ellipse rx="30" ry="46" fill="none" stroke="#B9DCA0" stroke-width="2" stroke-dasharray="5 4"/>
+            <text y="-56" text-anchor="middle" font-size="14" fill="#B9DCA0" font-family="Inter,sans-serif">Cl₂ steigt auf</text>
+          </g>
+
+          <!-- Natrium-Abscheidung -->
+          <text id="natext" class="deposit-txt" opacity="0" x="252" y="404" font-size="13" fill="#DCE3EA" font-family="Inter,sans-serif">Natrium scheidet sich ab</text>
+        </svg>
+      </div>
+
+      <div class="steuerung">
+        <button class="st leise" id="zurueck">Zurück</button>
+        <button class="st" id="play">Abspielen</button>
+        <button class="st leise" id="vor">Weiter</button>
+        <span class="zaehler" id="zaehler"></span>
+      </div>
+      <div class="schrittleiste" id="leiste"></div>
+    </div>
+
+    <div class="erklaerung">
+      <div class="karte"><h3 id="titel"></h3><p id="text"></p></div>
+      <div class="merk" id="merk2">
+        <strong>Richtung der Elektronen</strong>
+        <p>Am Minuspol der Spannungsquelle herrscht Elektronen<span>überschuss</span>, am Pluspol Elektronen<span>mangel</span>. Elektronen sind negativ geladen, werden vom Minuspol also abgestoßen und vom Pluspol angezogen. In den Leitungen bewegen sie sich deshalb vom Minuspol zum Pluspol: von der Quelle zur Kathode und von der Anode zur Quelle zurück.</p>
+      </div>
+      <div class="merk" id="merk">
+        <strong>Merke</strong>
+        <p><span>Kat</span>ionen bewegen sich zur <span>Kat</span>hode, <span>An</span>ionen zur <span>An</span>ode.<br>
+        An der Anode findet die <span>Ox</span>idation statt, an der Kathode die <span>Red</span>uktion.</p>
+      </div>
+      <div class="karte symbolkarte">
+        <h3>Symbolebene</h3>
+        <p class="gl" id="gl-kat"><small>Kathode (Minuspol) – Reduktion</small>2 Na<sup>+</sup> + 2 e<sup>–</sup> &nbsp;&rarr;&nbsp; 2 Na</p>
+        <p class="gl" id="gl-an"><small>Anode (Pluspol) – Oxidation</small>2 Cl<sup>–</sup> &nbsp;&rarr;&nbsp; Cl<sub>2</sub> + 2 e<sup>–</sup></p>
+        <p class="gl" id="gl-ges"><small>Gesamtreaktion – nur mit Energiezufuhr</small><b>2 NaCl &nbsp;&rarr;&nbsp; 2 Na + Cl<sub>2</sub></b></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="echo" id="aufloesung"></div>
+
+  <p class="genauer">In der Technik läuft genau diese Elektrolyse in der sogenannten Downs-Zelle. Dort wird dem Kochsalz Calciumchlorid zugesetzt, damit die Schmelze schon bei etwa 580 °C statt bei 801 °C flüssig wird — das spart sehr viel Energie. Das entstehende Natrium ist bei dieser Temperatur flüssig, schwimmt oben auf und wird abgeschöpft. In der Animation ist es der Übersichtlichkeit halber an der Elektrode dargestellt.</p>
+
+  <details class="wort">
+    <summary>Wortspeicher</summary>
+    <div class="inhalt">
+      <dl>
+        <dt>die Schmelze</dt><dd>ein flüssiger Stoff, der vorher fest war</dd>
+        <dt>die Elektrode</dt><dd>ein Stab, über den der Strom in die Flüssigkeit gelangt</dd>
+        <dt>die Kathode</dt><dd>die Elektrode, an der die Reduktion stattfindet (hier der Minuspol)</dd>
+        <dt>die Anode</dt><dd>die Elektrode, an der die Oxidation stattfindet (hier der Pluspol)</dd>
+        <dt>das Kation</dt><dd>ein positiv geladenes Ion</dd>
+        <dt>das Anion</dt><dd>ein negativ geladenes Ion</dd>
+        <dt>gerichtet</dt><dd>in eine bestimmte Richtung, nicht ungeordnet</dd>
+        <dt>der Elektronenüberschuss</dt><dd>zu viele Elektronen an einer Stelle (Minuspol)</dd>
+        <dt>der Elektronenmangel</dt><dd>zu wenige Elektronen an einer Stelle (Pluspol)</dd>
+        <dt>abstoßen</dt><dd>wegdrücken – gleiche Ladungen stoßen sich ab</dd>
+        <dt>sich abscheiden</dt><dd>sich als neuer Stoff an der Elektrode sammeln</dd>
+        <dt>der Stromkreis</dt><dd>der geschlossene Weg, den die Ladung nimmt</dd>
+        <dt>erzwingen</dt><dd>etwas möglich machen, was von selbst nicht abläuft</dd>
+      </dl>
+      <div class="bausteine">
+        <strong>Satzbausteine für deine Erklärung</strong>
+        <ul>
+          <li>Die Natrium-Ionen sind positiv geladen. Deshalb bewegen sie sich zur Kathode.</li>
+          <li>In den Leitungen bewegen sich die Elektronen vom Minuspol zum Pluspol.</li>
+          <li>An der Kathode nimmt jedes Natrium-Ion ein Elektron auf. Dabei entsteht ein Natrium-Atom.</li>
+          <li>An der Anode gibt jedes Chlorid-Ion ein Elektron ab. Je zwei Chlor-Atome bilden ein Chlor-Molekül.</li>
+          <li>In der Leitung bewegen sich Elektronen, in der Schmelze bewegen sich Ionen.</li>
+          <li>Ohne Spannungsquelle läuft die Reaktion nicht ab, weil sie Energie braucht.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+</section>
+
+<section>
+  <div class="sec-nr"><span>Schritt 3 von 4</span><span>Prüfen</span></div>
+  <h2>Hast du es verstanden?</h2>
+  <div id="quiz"></div>
+</section>
+
+<section>
+  <div class="sec-nr"><span>Schritt 4 von 4</span><span>Übertragen</span></div>
+  <h2>Hin und zurück</h2>
+  <p class="lede">Verbrennt Natrium mit Chlor, wird Energie frei — die Reaktion läuft von selbst ab. Bei der Elektrolyse läuft dieselbe Reaktion rückwärts, aber nur mit Energiezufuhr.</p>
+  <p class="lede">Erkläre in eigenen Worten: Warum braucht die Elektrolyse ständig eine Spannungsquelle, während die Bildung von Kochsalz keine braucht? Was passiert, wenn man den Strom abschaltet?</p>
+  <textarea id="transfer" aria-label="Deine Antwort" placeholder="Schreibe hier deine Antwort."></textarea>
+  <details class="loesung">
+    <summary>Lösung ansehen (erst nach deinem eigenen Versuch)</summary>
+    <div class="inhalt">
+      <p>Bei der Bildung von Natriumchlorid führt der Elektronenübergang zu einem energieärmeren Zustand. Die Energiedifferenz wird als Licht und Wärme frei. Die Reaktion läuft deshalb ohne äußere Energiequelle ab.</p>
+      <p>Bei der Elektrolyse verläuft der Elektronenübergang in die entgegengesetzte Richtung, also energetisch bergauf. Die dafür erforderliche Energie liefert die Spannungsquelle. Schaltet man den Strom ab, endet die gerichtete Bewegung der Ionen zu den Elektroden und die Reaktion stoppt sofort. Die bereits entstandenen Stoffe bleiben erhalten — sie würden bei Kontakt allerdings sofort wieder zu Natriumchlorid reagieren, weshalb Natrium und Chlor in der Technik getrennt abgeführt werden.</p>
+    </div>
+  </details>
+</section>
+
+<footer>Selbstlernmodul Chemie 9 &middot; Deutsche Schule Nairobi</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+var $ = function(id){ return document.getElementById(id); };
+var wenigerBewegung = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* Positionen je Schritt: id -> [x, y, opacity] ; null = unverändert */
+var SCHRITTE = [
+{
+  kurz:"Aufbau", titel:"Der Aufbau",
+  text:"Im festen Kochsalz sitzen die Ionen fest im Gitter. Erst in der Schmelze sind sie frei beweglich. Zwei Elektroden aus Graphit tauchen in die Schmelze ein. Die Spannungsquelle ist noch ausgeschaltet: Die Ionen bewegen sich ungeordnet durcheinander.",
+  p:{ na1:[255,225,1], na2:[335,300,1], na3:[392,360,1], na4:[272,378,1],
+      cl1:[388,222,1], cl2:[252,305,1], cl3:[430,262,1], cl4:[330,380,1],
+      wl1:[230,46,0], wl2:[180,46,0], wl3:[150,90,0],
+      wr1:[447,132,0], wr2:[490,100,0], wr3:[440,46,0],
+      tk1:[208,232,0], tk2:[208,300,0], ta1:[430,232,0], ta2:[430,300,0],
+      polK:[0,0,0], polA:[0,0,0], blase:[404,204,0], natext:[0,0,0] },
+  gl:[], merk:false, fluss:false
+},
+{
+  kurz:"Spannung", titel:"Die Spannung wird angelegt",
+  text:"Am Minuspol der Spannungsquelle herrscht Elektronenüberschuss, am Pluspol Elektronenmangel. Elektronen sind negativ geladen: Der Minuspol stößt sie ab, der Pluspol zieht sie an. Deshalb bewegen sie sich in der linken Leitung vom Minuspol zur linken Elektrode. Diese wird dadurch negativ geladen und ist die Kathode. Aus der rechten Elektrode werden Elektronen zum Pluspol hin abgezogen; sie wird positiv geladen und ist die Anode. In der Schmelze bewegt sich bisher nichts gerichtet.",
+  p:{ wl1:[200,46,1], wl2:[150,66,1], wl3:[150,110,1],
+      wr1:[447,126,1], wr2:[490,80,1], wr3:[420,46,1],
+      polK:[0,0,1], polA:[0,0,1] },
+  gl:[], merk:false, fluss:false
+},
+{
+  kurz:"Ionenbewegung", titel:"Die gerichtete Ionenbewegung",
+  text:"Jetzt wirkt die Ladung der Elektroden auf die Ionen. Die positiv geladenen Natrium-Ionen werden von der negativ geladenen Kathode angezogen, die negativ geladenen Chlorid-Ionen von der positiv geladenen Anode. Vorher bewegten sich die Ionen ungeordnet, jetzt zusätzlich gerichtet. Genau diese gerichtete Bewegung der Ionen transportiert die Ladung durch die Schmelze. Elektronen sind daran nicht beteiligt.",
+  p:{ na1:[224,232,1], na2:[224,300,1], na3:[270,336,1], na4:[270,382,1],
+      cl1:[416,232,1], cl2:[416,300,1], cl3:[412,350,1], cl4:[412,392,1],
+      wl1:[170,46,1], wl2:[150,96,1], wl3:[178,126,1],
+      wr1:[460,126,1], wr2:[490,60,1], wr3:[400,46,1] },
+  gl:[], merk:true, fluss:false
+},
+{
+  kurz:"Kathode", titel:"An der Kathode: Reduktion",
+  text:"Jedes Natrium-Ion nimmt an der Kathode ein Elektron auf. Aus dem Ion Na⁺ wird wieder ein Natrium-Atom — es ist jetzt ungeladen und silbrig. Die Aufnahme von Elektronen heißt Reduktion. Die Kathode gibt die Elektronen ab, die ihr die Spannungsquelle geliefert hat.",
+  p:{ tk1:[212,232,1], tk2:[212,300,1],
+      wl1:[150,60,1], wl2:[160,126,1], wl3:[193,140,1] },
+  gl:["gl-kat"], merk:true, fluss:false, reduziert:true
+},
+{
+  kurz:"Anode", titel:"An der Anode: Oxidation",
+  text:"Jedes Chlorid-Ion gibt an der Anode sein zusätzliches Elektron ab. Aus Cl⁻ wird ein Chlor-Atom. Je zwei Chlor-Atome verbinden sich sofort zu einem Chlor-Molekül Cl₂, das als grünliches Gas aufsteigt. Die Abgabe von Elektronen heißt Oxidation. Die abgegebenen Elektronen fließen durch die Anode in die Leitung zurück.",
+  p:{ na1:[230,340,1], na2:[230,378,1],
+      tk1:[212,232,0], tk2:[212,300,0],
+      ta1:[434,232,1], ta2:[434,300,1],
+      cl1:[404,222,1], cl2:[404,254,1], cl3:[412,304,1], cl4:[412,352,1],
+      blase:[404,238,1], natext:[0,0,1],
+      wr1:[470,126,1], wr2:[490,56,1], wr3:[410,46,1] },
+  gl:["gl-kat","gl-an"], merk:true, fluss:false, oxidiert:true
+},
+{
+  kurz:"Stromkreis", titel:"Der geschlossene Stromkreis",
+  text:"Jetzt läuft alles gleichzeitig. In den Leitungen bewegen sich Elektronen vom Minuspol der Quelle zur Kathode und von der Anode zum Pluspol zurück — insgesamt also vom Minuspol zum Pluspol. In der Schmelze bewegen sich Ionen: die positiven nach links, die negativen nach rechts. Kein einziges Elektron durchquert die Schmelze. Erst beide Bewegungen zusammen schließen den Stromkreis. Nachrückende Ionen ersetzen die umgesetzten, solange Spannung anliegt.",
+  p:{ na3:[224,232,1], na4:[224,300,1],
+      cl3:[416,300,1], cl4:[416,352,1],
+      ta1:[434,232,0], ta2:[434,300,0],
+      cl1:[404,196,1], cl2:[404,228,1], blase:[404,212,1] },
+  gl:["gl-kat","gl-an","gl-ges"], merk:true, fluss:true, reduziert:true, oxidiert:true
+}
+];
+
+var IDS = ["na1","na2","na3","na4","cl1","cl2","cl3","cl4","wl1","wl2","wl3","wr1","wr2","wr3","tk1","tk2","ta1","ta2","polK","polA","blase","natext"];
+var i = 0, timer = null;
+
+function setze(id, w){
+  var e = $(id);
+  if(!e) return;
+  if(id !== "polK" && id !== "polA" && id !== "natext"){
+    e.setAttribute("transform","translate("+w[0]+","+w[1]+")");
+  }
+  e.setAttribute("opacity", w[2]);
+}
+
+function zustandBis(n){
+  var z = {};
+  IDS.forEach(function(id){ z[id] = null; });
+  for(var s=0; s<=n; s++){
+    var p = SCHRITTE[s].p;
+    for(var k in p){ if(p.hasOwnProperty(k)) z[k] = p[k]; }
+  }
+  return z;
+}
+
+function zeichne(n){
+  var s = SCHRITTE[n];
+  var z = zustandBis(n);
+  IDS.forEach(function(id){ if(z[id]) setze(id, z[id]); });
+
+  // Reduzierte Natrium-Teilchen: Ladung weg, metallische Farbe
+  var red = false, ox = false;
+  for(var q=0;q<=n;q++){ if(SCHRITTE[q].reduziert) red = true; if(SCHRITTE[q].oxidiert) ox = true; }
+  ["na1","na2"].forEach(function(id){
+    var g = $(id);
+    g.querySelector(".ladung").setAttribute("opacity", red ? 0 : 1);
+    g.querySelector("circle").setAttribute("fill", red ? "#D3D9DF" : "#B7A6D0");
+    g.querySelector("circle").setAttribute("stroke", red ? "#9AA4AE" : "#8B78A8");
+  });
+  ["cl1","cl2"].forEach(function(id){
+    $(id).querySelector(".ladung").setAttribute("opacity", ox ? 0 : 1);
+  });
+
+  ["gl-kat","gl-an","gl-ges"].forEach(function(g){ $(g).classList.toggle("an", s.gl.indexOf(g) > -1); });
+  $("merk").classList.toggle("an", !!s.merk);
+  $("merk2").classList.toggle("an", n >= 1);
+  $("fluss").style.display = (s.fluss && !wenigerBewegung) ? "" : "none";
+  $("draht").style.opacity = (s.fluss && !wenigerBewegung) ? 0 : 1;
+
+  $("titel").textContent = s.titel;
+  $("text").textContent = s.text;
+  $("zaehler").textContent = "Schritt "+(n+1)+" von "+SCHRITTE.length;
+  $("zurueck").disabled = (n === 0);
+  $("vor").disabled = (n === SCHRITTE.length-1);
+  var kn = $("leiste").querySelectorAll("button");
+  for(var m=0;m<kn.length;m++){
+    if(m === n) kn[m].setAttribute("aria-current","step"); else kn[m].removeAttribute("aria-current");
+  }
+  if(n === SCHRITTE.length-1) zeigeAufloesung();
+}
+
+function gehe(n){ i = Math.max(0, Math.min(SCHRITTE.length-1, n)); zeichne(i); }
+function stopp(){ if(timer){ clearInterval(timer); timer = null; $("play").textContent = "Abspielen"; } }
+
+SCHRITTE.forEach(function(s, n){
+  var b = document.createElement("button");
+  b.textContent = (n+1)+" "+s.kurz;
+  b.addEventListener("click", function(){ stopp(); gehe(n); });
+  $("leiste").appendChild(b);
+});
+$("vor").addEventListener("click", function(){ stopp(); gehe(i+1); });
+$("zurueck").addEventListener("click", function(){ stopp(); gehe(i-1); });
+$("play").addEventListener("click", function(){
+  if(timer){ stopp(); return; }
+  if(i === SCHRITTE.length-1) gehe(0);
+  $("play").textContent = "Pause";
+  timer = setInterval(function(){
+    if(i >= SCHRITTE.length-1){ stopp(); return; }
+    gehe(i+1);
+  }, 4200);
+});
+
+/* Vorwissensfragen */
+var antw = {f1:null, f2:null, f3:null};
+[["f1","e1"],["f2","e2"],["f3","e3"]].forEach(function(paar){
+  var box = $(paar[0]), echo = $(paar[1]);
+  Array.prototype.forEach.call(box.querySelectorAll(".opt"), function(b){
+    b.addEventListener("click", function(){
+      Array.prototype.forEach.call(box.querySelectorAll(".opt"), function(x){ x.classList.remove("gewaehlt"); });
+      b.classList.add("gewaehlt");
+      antw[paar[0]] = b.dataset.v;
+      echo.className = "echo an neutral";
+      echo.textContent = "Notiert. Die Auflösung erscheint nach dem letzten Animationsschritt.";
+    });
+  });
+});
+
+function zeigeAufloesung(){
+  var box = $("aufloesung");
+  if(box.classList.contains("an")) return;
+  box.classList.add("an");
+  var t = "<b>Auflösung der beiden Fragen vom Anfang</b><br>";
+  t += "Frage 1: Richtig ist — in der Schmelze sind die Ionen frei beweglich. " +
+       (antw.f1 === "b" ? "Deine Antwort war richtig." :
+        antw.f1 === null ? "Du hast nicht geantwortet." :
+        "<b>Deine Antwort war falsch.</b> Es entstehen keine neuen Elektronen, und das Salz wird auch kein Metall. Nur die Beweglichkeit der vorhandenen Ionen ändert sich.") + "<br>";
+  t += "Frage 2: Richtig ist — die Ladung wird durch die gerichtete Bewegung der Ionen transportiert. " +
+       (antw.f2 === "b" ? "Deine Antwort war richtig." :
+        antw.f2 === null ? "Du hast nicht geantwortet." :
+        "<b>Deine Antwort war falsch.</b> Elektronen bewegen sich nur in den Leitungen und in den Elektroden. Durch die Schmelze selbst bewegen sich ausschließlich Ionen.") + "<br>";
+  t += "Frage 3: Richtig ist — in den Leitungen bewegen sich die Elektronen vom Minuspol zum Pluspol. " +
+       (antw.f3 === "b" ? "Deine Antwort war richtig." :
+        antw.f3 === null ? "Du hast nicht geantwortet." :
+        "<b>Deine Antwort war falsch.</b> Am Minuspol herrscht Elektronenüberschuss, am Pluspol Elektronenmangel. Negativ geladene Elektronen werden vom Minuspol abgestoßen und vom Pluspol angezogen. Die technische Stromrichtung ist umgekehrt festgelegt, das ist aber eine reine Vereinbarung.");
+  box.className = "echo an " + ((antw.f1 === "b" && antw.f2 === "b" && antw.f3 === "b") ? "gut" : "neutral");
+  box.innerHTML = t;
+}
+
+/* Quiz */
+var FRAGEN = [
+  {f:"An welcher Elektrode findet die Oxidation statt?", a:[
+    {t:"An der Kathode", r:false, e:"An der Kathode werden Elektronen aufgenommen, das ist die Reduktion. Merke: Anode und Oxidation beginnen beide mit einem Vokal."},
+    {t:"An der Anode", r:true,  e:"Dort geben die Chlorid-Ionen ihre Elektronen ab. Das gilt bei jeder Elektrolyse, unabhängig von der Polung."},
+    {t:"In der Mitte der Schmelze", r:false, e:"In der Schmelze bewegen sich die Ionen nur. Umgesetzt werden sie erst an den Elektroden."}]},
+  {f:"Warum leitet festes Kochsalz den Strom nicht?", a:[
+    {t:"Weil es keine geladenen Teilchen enthält.", r:false, e:"Falsch — es besteht vollständig aus Ionen. Sie können sich im festen Gitter nur nicht bewegen."},
+    {t:"Weil die Ionen im Gitter festsitzen und sich nicht bewegen können.", r:true, e:"Ladungstransport setzt bewegliche Ladungsträger voraus. Erst Schmelzen oder Lösen macht die Ionen beweglich."},
+    {t:"Weil Salz ein Isolator aus Molekülen ist.", r:false, e:"Natriumchlorid besteht nicht aus Molekülen, sondern aus Ionen."}]},
+  {f:"Ein Chlorid-Ion erreicht die Anode. Was geschieht?", a:[
+    {t:"Es nimmt ein Elektron auf.", r:false, e:"Das Chlorid-Ion besitzt bereits acht Außenelektronen. Die Aufnahme eines weiteren Elektrons ist energetisch nicht möglich."},
+    {t:"Es gibt ein Elektron ab und wird zum Chlor-Atom.", r:true, e:"Zwei dieser Atome verbinden sich anschließend zum Molekül Cl₂, das als Gas aufsteigt."},
+    {t:"Es zerfällt in Protonen und Elektronen.", r:false, e:"Der Atomkern bleibt bei chemischen Reaktionen unverändert. Es ändert sich nur die Elektronenhülle."}]},
+  {f:"Wie viele Elektronen fließen in der Leitung, während zwei Natrium-Ionen an der Kathode entladen werden?", a:[
+    {t:"Ein Elektron", r:false, e:"Jedes einzelne Natrium-Ion braucht genau ein Elektron, zwei Ionen also zwei."},
+    {t:"Zwei Elektronen", r:true, e:"Genau dieselbe Zahl gibt gleichzeitig die Anode ab: 2 Cl⁻ → Cl₂ + 2 e⁻. Die Bilanz ist immer ausgeglichen."},
+    {t:"Vier Elektronen", r:false, e:"Vier wären es bei zweifach geladenen Ionen, etwa bei Mg²⁺. Natrium-Ionen sind nur einfach geladen."}]},
+  {f:"Warum bewegen sich die Elektronen in den Leitungen vom Minuspol zum Pluspol?", a:[
+    {t:"Weil sie negativ geladen sind: Der Minuspol stößt sie ab, der Pluspol zieht sie an.", r:true, e:"Am Minuspol herrscht Elektronenüberschuss, am Pluspol Elektronenmangel. Genau dieses Ungleichgewicht hält die Spannungsquelle aufrecht."},
+    {t:"Weil sie positiv geladen sind und zum Minuspol streben.", r:false, e:"Elektronen sind negativ geladen. Positiv geladene Teilchen bewegen sich in Metallen ohnehin nicht."},
+    {t:"Weil die Ionen der Schmelze sie durch die Leitung ziehen.", r:false, e:"Die Ionen bleiben in der Schmelze. Sie gelangen niemals in die Leitung."}]},
+  {f:"In der Physik zeigt die technische Stromrichtung von Plus nach Minus. Widerspricht das der Elektronenbewegung?", a:[
+    {t:"Ja, eine der beiden Angaben muss falsch sein.", r:false, e:"Beide Angaben sind zutreffend. Sie beschreiben nur nicht dasselbe."},
+    {t:"Nein — die technische Stromrichtung ist eine Vereinbarung aus der Zeit vor der Entdeckung des Elektrons.", r:true, e:"Man legte die Richtung fest, als noch unbekannt war, welche Teilchen sich bewegen. Die Vereinbarung wurde beibehalten, weil sonst unzählige Formeln hätten geändert werden müssen."},
+    {t:"Nein, weil in der Leitung auch positiv geladene Teilchen fließen.", r:false, e:"In einem metallischen Leiter bewegen sich ausschließlich Elektronen. Die Atomrümpfe bleiben an ihrem Gitterplatz."}]},
+  {f:"Was geschieht mit den Elektronen innerhalb der Spannungsquelle?", a:[
+    {t:"Sie werden dort verbraucht.", r:false, e:"Elektronen werden nicht verbraucht. Ihre Gesamtzahl im Stromkreis bleibt gleich."},
+    {t:"Sie werden unter Energieaufwand zum Minuspol zurückbefördert.", r:true, e:"Nur deshalb bleibt der Elektronenüberschuss am Minuspol bestehen. Genau dafür wird elektrische Energie benötigt."},
+    {t:"Sie sammeln sich am Pluspol an, bis dieser voll ist.", r:false, e:"Dann käme der Stromfluss nach kurzer Zeit zum Erliegen. Tatsächlich läuft die Elektrolyse stundenlang weiter."}]},
+  {f:"Welche Aussage über den Stromkreis ist richtig?", a:[
+    {t:"Die Elektronen laufen einmal komplett durch Leitung und Schmelze im Kreis.", r:false, e:"Durch die Schmelze bewegt sich kein einziges Elektron. Das ist der häufigste Denkfehler bei der Elektrolyse."},
+    {t:"In den Leitungen bewegen sich Elektronen, in der Schmelze Ionen; zusammen schließen sie den Kreis.", r:true, e:"Der Ladungstransport wechselt an den Elektrodenoberflächen die Trägerart. Genau dort finden Oxidation und Reduktion statt."},
+    {t:"In der Schmelze bewegen sich die Elektronen nur langsamer als in der Leitung.", r:false, e:"Es ist kein Geschwindigkeitsunterschied, sondern ein Unterschied der Teilchenart."}]},
+  {f:"An welcher Elektrode entsteht bei dieser Elektrolyse ein Gas?", a:[
+    {t:"An der Kathode", r:false, e:"Dort entsteht Natrium, bei dieser Temperatur flüssig. Gasförmig ist es erst oberhalb von 883 °C."},
+    {t:"An der Anode", r:true, e:"Dort bilden sich aus je zwei Chlor-Atomen Chlor-Moleküle, die als grünliches Gas aufsteigen."},
+    {t:"An beiden Elektroden", r:false, e:"Nur an einer der beiden entsteht ein Gas. Vergleiche die beiden Teilgleichungen."}]}
+];
+var quiz = $("quiz");
+FRAGEN.forEach(function(q, n){
+  var d = document.createElement("div"); d.className = "frage";
+  var p = document.createElement("p"); p.innerHTML = (n+1)+". "+q.f; d.appendChild(p);
+  var echo = document.createElement("div"); echo.className = "echo";
+  q.a.forEach(function(a){
+    var b = document.createElement("button"); b.className = "opt"; b.innerHTML = a.t;
+    b.addEventListener("click", function(){
+      var opts = d.querySelectorAll(".opt");
+      for(var x=0;x<opts.length;x++) opts[x].disabled = true;
+      b.classList.add(a.r ? "richtig" : "falsch");
+      echo.className = "echo an " + (a.r ? "gut" : "schlecht");
+      echo.innerHTML = "<b>" + (a.r ? "Richtig." : "Falsch.") + "</b> " + a.e;
+      if(!a.r){ for(var y=0;y<opts.length;y++){ if(q.a[y].r) opts[y].classList.add("richtig"); } }
+    });
+    d.appendChild(b);
+  });
+  d.appendChild(echo);
+  quiz.appendChild(d);
+});
+
+zeichne(0);
+})();
+</script>
+</body>
+</html>
