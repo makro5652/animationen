@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Veresterung und Hydrolyse — das chemische Gleichgewicht</title>
+<style>
+:root{
+  --bg:#eef1f3; --surface:#ffffff; --surface-2:#f6f8f9;
+  --ink:#12181c; --ink-2:#4e5c66; --ink-3:#7b8892;
+  --rule:#d8dee2; --rule-2:#c2cbd1;
+  --a:#d2551f; --b:#1f63c4; --e:#0f8f68; --w:#5847c9;
+  --ok-bg:#e2f2e9; --ok-ink:#0d5c40;
+  --go-bg:#e4edfa; --go-ink:#124a8f;
+  --back-bg:#f6ebdc; --back-ink:#8a5510;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#101518; --surface:#1a2126; --surface-2:#212a30;
+    --ink:#e8edf0; --ink-2:#a7b4bc; --ink-3:#7c8b95;
+    --rule:#2c3740; --rule-2:#3c4a54;
+    --a:#f0834f; --b:#5c9bee; --e:#3cc295; --w:#9285ee;
+    --ok-bg:#123528; --ok-ink:#7fdcb5;
+    --go-bg:#13294a; --go-ink:#95c0f5;
+    --back-bg:#3a2a12; --back-ink:#e4b876;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:16px; line-height:1.6;
+}
+.wrap{max-width:1180px; margin:0 auto; padding:24px 20px 64px}
+header{margin-bottom:22px}
+h1{font-size:1.5rem; font-weight:600; letter-spacing:-0.01em; margin:0 0 6px}
+.sub{color:var(--ink-2); font-size:0.95rem; margin:0}
+.eq{margin:14px 0 0; font-size:1.05rem; font-weight:500}
+.eq .r{white-space:nowrap}
+.legend{display:flex; flex-wrap:wrap; gap:6px 18px; margin:12px 0 0; font-size:0.85rem; color:var(--ink-2)}
+.legend span{display:flex; align-items:center; gap:7px}
+.dot{width:11px; height:11px; border-radius:50%; flex:none}
+
+.grid{display:grid; gap:18px; grid-template-columns:minmax(0,1fr)}
+@media (min-width:900px){
+  .grid{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); align-items:start}
+  .span{grid-column:1 / -1}
+}
+.card{background:var(--surface); border:1px solid var(--rule); border-radius:var(--r); padding:16px}
+h2{font-size:0.95rem; font-weight:600; margin:0 0 12px; letter-spacing:0}
+.note{font-size:0.82rem; color:var(--ink-3); line-height:1.5; margin:8px 0 0}
+
+.stage{border:1px solid var(--rule); border-radius:var(--r); overflow:hidden; background:var(--surface-2)}
+canvas{display:block; width:100%}
+.banner{text-align:center; font-weight:600; font-size:0.95rem; padding:11px 10px; border-radius:var(--r); margin:12px 0 0; background:var(--go-bg); color:var(--go-ink)}
+
+.metrics{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px}
+.metric{background:var(--surface-2); border-radius:8px; padding:11px 12px}
+.metric .lab{font-size:0.78rem; color:var(--ink-2); line-height:1.35}
+.metric .val{font-size:1.35rem; font-weight:600; margin-top:3px; font-variant-numeric:tabular-nums}
+
+.slider{display:flex; align-items:center; gap:14px}
+.slider label{font-size:0.88rem; color:var(--ink-2); flex:none; min-width:74px}
+.slider output{font-size:1rem; font-weight:600; min-width:46px; text-align:right; font-variant-numeric:tabular-nums}
+input[type=range]{-webkit-appearance:none; appearance:none; flex:1; height:30px; background:transparent; margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:5px; border-radius:3px; background:var(--rule-2)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:26px; height:26px; border-radius:50%; background:var(--surface); border:2px solid var(--ink-2); margin-top:-11px; cursor:pointer}
+input[type=range]::-moz-range-track{height:5px; border-radius:3px; background:var(--rule-2)}
+input[type=range]::-moz-range-thumb{width:24px; height:24px; border-radius:50%; background:var(--surface); border:2px solid var(--ink-2); cursor:pointer}
+input[type=range]:focus-visible{outline:2px solid var(--b); outline-offset:4px}
+
+.pie-row{display:flex; gap:16px; align-items:center; flex-wrap:wrap}
+#pie{width:150px; height:150px; flex:none}
+.plist{flex:1; min-width:190px; font-size:0.86rem; color:var(--ink-2)}
+.prow{display:flex; align-items:center; gap:8px; padding:4px 0}
+.prow b{margin-left:auto; color:var(--ink); font-weight:600; font-variant-numeric:tabular-nums; white-space:nowrap}
+
+.charts{display:grid; gap:18px; grid-template-columns:minmax(0,1fr)}
+@media (min-width:900px){.charts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.btns{display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+button{
+  font:inherit; font-size:0.9rem; min-height:46px; padding:10px 12px;
+  background:var(--surface-2); color:var(--ink); border:1px solid var(--rule-2);
+  border-radius:8px; cursor:pointer; touch-action:manipulation;
+}
+button:hover{border-color:var(--ink-3)}
+button:active{transform:scale(0.985)}
+button:focus-visible{outline:2px solid var(--b); outline-offset:2px}
+.hr{height:1px; background:var(--rule); margin:16px 0}
+#log{font-size:0.9rem; color:var(--ink-2); margin:14px 0 0; min-height:3em}
+
+.expl{max-width:70ch}
+details{border-top:1px solid var(--rule); padding:2px 0}
+details:last-of-type{border-bottom:1px solid var(--rule)}
+summary{cursor:pointer; padding:14px 2px; font-weight:600; font-size:0.95rem; list-style:none; display:flex; justify-content:space-between; align-items:center; gap:12px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+"; color:var(--ink-3); font-weight:400; font-size:1.3rem; line-height:1}
+details[open] summary::after{content:"\2212"}
+.body{padding:0 2px 18px; color:var(--ink-2); font-size:0.93rem}
+.body p{margin:0 0 10px}
+.body p:last-child{margin:0}
+.body h3{font-size:0.9rem; font-weight:600; color:var(--ink); margin:16px 0 6px}
+.fml{display:block; background:var(--surface-2); border-radius:8px; padding:10px 12px; margin:10px 0;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:0.83rem; color:var(--ink); line-height:1.8}
+.body svg{width:100%; height:auto; max-width:420px; margin:10px 0}
+footer{margin-top:32px; color:var(--ink-3); font-size:0.82rem; max-width:70ch}
+@media (prefers-reduced-motion:reduce){button:active{transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Veresterung und Hydrolyse</h1>
+  <p class="sub">Wie sich ein chemisches Gleichgewicht einstellt — Teilchenmodell auf Grundlage der Stoßtheorie</p>
+  <p class="eq"><span class="r" style="color:var(--a)">Ethansäure</span> + <span class="r" style="color:var(--b)">Ethanol</span> &#8652; <span class="r" style="color:var(--e)">Ester</span> + <span class="r" style="color:var(--w)">Wasser</span> &nbsp; <span style="color:var(--ink-3);font-weight:400">exotherm</span></p>
+  <div class="legend">
+    <span><i class="dot" style="background:var(--a)"></i>Ethansäure</span>
+    <span><i class="dot" style="background:var(--b)"></i>Ethanol</span>
+    <span><i class="dot" style="background:var(--e)"></i>Ester</span>
+    <span><i class="dot" style="background:var(--w)"></i>Wasser</span>
+  </div>
+</header>
+
+<div class="grid">
+
+  <section>
+    <div class="stage">
+      <canvas id="box" role="img" aria-label="Teilchenmodell: farbige Kugeln stoßen elastisch zusammen. Ein farbiger Ring markiert einen erfolgreichen Stoß, ein grauer Ring einen Stoß, dessen Energie nicht über die Aktivierungsbarriere reicht.">Teilchenmodell der Reaktionsmischung.</canvas>
+    </div>
+    <div class="banner" id="dir">Hinreaktion überwiegt &#8594;</div>
+    <p class="note">Farbiger Ring: der Stoß war energiereich genug, es wird reagiert. Grauer Ring: die Partner passen zueinander, die Stoßenergie reicht aber nicht über die Aktivierungsbarriere.</p>
+
+    <div class="card" style="margin-top:18px">
+      <h2>Stoßstatistik</h2>
+      <div class="metrics">
+        <div class="metric"><div class="lab">Stöße insgesamt, pro Zeit</div><div class="val" id="cs">0</div></div>
+        <div class="metric"><div class="lab">davon erfolgreich</div><div class="val" id="ce">0 %</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <h2>Temperatur</h2>
+      <div class="slider">
+        <label for="tp">T, willk. Einh.</label>
+        <input type="range" id="tp" min="0.6" max="1.8" step="0.05" value="1">
+        <output id="tpo">1,00</output>
+      </div>
+      <p class="note" id="pinfo">Anteil hinreichend energiereicher Stöße: Hinreaktion 13,5 %, Rückreaktion 3,4 %</p>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <h2>Messwerte</h2>
+      <div class="metrics">
+        <div class="metric"><div class="lab">Reaktionsquotient Q</div><div class="val" id="qv">0,00</div></div>
+        <div class="metric"><div class="lab">K bei dieser Temperatur</div><div class="val" id="kv">4,00</div></div>
+        <div class="metric"><div class="lab">v(hin), gemessen</div><div class="val" id="vf" style="color:var(--a)">0,00</div></div>
+        <div class="metric"><div class="lab">v(rück), gemessen</div><div class="val" id="vr" style="color:var(--e)">0,00</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <h2>Stoffmengenanteile</h2>
+      <div class="pie-row">
+        <canvas id="pie" role="img" aria-label="Kreisdiagramm der Stoffmengenanteile von Ethansäure, Ethanol, Ester und Wasser.">Kreisdiagramm der Anteile.</canvas>
+        <div class="plist" id="plist"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="span charts">
+    <div class="card">
+      <h2>Konzentration gegen Zeit, c(t) in mol/L</h2>
+      <canvas id="ct" role="img" aria-label="Konzentrations-Zeit-Diagramm der vier Stoffe.">c(t)-Diagramm.</canvas>
+    </div>
+    <div class="card">
+      <h2>Reaktionsgeschwindigkeit gegen Zeit</h2>
+      <canvas id="vt" role="img" aria-label="Geschwindigkeits-Zeit-Diagramm: die Hinreaktion wird langsamer, die Rückreaktion schneller, beide treffen sich im Gleichgewicht.">v(t)-Diagramm.</canvas>
+      <p class="note">Durchgezogen: Hinreaktion. Gestrichelt: Rückreaktion. Beide aus den gezählten erfolgreichen Stößen ermittelt.</p>
+    </div>
+  </section>
+
+  <section class="span card">
+    <h2>Steuerung</h2>
+    <div class="btns">
+      <button id="pp">Pause</button>
+      <button id="rs">Zurücksetzen</button>
+      <button id="m1">Start: Säure + Alkohol</button>
+      <button id="m2">Start: Ester + Wasser</button>
+    </div>
+    <div class="hr"></div>
+    <h2>Zwang durch Konzentrationsänderung</h2>
+    <div class="btns">
+      <button id="b1">+ 0,5 Ethansäure</button>
+      <button id="b2">+ 0,5 Ethanol</button>
+      <button id="b3">&minus; 60 % Ester</button>
+      <button id="b4">&minus; 60 % Wasser</button>
+      <button id="b5">+ 0,5 Wasser</button>
+    </div>
+    <div class="hr"></div>
+    <div class="slider">
+      <label for="sp">Tempo</label>
+      <input type="range" id="sp" min="0.25" max="4" step="0.25" value="1">
+      <output id="spo">1,00</output>
+    </div>
+    <p id="log">Der Ansatz enthält nur Edukte. v(rück) ist null, weil es noch keine Ester- und Wasserteilchen gibt, die zusammenstoßen könnten.</p>
+  </section>
+
+  <section class="span expl">
+    <h2 style="font-size:1.05rem; margin-bottom:4px">Erklärungen</h2>
+
+    <details>
+      <summary>Was ist ein chemisches Gleichgewicht?</summary>
+      <div class="body">
+        <p>Viele Reaktionen laufen nicht vollständig ab. Sie sind umkehrbar, das heißt die entstandenen Produkte können erneut miteinander reagieren und dabei die Ausgangsstoffe zurückbilden. Man schreibt solche Reaktionen mit einem Doppelpfeil.</p>
+        <p>Die Veresterung ist ein Beispiel dafür: Ethansäure und Ethanol bilden den Ester und Wasser, gleichzeitig setzt der Ester mit dem Wasser wieder Säure und Alkohol frei. Diese Rückreaktion heißt Esterhydrolyse.</p>
+        <h3>Der Gleichgewichtszustand</h3>
+        <p>Solange mehr Ester gebildet als hydrolysiert wird, steigt seine Konzentration. Weil dabei die Eduktkonzentrationen sinken und die Produktkonzentrationen wachsen, wird die Hinreaktion langsamer und die Rückreaktion schneller. Irgendwann sind beide Geschwindigkeiten exakt gleich groß. Ab diesem Zeitpunkt ändern sich die Konzentrationen nicht mehr, das System hat den Gleichgewichtszustand erreicht.</p>
+        <h3>Warum dynamisch?</h3>
+        <p>Von außen betrachtet scheint nichts mehr zu geschehen. Auf der Teilchenebene laufen aber beide Reaktionen unvermindert weiter, nur eben gleich schnell. Pro Zeitspanne entsteht genau so viel Ester, wie zerfällt. Man spricht deshalb von einem dynamischen Gleichgewicht, nicht von einem Stillstand.</p>
+        <h3>Drei häufige Fehlvorstellungen</h3>
+        <p>Erstens bedeutet Gleichgewicht nicht, dass die Konzentrationen gleich groß sind. Zweitens bedeutet es nicht, dass die Reaktion aufhört. Drittens hängt die Gleichgewichtslage nicht davon ab, von welcher Seite man startet: Ein Ansatz aus reinem Ester und Wasser führt bei gleicher Temperatur zu genau derselben Zusammensetzung.</p>
+        <h3>Voraussetzungen und Beeinflussung</h3>
+        <p>Ein Gleichgewicht kann sich nur in einem geschlossenen System einstellen. Entweicht ein Stoff dauerhaft, wird das Gleichgewicht immer wieder gestört und die Reaktion läuft praktisch vollständig ab. Ein Katalysator beschleunigt Hin- und Rückreaktion in gleichem Maß, das Gleichgewicht wird also schneller erreicht, seine Lage bleibt aber unverändert. Ein Zwang durch Konzentrations- oder Temperaturänderung verschiebt dagegen die Lage. Das ist der Inhalt des Prinzips von Le Chatelier.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Wie ist die Stoßtheorie umgesetzt?</summary>
+      <div class="body">
+        <p>Jedes Teilchen bewegt sich geradlinig, bis es auf die Gefäßwand oder ein anderes Teilchen trifft. Alle Stöße werden elastisch berechnet, Impuls und kinetische Energie bleiben dabei erhalten.</p>
+        <p>Damit eine Reaktion überhaupt möglich ist, müssen zwei Bedingungen erfüllt sein. Erstens müssen die Partner zueinander passen: Säure mit Alkohol für die Hinreaktion, Ester mit Wasser für die Rückreaktion. Stöße wie Säure mit Säure oder Ester mit Alkohol führen nur zur Richtungsänderung.</p>
+        <p>Zweitens muss der Stoß energiereich genug sein. Ausgewertet wird dabei nicht die gesamte kinetische Energie, sondern nur der Anteil, der auf die Verbindungslinie der beiden Teilchenmittelpunkte entfällt. Ein Streifschuss überträgt kaum Energie auf diese Achse und bleibt deshalb wirkungslos, ein frontaler Zusammenprall dagegen nicht. Überschreitet diese Energie die Aktivierungsenergie, entstehen die Produkte, andernfalls prallen die Teilchen unverändert ab. Diese Fälle erkennst du am grauen Ring.</p>
+        <p>Aus diesem Kriterium folgt ohne weitere Annahme, dass der Anteil erfolgreicher Stöße gleich e hoch (&minus;Ea/RT) ist. Das ist genau der Boltzmann-Faktor und damit die Grundlage der Arrhenius-Gleichung.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Was bewirkt die Temperatur?</summary>
+      <div class="body">
+        <p>Der Regler verändert die mittlere kinetische Energie der Teilchen. Die Geschwindigkeiten bleiben dabei Maxwell-Boltzmann-verteilt, es gibt also immer langsame und schnelle Teilchen; nur Lage und Breite der Verteilung verschieben sich.</p>
+        <p>Eine Temperaturerhöhung wirkt auf zwei Wegen. Zum einen steigt die Stoßhäufigkeit, weil sich die Teilchen schneller bewegen. Zum anderen, und das ist der weitaus stärkere Effekt, wächst der Anteil der Stöße, die die Aktivierungsbarriere überwinden. Beide Reaktionsrichtungen werden dadurch schneller, das Gleichgewicht stellt sich früher ein.</p>
+        <h3>Warum sich die Lage verschiebt</h3>
+        <p>Entscheidend ist, dass die beiden Barrieren unterschiedlich hoch sind. Für die Rückreaktion ist sie höher, weil die Produkte energetisch tiefer liegen. Der prozentuale Zugewinn an erfolgreichen Stößen ist bei der höheren Barriere größer. Eine Temperaturerhöhung begünstigt daher die Rückreaktion stärker, K sinkt und das Gleichgewicht verschiebt sich zur Eduktseite.</p>
+        <svg viewBox="0 0 300 160" role="img" aria-label="Energiediagramm: Die Edukte liegen höher als die Produkte, dazwischen liegt der Übergangszustand als Maximum. Die Aktivierungsenergie der Rückreaktion ist größer als die der Hinreaktion.">
+          <title>Energiediagramm der Veresterung</title>
+          <path d="M8 78 L58 78 C88 78 98 22 128 22 C158 22 168 118 198 118 L292 118" fill="none" stroke="var(--a)" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="58" y1="78" x2="206" y2="78" stroke="var(--ink-3)" stroke-width="1" stroke-dasharray="3 3"/>
+          <line x1="128" y1="22" x2="236" y2="22" stroke="var(--ink-3)" stroke-width="1" stroke-dasharray="3 3"/>
+          <line x1="198" y1="118" x2="240" y2="118" stroke="var(--ink-3)" stroke-width="1" stroke-dasharray="3 3"/>
+          <line x1="206" y1="78" x2="206" y2="22" stroke="var(--ink-2)" stroke-width="1.5"/>
+          <line x1="236" y1="118" x2="236" y2="22" stroke="var(--ink-2)" stroke-width="1.5"/>
+          <text x="8" y="70" font-size="11" fill="var(--ink-2)">Edukte</text>
+          <text x="246" y="112" font-size="11" fill="var(--ink-2)">Produkte</text>
+          <text x="150" y="52" font-size="11" fill="var(--ink-2)">Ea hin</text>
+          <text x="242" y="72" font-size="11" fill="var(--ink-2)">Ea rück</text>
+          <text x="86" y="146" font-size="11" fill="var(--ink-3)">Reaktionskoordinate</text>
+        </svg>
+        <p>Das ist die anschauliche Begründung des Prinzips von Le Chatelier für den Fall einer exothermen Hinreaktion: Das System weicht der zugeführten Wärme aus, indem es die wärmeverbrauchende Richtung begünstigt.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Warum entsteht ein Gleichgewicht?</summary>
+      <div class="body">
+        <p>Die Zahl der Stöße zwischen zwei Teilchensorten ist proportional zum Produkt ihrer Teilchenzahlen. Zu Beginn gibt es sehr viele Säure-Alkohol-Begegnungen und keine einzige Ester-Wasser-Begegnung.</p>
+        <p>Mit jedem erfolgreichen Stoß sinkt die Zahl der Eduktteilchen, damit sinkt die Stoßhäufigkeit und folglich v(hin). Gleichzeitig wächst die Zahl der Produktteilchen, ihre Begegnungen werden häufiger, v(rück) steigt.</p>
+        <p>Beide Geschwindigkeiten laufen aufeinander zu. Sobald sie gleich groß sind, wird pro Zeitspanne genau so viel Ester gebildet wie hydrolysiert. Die Konzentrationen bleiben konstant, die Reaktionen laufen aber unvermindert weiter.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Was ist der Reaktionsquotient Q?</summary>
+      <div class="body">
+        <p>Q besitzt exakt dieselbe mathematische Form wie K, wird aber für einen beliebigen Zustand des Systems gebildet, also auch fernab des Gleichgewichts:</p>
+        <span class="fml">Q = [c(Ester) &middot; c(Wasser)] / [c(Säure) &middot; c(Alkohol)]</span>
+        <p>Der Vergleich von Q mit K gibt die Richtung der Nettoreaktion an: Bei Q kleiner K überwiegt die Hinreaktion, bei Q größer K die Rückreaktion, bei Q gleich K liegt das Gleichgewicht vor. Ein Zwang durch Konzentrationsänderung verändert nur Q. Eine Temperaturänderung verändert dagegen K selbst, sodass das bisherige Q plötzlich nicht mehr passt.</p>
+        <p>Da hier mit endlich vielen Teilchen gerechnet wird, schwankt Q auch im Gleichgewicht um den Wert von K. Diese Fluktuation ist physikalisch real und verschwindet erst bei sehr großen Teilchenzahlen.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Wie berechnet sich K?</summary>
+      <div class="body">
+        <p>Im Gleichgewicht sind Hin- und Rückreaktionsgeschwindigkeit gleich groß. Die Stoßzahl je Zeiteinheit ist proportional zum Produkt der Konzentrationen, die Reaktionsgeschwindigkeit zusätzlich zum Anteil hinreichend energiereicher Stöße:</p>
+        <span class="fml">e^(&minus;Ea,hin/RT) &middot; c(Säure) &middot; c(Alkohol)<br>&nbsp;&nbsp;= e^(&minus;Ea,rück/RT) &middot; c(Ester) &middot; c(Wasser)</span>
+        <p>Umstellen liefert unmittelbar das Massenwirkungsgesetz und zugleich die Temperaturabhängigkeit:</p>
+        <span class="fml">K = [c(Ester) &middot; c(Wasser)] / [c(Säure) &middot; c(Alkohol)]<br>&nbsp;&nbsp;= e^((Ea,rück &minus; Ea,hin)/RT) = e^(&minus;&Delta;U/RT)</span>
+        <p>Die Differenz der beiden Aktivierungsenergien ist gerade die Reaktionsenergie. In dieser Simulation ist Ea(hin) = 2,00 und Ea(rück) = 3,39 in reduzierten Einheiten, also &Delta;U = &minus;1,39. Bei der Bezugstemperatur T = 1,00 ergibt das K = 4,00. Der Wert ist nicht eingebaut, sondern stellt sich aus den Stößen von selbst ein.</p>
+        <p>Diese Beziehung ist die Grundform der van-'t-Hoff-Gleichung. Da auf beiden Seiten je zwei Teilchen stehen, ist K dimensionslos.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Didaktische Vereinfachungen und Grenzen des Modells</summary>
+      <div class="body">
+        <h3>Zur Stoßtheorie</h3>
+        <p>Der sterische Faktor fehlt. Das Modell prüft ausschließlich das Energiekriterium längs der Zentralen, jede räumliche Orientierung der Teilchen ist gleich gut geeignet. Real liegt dieser Faktor bei komplexen organischen Molekülen oft mehrere Größenordnungen unter eins, was die absoluten Geschwindigkeiten stark senkt.</p>
+        <p>Die Teilchen sind starre Scheiben ohne innere Struktur. Rotation und Schwingung existieren nicht, es gibt keinen Übergangszustand mit endlicher Lebensdauer. Der Stoß führt unmittelbar zum fertigen Produkt oder zu nichts.</p>
+        <p>Alle vier Spezies besitzen denselben Radius und dieselbe Masse. Das ist notwendig, damit die Stoßquerschnitte identisch sind und K sauber aus dem Verhältnis der beiden Boltzmann-Faktoren folgt. Reale Molekülgrößen unterscheiden sich erheblich, Wasser ist deutlich kleiner als der Ester.</p>
+        <p>Das System ist zweidimensional. Stoßfrequenzen skalieren in der Fläche anders als im Raum, weshalb die absoluten Zahlen der Stoßstatistik ohne Aussagekraft sind. Nur die Verhältnisse und ihre zeitliche Entwicklung tragen.</p>
+        <h3>Zur Energiebilanz</h3>
+        <p>Die bei der Reaktion frei werdende beziehungsweise verbrauchte Energie wird den Teilchen nicht als kinetische Energie zurückgegeben. Ein Thermostat hält die eingestellte Temperatur konstant, das System ist also isotherm gedacht, so als stünde es in einem sehr großen Wärmebad. Ein realer Ansatz würde sich bei einer exothermen Reaktion erwärmen.</p>
+        <p>Die Reaktionsenergie ist bewusst übertrieben groß gewählt. Die Veresterung von Ethanol mit Ethansäure ist in Lösung nahezu thermoneutral, ihr K hängt deshalb real kaum von der Temperatur ab. Mit einem realistisch kleinen Wert wäre am Temperaturregler nichts zu erkennen. Die hier gezeigte deutliche Verschiebung ist qualitativ richtig, quantitativ aber überzeichnet.</p>
+        <p>Die Temperatur trägt reduzierte Einheiten, keine Kelvin. Eine Umrechnung wäre Scheingenauigkeit, weil die Aktivierungsenergien frei gesetzt sind. Ebenso trägt die Zeitachse willkürliche Einheiten.</p>
+        <h3>Zur Reaktion selbst</h3>
+        <p>Der reale Reaktionsmechanismus wird nicht abgebildet. Die säurekatalysierte Veresterung nach Fischer verläuft mehrstufig über Protonierung, nucleophile Addition, Protonenwanderung und Wasserabspaltung. Sie ist also gerade kein einfacher Zweierstoß, und die Katalysatorkonzentration geht real in das Zeitgesetz ein. Ein Katalysator kommt in der Simulation überhaupt nicht vor.</p>
+        <p>Unberücksichtigt bleiben außerdem Aktivitätskoeffizienten, Volumenänderungen bei Zugabe und Entnahme sowie die Doppelrolle des Wassers als Reaktionspartner und Lösungsmittel. Zugabe und Entnahme erfolgen sprunghaft, während ein Wasserabscheider real kontinuierlich arbeitet.</p>
+      </div>
+    </details>
+  </section>
+</div>
+
+<footer>Teilchenzahl: 40 Teilchen je mol/L bei konstantem Volumen. Die Datei läuft ohne Internetverbindung und speichert nichts.</footer>
+</div>
+
+<script>
+(function(){
+var WW=380, WH=240;
+var COLV={a:"--a",b:"--b",e:"--e",w:"--w"};
+var NAME={a:"Ethansäure",b:"Ethanol",e:"Ester",w:"Wasser"};
+var ORD=["a","b","e","w"];
+var S=40,R=6,V1=95,M=2/(V1*V1),EAF=2.0,EAR=2.0+Math.log(4);
+var parts=[],t=0,run=true,hist=[],speed=1,pushAcc=0,T=1;
+var fwd=0,bwd=0,coll=0,vfE=0,vrE=0,csE=0,ceE=0;
+var box=document.getElementById("box"),ct=document.getElementById("ct"),vt=document.getElementById("vt"),pie=document.getElementById("pie");
+var dpr=Math.min(window.devicePixelRatio||1,2.5);
+var scaleBox=1, CW=0, CH=170;
+
+function css(v){return getComputedStyle(document.body).getPropertyValue(v).trim();}
+function COL(k){return css(COLV[k]);}
+
+function fitBox(){
+  var w=box.clientWidth||600, h=Math.round(w*WH/WW);
+  box.style.height=h+"px";
+  box.width=Math.round(w*dpr); box.height=Math.round(h*dpr);
+  scaleBox=w/WW;
+  box.getContext("2d").setTransform(dpr*scaleBox,0,0,dpr*scaleBox,0,0);
+}
+function fitChart(cv){
+  var w=cv.clientWidth||500;
+  cv.style.height=CH+"px";
+  cv.width=Math.round(w*dpr); cv.height=Math.round(CH*dpr);
+  cv.getContext("2d").setTransform(dpr,0,0,dpr,0,0);
+  return w;
+}
+function fitPie(){
+  pie.width=Math.round(150*dpr); pie.height=Math.round(150*dpr);
+  pie.getContext("2d").setTransform(dpr,0,0,dpr,0,0);
+}
+function sizes(){fitBox();CW=fitChart(ct);fitChart(vt);fitPie();}
+
+function mbSpeed(){return Math.sqrt(-2*T/M*Math.log(1-Math.random()));}
+function mk(ty){var an=Math.random()*6.283185,v=mbSpeed();
+  return{ty:ty,x:R+Math.random()*(WW-2*R),y:R+Math.random()*(WH-2*R),vx:Math.cos(an)*v,vy:Math.sin(an)*v,fl:0,fg:0};}
+function addN(ty,n){for(var i=0;i<n;i++)parts.push(mk(ty));}
+function cnt(ty){var n=0;for(var i=0;i<parts.length;i++)if(parts[i].ty===ty)n++;return n;}
+function conc(){return{a:cnt("a")/S,b:cnt("b")/S,e:cnt("e")/S,w:cnt("w")/S};}
+function removeFrac(ty,f){
+  var idx=[];for(var i=0;i<parts.length;i++)if(parts[i].ty===ty)idx.push(i);
+  var k=Math.floor(idx.length*f);
+  for(var j=0;j<k;j++){var p=(Math.random()*idx.length)|0;parts[idx[p]]=null;idx.splice(p,1);}
+  parts=parts.filter(function(q){return q!==null;});
+}
+function snap(){var c=conc();hist.push([t,c.a,c.b,c.e,c.w,vfE,vrE]);
+  if(hist.length>3000){var h2=[];for(var i=0;i<hist.length;i+=2)h2.push(hist[i]);hist=h2;}}
+function reset(mode){
+  parts=[];t=0;hist=[];pushAcc=0;fwd=0;bwd=0;coll=0;vfE=0;vrE=0;csE=0;ceE=0;
+  if(mode==="h"){addN("e",S);addN("w",S);}else{addN("a",S);addN("b",S);}
+  snap();
+  say(mode==="h"?"Der Ansatz enthält nur Produkte. Nur Ester-Wasser-Stöße können reagieren, die Hydrolyse startet.":"Der Ansatz enthält nur Edukte. v(rück) ist null, weil es noch keine Ester- und Wasserteilchen gibt, die zusammenstoßen könnten.");
+}
+function react(p,q,vn){
+  var t1=p.ty,t2=q.ty,pair=null;
+  if((t1==="a"&&t2==="b")||(t1==="b"&&t2==="a"))pair="f";
+  else if((t1==="e"&&t2==="w")||(t1==="w"&&t2==="e"))pair="r";
+  if(!pair)return;
+  var elc=0.25*M*vn*vn;
+  if(elc<(pair==="f"?EAF:EAR)){p.fg=1;q.fg=1;return;}
+  if(pair==="f"){if(t1==="a"){p.ty="e";q.ty="w";}else{p.ty="w";q.ty="e";}fwd++;}
+  else{if(t1==="e"){p.ty="a";q.ty="b";}else{p.ty="b";q.ty="a";}bwd++;}
+  p.fl=1;q.fl=1;
+}
+function physics(dt){
+  var i,j,n=parts.length,p,q,D=2*R,D2=D*D;
+  for(i=0;i<n;i++){p=parts[i];
+    p.x+=p.vx*dt;p.y+=p.vy*dt;
+    if(p.x<R){p.x=R;p.vx=-p.vx}else if(p.x>WW-R){p.x=WW-R;p.vx=-p.vx}
+    if(p.y<R){p.y=R;p.vy=-p.vy}else if(p.y>WH-R){p.y=WH-R;p.vy=-p.vy}}
+  for(i=0;i<n;i++){p=parts[i];
+    for(j=i+1;j<n;j++){q=parts[j];
+      var dx=q.x-p.x,dy=q.y-p.y,d2=dx*dx+dy*dy;
+      if(d2>=D2||d2===0)continue;
+      var d=Math.sqrt(d2),nx=dx/d,ny=dy/d;
+      var vn=(q.vx-p.vx)*nx+(q.vy-p.vy)*ny;
+      var ov=(D-d)/2+0.01;p.x-=nx*ov;p.y-=ny*ov;q.x+=nx*ov;q.y+=ny*ov;
+      if(vn>=0)continue;
+      p.vx+=vn*nx;p.vy+=vn*ny;q.vx-=vn*nx;q.vy-=vn*ny;
+      coll++;react(p,q,vn);}}
+}
+function thermostat(){
+  var n=parts.length;if(!n)return;
+  var ke=0,i;for(i=0;i<n;i++)ke+=0.5*M*(parts[i].vx*parts[i].vx+parts[i].vy*parts[i].vy);
+  if(ke<=0)return;
+  var f=Math.sqrt((n*T)/ke),g=1+0.10*(f-1);
+  for(i=0;i<n;i++){parts[i].vx*=g;parts[i].vy*=g;}
+}
+function drawBox(dt){
+  var x=box.getContext("2d");x.clearRect(0,0,WW,WH);
+  var mu=css("--ink-3"), lw=1.6/Math.max(scaleBox,0.5);
+  for(var i=0;i<parts.length;i++){var p=parts[i];
+    if(p.fg>0){p.fg-=dt*2.5;if(p.fg<0)p.fg=0;
+      x.beginPath();x.arc(p.x,p.y,R+3.5,0,6.2832);x.strokeStyle=mu;x.globalAlpha=p.fg*0.85;x.lineWidth=lw;x.stroke();x.globalAlpha=1;}
+    if(p.fl>0){p.fl-=dt*1.8;if(p.fl<0)p.fl=0;
+      x.beginPath();x.arc(p.x,p.y,R+6*p.fl+3,0,6.2832);x.strokeStyle=COL(p.ty);x.globalAlpha=p.fl;x.lineWidth=lw*1.6;x.stroke();x.globalAlpha=1;}
+    x.beginPath();x.arc(p.x,p.y,R,0,6.2832);x.fillStyle=COL(p.ty);x.fill();}
+}
+var listEl=document.getElementById("plist"),rows={};
+function buildList(){
+  listEl.innerHTML="";
+  for(var i=0;i<4;i++){var k=ORD[i];
+    var d=document.createElement("div");d.className="prow";
+    d.innerHTML='<span class="dot" style="background:var('+COLV[k]+')"></span><span>'+NAME[k]+'</span><b></b>';
+    listEl.appendChild(d);rows[k]=d.lastChild;}
+}
+function drawPie(c){
+  var x=pie.getContext("2d"),Rp=68,cx=75,cy=75;
+  x.clearRect(0,0,150,150);
+  var tot=c.a+c.b+c.e+c.w;if(tot<=0)return;
+  var ang=-Math.PI/2, sfc=css("--surface");
+  for(var i=0;i<4;i++){var k=ORD[i],f=c[k]/tot;
+    rows[k].textContent=c[k].toFixed(2).replace(".",",")+" mol/L · "+Math.round(f*100)+" %";
+    if(f<=0)continue;
+    var a2=ang+f*6.283185;
+    x.beginPath();x.moveTo(cx,cy);x.arc(cx,cy,Rp,ang,a2);x.closePath();
+    x.fillStyle=COL(k);x.fill();x.strokeStyle=sfc;x.lineWidth=2;x.stroke();ang=a2;}
+}
+function axes(x,w,xmax,ymax){
+  var gl=css("--rule"),tm=css("--ink-3");
+  x.clearRect(0,0,w,CH);x.strokeStyle=gl;x.lineWidth=1;
+  for(var i=0;i<=4;i++){var yy=Math.round(CH-24-i*(CH-38)/4)+0.5;x.beginPath();x.moveTo(38,yy);x.lineTo(w-4,yy);x.stroke();}
+  x.fillStyle=tm;x.font="12px -apple-system,system-ui,sans-serif";x.textAlign="right";
+  x.fillText("0",33,CH-20);x.fillText(ymax.toFixed(ymax<1?2:1).replace(".",","),33,17);
+  x.textAlign="left";x.fillText("0",38,CH-6);
+  x.textAlign="right";x.fillText(Math.round(xmax)+" willk. Einh.",w-4,CH-6);x.textAlign="left";
+}
+function line(x,w,xmax,ymax,idx,col,dash){
+  x.save();x.beginPath();x.setLineDash(dash||[]);x.strokeStyle=col;x.lineWidth=2;x.lineJoin="round";
+  for(var i=0;i<hist.length;i++){var px=38+(hist[i][0]/xmax)*(w-42),py=CH-24-(hist[i][idx]/ymax)*(CH-38);
+    if(i===0)x.moveTo(px,py);else x.lineTo(px,py);}
+  x.stroke();x.restore();
+}
+function drawCharts(){
+  var w=ct.clientWidth,xmax=Math.max(20,Math.ceil(t/10)*10),i,j;
+  var ym=1;for(i=0;i<hist.length;i++)for(j=1;j<=4;j++)if(hist[i][j]>ym)ym=hist[i][j];
+  ym=Math.ceil(ym*10)/10;
+  var x=ct.getContext("2d");axes(x,w,xmax,ym);
+  line(x,w,xmax,ym,1,COL("a"));line(x,w,xmax,ym,2,COL("b"),[6,4]);
+  line(x,w,xmax,ym,3,COL("e"));line(x,w,xmax,ym,4,COL("w"),[6,4]);
+  var w2=vt.clientWidth,vm=0.3;
+  for(i=0;i<hist.length;i++){if(hist[i][5]>vm)vm=hist[i][5];if(hist[i][6]>vm)vm=hist[i][6];}
+  vm=Math.ceil(vm*4)/4;
+  var y=vt.getContext("2d");axes(y,w2,xmax,vm);
+  line(y,w2,xmax,vm,5,COL("a"));line(y,w2,xmax,vm,6,COL("e"),[6,4]);
+}
+function readout(c){
+  document.getElementById("vf").textContent=vfE.toFixed(2).replace(".",",");
+  document.getElementById("vr").textContent=vrE.toFixed(2).replace(".",",");
+  document.getElementById("cs").textContent=Math.round(csE);
+  document.getElementById("ce").textContent=(csE>0.5?Math.round(ceE/csE*100):0)+" %";
+  var q=(c.a*c.b>1e-9)?(c.e*c.w)/(c.a*c.b):Infinity;
+  document.getElementById("qv").textContent=isFinite(q)?q.toFixed(2).replace(".",","):"sehr groß";
+  var d=document.getElementById("dir"),mx=Math.max(vfE,vrE,1e-9),rel=Math.abs(vfE-vrE)/mx;
+  if(rel<0.12){d.textContent="Dynamisches Gleichgewicht: v(hin) = v(rück)";d.style.background="var(--ok-bg)";d.style.color="var(--ok-ink)";}
+  else if(vfE>vrE){d.textContent="Hinreaktion überwiegt \u2192";d.style.background="var(--go-bg)";d.style.color="var(--go-ink)";}
+  else{d.textContent="\u2190 Rückreaktion überwiegt";d.style.background="var(--back-bg)";d.style.color="var(--back-ink)";}
+}
+function tempUI(){
+  var pf=Math.exp(-EAF/T),pr=Math.exp(-EAR/T);
+  document.getElementById("tpo").textContent=T.toFixed(2).replace(".",",");
+  document.getElementById("kv").textContent=(pf/pr).toFixed(2).replace(".",",");
+  document.getElementById("pinfo").textContent="Anteil hinreichend energiereicher Stöße: Hinreaktion "+(pf*100).toFixed(1).replace(".",",")+" %, Rückreaktion "+(pr*100).toFixed(1).replace(".",",")+" %";
+}
+function say(s){document.getElementById("log").textContent=s;}
+
+var last=performance.now();
+function loop(now){
+  var rdt=Math.min(0.04,(now-last)/1000);last=now;
+  var dt=rdt*speed;
+  if(run){
+    fwd=0;bwd=0;coll=0;
+    var sub=Math.ceil(dt/0.010),sd=dt/sub;
+    for(var s=0;s<sub;s++)physics(sd);
+    thermostat();
+    t+=dt;
+    var al=1-Math.exp(-dt/1.2);
+    vfE+=al*((fwd/S)/Math.max(dt,1e-4)-vfE);
+    vrE+=al*((bwd/S)/Math.max(dt,1e-4)-vrE);
+    csE+=al*(coll/Math.max(dt,1e-4)-csE);
+    ceE+=al*((fwd+bwd)/Math.max(dt,1e-4)-ceE);
+    pushAcc+=dt;if(pushAcc>=0.15){pushAcc=0;snap();}
+  }
+  drawBox(rdt);var c=conc();drawPie(c);drawCharts();readout(c);
+  requestAnimationFrame(loop);
+}
+
+document.getElementById("b1").onclick=function(){addN("a",Math.round(0.5*S));snap();say("Zwang: Ethansäureteilchen wurden zugegeben. Es kommt zu mehr Säure-Alkohol-Stößen, v(hin) steigt sprunghaft, bis Q wieder bei K liegt.");};
+document.getElementById("b2").onclick=function(){addN("b",Math.round(0.5*S));snap();say("Zwang: Ethanolteilchen wurden zugegeben. Die Stoßhäufigkeit der Edukte steigt, v(hin) überwiegt vorübergehend.");};
+document.getElementById("b5").onclick=function(){addN("w",Math.round(0.5*S));snap();say("Zwang: Wasser wurde zugegeben. Ester-Wasser-Stöße werden häufiger, v(rück) überwiegt und der Ester wird teilweise hydrolysiert.");};
+document.getElementById("b3").onclick=function(){removeFrac("e",0.6);snap();say("Zwang: Ester wurde abdestilliert. Ester-Wasser-Stöße werden selten, v(rück) bricht ein, die Hinreaktion bildet Ester nach.");};
+document.getElementById("b4").onclick=function(){removeFrac("w",0.6);snap();say("Zwang: Wasser wurde entzogen, etwa durch konz. Schwefelsäure oder einen Wasserabscheider. v(rück) sinkt stark, das Gleichgewicht verschiebt sich auf die Produktseite.");};
+document.getElementById("pp").onclick=function(){run=!run;this.textContent=run?"Pause":"Weiter";};
+document.getElementById("rs").onclick=function(){reset("v");};
+document.getElementById("m1").onclick=function(){reset("v");};
+document.getElementById("m2").onclick=function(){reset("h");};
+var sp=document.getElementById("sp");
+sp.addEventListener("input",function(){speed=parseFloat(this.value);document.getElementById("spo").textContent=speed.toFixed(2).replace(".",",");});
+var tp=document.getElementById("tp");
+tp.addEventListener("input",function(){T=parseFloat(this.value);tempUI();});
+tp.addEventListener("change",function(){
+  say(T>1.02?"Zwang: Die Temperatur wurde erhöht. Beide Richtungen werden schneller, die Rückreaktion mit der höheren Aktivierungsbarriere aber stärker. K sinkt, das Gleichgewicht verschiebt sich zur Eduktseite."
+    :(T<0.98?"Zwang: Die Temperatur wurde gesenkt. Beide Richtungen werden langsamer, die Rückreaktion verliert dabei stärker. K steigt, das Gleichgewicht verschiebt sich zur Produktseite."
+    :"Die Temperatur steht wieder bei der Bezugstemperatur, K beträgt 4,00."));
+});
+
+var rt;
+window.addEventListener("resize",function(){clearTimeout(rt);rt=setTimeout(sizes,120);});
+window.addEventListener("orientationchange",function(){setTimeout(sizes,250);});
+if(window.matchMedia){var mq=window.matchMedia("(prefers-color-scheme: dark)");
+  if(mq.addEventListener)mq.addEventListener("change",sizes);}
+
+sizes();buildList();tempUI();reset("v");requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
