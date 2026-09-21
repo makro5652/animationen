@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktives Schalenmodell</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#09090b;color:#f4f4f5;font-family:system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+h1{font-size:1.6rem;font-weight:700}
+.sub{font-size:.75rem;color:#71717a;text-transform:uppercase;letter-spacing:.15em}
+header{display:flex;justify-content:space-between;align-items:flex-end;padding:1.5rem 2rem 1rem}
+#el-name{font-size:1.1rem;font-weight:500;color:#60a5fa}
+.main{display:grid;grid-template-columns:220px 1fr 220px;gap:1.5rem;padding:0 2rem 1.5rem;flex:1}
+.panel{background:#18181b;border:1px solid #27272a;border-radius:1.25rem;padding:1.25rem}
+.row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
+.label{font-size:.78rem;color:#a1a1aa}
+.badge{font-family:monospace;font-size:.8rem;padding:.15rem .5rem;border-radius:.35rem}
+.badge-r{background:rgba(239,68,68,.1);color:#f87171}
+.badge-b{background:rgba(59,130,246,.1);color:#60a5fa}
+.badge-z{background:rgba(113,113,122,.1);color:#a1a1aa}
+.btns{display:flex;gap:.5rem;margin-bottom:1rem}
+button{flex:1;padding:.55rem;border-radius:.75rem;border:1px solid #3f3f46;background:#27272a;color:#f4f4f5;cursor:pointer;font-size:1rem;transition:background .15s}
+button:hover{background:#3f3f46}
+.btn-r{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4);color:#f87171}
+.btn-r:hover{background:rgba(239,68,68,.25)}
+.btn-b{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.4);color:#60a5fa}
+.btn-b:hover{background:rgba(59,130,246,.25)}
+.divider{border:none;border-top:1px solid #27272a;margin:.75rem 0}
+.toggle-row{display:flex;justify-content:space-between;align-items:center;background:#27272a;border:1px solid #3f3f46;border-radius:.85rem;padding:.5rem .75rem;margin-bottom:1rem}
+.toggle-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:#a1a1aa}
+.switch{position:relative;width:42px;height:24px}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:#3f3f46;border-radius:999px;transition:.2s}
+.slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+input:checked+.slider{background:#3b82f6}
+input:checked+.slider::before{transform:translateX(18px)}
+canvas{display:block;width:100%;height:auto;max-width:480px;margin:0 auto;cursor:crosshair}
+.canvas-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.speed-row{display:flex;align-items:center;gap:.75rem;margin-top:.75rem}
+.speed-row input{accent-color:#3b82f6;width:100px}
+.speed-row span{font-size:.68rem;text-transform:uppercase;color:#52525b;letter-spacing:.1em}
+.stability{position:absolute;top:.5rem;right:.5rem;background:#18181b;border:1px solid #27272a;border-radius:.85rem;padding:.35rem .75rem;font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:#71717a}
+.nuklid{display:flex;justify-content:center;margin-bottom:1.25rem}
+.nuklid-card{position:relative;width:90px;height:120px;background:#27272a;border:1px solid #3f3f46;border-radius:.85rem;display:flex;align-items:center;justify-content:center}
+.nuklid-card .mass{position:absolute;top:.4rem;left:.5rem;font-family:monospace;font-size:.78rem;color:#a1a1aa}
+.nuklid-card .z{position:absolute;bottom:.4rem;left:.5rem;font-family:monospace;font-size:.78rem;color:#a1a1aa}
+.nuklid-card .sym{font-size:2.2rem;font-weight:700}
+.nuklid-card .charge{position:absolute;top:.4rem;right:.5rem;font-family:monospace;font-size:.78rem;color:#60a5fa}
+.info-row{display:flex;justify-content:space-between;border-bottom:1px solid #27272a;padding-bottom:.5rem;margin-bottom:.5rem;font-size:.82rem}
+.info-row .k{color:#71717a}
+.info-row .v{font-weight:500}
+.config-title{font-size:.65rem;text-transform:uppercase;color:#52525b;letter-spacing:.1em;margin:.75rem 0 .4rem}
+.config-chips{display:flex;gap:.35rem;flex-wrap:wrap}
+.chip{background:rgba(59,130,246,.15);color:#60a5fa;padding:.2rem .5rem;border-radius:.35rem;font-size:.75rem}
+.reset-btn{width:100%;padding:.5rem;background:none;border:none;color:#52525b;font-size:.7rem;text-transform:uppercase;letter-spacing:.15em;cursor:pointer;margin-top:.75rem}
+.reset-btn:hover{color:#a1a1aa;background:none}
+@media(max-width:700px){
+  .main{grid-template-columns:1fr;grid-template-rows:auto auto auto}
+  header{flex-direction:column;align-items:flex-start;gap:.25rem}
+}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="sub">Chemie Labor</div>
+    <h1>Bohr'sches Schalenmodell</h1>
+  </div>
+  <div style="text-align:right">
+    <div id="el-name">Wasserstoff</div>
+    <div class="sub">Aktuelles Element</div>
+  </div>
+</header>
+
+<div class="main">
+  <!-- LEFT -->
+  <div class="panel">
+    <div class="toggle-row">
+      <span class="toggle-label">Neutronen anzeigen</span>
+      <label class="switch"><input type="checkbox" id="n-toggle" checked onchange="toggleN()"><span class="slider"></span></label>
+    </div>
+
+    <div class="row"><span class="label">Protonen</span><span id="vp" class="badge badge-r">1</span></div>
+    <div class="btns">
+      <button onclick="chg('p',-1)">−</button>
+      <button class="btn-r" onclick="chg('p',1)">+</button>
+    </div>
+
+    <div id="n-ctrl">
+      <div class="row"><span class="label">Neutronen</span><span id="vn" class="badge badge-z">0</span></div>
+      <div class="btns">
+        <button onclick="chg('n',-1)">−</button>
+        <button onclick="chg('n',1)">+</button>
+      </div>
+    </div>
+
+    <div class="row"><span class="label">Elektronen</span><span id="ve" class="badge badge-b">1</span></div>
+    <div class="btns">
+      <button onclick="chg('e',-1)">−</button>
+      <button class="btn-b" onclick="chg('e',1)">+</button>
+    </div>
+
+    <hr class="divider">
+    <button class="reset-btn" onclick="reset()">Modell zurücksetzen</button>
+  </div>
+
+  <!-- CENTER -->
+  <div class="panel canvas-wrap">
+    <div class="stability">Isotopen-Stabilität: <span id="stab">Stabil</span></div>
+    <canvas id="c" width="560" height="560"></canvas>
+    <div class="speed-row">
+      <input type="range" id="spd" min="0" max="2" step="0.1" value="0.5">
+      <span>Animation</span>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="panel">
+    <div class="nuklid">
+      <div class="nuklid-card">
+        <span id="nm" class="mass">1</span>
+        <span id="nz" class="z">1</span>
+        <span id="ns" class="sym">H</span>
+        <span id="nc" class="charge"></span>
+      </div>
+    </div>
+    <div class="info-row"><span class="k">Zustand</span><span id="i-state" class="v">Neutrales Atom</span></div>
+    <div class="info-row"><span class="k">Valenzelektronen</span><span id="i-val" class="v">1</span></div>
+    <div class="info-row"><span class="k">Äußerste Schale</span><span id="i-shell" class="v" style="color:#60a5fa">K</span></div>
+    <div class="config-title">Konfiguration</div>
+    <div id="i-cfg" class="config-chips"></div>
+  </div>
+</div>
+
+<script>
+const els=[
+  {z:0,s:"X",n:"Vakuum",m:0},
+  {z:1,s:"H",n:"Wasserstoff",m:1},{z:2,s:"He",n:"Helium",m:4},
+  {z:3,s:"Li",n:"Lithium",m:7},{z:4,s:"Be",n:"Beryllium",m:9},
+  {z:5,s:"B",n:"Bor",m:11},{z:6,s:"C",n:"Kohlenstoff",m:12},
+  {z:7,s:"N",n:"Stickstoff",m:14},{z:8,s:"O",n:"Sauerstoff",m:16},
+  {z:9,s:"F",n:"Fluor",m:19},{z:10,s:"Ne",n:"Neon",m:20},
+  {z:11,s:"Na",n:"Natrium",m:23},{z:12,s:"Mg",n:"Magnesium",m:24},
+  {z:13,s:"Al",n:"Aluminium",m:27},{z:14,s:"Si",n:"Silicium",m:28},
+  {z:15,s:"P",n:"Phosphor",m:31},{z:16,s:"S",n:"Schwefel",m:32},
+  {z:17,s:"Cl",n:"Chlor",m:35},{z:18,s:"Ar",n:"Argon",m:40},
+  {z:19,s:"K",n:"Kalium",m:39},{z:20,s:"Ca",n:"Calcium",m:40}
+];
+const stableN=[0,0,2,4,5,6,6,7,8,10,10,12,12,14,14,16,16,18,22,20,20];
+const shells=['K','L','M','N'];
+const maxE=[2,8,8,2];
+const bounds=[55,105,155,205,255];
+
+let S={p:1,n:0,e:1,rot:0,showN:true};
+
+function shellDist(e){
+  let rem=e,d=[0,0,0,0];
+  for(let i=0;i<4;i++){let t=Math.min(rem,maxE[i]);d[i]=t;rem-=t;}
+  if(rem>0)d[3]+=rem;
+  return d;
+}
+
+function toggleN(){
+  S.showN=document.getElementById('n-toggle').checked;
+  const c=document.getElementById('n-ctrl');
+  c.style.opacity=S.showN?'1':'0.3';
+  c.style.pointerEvents=S.showN?'auto':'none';
+  ui();
+}
+
+function chg(t,d){
+  S[t]=Math.max(0,Math.min(t==='p'?20:40,S[t]+d));
+  if(t==='p'&&S.p<=20&&S.p>0)S.n=stableN[S.p];
+  ui();
+}
+
+function reset(){
+  S={p:1,n:0,e:1,rot:0,showN:true};
+  document.getElementById('n-toggle').checked=true;
+  toggleN();
+  ui();
+}
+
+function ui(){
+  const el=els[S.p]||{s:'?',n:'Unbekannt',m:S.p};
+  document.getElementById('el-name').textContent=el.n;
+  document.getElementById('vp').textContent=S.p;
+  document.getElementById('vn').textContent=S.n;
+  document.getElementById('ve').textContent=S.e;
+  document.getElementById('ns').textContent=el.s;
+  const mass=S.showN?(S.p+S.n):el.m;
+  document.getElementById('nm').textContent=mass>0?mass:'';
+  document.getElementById('nz').textContent=S.p>0?S.p:'';
+  const diff=S.p-S.e;
+  const cs=diff===0?'':(Math.abs(diff)+(diff>0?'+':'-'));
+  document.getElementById('nc').textContent=cs;
+  const sl=S.p===0?'Vakuum':diff>0?`Kation (${cs})`:diff<0?`Anion (${cs})`:'Neutrales Atom';
+  document.getElementById('i-state').textContent=sl;
+  const ratio=S.p>0?S.n/S.p:1;
+  const ok=S.p===0||(ratio>=0.8&&ratio<=1.2)||(S.p===1&&S.n<=2);
+  const st=document.getElementById('stab');
+  st.textContent=ok?'Stabil':'Instabil';
+  st.style.color=ok?'#4ade80':'#f87171';
+  const dist=shellDist(S.e);
+  const cfg=document.getElementById('i-cfg');
+  cfg.innerHTML='';
+  let last=-1;
+  dist.forEach((c,i)=>{if(c>0){const d=document.createElement('div');d.className='chip';d.textContent=`${shells[i]}: ${c}`;cfg.appendChild(d);last=i;}});
+  document.getElementById('i-val').textContent=last>=0?dist[last]:0;
+  document.getElementById('i-shell').textContent=last>=0?shells[last]:'-';
+}
+
+const cv=document.getElementById('c');
+const cx=cv.getContext('2d');
+
+function draw(){
+  const W=cv.width,H=cv.height,cx_=W/2,cy_=H/2;
+  const spd=parseFloat(document.getElementById('spd').value);
+  cx.clearRect(0,0,W,H);
+  const dist=shellDist(S.e);
+  let active=0;
+  for(let i=3;i>=0;i--)if(dist[i]>0){active=i+1;break;}
+  const show=Math.max(1,active+1);
+
+  for(let i=0;i<show;i++){
+    cx.beginPath();
+    cx.arc(cx_,cy_,bounds[i],0,Math.PI*2);
+    cx.strokeStyle='rgba(63,63,70,0.45)';
+    cx.lineWidth=1.5;
+    cx.setLineDash([6,8]);
+    cx.stroke();
+    cx.setLineDash([]);
+  }
+
+  // nucleus glow
+  const ng=cx.createRadialGradient(cx_,cy_,0,cx_,cy_,38);
+  ng.addColorStop(0,'rgba(239,68,68,0.3)');
+  ng.addColorStop(1,'rgba(239,68,68,0)');
+  cx.beginPath();cx.arc(cx_,cy_,38,0,Math.PI*2);cx.fillStyle=ng;cx.fill();
+
+  cx.beginPath();cx.arc(cx_,cy_,32,0,Math.PI*2);
+  cx.fillStyle='rgba(239,68,68,0.18)';cx.fill();
+  cx.strokeStyle='rgba(239,68,68,0.7)';cx.lineWidth=2.5;cx.stroke();
+
+  cx.fillStyle='#fff';cx.textAlign='center';cx.textBaseline='middle';
+  cx.font='bold 14px monospace';
+  if(S.showN){
+    cx.fillText(`${S.p}p⁺`,cx_,cy_-8);
+    cx.fillStyle='#a1a1aa';cx.font='12px monospace';
+    cx.fillText(`${S.n}n`,cx_,cy_+10);
+  } else {
+    cx.fillText(`${S.p}p⁺`,cx_,cy_);
+  }
+
+  S.rot+=0.008*spd;
+
+  dist.forEach((count,si)=>{
+    if(count===0)return;
+    const r=(bounds[si]+bounds[si+1])/2;
+    cx.fillStyle='#3f3f46';cx.font='10px monospace';cx.textAlign='left';cx.textBaseline='alphabetic';
+    cx.fillText(shells[si],cx_+6,cy_-r+4);
+    for(let i=0;i<count;i++){
+      const angle=(i/count)*Math.PI*2+(S.rot/(si+1.2));
+      const ex=cx_+Math.cos(angle)*r,ey=cy_+Math.sin(angle)*r;
+      const g=cx.createRadialGradient(ex,ey,0,ex,ey,12);
+      g.addColorStop(0,'rgba(59,130,246,0.55)');g.addColorStop(1,'transparent');
+      cx.beginPath();cx.arc(ex,ey,12,0,Math.PI*2);cx.fillStyle=g;cx.fill();
+      cx.beginPath();cx.arc(ex,ey,6,0,Math.PI*2);
+      cx.fillStyle='#3b82f6';cx.strokeStyle='#fff';cx.lineWidth=1.5;cx.fill();cx.stroke();
+    }
+  });
+
+  requestAnimationFrame(draw);
+}
+
+ui();draw();
+</script>
+</body>
+</html>
