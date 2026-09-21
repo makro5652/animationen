@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation der Stoßtheorie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        canvas {
+            touch-action: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+    <header class="bg-slate-800 border-b border-slate-700 p-4 shadow-md">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-semibold text-slate-100">Interaktive Simulation der Stoßtheorie</h1>
+                <p class="text-xs text-slate-400">Reaktionskinetik: Einfluss von Temperatur, Konzentration und Aktivierungsenergie</p>
+            </div>
+            <div class="flex gap-2">
+                <button id="btnPlayPause" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded text-sm font-medium transition">Pause</button>
+                <button id="btnReset" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded text-sm font-medium transition">Zurücksetzen</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
+        
+        <section class="lg:col-span-4 bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-5 flex flex-col justify-between">
+            <div class="space-y-4">
+                <h2 class="text-base font-medium text-slate-200 border-b border-slate-700 pb-2">Parametereinstellungen</h2>
+                
+                <div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <label for="tempSlider" class="text-slate-300">Temperatur (T)</label>
+                        <span id="tempValue" class="text-emerald-400 font-mono">300 K</span>
+                    </div>
+                    <input type="range" id="tempSlider" min="100" max="800" value="300" class="w-full accent-emerald-500 bg-slate-700 rounded h-2">
+                    <p class="text-xs text-slate-400 mt-1">Bestimmt die mittlere kinetische Energie und Geschwindigkeit der Teilchen.</p>
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <label for="concASlider" class="text-slate-300">Konzentration Teilchen A (Blau)</label>
+                        <span id="concAValue" class="text-blue-400 font-mono">30</span>
+                    </div>
+                    <input type="range" id="concASlider" min="5" max="80" value="30" class="w-full accent-blue-500 bg-slate-700 rounded h-2">
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <label for="concBSlider" class="text-slate-300">Konzentration Teilchen B (Rot)</label>
+                        <span id="concBValue" class="text-rose-400 font-mono">30</span>
+                    </div>
+                    <input type="range" id="concBSlider" min="5" max="80" value="30" class="w-full accent-rose-500 bg-slate-700 rounded h-2">
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <label for="eaSlider" class="text-slate-300">Aktivierungsenergie (Ea)</label>
+                        <span id="eaValue" class="text-amber-400 font-mono">Mittelschwelle</span>
+                    </div>
+                    <input type="range" id="eaSlider" min="10" max="100" value="50" class="w-full accent-amber-500 bg-slate-700 rounded h-2">
+                    <p class="text-xs text-slate-400 mt-1">Mindestenergie, die beim Stoß für eine Reaktion erforderlich ist.</p>
+                </div>
+
+                <div class="pt-2 border-t border-slate-700">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="stericCheck" class="rounded bg-slate-700 border-slate-600 text-emerald-600 focus:ring-0">
+                        <span class="text-sm text-slate-300">Räumliche Orientierung beachten (sterischer Faktor)</span>
+                    </label>
+                    <p class="text-xs text-slate-400 mt-1">Nur Stöße im passenden Winkel führen zur Reaktion.</p>
+                </div>
+
+                <div class="pt-2 border-t border-slate-700">
+                    <span class="text-sm text-slate-300 block mb-2">Simulationsmodus</span>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="simMode" value="continuous" checked class="text-emerald-600 bg-slate-700 border-slate-600 focus:ring-0">
+                            <span class="text-xs text-slate-300">Kontinuierlich (Teilchen reagieren kurz, bleiben erhalten)</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="simMode" value="consume" class="text-emerald-600 bg-slate-700 border-slate-600 focus:ring-0">
+                            <span class="text-xs text-slate-300">Produktbildung (A + B werden zu grünem Produkt AB)</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/50 p-3 rounded border border-slate-700 text-xs space-y-2">
+                <div class="font-medium text-slate-300 mb-1">Legende</div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span>
+                    <span>Reaktand A</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+                    <span>Reaktand B</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                    <span>Produkt AB (bei Produktbildung)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-amber-400 border border-amber-200 inline-block"></span>
+                    <span>Erfolgreicher Stoß (Aufblitzen)</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="lg:col-span-8 flex flex-col gap-4">
+            
+            <div class="bg-slate-800 border border-slate-700 rounded-lg p-3 relative flex-1 flex flex-col min-h-[360px]">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-sm font-medium text-slate-200">Reaktionsraum</h2>
+                    <span id="fpsCounter" class="text-xs font-mono text-slate-400">60 FPS</span>
+                </div>
+                <div class="relative flex-1 w-full h-full bg-slate-950 rounded border border-slate-800 overflow-hidden">
+                    <canvas id="simCanvas" class="absolute top-0 left-0 w-full h-full"></canvas>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-3 flex flex-col justify-between">
+                    <h3 class="text-xs font-medium text-slate-300 mb-2">Stoßstatistik</h3>
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <div class="bg-slate-900 p-2 rounded border border-slate-700/50">
+                            <span class="text-[10px] text-slate-400 uppercase block">Gesamtstöße</span>
+                            <span id="statTotalCollisions" class="text-base font-mono text-slate-200">0</span>
+                        </div>
+                        <div class="bg-slate-900 p-2 rounded border border-slate-700/50">
+                            <span class="text-[10px] text-slate-400 uppercase block">Wirksame Stöße</span>
+                            <span id="statEffectiveCollisions" class="text-base font-mono text-emerald-400">0</span>
+                        </div>
+                        <div class="bg-slate-900 p-2 rounded border border-slate-700/50">
+                            <span class="text-[10px] text-slate-400 uppercase block">Erfolgsquote</span>
+                            <span id="statRatio" class="text-base font-mono text-amber-400">0.0 %</span>
+                        </div>
+                        <div class="bg-slate-900 p-2 rounded border border-slate-700/50">
+                            <span class="text-[10px] text-slate-400 uppercase block">Produkte AB</span>
+                            <span id="statProducts" class="text-base font-mono text-blue-400">0</span>
+                        </div>
+                    </div>
+                    <div class="h-28 w-full bg-slate-950 rounded border border-slate-800 p-1 relative">
+                        <canvas id="mbCanvas" class="absolute top-0 left-0 w-full h-full"></canvas>
+                    </div>
+                    <p class="text-[10px] text-slate-400 text-center mt-1">Maxwell-Boltzmann-Geschwindigkeitsverteilung mit Ea-Schwelle</p>
+                </div>
+
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-3 flex flex-col">
+                    <h3 class="text-xs font-medium text-slate-300 mb-2">Reaktionsverlauf über Zeit</h3>
+                    <div class="flex-1 min-h-[140px] bg-slate-950 rounded border border-slate-800 p-1 relative">
+                        <canvas id="chartCanvas" class="absolute top-0 left-0 w-full h-full"></canvas>
+                    </div>
+                    <div class="flex justify-around text-[10px] text-slate-400 mt-2">
+                        <span class="text-blue-400">Menge A</span>
+                        <span class="text-rose-400">Menge B</span>
+                        <span class="text-emerald-400">Produkte AB</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Skript wird direkt ausgeführt, ohne auf das window.load Event zu warten
+        const simCanvas = document.getElementById('simCanvas');
+        const simCtx = simCanvas.getContext('2d');
+        const mbCanvas = document.getElementById('mbCanvas');
+        const mbCtx = mbCanvas.getContext('2d');
+        const chartCanvas = document.getElementById('chartCanvas');
+        const chartCtx = chartCanvas.getContext('2d');
+
+        const tempSlider = document.getElementById('tempSlider');
+        const tempValue = document.getElementById('tempValue');
+        const concASlider = document.getElementById('concASlider');
+        const concAValue = document.getElementById('concAValue');
+        const concBSlider = document.getElementById('concBSlider');
+        const concBValue = document.getElementById('concBValue');
+        const eaSlider = document.getElementById('eaSlider');
+        const eaValue = document.getElementById('eaValue');
+        const stericCheck = document.getElementById('stericCheck');
+        const btnPlayPause = document.getElementById('btnPlayPause');
+        const btnReset = document.getElementById('btnReset');
+        const fpsCounter = document.getElementById('fpsCounter');
+
+        const statTotalCollisions = document.getElementById('statTotalCollisions');
+        const statEffectiveCollisions = document.getElementById('statEffectiveCollisions');
+        const statRatio = document.getElementById('statRatio');
+        const statProducts = document.getElementById('statProducts');
+
+        let isRunning = true;
+        let temperature = parseFloat(tempSlider.value);
+        let countA = parseInt(concASlider.value);
+        let countB = parseInt(concBSlider.value);
+        let activationEnergy = parseFloat(eaSlider.value);
+        let requireSteric = stericCheck.checked;
+        let simMode = 'continuous';
+
+        let totalABCollisions = 0;
+        let effectiveCollisions = 0;
+        let particles = [];
+        let flashes = [];
+        let historyData = [];
+        let lastChartUpdate = 0;
+
+        let lastFrameTime = performance.now();
+        let frameCount = 0;
+
+        function resizeCanvases() {
+            simCanvas.width = simCanvas.parentElement.clientWidth || 600;
+            simCanvas.height = simCanvas.parentElement.clientHeight || 400;
+
+            mbCanvas.width = mbCanvas.parentElement.clientWidth || 300;
+            mbCanvas.height = mbCanvas.parentElement.clientHeight || 100;
+
+            chartCanvas.width = chartCanvas.parentElement.clientWidth || 300;
+            chartCanvas.height = chartCanvas.parentElement.clientHeight || 140;
+        }
+        
+        window.addEventListener('resize', resizeCanvases);
+        resizeCanvases();
+
+        class Particle {
+            constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.radius = type === 'AB' ? 7 : 5;
+                this.type = type;
+                this.mass = type === 'AB' ? 2 : 1;
+                
+                const rand = Math.max(0.001, Math.random());
+                const speed = Math.sqrt(-2 * Math.log(rand)) * Math.sqrt(temperature / 100) * 1.5;
+                const angle = Math.random() * Math.PI * 2;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+            }
+
+            update(dt, width, height) {
+                this.x += this.vx * dt;
+                this.y += this.vy * dt;
+
+                const safeWidth = Math.max(width, 50);
+                const safeHeight = Math.max(height, 50);
+
+                if (this.x - this.radius < 0) {
+                    this.x = this.radius;
+                    this.vx *= -1;
+                } else if (this.x + this.radius > safeWidth) {
+                    this.x = safeWidth - this.radius;
+                    this.vx *= -1;
+                }
+
+                if (this.y - this.radius < 0) {
+                    this.y = this.radius;
+                    this.vy *= -1;
+                } else if (this.y + this.radius > safeHeight) {
+                    this.y = safeHeight - this.radius;
+                    this.vy *= -1;
+                }
+            }
+
+            draw(ctx) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                if (this.type === 'A') {
+                    ctx.fillStyle = '#3b82f6';
+                } else if (this.type === 'B') {
+                    ctx.fillStyle = '#f43f5e';
+                } else {
+                    ctx.fillStyle = '#10b981';
+                }
+                ctx.fill();
+                ctx.strokeStyle = '#0f172a';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+
+            adjustSpeedForTemperature(oldTemp, newTemp) {
+                if (oldTemp <= 0) return;
+                const factor = Math.sqrt(newTemp / oldTemp);
+                this.vx *= factor;
+                this.vy *= factor;
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            totalABCollisions = 0;
+            effectiveCollisions = 0;
+            flashes = [];
+            historyData = [];
+            
+            const w = simCanvas.width || 600;
+            const h = simCanvas.height || 400;
+
+            for (let i = 0; i < countA; i++) {
+                particles.push(new Particle(
+                    Math.random() * (w - 20) + 10,
+                    Math.random() * (h - 20) + 10,
+                    'A'
+                ));
+            }
+
+            for (let i = 0; i < countB; i++) {
+                particles.push(new Particle(
+                    Math.random() * (w - 20) + 10,
+                    Math.random() * (h - 20) + 10,
+                    'B'
+                ));
+            }
+
+            updateStats();
+        }
+
+        function handleCollisions() {
+            const len = particles.length;
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const p1 = particles[i];
+                    const p2 = particles[j];
+
+                    const dx = p2.x - p1.x;
+                    const dy = p2.y - p1.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const minDist = p1.radius + p2.radius;
+
+                    if (dist < minDist && dist > 0) {
+                        const overlap = minDist - dist;
+                        const nx = dx / dist;
+                        const ny = dy / dist;
+
+                        p1.x -= nx * overlap * 0.5;
+                        p1.y -= ny * overlap * 0.5;
+                        p2.x += nx * overlap * 0.5;
+                        p2.y += ny * overlap * 0.5;
+
+                        const rvx = p2.vx - p1.vx;
+                        const rvy = p2.vy - p1.vy;
+                        const velAlongNormal = rvx * nx + rvy * ny;
+
+                        if (velAlongNormal > 0) continue;
+
+                        const relSpeedSq = rvx * rvx + rvy * rvy;
+                        const collisionEnergy = 0.5 * relSpeedSq;
+
+                        const isABPair = (p1.type === 'A' && p2.type === 'B') || (p1.type === 'B' && p2.type === 'A');
+
+                        if (isABPair) {
+                            totalABCollisions++;
+
+                            const energySufficient = collisionEnergy >= activationEnergy * 0.15;
+                            
+                            let stericFavorable = true;
+                            if (requireSteric) {
+                                const stericAngle = Math.abs(rvx * nx + rvy * ny) / Math.sqrt(relSpeedSq);
+                                stericFavorable = stericAngle > 0.6;
+                            }
+
+                            if (energySufficient && stericFavorable) {
+                                effectiveCollisions++;
+
+                                flashes.push({
+                                    x: (p1.x + p2.x) / 2,
+                                    y: (p1.y + p2.y) / 2,
+                                    radius: 12,
+                                    alpha: 1.0,
+                                    color: '#fbbf24'
+                                });
+
+                                if (simMode === 'consume') {
+                                    p1.type = 'AB';
+                                    p1.radius = 7;
+                                    p1.mass = 2;
+                                    particles.splice(j, 1);
+                                    updateStats();
+                                    j--;
+                                    continue;
+                                }
+                            } else {
+                                flashes.push({
+                                    x: (p1.x + p2.x) / 2,
+                                    y: (p1.y + p2.y) / 2,
+                                    radius: 5,
+                                    alpha: 0.4,
+                                    color: '#94a3b8'
+                                });
+                            }
+                        }
+
+                        const restitution = 1.0;
+                        const impulse = -(1 + restitution) * velAlongNormal / (1/p1.mass + 1/p2.mass);
+
+                        const impulseX = impulse * nx;
+                        const impulseY = impulse * ny;
+
+                        p1.vx -= (1 / p1.mass) * impulseX;
+                        p1.vy -= (1 / p1.mass) * impulseY;
+                        p2.vx += (1 / p2.mass) * impulseX;
+                        p2.vy += (1 / p2.mass) * impulseY;
+                    }
+                }
+            }
+        }
+
+        function updateStats() {
+            statTotalCollisions.textContent = totalABCollisions;
+            statEffectiveCollisions.textContent = effectiveCollisions;
+            
+            const ratio = totalABCollisions > 0 ? ((effectiveCollisions / totalABCollisions) * 100).toFixed(1) : '0.0';
+            statRatio.textContent = `${ratio} %`;
+
+            const countAB = particles.filter(p => p.type === 'AB').length;
+            statProducts.textContent = countAB;
+        }
+
+        function drawMaxwellBoltzmann() {
+            const w = mbCanvas.width;
+            const h = mbCanvas.height;
+            mbCtx.clearRect(0, 0, w, h);
+
+            if (w === 0 || h === 0) return;
+
+            const padding = 20;
+            const graphW = w - padding * 2;
+            const graphH = h - padding * 2;
+
+            mbCtx.strokeStyle = '#475569';
+            mbCtx.lineWidth = 1;
+            mbCtx.beginPath();
+            mbCtx.moveTo(padding, padding);
+            mbCtx.lineTo(padding, h - padding);
+            mbCtx.lineTo(w - padding, h - padding);
+            mbCtx.stroke();
+
+            const a = 1 / (temperature * 0.02);
+            mbCtx.beginPath();
+            mbCtx.strokeStyle = '#38bdf8';
+            mbCtx.lineWidth = 2;
+
+            const maxV = 25;
+            let thresholdX = padding + (Math.sqrt(activationEnergy * 0.3) / maxV) * graphW;
+            thresholdX = Math.min(Math.max(thresholdX, padding), w - padding);
+
+            mbCtx.fillStyle = 'rgba(251, 191, 36, 0.25)';
+            mbCtx.beginPath();
+            mbCtx.moveTo(thresholdX, h - padding);
+
+            for (let x = 0; x <= graphW; x++) {
+                const v = (x / graphW) * maxV;
+                const yVal = v * Math.exp(-a * v * v) * graphH * 0.22 * Math.sqrt(temperature);
+                const canvasX = padding + x;
+                const canvasY = h - padding - yVal;
+
+                if (x === 0) mbCtx.moveTo(canvasX, canvasY);
+                else mbCtx.lineTo(canvasX, canvasY);
+            }
+            mbCtx.stroke();
+
+            mbCtx.beginPath();
+            mbCtx.moveTo(thresholdX, h - padding);
+            for (let x = thresholdX - padding; x <= graphW; x++) {
+                const v = (x / graphW) * maxV;
+                const yVal = v * Math.exp(-a * v * v) * graphH * 0.22 * Math.sqrt(temperature);
+                const canvasX = padding + x;
+                const canvasY = h - padding - yVal;
+                mbCtx.lineTo(canvasX, canvasY);
+            }
+            mbCtx.lineTo(w - padding, h - padding);
+            mbCtx.closePath();
+            mbCtx.fillStyle = 'rgba(251, 191, 36, 0.3)';
+            mbCtx.fill();
+
+            mbCtx.strokeStyle = '#fbbf24';
+            mbCtx.lineWidth = 2;
+            mbCtx.setLineDash([3, 3]);
+            mbCtx.beginPath();
+            mbCtx.moveTo(thresholdX, padding);
+            mbCtx.lineTo(thresholdX, h - padding);
+            mbCtx.stroke();
+            mbCtx.setLineDash([]);
+
+            mbCtx.fillStyle = '#fbbf24';
+            mbCtx.font = '10px monospace';
+            mbCtx.fillText('Ea', Math.min(thresholdX + 4, w - 25), padding + 10);
+        }
+
+        function drawChart() {
+            const w = chartCanvas.width;
+            const h = chartCanvas.height;
+            chartCtx.clearRect(0, 0, w, h);
+
+            if (w === 0 || h === 0 || historyData.length < 2) return;
+
+            const padding = 20;
+            const graphW = w - padding * 2;
+            const graphH = h - padding * 2;
+
+            chartCtx.strokeStyle = '#475569';
+            chartCtx.lineWidth = 1;
+            chartCtx.beginPath();
+            chartCtx.moveTo(padding, padding);
+            chartCtx.lineTo(padding, h - padding);
+            chartCtx.lineTo(w - padding, h - padding);
+            chartCtx.stroke();
+
+            const maxLen = 100;
+            const maxVal = Math.max(countA + countB, 10);
+
+            const drawLine = (key, color) => {
+                chartCtx.beginPath();
+                chartCtx.strokeStyle = color;
+                chartCtx.lineWidth = 1.5;
+
+                for (let i = 0; i < historyData.length; i++) {
+                    const x = padding + (i / (maxLen - 1)) * graphW;
+                    const y = h - padding - (historyData[i][key] / maxVal) * graphH;
+
+                    if (i === 0) chartCtx.moveTo(x, y);
+                    else chartCtx.lineTo(x, y);
+                }
+                chartCtx.stroke();
+            };
+
+            drawLine('A', '#3b82f6');
+            drawLine('B', '#f43f5e');
+            drawLine('AB', '#10b981');
+        }
+
+        function animate(now) {
+            if (!now) now = performance.now();
+            const dt = Math.min((now - lastFrameTime) / 1000, 0.05);
+            lastFrameTime = now;
+
+            frameCount++;
+            if (frameCount % 30 === 0 && dt > 0) {
+                fpsCounter.textContent = `${Math.round(1 / dt)} FPS`;
+            }
+
+            if (isRunning) {
+                particles.forEach(p => p.update(1, simCanvas.width, simCanvas.height));
+                handleCollisions();
+
+                if (now - lastChartUpdate > 200) {
+                    const currentA = particles.filter(p => p.type === 'A').length;
+                    const currentB = particles.filter(p => p.type === 'B').length;
+                    const currentAB = particles.filter(p => p.type === 'AB').length;
+
+                    historyData.push({ A: currentA, B: currentB, AB: currentAB });
+                    if (historyData.length > 100) historyData.shift();
+
+                    lastChartUpdate = now;
+                    updateStats();
+                }
+            }
+
+            simCtx.clearRect(0, 0, simCanvas.width, simCanvas.height);
+
+            for (let i = flashes.length - 1; i >= 0; i--) {
+                const f = flashes[i];
+                simCtx.beginPath();
+                simCtx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
+                simCtx.fillStyle = f.color;
+                simCtx.globalAlpha = f.alpha;
+                simCtx.fill();
+                simCtx.globalAlpha = 1.0;
+
+                f.radius += 0.4;
+                f.alpha -= 0.05;
+
+                if (f.alpha <= 0) {
+                    flashes.splice(i, 1);
+                }
+            }
+
+            particles.forEach(p => p.draw(simCtx));
+
+            drawMaxwellBoltzmann();
+            drawChart();
+
+            requestAnimationFrame(animate);
+        }
+
+        tempSlider.addEventListener('input', (e) => {
+            const newTemp = parseFloat(e.target.value);
+            tempValue.textContent = `${newTemp} K`;
+            
+            particles.forEach(p => p.adjustSpeedForTemperature(temperature, newTemp));
+            temperature = newTemp;
+        });
+
+        concASlider.addEventListener('input', (e) => {
+            countA = parseInt(e.target.value);
+            concAValue.textContent = countA;
+            initParticles();
+        });
+
+        concBSlider.addEventListener('input', (e) => {
+            countB = parseInt(e.target.value);
+            concBValue.textContent = countB;
+            initParticles();
+        });
+
+        eaSlider.addEventListener('input', (e) => {
+            activationEnergy = parseFloat(e.target.value);
+            if (activationEnergy < 35) eaValue.textContent = "Niedrig";
+            else if (activationEnergy < 70) eaValue.textContent = "Mittel";
+            else eaValue.textContent = "Hoch";
+        });
+
+        stericCheck.addEventListener('change', (e) => {
+            requireSteric = e.target.checked;
+        });
+
+        document.querySelectorAll('input[name="simMode"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                simMode = e.target.value;
+                initParticles();
+            });
+        });
+
+        btnPlayPause.addEventListener('click', () => {
+            isRunning = !isRunning;
+            btnPlayPause.textContent = isRunning ? 'Pause' : 'Start';
+            btnPlayPause.className = isRunning
+                ? 'bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded text-sm font-medium transition'
+                : 'bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded text-sm font-medium transition';
+        });
+
+        btnReset.addEventListener('click', () => {
+            initParticles();
+        });
+
+        // Initiiere direkt beim Laden
+        initParticles();
+        requestAnimationFrame(animate);
+    </script>
+</body>
+</html>
