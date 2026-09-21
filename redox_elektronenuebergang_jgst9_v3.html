@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elektronenübergang – Selbstlernmodul Chemie 9</title>
+<style>
+:root{
+  --paper:#E9ECF0;
+  --card:#FFFFFF;
+  --ink:#18222E;
+  --muted:#5B6976;
+  --line:#CBD3DB;
+  --stage:#152640;
+  --elec:#F3C551;
+  --accent:#0F6E75;
+  --ok:#1F7A4D;
+  --no:#B03A32;
+  --sans:"Inter","Segoe UI",system-ui,-apple-system,"Helvetica Neue",sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 80px}
+h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.25;margin:0}
+p{margin:0 0 .8em}
+p:last-child{margin-bottom:0}
+
+header{background:var(--stage);color:#EAF0F7;padding:38px 0 30px;margin-bottom:34px;border-bottom:4px solid var(--elec)}
+header .wrap{padding-bottom:0}
+h1{font-size:clamp(28px,4.4vw,40px);color:#fff;max-width:20ch}
+.kurs{font-family:var(--sans);font-size:14px;letter-spacing:.02em;color:#9FB6D2;margin-bottom:10px}
+.ziel{margin-top:16px;max-width:62ch;color:#C6D5E6;font-size:16px}
+.ziel b{color:#fff;font-weight:600}
+
+section{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:26px 26px 28px;margin-bottom:22px}
+.sec-nr{font-family:var(--serif);font-size:15px;color:var(--accent);border-bottom:1px solid var(--line);padding-bottom:6px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.sec-nr span:last-child{color:var(--muted);font-family:var(--sans);font-size:13px}
+h2{font-size:24px;margin-bottom:12px}
+.lede{max-width:66ch}
+.hinweis{color:var(--muted);font-size:15px;max-width:66ch}
+
+.frage{margin-top:18px;max-width:70ch}
+.frage>p{font-weight:600;margin-bottom:10px}
+.opt{display:block;width:100%;text-align:left;font:inherit;color:inherit;background:#F7F9FB;border:1px solid var(--line);border-radius:5px;padding:11px 14px;margin-bottom:8px;cursor:pointer}
+.opt:hover{border-color:var(--accent);background:#F1F6F7}
+.opt:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.opt[disabled]{cursor:default}
+.opt.gewaehlt{border-color:var(--accent);background:#E7F1F2}
+.opt.richtig{border-color:var(--ok);background:#E9F4EE}
+.opt.falsch{border-color:var(--no);background:#FAEDEC}
+.echo{margin-top:10px;font-size:16px;padding:11px 14px;border-radius:5px;display:none}
+.echo.an{display:block}
+.echo.gut{background:#E9F4EE;border-left:4px solid var(--ok)}
+.echo.schlecht{background:#FAEDEC;border-left:4px solid var(--no)}
+.echo.neutral{background:#EEF1F4;border-left:4px solid var(--muted)}
+.echo b{font-weight:700}
+
+.buehne-raster{display:grid;grid-template-columns:1.35fr 1fr;gap:22px;margin-top:18px}
+@media(max-width:840px){.buehne-raster{grid-template-columns:1fr}}
+.buehne{background:var(--stage);border-radius:6px;overflow:hidden}
+svg{display:block;width:100%;height:auto}
+
+.steuerung{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px;background:#0F1E33}
+button.st{font:inherit;font-size:15px;color:#0F1E33;background:var(--elec);border:none;border-radius:4px;padding:9px 16px;cursor:pointer;font-weight:600}
+button.st.leise{background:#2E466B;color:#DCE7F4}
+button.st:hover{filter:brightness(1.08)}
+button.st:focus-visible{outline:3px solid var(--elec);outline-offset:2px}
+button.st[disabled]{opacity:.4;cursor:default;filter:none}
+.zaehler{color:#9FB6D2;font-size:14px;margin-left:auto;padding-right:4px}
+.schrittleiste{display:flex;gap:4px;padding:0 12px 12px;background:#0F1E33;flex-wrap:wrap}
+.schrittleiste button{font:inherit;font-size:13px;background:transparent;color:#7C96B8;border:1px solid #2E466B;border-radius:3px;padding:4px 9px;cursor:pointer}
+.schrittleiste button[aria-current="step"]{background:var(--elec);color:#0F1E33;border-color:var(--elec);font-weight:600}
+.schrittleiste button:focus-visible{outline:2px solid var(--elec);outline-offset:2px}
+
+.schalter{display:flex;align-items:center;gap:9px;padding:11px 12px;background:#0F1E33;color:#C6D5E6;font-size:15px;border-top:1px solid #22385A}
+.schalter input{width:18px;height:18px;accent-color:var(--elec);cursor:pointer}
+.schalter label{cursor:pointer}
+
+.erklaerung{display:flex;flex-direction:column;gap:16px}
+.karte{border:1px solid var(--line);border-radius:5px;padding:16px 18px}
+.karte h3{font-size:19px;margin-bottom:8px}
+.karte p{font-size:16px}
+.symbolkarte{background:#F7F9FB}
+.gl{font-family:var(--serif);font-size:17px;margin:0 0 10px;opacity:.22;transition:opacity .5s;line-height:1.5}
+.gl.an{opacity:1}
+.gl small{display:block;font-family:var(--sans);font-size:13px;color:var(--muted)}
+.gl b{font-weight:600}
+
+.stoffwahl{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 4px}
+.stoffwahl button{font:inherit;font-size:16px;background:#F7F9FB;border:1px solid var(--line);border-radius:5px;padding:9px 15px;cursor:pointer;color:inherit}
+.stoffwahl button:hover{border-color:var(--accent)}
+.stoffwahl button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.stoffwahl button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.stoffwahl .formel{font-family:var(--serif)}
+.genauer{margin-top:14px;padding:12px 15px;background:#F1F6F7;border-left:4px solid var(--accent);border-radius:0 5px 5px 0;font-size:16px;display:none}
+.genauer.an{display:block}
+
+details.wort,details.loesung{border:1px solid var(--line);border-radius:5px;background:#F7F9FB;margin-top:18px}
+details.wort summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:16px;list-style:none;display:flex;justify-content:space-between}
+details.wort summary::-webkit-details-marker{display:none}
+details.wort summary::after{content:"+";color:var(--accent);font-size:20px;line-height:1}
+details.wort[open] summary::after{content:"–"}
+details.wort .inhalt,details.loesung .inhalt{padding:0 16px 16px}
+dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:16px}
+dt{font-weight:600}
+dd{margin:0;color:var(--muted)}
+.bausteine{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.bausteine ul{margin:6px 0 0;padding-left:20px}
+.bausteine li{margin-bottom:5px;font-size:16px}
+
+textarea{width:100%;min-height:120px;font:inherit;font-size:16px;padding:12px;border:1px solid var(--line);border-radius:5px;background:#F7F9FB;color:var(--ink);resize:vertical}
+textarea:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+details.loesung{border:none;border-left:4px solid var(--accent);background:#F1F6F7;border-radius:0 5px 5px 0;margin-top:12px}
+details.loesung summary{cursor:pointer;padding:11px 14px;font-weight:600}
+details.loesung .gl{opacity:1;margin-bottom:6px}
+
+footer{color:var(--muted);font-size:14px;text-align:center;margin-top:34px}
+sup,sub{font-size:.72em}
+@media (prefers-reduced-motion: reduce){*{transition-duration:.001ms !important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="kurs">Chemie · Jahrgangsstufe 9 · Selbstlernmodul</div>
+    <h1>Wohin gehen die Elektronen?</h1>
+    <p class="ziel">Du untersuchst Redoxreaktionen auf der <b>Teilchenebene</b>. Am Ende kannst du erklären, warum <b>Oxidation und Reduktion immer zusammen</b> ablaufen, und du kannst die Teilgleichungen selbst aufstellen.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- 1 -->
+<section>
+  <div class="sec-nr"><span>Schritt 1 von 5</span><span>Beobachten</span></div>
+  <h2>Was man im Labor sieht</h2>
+  <p class="lede">Ein Magnesiumband wird in die Brennerflamme gehalten. Es entzündet sich und brennt mit einem sehr hellen, weißen Licht. Zurück bleibt ein weißes, brüchiges Pulver: Magnesiumoxid. Das Pulver wiegt <em>mehr</em> als das Magnesiumband vorher.</p>
+  <p class="hinweis">Auf dieser Ebene siehst du nur das Ergebnis. Warum die Reaktion abläuft, erkennst du erst, wenn du die Teilchen betrachtest.</p>
+  <div class="frage" id="f0">
+    <p>Vorhersage: Was geschieht mit den äußeren Elektronen der Magnesium-Atome?</p>
+    <button class="opt" data-v="a">Sie bleiben beim Magnesium-Atom.</button>
+    <button class="opt" data-v="b">Sie gehen auf die Sauerstoff-Atome über.</button>
+    <button class="opt" data-v="c">Sie werden bei der Verbrennung vernichtet.</button>
+    <div class="echo" id="e0"></div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section>
+  <div class="sec-nr"><span>Schritt 2 von 5</span><span>Teilchenebene</span></div>
+  <h2>Die Reaktion in Einzelschritten</h2>
+  <p class="lede">Klicke dich durch die Schritte. Du kannst jederzeit zurückgehen und einen Schritt noch einmal ansehen.</p>
+  <div class="buehne-raster" id="buehne-mgo"></div>
+  <div class="echo" id="e0-aufloesung"></div>
+
+  <details class="wort">
+    <summary>Wortspeicher</summary>
+    <div class="inhalt">
+      <dl>
+        <dt>abgeben</dt><dd>etwas weggeben – das Magnesium gibt Elektronen ab</dd>
+        <dt>aufnehmen</dt><dd>etwas zu sich nehmen – der Sauerstoff nimmt Elektronen auf</dd>
+        <dt>übergehen auf</dt><dd>von einem Teilchen zum anderen wandern</dd>
+        <dt>das Ion</dt><dd>ein Teilchen mit elektrischer Ladung</dd>
+        <dt>die Ladung</dt><dd>positiv (+) oder negativ (–)</dd>
+        <dt>die Schale</dt><dd>ein Bereich um den Kern, in dem sich Elektronen aufhalten</dd>
+        <dt>die Oxidation</dt><dd>die Abgabe von Elektronen</dd>
+        <dt>die Reduktion</dt><dd>die Aufnahme von Elektronen</dd>
+        <dt>das Oxidationsmittel</dt><dd>der Stoff, der Elektronen aufnimmt</dd>
+        <dt>das Reduktionsmittel</dt><dd>der Stoff, der Elektronen abgibt</dd>
+        <dt>anziehen</dt><dd>plus und minus ziehen sich gegenseitig an</dd>
+      </dl>
+      <div class="bausteine">
+        <strong>Satzbausteine für deine Erklärung</strong>
+        <ul>
+          <li>Das Magnesium-Atom gibt zwei Elektronen ab. Dabei entsteht ein Magnesium-Ion.</li>
+          <li>Das Sauerstoff-Atom nimmt zwei Elektronen auf. Dabei entsteht ein Oxid-Ion.</li>
+          <li>Magnesium wird oxidiert, weil es Elektronen abgibt.</li>
+          <li>Sauerstoff wird reduziert, weil er Elektronen aufnimmt.</li>
+          <li>Die Ionen ziehen sich an, weil sie entgegengesetzt geladen sind.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+</section>
+
+<!-- 3 -->
+<section>
+  <div class="sec-nr"><span>Schritt 3 von 5</span><span>Prüfen</span></div>
+  <h2>Hast du es verstanden?</h2>
+  <p class="hinweis">Sieh dir bei Bedarf den passenden Animationsschritt noch einmal an, bevor du antwortest.</p>
+  <div id="quiz"></div>
+</section>
+
+<!-- 4 -->
+<section>
+  <div class="sec-nr"><span>Schritt 4 von 5</span><span>Übertragen</span></div>
+  <h2>Eine neue Reaktion</h2>
+  <p class="lede">Zinkpulver reagiert beim Erhitzen mit Kupferoxid. Es entstehen Zinkoxid und Kupfer:</p>
+  <p class="gl an" style="margin:14px 0 16px">Zn + CuO &nbsp;&rarr;&nbsp; ZnO + Cu</p>
+  <p class="lede">Stelle die beiden Teilgleichungen auf. Welcher Stoff wird oxidiert, welcher reduziert? Begründe mit den Elektronen.</p>
+  <textarea id="transfer" aria-label="Deine Antwort zur Transferaufgabe" placeholder="Schreibe hier deine Antwort."></textarea>
+  <details class="loesung">
+    <summary>Lösung ansehen (erst nach deinem eigenen Versuch)</summary>
+    <div class="inhalt">
+      <p class="gl"><small>Oxidation</small>Zn &nbsp;&rarr;&nbsp; Zn<sup>2+</sup> + 2 e<sup>–</sup></p>
+      <p class="gl"><small>Reduktion</small>Cu<sup>2+</sup> + 2 e<sup>–</sup> &nbsp;&rarr;&nbsp; Cu</p>
+      <p>Zink gibt zwei Elektronen ab und wird oxidiert. Es ist das Reduktionsmittel. Die Kupfer-Ionen nehmen diese zwei Elektronen auf und werden reduziert; Kupferoxid ist das Oxidationsmittel.</p>
+      <p>Die Oxid-Ionen (O<sup>2–</sup>) verändern sich dabei nicht. Sie wechseln nur den Partner: vom Kupfer-Ion zum Zink-Ion.</p>
+    </div>
+  </details>
+</section>
+
+<!-- 5 -->
+<section>
+  <div class="sec-nr"><span>Schritt 5 von 5</span><span>Weitere Beispiele</span></div>
+  <h2>Drei weitere Reaktionen</h2>
+  <p class="lede">Dieselbe Animation für drei andere Stoffe. Achte darauf, <em>wie viele</em> Elektronen jedes Atom abgibt oder aufnimmt — das entscheidet über die Verhältnisformel.</p>
+  <p class="hinweis">Aufgabe: Notiere für jedes Beispiel die beiden Teilgleichungen in deinem Heft. Schalte danach die Schalen ein und prüfe, ob jedes Ion die Edelgaskonfiguration erreicht hat.</p>
+
+  <div class="stoffwahl" id="stoffwahl" role="group" aria-label="Beispiel auswählen"></div>
+  <div class="buehne-raster" id="buehne-mehr"></div>
+  <p class="genauer" id="genauer"></p>
+</section>
+
+<footer>Selbstlernmodul Chemie 9 &middot; Deutsche Schule Nairobi</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+var NS = "http://www.w3.org/2000/svg";
+var $ = function(id){ return document.getElementById(id); };
+
+function svgEl(name, attrs){
+  var e = document.createElementNS(NS, name);
+  for(var k in attrs){ if(attrs.hasOwnProperty(k)) e.setAttribute(k, attrs[k]); }
+  return e;
+}
+
+/* ================= Daten ================= */
+var FARBEN = {
+  Mg:{fuell:"#93A3B1", rand:"#6C7B89", schrift:"#152640"},
+  Na:{fuell:"#B7A6D0", rand:"#8B78A8", schrift:"#152640"},
+  Al:{fuell:"#A6B4BE", rand:"#7C8A94", schrift:"#152640"},
+  O :{fuell:"#CE564F", rand:"#9E3B36", schrift:"#FFF3F2"},
+  Cl:{fuell:"#7BAE4E", rand:"#547E30", schrift:"#122008"},
+  Br:{fuell:"#A0522D", rand:"#71391E", schrift:"#FFEFE6"}
+};
+
+var BEISPIELE = {
+  mgo:{
+    name:"Magnesiumoxid", formel:"MgO", molekuel:true,
+    atome:[
+      {id:"m1", sym:"Mg", art:"metall", schalen:[2,8,2], ladung:"2+", start:[140,125], getrennt:[140,125], gitter:[275,155]},
+      {id:"m2", sym:"Mg", art:"metall", schalen:[2,8,2], ladung:"2+", start:[140,305], getrennt:[140,305], gitter:[425,285]},
+      {id:"n1", sym:"O",  art:"nicht",  schalen:[2,6],   ladung:"2–", start:[470,178], getrennt:[470,118], gitter:[425,155]},
+      {id:"n2", sym:"O",  art:"nicht",  schalen:[2,6],   ladung:"2–", start:[470,252], getrennt:[470,312], gitter:[275,285]}
+    ],
+    bindung:["n1","n2"],
+    uebergaenge:[{von:"m1",nach:"n1"},{von:"m1",nach:"n1"},{von:"m2",nach:"n2"},{von:"m2",nach:"n2"}],
+    gitterSkala:.62,
+    gl:{
+      ox:'<small>Oxidation – Elektronen werden abgegeben</small>2 Mg &nbsp;&rarr;&nbsp; 2 Mg<sup>2+</sup> + 4 e<sup>–</sup>',
+      red:'<small>Reduktion – Elektronen werden aufgenommen</small>O<sub>2</sub> + 4 e<sup>–</sup> &nbsp;&rarr;&nbsp; 2 O<sup>2–</sup>',
+      ges:'<small>Redoxreaktion – beides zusammen</small><b>2 Mg + O<sub>2</sub> &nbsp;&rarr;&nbsp; 2 MgO</b>'
+    },
+    texte:{
+      start:["Die Ausgangsstoffe","Links: zwei Magnesium-Atome. Jedes hat zwei Außenelektronen (gelb). Rechts: ein Sauerstoff-Molekül aus zwei Sauerstoff-Atomen. Jedes Sauerstoff-Atom hat sechs Außenelektronen."],
+      trennen:["Das Sauerstoff-Molekül wird getrennt","Die Brennerflamme liefert Energie. Damit bricht die Bindung zwischen den beiden Sauerstoff-Atomen. Jetzt liegen zwei einzelne Sauerstoff-Atome vor. Ohne diese Energie startet die Reaktion nicht."],
+      abgabe:["Magnesium gibt Elektronen ab","Jedes Magnesium-Atom gibt seine zwei Außenelektronen ab. Dieser Vorgang heißt Oxidation."],
+      aufnahme:["Sauerstoff nimmt die Elektronen auf","Jedes Sauerstoff-Atom nimmt zwei Elektronen auf und hat danach acht Außenelektronen. Dieser Vorgang heißt Reduktion. Er läuft gleichzeitig mit der Oxidation ab."],
+      ionen:["Aus Atomen werden Ionen","Magnesium hat zwei negative Ladungen verloren: Mg<sup>2+</sup>. Sauerstoff hat zwei gewonnen: O<sup>2–</sup>. Die äußere Schale des Magnesiums ist jetzt leer, das Ion ist deutlich kleiner als das Atom. Das Oxid-Ion ist größer als das Atom."],
+      gitter:["Das Ionengitter entsteht","Positive und negative Ionen ziehen sich an und ordnen sich regelmäßig an. So entsteht das weiße Pulver Magnesiumoxid. Auf ein Magnesium-Ion kommt ein Oxid-Ion: MgO."]
+    }
+  },
+
+  nacl:{
+    name:"Natriumchlorid", formel:"NaCl", molekuel:true,
+    atome:[
+      {id:"m1", sym:"Na", art:"metall", schalen:[2,8,1], ladung:"+",  start:[140,125], getrennt:[140,125], gitter:[275,155]},
+      {id:"m2", sym:"Na", art:"metall", schalen:[2,8,1], ladung:"+",  start:[140,305], getrennt:[140,305], gitter:[425,285]},
+      {id:"n1", sym:"Cl", art:"nicht",  schalen:[2,8,7], ladung:"–",  start:[470,178], getrennt:[470,118], gitter:[425,155]},
+      {id:"n2", sym:"Cl", art:"nicht",  schalen:[2,8,7], ladung:"–",  start:[470,252], getrennt:[470,312], gitter:[275,285]}
+    ],
+    bindung:["n1","n2"],
+    uebergaenge:[{von:"m1",nach:"n1"},{von:"m2",nach:"n2"}],
+    gitterSkala:.6,
+    gl:{
+      ox:'<small>Oxidation</small>2 Na &nbsp;&rarr;&nbsp; 2 Na<sup>+</sup> + 2 e<sup>–</sup>',
+      red:'<small>Reduktion</small>Cl<sub>2</sub> + 2 e<sup>–</sup> &nbsp;&rarr;&nbsp; 2 Cl<sup>–</sup>',
+      ges:'<small>Redoxreaktion</small><b>2 Na + Cl<sub>2</sub> &nbsp;&rarr;&nbsp; 2 NaCl</b>'
+    },
+    texte:{
+      start:["Die Ausgangsstoffe","Links: zwei Natrium-Atome. Jedes hat nur <em>ein</em> Außenelektron. Rechts: ein Chlor-Molekül aus zwei Chlor-Atomen. Jedes Chlor-Atom hat sieben Außenelektronen — ihm fehlt genau eines."],
+      trennen:["Das Chlor-Molekül wird getrennt","Die Bindung zwischen den beiden Chlor-Atomen bricht. Jetzt liegen zwei einzelne Chlor-Atome vor."],
+      abgabe:["Natrium gibt sein Außenelektron ab","Jedes Natrium-Atom gibt genau ein Elektron ab. Es wird oxidiert."],
+      aufnahme:["Chlor nimmt das Elektron auf","Jedes Chlor-Atom nimmt genau ein Elektron auf und hat danach acht Außenelektronen. Es wird reduziert."],
+      ionen:["Aus Atomen werden Ionen","Natrium ist jetzt einfach positiv geladen (Na<sup>+</sup>), Chlor einfach negativ (Cl<sup>–</sup>). Weil hier je ein Elektron übergeht, ist das Verhältnis 1:1."],
+      gitter:["Das Ionengitter entsteht","Die Ionen ordnen sich abwechselnd an. Es entsteht Kochsalz. Auf ein Natrium-Ion kommt ein Chlorid-Ion: NaCl."]
+    }
+  },
+
+  al2o3:{
+    name:"Aluminiumoxid", formel:"Al₂O₃", molekuel:false,
+    atome:[
+      {id:"m1", sym:"Al", art:"metall", schalen:[2,8,3], ladung:"3+", start:[135,140], getrennt:[135,140], gitter:[350,150]},
+      {id:"m2", sym:"Al", art:"metall", schalen:[2,8,3], ladung:"3+", start:[135,300], getrennt:[135,300], gitter:[300,300]},
+      {id:"n1", sym:"O",  art:"nicht",  schalen:[2,6],   ladung:"2–", start:[480,100], getrennt:[480,100], gitter:[250,150]},
+      {id:"n2", sym:"O",  art:"nicht",  schalen:[2,6],   ladung:"2–", start:[480,215], getrennt:[480,215], gitter:[450,150]},
+      {id:"n3", sym:"O",  art:"nicht",  schalen:[2,6],   ladung:"2–", start:[480,330], getrennt:[480,330], gitter:[400,300]}
+    ],
+    bindung:null,
+    uebergaenge:[
+      {von:"m1",nach:"n1"},{von:"m1",nach:"n1"},{von:"m1",nach:"n2"},
+      {von:"m2",nach:"n2"},{von:"m2",nach:"n3"},{von:"m2",nach:"n3"}
+    ],
+    gitterSkala:.55,
+    genauer:"Aluminiumoxid im Alltag: Auf jedem Gegenstand aus Aluminium liegt eine hauchdünne, sehr feste Schicht Al<sub>2</sub>O<sub>3</sub>. Sie bildet sich an der Luft von selbst und schützt das Metall darunter vor weiterer Reaktion. Deshalb rostet ein Aluminiumtopf nicht, obwohl Aluminium ein sehr unedles Metall ist.",
+    gl:{
+      ox:'<small>Oxidation</small>4 Al &nbsp;&rarr;&nbsp; 4 Al<sup>3+</sup> + 12 e<sup>–</sup>',
+      red:'<small>Reduktion</small>3 O<sub>2</sub> + 12 e<sup>–</sup> &nbsp;&rarr;&nbsp; 6 O<sup>2–</sup>',
+      ges:'<small>Redoxreaktion</small><b>4 Al + 3 O<sub>2</sub> &nbsp;&rarr;&nbsp; 2 Al<sub>2</sub>O<sub>3</sub></b>'
+    },
+    texte:{
+      start:["Die Ausgangsstoffe","Links: zwei Aluminium-Atome mit je <em>drei</em> Außenelektronen. Rechts: drei Sauerstoff-Atome mit je sechs Außenelektronen. Die Sauerstoff-Moleküle wurden bereits getrennt; die Gleichung rechts zeigt deshalb die doppelte Menge."],
+      abgabe:["Aluminium gibt drei Elektronen ab","Jedes Aluminium-Atom gibt alle drei Außenelektronen ab. Bei zwei Atomen sind das zusammen sechs Elektronen."],
+      aufnahme:["Sauerstoff nimmt je zwei Elektronen auf","Jedes Sauerstoff-Atom nimmt zwei Elektronen auf, dann ist seine äußere Schale mit acht besetzt. Drei Sauerstoff-Atome nehmen zusammen sechs Elektronen auf. Die Rechnung geht genau auf: Sechs ist die kleinste Zahl, die sich sowohl durch 3 (Aluminium) als auch durch 2 (Sauerstoff) teilen lässt."],
+      ionen:["Aus Atomen werden Ionen","Zwei Aluminium-Ionen tragen zusammen sechs positive Ladungen (2 × Al<sup>3+</sup>), drei Oxid-Ionen zusammen sechs negative (3 × O<sup>2–</sup>). Nach außen ist der Stoff dadurch elektrisch neutral."],
+      gitter:["Das Verhältnis 2:3","Auf zwei Aluminium-Ionen kommen drei Oxid-Ionen. Die Verhältnisformel lautet Al<sub>2</sub>O<sub>3</sub>. Vergleiche mit Na<sub>2</sub>O: Dort gibt jedes Natrium-Atom nur ein Elektron ab, deshalb werden zwei Natrium-Atome pro Sauerstoff-Atom gebraucht."]
+    }
+  },
+
+  na2o:{
+    name:"Natriumoxid", formel:"Na₂O", molekuel:false,
+    atome:[
+      {id:"m1", sym:"Na", art:"metall", schalen:[2,8,1], ladung:"+",  start:[140,115], getrennt:[140,115], gitter:[350,95]},
+      {id:"m2", sym:"Na", art:"metall", schalen:[2,8,1], ladung:"+",  start:[140,315], getrennt:[140,315], gitter:[350,335]},
+      {id:"n1", sym:"O",  art:"nicht",  schalen:[2,6],   ladung:"2–", start:[470,215], getrennt:[470,215], gitter:[350,215]}
+    ],
+    bindung:null,
+    uebergaenge:[{von:"m1",nach:"n1"},{von:"m2",nach:"n1"}],
+    gitterSkala:.6,
+    gl:{
+      ox:'<small>Oxidation</small>4 Na &nbsp;&rarr;&nbsp; 4 Na<sup>+</sup> + 4 e<sup>–</sup>',
+      red:'<small>Reduktion</small>O<sub>2</sub> + 4 e<sup>–</sup> &nbsp;&rarr;&nbsp; 2 O<sup>2–</sup>',
+      ges:'<small>Redoxreaktion</small><b>4 Na + O<sub>2</sub> &nbsp;&rarr;&nbsp; 2 Na<sub>2</sub>O</b>'
+    },
+    texte:{
+      start:["Die Ausgangsstoffe","Links: zwei Natrium-Atome mit je einem Außenelektron. Rechts: ein Sauerstoff-Atom mit sechs Außenelektronen. Das Sauerstoff-Molekül wurde bereits getrennt. Die Gleichung rechts zeigt deshalb die doppelte Menge."],
+      abgabe:["Beide Natrium-Atome geben ab","Jedes Natrium-Atom gibt sein einziges Außenelektron ab. Zusammen sind das zwei Elektronen."],
+      aufnahme:["Sauerstoff nimmt beide Elektronen auf","Dem Sauerstoff-Atom fehlen zwei Elektronen zur vollen Außenschale. Ein einzelnes Natrium-Atom kann nur eines liefern. Deshalb werden zwei Natrium-Atome gebraucht."],
+      ionen:["Aus Atomen werden Ionen","Jedes Natrium ist einfach positiv geladen (Na<sup>+</sup>), der Sauerstoff zweifach negativ (O<sup>2–</sup>). Zwei mal plus gleichen zwei mal minus aus."],
+      gitter:["Das Verhältnis 2:1","Auf zwei Natrium-Ionen kommt ein Oxid-Ion. Die Verhältnisformel lautet Na<sub>2</sub>O. Vergleiche das mit NaCl: Dort ist das Verhältnis 1:1, weil Chlor nur ein Elektron aufnimmt."]
+    }
+  }
+};
+
+/* ================= Zeichen-Engine ================= */
+function Buehne(container, schluessel, optionen){
+  this.box = container;
+  this.opt = optionen || {};
+  this.alleSchalen = false;
+  this.i = 0;
+  this.timer = null;
+  this.baueGeruest();
+  this.lade(schluessel);
+}
+
+Buehne.prototype.baueGeruest = function(){
+  var self = this;
+  this.box.innerHTML =
+    '<div>'+
+      '<div class="buehne"><svg viewBox="0 0 640 430" role="img"><title></title></svg></div>'+
+      '<div class="steuerung">'+
+        '<button class="st leise" data-r="zurueck">Zurück</button>'+
+        '<button class="st" data-r="play">Abspielen</button>'+
+        '<button class="st leise" data-r="vor">Weiter</button>'+
+        '<span class="zaehler" data-r="zaehler"></span>'+
+      '</div>'+
+      '<div class="schrittleiste" data-r="leiste"></div>'+
+      '<div class="schalter"><input type="checkbox" data-r="schalen"><label>Alle Schalen anzeigen</label></div>'+
+    '</div>'+
+    '<div class="erklaerung">'+
+      '<div class="karte"><h3 data-r="titel"></h3><p data-r="text"></p></div>'+
+      '<div class="karte symbolkarte"><h3>Symbolebene</h3>'+
+        '<p class="gl" data-r="ox"></p><p class="gl" data-r="red"></p><p class="gl" data-r="ges"></p>'+
+      '</div>'+
+    '</div>';
+
+  var q = function(r){ return self.box.querySelector('[data-r="'+r+'"]'); };
+  this.svg = this.box.querySelector("svg");
+  this.el = {titel:q("titel"), text:q("text"), ox:q("ox"), red:q("red"), ges:q("ges"),
+             zaehler:q("zaehler"), leiste:q("leiste"), vor:q("vor"), zurueck:q("zurueck"), play:q("play")};
+
+  q("zurueck").addEventListener("click", function(){ self.stopp(); self.gehe(self.i-1); });
+  q("vor").addEventListener("click", function(){ self.stopp(); self.gehe(self.i+1); });
+  q("play").addEventListener("click", function(){ self.abspielen(); });
+  var cb = q("schalen");
+  cb.addEventListener("change", function(){
+    self.alleSchalen = cb.checked;
+    self.zeichneSzene();
+    self.gehe(self.i);
+  });
+};
+
+Buehne.prototype.lade = function(schluessel){
+  this.schluessel = schluessel;
+  this.d = BEISPIELE[schluessel];
+  this.phasen = ["start"].concat(this.d.molekuel ? ["trennen"] : [], ["abgabe","aufnahme","ionen","gitter"]);
+  this.kurz = {start:"1 Ausgangsstoffe", trennen:"2 Molekül trennen", abgabe:"Abgabe", aufnahme:"Aufnahme", ionen:"Ionen", gitter:"Verhältnis"};
+  this.svg.querySelector("title").textContent =
+    "Animation: Bildung von " + this.d.name + " durch Elektronenübergang.";
+  this.zeichneSzene();
+  this.baueLeiste();
+  this.gehe(0);
+};
+
+Buehne.prototype.baueLeiste = function(){
+  var self = this;
+  this.el.leiste.innerHTML = "";
+  this.phasen.forEach(function(p, n){
+    var b = document.createElement("button");
+    b.textContent = (n+1) + " " + ({start:"Ausgangsstoffe",trennen:"Trennen",abgabe:"Abgabe",aufnahme:"Aufnahme",ionen:"Ionen",gitter:"Verhältnis"})[p];
+    b.addEventListener("click", function(){ self.stopp(); self.gehe(n); });
+    self.el.leiste.appendChild(b);
+  });
+};
+
+/* --- Geometrie --- */
+function aussenR(schalen, alle){
+  return alle ? (28 + (schalen.length-1)*13) : 50;
+}
+function polar(r, grad){
+  var b = grad * Math.PI/180;
+  return [r*Math.cos(b), r*Math.sin(b)];
+}
+
+Buehne.prototype.zeichneSzene = function(){
+  var self = this, d = this.d, alle = this.alleSchalen;
+  // alles außer <title> entfernen
+  while(this.svg.childNodes.length > 1){ this.svg.removeChild(this.svg.lastChild); }
+
+  var defs = svgEl("defs");
+  var pat = svgEl("pattern",{id:"gitter-"+this.box.id, width:40, height:40, patternUnits:"userSpaceOnUse"});
+  pat.appendChild(svgEl("path",{d:"M40 0H0V40", fill:"none", stroke:"#22385A", "stroke-width":1}));
+  defs.appendChild(pat); this.svg.appendChild(defs);
+  this.svg.appendChild(svgEl("rect",{width:640, height:430, fill:"url(#gitter-"+this.box.id+")", opacity:.5}));
+
+  this.knoten = {};
+  this.aufnahmeZahl = {};
+  d.uebergaenge.forEach(function(u){
+    self.aufnahmeZahl[u.nach] = (self.aufnahmeZahl[u.nach]||0) + 1;
+  });
+
+  // Bindung
+  if(d.bindung){
+    var a1 = this.atomVon(d.bindung[0]), a2 = this.atomVon(d.bindung[1]);
+    var r1 = aussenR(a1.schalen, alle), r2 = aussenR(a2.schalen, alle);
+    this.bindungEl = svgEl("line",{x1:a1.start[0], y1:a1.start[1]+r1-8, x2:a2.start[0], y2:a2.start[1]-r2+8,
+      stroke:"#E8C6C4","stroke-width":5,"stroke-linecap":"round"});
+    this.bindungEl.style.transition = "opacity .5s";
+    this.svg.appendChild(this.bindungEl);
+  } else { this.bindungEl = null; }
+
+  // Atome
+  d.atome.forEach(function(a){ self.svg.appendChild(self.zeichneAtom(a, alle)); });
+  // Elektronen zuletzt (liegen oben)
+  this.elektronen = [];
+  d.uebergaenge.forEach(function(u, n){
+    var g = svgEl("g");
+    g.style.transition = "transform .9s ease-in-out";
+    g.appendChild(svgEl("circle",{r:8, fill:"#F3C551"}));
+    var t = svgEl("text",{y:4,"text-anchor":"middle","font-size":11,"font-family":"Georgia,serif",fill:"#152640"});
+    t.textContent = "–"; g.appendChild(t);
+    self.svg.appendChild(g);
+    self.elektronen.push({g:g, u:u, n:n});
+  });
+  this.berechneElektronenPositionen();
+};
+
+Buehne.prototype.atomVon = function(id){
+  for(var i=0;i<this.d.atome.length;i++){ if(this.d.atome[i].id===id) return this.d.atome[i]; }
+  return null;
+};
+
+Buehne.prototype.zeichneAtom = function(a, alle){
+  var f = FARBEN[a.sym];
+  var g = svgEl("g");
+  g.style.transition = "transform .8s ease-in-out";
+  var schalen = alle ? a.schalen : [a.schalen[a.schalen.length-1]];
+  var k = schalen.length;
+  var kernR = alle ? 17 : 30;
+  var rAussen = aussenR(a.schalen, alle);
+
+  for(var j=0;j<k;j++){
+    var r = alle ? (28 + j*13) : 50;
+    var istAussen = (j === k-1);
+    var ring = svgEl("circle",{r:r, fill:"none", stroke:f.fuell, "stroke-width":1.5,
+                               "stroke-dasharray": istAussen ? "3 5" : "2 4", opacity: istAussen ? .85 : .5});
+    if(istAussen){ ring.style.transition = "opacity .5s"; g.appendChild(ring); g.dataset && 0; this._merkeRing = ring; }
+    else { g.appendChild(ring); }
+    if(istAussen && a.art === "metall"){ a._ringEl = ring; }
+
+    // Elektronen dieser Schale
+    var anzahl = schalen[j];
+    if(istAussen){
+      var empf = this.aufnahmeZahl[a.id] || 0;
+      var gesamt = anzahl + empf;
+      var reserviert = [];
+      for(var q=0;q<empf;q++){ reserviert.push(gesamt-2-q); }
+      var gesetzt = 0;
+      for(var i2=0;i2<gesamt && gesetzt<anzahl;i2++){
+        if(reserviert.indexOf(i2) > -1) continue;
+        if(a.art === "metall") break; // Außenelektronen des Metalls wandern (separat animiert)
+        var p = polar(r, -90 + i2*(360/gesamt));
+        g.appendChild(svgEl("circle",{cx:p[0].toFixed(1), cy:p[1].toFixed(1), r:4.5, fill:"#F3C551"}));
+        gesetzt++;
+      }
+      a._rAussen = r; a._gesamtPlaetze = gesamt;
+    } else {
+      for(var i3=0;i3<anzahl;i3++){
+        var p2 = polar(r, -90 + i3*(360/anzahl));
+        g.appendChild(svgEl("circle",{cx:p2[0].toFixed(1), cy:p2[1].toFixed(1), r:3.6, fill:"#F3C551", opacity:.75}));
+      }
+    }
+  }
+
+  g.appendChild(svgEl("circle",{r:kernR, fill:f.fuell, stroke:f.rand, "stroke-width":2}));
+  var t = svgEl("text",{y: alle?5:7, "text-anchor":"middle", "font-family":"Georgia,serif",
+                        "font-size": alle?15:23, fill:f.schrift});
+  t.textContent = a.sym; g.appendChild(t);
+
+  var lg = svgEl("g",{opacity:0});
+  lg.style.transition = "opacity .5s";
+  var lp = polar(rAussen + 4, -42);
+  lg.appendChild(svgEl("circle",{cx:lp[0].toFixed(1), cy:lp[1].toFixed(1), r:15,
+                                 fill: a.art==="metall" ? "#F3C551" : "#7FB6DE"}));
+  var lt = svgEl("text",{x:lp[0].toFixed(1), y:(lp[1]+6).toFixed(1), "text-anchor":"middle",
+                         "font-family":"Georgia,serif","font-size":15, fill:"#152640"});
+  lt.textContent = a.ladung; lg.appendChild(lt);
+  g.appendChild(lg);
+
+  this.knoten[a.id] = {g:g, ladung:lg, ring:a._ringEl || null, rAussen:rAussen, atom:a};
+  a._ringEl = null;
+  return g;
+};
+
+Buehne.prototype.berechneElektronenPositionen = function(){
+  var self = this;
+  var proMetall = {}, proNicht = {};
+  this.elektronen.forEach(function(e){
+    var m = self.atomVon(e.u.von), n = self.atomVon(e.u.nach);
+    var kM = self.knoten[e.u.von], kN = self.knoten[e.u.nach];
+    proMetall[m.id] = (proMetall[m.id]||0);
+    var idx = proMetall[m.id]++;
+    var gesamtM = 0;
+    self.d.uebergaenge.forEach(function(u){ if(u.von===m.id) gesamtM++; });
+    var winkel = gesamtM === 1 ? 0 : (-38 + idx*(76/(gesamtM-1)));
+    var ps = polar(kM.rAussen, winkel);
+    e.start = [m.start[0]+ps[0], m.start[1]+ps[1]];
+
+    proNicht[n.id] = (proNicht[n.id]||0);
+    var idx2 = proNicht[n.id]++;
+    var gesamtP = n._gesamtPlaetze || 8;
+    var platz = gesamtP - 2 - idx2;
+    var pz = polar(kN.rAussen, -90 + platz*(360/gesamtP));
+    e.zielOffset = pz;
+
+    e.flug = [(m.start[0] + n.getrennt[0])/2, (m.start[1] + n.getrennt[1])/2 + (idx-(gesamtM-1)/2)*34];
+  });
+};
+
+Buehne.prototype.setzeTransform = function(id, pos, skala){
+  this.knoten[id].g.setAttribute("transform","translate("+pos[0]+","+pos[1]+") scale("+skala+")");
+};
+
+Buehne.prototype.gehe = function(n){
+  this.i = Math.max(0, Math.min(this.phasen.length-1, n));
+  var self = this, d = this.d, p = this.phasen[this.i];
+  var istGitter = (p === "gitter");
+  var istIon = (p === "ionen" || istGitter);
+  var basis = istGitter ? d.gitterSkala : 1;
+
+  d.atome.forEach(function(a){
+    var pos = istGitter ? a.gitter : (self.phasen.indexOf("trennen") > -1 && self.i >= self.phasen.indexOf("trennen") ? a.getrennt : a.start);
+    var ionSkala = istIon ? (a.art === "metall" ? .78 : 1.06) : 1;
+    self.setzeTransform(a.id, pos, (basis * ionSkala).toFixed(3));
+    self.knoten[a.id].ladung.style.opacity = istIon ? 1 : 0;
+    if(self.knoten[a.id].ring && a.art === "metall"){
+      self.knoten[a.id].ring.style.opacity = istIon ? 0 : .85;
+    }
+  });
+
+  if(this.bindungEl){ this.bindungEl.style.opacity = (p === "start") ? 1 : 0; }
+
+  this.elektronen.forEach(function(e){
+    var ziel;
+    if(p === "start" || p === "trennen"){ ziel = e.start; }
+    else if(p === "abgabe"){ ziel = e.flug; }
+    else {
+      var n2 = self.atomVon(e.u.nach);
+      var pos = istGitter ? n2.gitter : n2.getrennt;
+      var s = basis * (istIon ? 1.06 : 1);
+      ziel = [pos[0] + e.zielOffset[0]*s, pos[1] + e.zielOffset[1]*s];
+    }
+    e.g.setAttribute("transform","translate("+ziel[0].toFixed(1)+","+ziel[1].toFixed(1)+") scale("+(istGitter?basis:1).toFixed(2)+")");
+  });
+
+  var t = d.texte[p];
+  this.el.titel.textContent = t[0];
+  this.el.text.innerHTML = t[1];
+
+  var stufe = this.phasen.indexOf(p);
+  this.el.ox.innerHTML = d.gl.ox;  this.el.ox.classList.toggle("an", stufe >= this.phasen.indexOf("abgabe"));
+  this.el.red.innerHTML = d.gl.red; this.el.red.classList.toggle("an", stufe >= this.phasen.indexOf("aufnahme"));
+  this.el.ges.innerHTML = d.gl.ges; this.el.ges.classList.toggle("an", istGitter);
+
+  this.el.zaehler.textContent = "Schritt "+(this.i+1)+" von "+this.phasen.length;
+  this.el.zurueck.disabled = (this.i === 0);
+  this.el.vor.disabled = (this.i === this.phasen.length-1);
+  var kn = this.el.leiste.querySelectorAll("button");
+  for(var m=0;m<kn.length;m++){
+    if(m === this.i) kn[m].setAttribute("aria-current","step"); else kn[m].removeAttribute("aria-current");
+  }
+  if(this.opt.beiEnde && istGitter){ this.opt.beiEnde(); }
+};
+
+Buehne.prototype.stopp = function(){
+  if(this.timer){ clearInterval(this.timer); this.timer = null; this.el.play.textContent = "Abspielen"; }
+};
+Buehne.prototype.abspielen = function(){
+  var self = this;
+  if(this.timer){ this.stopp(); return; }
+  if(this.i === this.phasen.length-1){ this.gehe(0); }
+  this.el.play.textContent = "Pause";
+  this.timer = setInterval(function(){
+    if(self.i >= self.phasen.length-1){ self.stopp(); return; }
+    self.gehe(self.i+1);
+  }, 3600);
+};
+
+/* ================= Abschnitt 2: MgO ================= */
+var vorhersage = null;
+function zeigeVorhersage(){
+  var box = $("e0-aufloesung");
+  if(box.classList.contains("an")) return;
+  box.classList.add("an");
+  if(vorhersage === null){
+    box.className = "echo an neutral";
+    box.innerHTML = "<b>Auflösung zur Vorhersage:</b> Die Außenelektronen des Magnesiums gehen auf die Sauerstoff-Atome über. Sie verschwinden nicht — sie wechseln nur den Besitzer.";
+  } else if(vorhersage === "b"){
+    box.className = "echo an gut";
+    box.innerHTML = "<b>Richtig.</b> Deine Vorhersage stimmt: Die Elektronen gehen auf die Sauerstoff-Atome über. Genau das nennt man einen Elektronenübergang.";
+  } else if(vorhersage === "a"){
+    box.className = "echo an schlecht";
+    box.innerHTML = "<b>Falsch.</b> Die Elektronen bleiben nicht beim Magnesium. Wenn sie blieben, könnte kein Magnesium-Ion (Mg<sup>2+</sup>) entstehen — und ohne Ionen gäbe es kein Ionengitter.";
+  } else {
+    box.className = "echo an schlecht";
+    box.innerHTML = "<b>Falsch.</b> Elektronen werden bei einer chemischen Reaktion nicht vernichtet. Ihre Gesamtzahl bleibt gleich; sie wechseln nur vom Magnesium zum Sauerstoff.";
+  }
+}
+
+var f0 = $("f0"), e0 = $("e0");
+Array.prototype.forEach.call(f0.querySelectorAll(".opt"), function(b){
+  b.addEventListener("click", function(){
+    Array.prototype.forEach.call(f0.querySelectorAll(".opt"), function(x){ x.classList.remove("gewaehlt"); });
+    b.classList.add("gewaehlt");
+    vorhersage = b.dataset.v;
+    e0.className = "echo an neutral";
+    e0.innerHTML = "Deine Vorhersage ist notiert. Prüfe sie jetzt in der Animation. Die Auflösung erscheint dort nach dem letzten Schritt.";
+  });
+});
+
+new Buehne($("buehne-mgo"), "mgo", {beiEnde: zeigeVorhersage});
+
+/* ================= Abschnitt 3: Quiz ================= */
+var FRAGEN = [
+  {f:"Welches Teilchen gibt in dieser Reaktion Elektronen ab?", a:[
+    {t:"Das Magnesium-Atom", r:true,  e:"Es gibt seine beiden Außenelektronen ab und wird dabei zum Mg<sup>2+</sup>-Ion."},
+    {t:"Das Sauerstoff-Atom", r:false, e:"Der Sauerstoff nimmt Elektronen auf, er gibt keine ab. Sieh dir den Schritt „Aufnahme“ noch einmal an."},
+    {t:"Beide gleichzeitig", r:false, e:"Nur eines der beiden gibt ab, das andere nimmt auf. Sonst wäre die Elektronenbilanz nicht ausgeglichen."}]},
+  {f:"Wie heißt der Vorgang „Elektronen werden abgegeben“?", a:[
+    {t:"Reduktion", r:false, e:"Reduktion ist die <em>Aufnahme</em> von Elektronen. Die beiden Begriffe werden häufig verwechselt."},
+    {t:"Oxidation", r:true,  e:"Oxidation bedeutet Elektronenabgabe. Dafür braucht es nicht zwingend Sauerstoff."},
+    {t:"Neutralisation", r:false, e:"Neutralisation gehört zu den Säure-Base-Reaktionen. Dort werden Protonen übertragen, keine Elektronen."}]},
+  {f:"Welche Rolle hat der Sauerstoff in dieser Reaktion?", a:[
+    {t:"Er ist das Reduktionsmittel.", r:false, e:"Das Reduktionsmittel gibt Elektronen ab. Hier ist das Magnesium das Reduktionsmittel."},
+    {t:"Er ist das Oxidationsmittel.", r:true,  e:"Der Sauerstoff nimmt Elektronen auf und ermöglicht dadurch die Oxidation des Magnesiums."},
+    {t:"Er verändert sich nicht.", r:false, e:"Der Sauerstoff nimmt vier Elektronen auf und wird zu zwei Oxid-Ionen (O<sup>2–</sup>)."}]},
+  {f:"Warum kann eine Oxidation niemals allein ablaufen?", a:[
+    {t:"Weil dazu immer Sauerstoff nötig ist.", r:false, e:"Sauerstoff ist nicht nötig. Auch Zink und Kupferoxid reagieren miteinander, ohne dass Sauerstoff-Moleküle beteiligt sind."},
+    {t:"Weil abgegebene Elektronen von einem anderen Teilchen aufgenommen werden müssen.", r:true, e:"Freie Elektronen existieren im Reaktionsgemisch nicht. Jede Abgabe braucht einen Empfänger — deshalb laufen Oxidation und Reduktion immer gemeinsam ab."},
+    {t:"Weil dabei immer Energie frei wird.", r:false, e:"Ob Energie frei wird oder zugeführt werden muss, hängt von der Reaktion ab. Das ist nicht der Grund."}]}
+];
+
+var quiz = $("quiz");
+FRAGEN.forEach(function(q, n){
+  var d = document.createElement("div"); d.className = "frage";
+  var p = document.createElement("p"); p.innerHTML = (n+1)+". "+q.f; d.appendChild(p);
+  var echo = document.createElement("div"); echo.className = "echo";
+  q.a.forEach(function(a, k){
+    var b = document.createElement("button"); b.className = "opt"; b.innerHTML = a.t;
+    b.addEventListener("click", function(){
+      var opts = d.querySelectorAll(".opt");
+      for(var x=0;x<opts.length;x++){ opts[x].disabled = true; }
+      b.classList.add(a.r ? "richtig" : "falsch");
+      echo.className = "echo an " + (a.r ? "gut" : "schlecht");
+      echo.innerHTML = "<b>" + (a.r ? "Richtig." : "Falsch.") + "</b> " + a.e;
+      if(!a.r){ for(var y=0;y<opts.length;y++){ if(q.a[y].r) opts[y].classList.add("richtig"); } }
+    });
+    d.appendChild(b);
+  });
+  d.appendChild(echo);
+  quiz.appendChild(d);
+});
+
+/* ================= Abschnitt 5: weitere Beispiele ================= */
+var WEITERE = [["nacl","Natriumchlorid","NaCl"],["al2o3","Aluminiumoxid","Al₂O₃"],["na2o","Natriumoxid","Na₂O"]];
+var buehneMehr = new Buehne($("buehne-mehr"), "nacl", {});
+var wahl = $("stoffwahl"), genauer = $("genauer");
+
+function setzeGenauer(k){
+  var g = BEISPIELE[k].genauer;
+  if(g){ genauer.innerHTML = g; genauer.classList.add("an"); }
+  else { genauer.classList.remove("an"); genauer.innerHTML = ""; }
+}
+
+WEITERE.forEach(function(w, n){
+  var b = document.createElement("button");
+  b.innerHTML = w[1] + ' <span class="formel">' + w[2] + '</span>';
+  b.setAttribute("aria-pressed", n === 0 ? "true" : "false");
+  b.addEventListener("click", function(){
+    Array.prototype.forEach.call(wahl.querySelectorAll("button"), function(x){ x.setAttribute("aria-pressed","false"); });
+    b.setAttribute("aria-pressed","true");
+    buehneMehr.stopp();
+    buehneMehr.lade(w[0]);
+    setzeGenauer(w[0]);
+  });
+  wahl.appendChild(b);
+});
+setzeGenauer("nacl");
+})();
+</script>
+</body>
+</html>
