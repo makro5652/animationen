@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animation der Fehling-Probe (Ionenverbindung)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        canvas {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            max-width: 100%;
+            height: auto;
+        }
+        .control-panel {
+            background-color: #ffffff;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-5xl mx-auto">
+        <h1 class="text-2xl mb-4 text-slate-800">Animation: Fehling-Reaktion (Ethanal zu Essigsäure)</h1>
+        
+        <div class="control-panel p-6 rounded-lg mb-6 border border-slate-200">
+            <div class="flex flex-wrap items-center gap-6">
+                <button id="playPauseBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded transition-colors">
+                    Start
+                </button>
+                
+                <button id="resetBtn" class="border border-slate-300 hover:bg-slate-50 px-6 py-2 rounded transition-colors">
+                    Zurücksetzen
+                </button>
+
+                <div class="flex flex-col gap-1">
+                    <label for="speedSlider" class="text-sm text-slate-600">Geschwindigkeit</label>
+                    <input type="range" id="speedSlider" min="0.1" max="3" step="0.1" value="1" class="w-40">
+                </div>
+            </div>
+            
+            <div id="statusText" class="mt-4 text-slate-700 min-h-[1.5rem]">
+                Bereit zum Starten
+            </div>
+        </div>
+
+        <div class="relative overflow-hidden">
+            <canvas id="reactionCanvas" width="900" height="550" class="w-full"></canvas>
+            <div id="legend" class="absolute top-4 left-4 bg-white/80 p-3 rounded text-xs border border-slate-200 pointer-events-none">
+                <div class="flex items-center gap-2 mb-1"><span class="w-3 h-3 rounded-full bg-gray-400"></span> Kohlenstoff (C)</div>
+                <div class="flex items-center gap-2 mb-1"><span class="w-3 h-3 rounded-full bg-red-500"></span> Sauerstoff (O)</div>
+                <div class="flex items-center gap-2 mb-1"><span class="w-3 h-3 rounded-full bg-blue-500"></span> Kupfer (Cu)</div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-white border border-slate-400"></span> Wasserstoff (H)</div>
+            </div>
+        </div>
+
+        <div class="mt-6 text-slate-600 text-sm leading-relaxed">
+            Reaktionsgleichung: CH3CHO + 2 Cu2+ + 4 OH- -> CH3COOH + Cu2O + 2 H2O.
+            In dieser Darstellung werden für die Kupfer-Ionen und das Oxid-Ion reale Ladungen (z.B. 2+, 2-) verwendet, um den ionischen Charakter des Kupfer(I)-oxids zu verdeutlichen. Die kovalent gebundenen Atome zeigen weiterhin Oxidationszahlen.
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('reactionCanvas');
+        const ctx = canvas.getContext('2d');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const speedSlider = document.getElementById('speedSlider');
+        const statusText = document.getElementById('statusText');
+
+        let isRunning = false;
+        let progress = 0;
+        let speed = 0.0025;
+
+        const atoms = [
+            // Ethanal: Methylgruppe
+            { id: 'C1', type: 'C', label: 'C', x: 80, y: 250, ox: '-III', targetX: 80, targetY: 250, targetOx: '-III' },
+            { id: 'H_m1', type: 'H', label: 'H', x: 40, y: 250, ox: '+I', targetX: 40, targetY: 250, targetOx: '+I' },
+            { id: 'H_m2', type: 'H', label: 'H', x: 80, y: 210, ox: '+I', targetX: 80, targetY: 210, targetOx: '+I' },
+            { id: 'H_m3', type: 'H', label: 'H', x: 80, y: 290, ox: '+I', targetX: 80, targetY: 290, targetOx: '+I' },
+            
+            // Ethanal: Carbonylgruppe
+            { id: 'C2', type: 'C', label: 'C', x: 160, y: 250, ox: '+I', targetX: 160, targetY: 250, targetOx: '+III' },
+            { id: 'O1', type: 'O', label: 'O', x: 200, y: 210, ox: '-II', targetX: 200, targetY: 210, targetOx: '-II' },
+            { id: 'H_ald', type: 'H', label: 'H', x: 200, y: 290, ox: '+I', targetX: 450, targetY: 420, targetOx: '+I' },
+            
+            // Kupfer-Ionen (Hier reale Ladungen statt Oxidationszahlen)
+            { id: 'Cu1', type: 'Cu', label: 'Cu', x: 700, y: 150, ox: '2+', targetX: 740, targetY: 230, targetOx: '+' },
+            { id: 'Cu2', type: 'Cu', label: 'Cu', x: 820, y: 150, ox: '2+', targetX: 800, targetY: 270, targetOx: '+' },
+            
+            // 4 Hydroxid-Ionen
+            // OH- 1: Bildet die OH-Gruppe der Essigsäure
+            { id: 'O_OH1', type: 'O', label: 'O', x: 300, y: 100, ox: '-II', targetX: 200, targetY: 290, targetOx: '-II' },
+            { id: 'H_OH1', type: 'H', label: 'H', x: 340, y: 100, ox: '+I', targetX: 240, targetY: 330, targetOx: '+I' },
+            
+            // OH- 2: Startet bei Cu1 -> O geht zu Cu2O Gitter (Hier reale Ladung 2- im Gitterkontext)
+            { id: 'O_OH2', type: 'O', label: 'O', x: 700, y: 190, ox: '2-', targetX: 770, targetY: 250, targetOx: '2-' },
+            { id: 'H_OH2', type: 'H', label: 'H', x: 730, y: 210, ox: '+I', targetX: 520, targetY: 420, targetOx: '+I' },
+            
+            // OH- 3: Startet bei Cu2 -> Bildet Wasser 1
+            { id: 'O_OH3', type: 'O', label: 'O', x: 820, y: 190, ox: '-II', targetX: 485, targetY: 420, targetOx: '-II' },
+            { id: 'H_OH3', type: 'H', label: 'H', x: 850, y: 210, ox: '+I', targetX: 630, targetY: 420, targetOx: '+I' },
+
+            // OH- 4: Bildet Wasser 2
+            { id: 'O_OH4', type: 'O', label: 'O', x: 650, y: 450, ox: '-II', targetX: 650, targetY: 420, targetOx: '-II' },
+            { id: 'H_OH4', type: 'H', label: 'H', x: 690, y: 470, ox: '+I', targetX: 670, targetY: 460, targetOx: '+I' }
+        ];
+
+        function drawAtom(atom, p) {
+            const curX = atom.x + (atom.targetX - atom.x) * p;
+            const curY = atom.y + (atom.targetY - atom.y) * p;
+            
+            let color = '#94a3b8';
+            if (atom.type === 'O') color = '#ef4444';
+            if (atom.type === 'Cu') {
+                const r = Math.floor(59 + (185 - 59) * p);
+                const g = Math.floor(130 + (28 - 130) * p);
+                const b = Math.floor(246 + (28 - 246) * p);
+                color = `rgb(${r},${g},${b})`;
+            }
+            if (atom.type === 'H') color = '#ffffff';
+
+            ctx.beginPath();
+            ctx.arc(curX, curY, 15, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+
+            ctx.fillStyle = atom.type === 'H' ? '#000' : '#fff';
+            ctx.font = '10px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(atom.label, curX, curY);
+
+            const curOx = p < 0.5 ? atom.ox : atom.targetOx;
+            ctx.fillStyle = '#475569';
+            ctx.font = '9px sans-serif';
+            ctx.fillText(curOx, curX, curY - 22);
+        }
+
+        function drawBonds(p) {
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 2.5;
+
+            const pos = (id) => {
+                const a = atoms.find(atom => atom.id === id);
+                return {
+                    x: a.x + (a.targetX - a.x) * p,
+                    y: a.y + (a.targetY - a.y) * p
+                };
+            };
+
+            const c1 = pos('C1'); const c2 = pos('C2');
+            const o1 = pos('O1'); const hAld = pos('H_ald');
+            const oOH1 = pos('O_OH1'); const hOH1 = pos('H_OH1');
+            const oOH2 = pos('O_OH2'); const hOH2 = pos('H_OH2');
+            const oOH3 = pos('O_OH3'); const hOH3 = pos('H_OH3');
+            const oOH4 = pos('O_OH4'); const hOH4 = pos('H_OH4');
+
+            // Methylgruppe
+            ['H_m1', 'H_m2', 'H_m3'].forEach(id => {
+                const h = pos(id);
+                ctx.beginPath(); ctx.moveTo(c1.x, c1.y); ctx.lineTo(h.x, h.y); ctx.stroke();
+            });
+            ctx.beginPath(); ctx.moveTo(c1.x, c1.y); ctx.lineTo(c2.x, c2.y); ctx.stroke();
+
+            // C=O Doppelbindung
+            ctx.beginPath();
+            ctx.moveTo(c2.x-3, c2.y); ctx.lineTo(o1.x-3, o1.y);
+            ctx.moveTo(c2.x+3, c2.y); ctx.lineTo(o1.x+3, o1.y);
+            ctx.stroke();
+
+            if (p < 0.5) {
+                const factor = 1 - (p / 0.5);
+                ctx.globalAlpha = factor;
+                ctx.beginPath(); ctx.moveTo(c2.x, c2.y); ctx.lineTo(hAld.x, hAld.y); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(oOH2.x, oOH2.y); ctx.lineTo(hOH2.x, hOH2.y); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(oOH3.x, oOH3.y); ctx.lineTo(hOH3.x, hOH3.y); ctx.stroke();
+                ctx.globalAlpha = 1;
+            }
+
+            // Essigsäure-Bildung
+            if (p > 0.4) {
+                ctx.beginPath(); ctx.moveTo(c2.x, c2.y); ctx.lineTo(oOH1.x, oOH1.y); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(oOH1.x, oOH1.y); ctx.lineTo(hOH1.x, hOH1.y); ctx.stroke();
+            }
+
+            // Wasser-Moleküle
+            if (p > 0.6) {
+                ctx.beginPath(); ctx.moveTo(oOH3.x, oOH3.y); ctx.lineTo(hAld.x, hAld.y); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(oOH3.x, oOH3.y); ctx.lineTo(hOH2.x, hOH2.y); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(oOH4.x, oOH4.y); ctx.lineTo(hOH3.x, hOH3.y); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(oOH4.x, oOH4.y); ctx.lineTo(hOH4.x, hOH4.y); ctx.stroke();
+            }
+
+            // Kupfer(I)-oxid Gitterbereich (Ionenverbindung)
+            if (p > 0.8) {
+                ctx.save();
+                ctx.globalAlpha = (p - 0.8) * 3;
+                ctx.fillStyle = 'rgba(153, 27, 27, 0.15)';
+                ctx.beginPath();
+                ctx.roundRect(710, 200, 120, 100, 8);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function updateStatus() {
+            if (progress === 0) statusText.innerText = 'Edukte: Ethanal, Cu2+ (als Hydroxid-Komplex) und OH-Ionen';
+            else if (progress < 0.4) statusText.innerText = 'Oxidation: Das Hydroxid-Ion greift das Carbonyl-C-Atom an';
+            else if (progress < 0.8) statusText.innerText = 'Umlagerung: Essigsäure bildet sich; Elektronen wandern zum Kupfer';
+            else statusText.innerText = 'Produkte: Essigsäure, Wasser und festes Kupfer(I)-oxid (Ionengitter)';
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBonds(progress);
+            atoms.forEach(atom => drawAtom(atom, progress));
+            
+            if (isRunning) {
+                progress += speed * parseFloat(speedSlider.value);
+                if (progress >= 1) {
+                    progress = 1;
+                    isRunning = false;
+                    playPauseBtn.innerText = 'Start';
+                }
+            }
+            updateStatus();
+            requestAnimationFrame(animate);
+        }
+
+        playPauseBtn.addEventListener('click', () => {
+            if (progress >= 1) progress = 0;
+            isRunning = !isRunning;
+            playPauseBtn.innerText = isRunning ? 'Pause' : 'Start';
+        });
+
+        resetBtn.addEventListener('click', () => {
+            isRunning = false;
+            progress = 0;
+            playPauseBtn.innerText = 'Start';
+        });
+
+        animate();
+    </script>
+</body>
+</html>
