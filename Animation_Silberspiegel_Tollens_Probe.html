@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animation der Tollens-Probe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            user-select: none;
+        }
+        canvas {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            max-width: 100%;
+            height: auto;
+            cursor: grab;
+        }
+        canvas:active {
+            cursor: grabbing;
+        }
+        .control-panel {
+            background-color: #ffffff;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-5xl mx-auto">
+        <h1 class="text-2xl mb-4 text-slate-800">Animation: Tollens-Probe (Silberspiegelprobe)</h1>
+        
+        <div class="control-panel p-6 rounded-lg mb-6 border border-slate-200">
+            <div class="flex flex-wrap items-center gap-6">
+                <button id="playPauseBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded transition-colors">
+                    Start
+                </button>
+                
+                <button id="resetBtn" class="border border-slate-300 hover:bg-slate-50 px-6 py-2 rounded transition-colors">
+                    Zurücksetzen
+                </button>
+
+                <div class="flex flex-col gap-1">
+                    <label for="speedSlider" class="text-sm text-slate-600">Geschwindigkeit</label>
+                    <input type="range" id="speedSlider" min="0.1" max="3" step="0.1" value="1" class="w-40">
+                </div>
+            </div>
+            
+            <div id="statusText" class="mt-4 text-slate-700 min-h-[1.5rem]">
+                Bereit zum Starten
+            </div>
+        </div>
+
+        <div class="relative overflow-hidden">
+            <canvas id="reactionCanvas" width="900" height="550" class="w-full"></canvas>
+            <div id="legend" class="absolute top-4 left-4 bg-white/80 p-3 rounded text-xs border border-slate-200 pointer-events-none">
+                <div class="flex items-center gap-2 mb-1"><span class="w-3 h-3 rounded-full bg-gray-400"></span> Kohlenstoff (C)</div>
+                <div class="flex items-center gap-2 mb-1"><span class="w-3 h-3 rounded-full bg-red-500"></span> Sauerstoff (O)</div>
+                <div class="flex items-center gap-2 mb-1"><span class="w-3 h-3 rounded-full bg-slate-300"></span> Silber (Ag)</div>
+                <div class="flex items-center gap-2 mb-1"><span class="w-3 h-3 rounded-full bg-blue-300"></span> Stickstoff (N)</div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-white border border-slate-400"></span> Wasserstoff (H)</div>
+            </div>
+        </div>
+
+        <div class="mt-6 text-slate-600 text-sm leading-relaxed">
+            Reaktionsgleichung: CH3CHO + 2 [Ag(NH3)2]+ + 2 OH- -> CH3COOH + 2 Ag + 4 NH3 + H2O.
+            Die Diamminsilber(I)-Komplexe werden reduziert, während das Ethanal zu Essigsäure oxidiert wird. Die Silberatome lagern sich an der Gefäßwand (unten) als Silberspiegel ab.
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('reactionCanvas');
+        const ctx = canvas.getContext('2d');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const speedSlider = document.getElementById('speedSlider');
+        const statusText = document.getElementById('statusText');
+
+        let isRunning = false;
+        let progress = 0;
+        let speed = 0.0025;
+
+        let draggedGroup = [];
+        let lastMousePos = { x: 0, y: 0 };
+
+        const atoms = [
+            // Ethanal
+            { id: 'C1', type: 'C', label: 'C', x: 100, y: 250, ox: '-III', targetX: 100, targetY: 250, targetOx: '-III' },
+            { id: 'H_m1', type: 'H', label: 'H', x: 60, y: 250, ox: '+I', targetX: 60, targetY: 250, targetOx: '+I' },
+            { id: 'H_m2', type: 'H', label: 'H', x: 100, y: 210, ox: '+I', targetX: 100, targetY: 210, targetOx: '+I' },
+            { id: 'H_m3', type: 'H', label: 'H', x: 100, y: 290, ox: '+I', targetX: 100, targetY: 290, targetOx: '+I' },
+            { id: 'C2', type: 'C', label: 'C', x: 180, y: 250, ox: '+I', targetX: 180, targetY: 250, targetOx: '+III' },
+            { id: 'O1', type: 'O', label: 'O', x: 220, y: 210, ox: '-II', targetX: 220, targetY: 210, targetOx: '-II' },
+            { id: 'H_ald', type: 'H', label: 'H', x: 220, y: 290, ox: '+I', targetX: 500, targetY: 100, targetOx: '+I' },
+            
+            // Diamminsilber Komplex 1
+            { id: 'Ag1', type: 'Ag', label: 'Ag', x: 500, y: 250, ox: '+', targetX: 400, targetY: 520, targetOx: '0' },
+            { id: 'N1a', type: 'N', label: 'NH3', x: 450, y: 250, ox: '0', targetX: 400, targetY: 50, targetOx: '0' },
+            { id: 'N1b', type: 'N', label: 'NH3', x: 550, y: 250, ox: '0', targetX: 450, targetY: 30, targetOx: '0' },
+
+            // Diamminsilber Komplex 2
+            { id: 'Ag2', type: 'Ag', label: 'Ag', x: 700, y: 250, ox: '+', targetX: 500, targetY: 520, targetOx: '0' },
+            { id: 'N2a', type: 'N', label: 'NH3', x: 650, y: 250, ox: '0', targetX: 700, targetY: 50, targetOx: '0' },
+            { id: 'N2b', type: 'N', label: 'NH3', x: 750, y: 250, ox: '0', targetX: 750, targetY: 30, targetOx: '0' },
+
+            // OH- Ionen
+            { id: 'O_OH1', type: 'O', label: 'O', x: 300, y: 400, ox: '-II', targetX: 220, targetY: 290, targetOx: '-II' },
+            { id: 'H_OH1', type: 'H', label: 'H', x: 300, y: 440, ox: '+I', targetX: 260, targetY: 330, targetOx: '+I' },
+            
+            { id: 'O_OH2', type: 'O', label: 'O', x: 500, y: 400, ox: '-II', targetX: 520, targetY: 130, targetOx: '-II' },
+            { id: 'H_OH2', type: 'H', label: 'H', x: 500, y: 440, ox: '+I', targetX: 540, targetY: 160, targetOx: '+I' }
+        ];
+
+        const atomGroups = [
+            ['C1', 'H_m1', 'H_m2', 'H_m3', 'C2', 'O1', 'H_ald'],
+            ['Ag1', 'N1a', 'N1b'],
+            ['Ag2', 'N2a', 'N2b'],
+            ['O_OH1', 'H_OH1'],
+            ['O_OH2', 'H_OH2']
+        ];
+
+        function getAtomCurrentPos(atom, p) {
+            return {
+                x: atom.x + (atom.targetX - atom.x) * p,
+                y: atom.y + (atom.targetY - atom.y) * p
+            };
+        }
+
+        function drawAtom(atom, p) {
+            const pos = getAtomCurrentPos(atom, p);
+            let color = '#94a3b8'; // C
+            if (atom.type === 'O') color = '#ef4444';
+            if (atom.type === 'Ag') {
+                const shade = Math.floor(203 + (241 - 203) * p);
+                color = `rgb(${shade},${shade},${shade})`;
+            }
+            if (atom.type === 'N') color = '#93c5fd';
+            if (atom.type === 'H') color = '#ffffff';
+
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, 16, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            
+            const isDragged = draggedGroup.some(a => a.id === atom.id);
+            ctx.strokeStyle = isDragged ? '#2563eb' : '#334155';
+            ctx.lineWidth = isDragged ? 2.5 : 1.2;
+            ctx.stroke();
+
+            ctx.fillStyle = (atom.type === 'H' || atom.type === 'N') ? '#000' : '#fff';
+            ctx.font = '10px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(atom.label, pos.x, pos.y);
+
+            const curOx = p < 0.5 ? atom.ox : atom.targetOx;
+            ctx.fillStyle = '#475569';
+            ctx.font = '9px sans-serif';
+            ctx.fillText(curOx, pos.x, pos.y - 24);
+        }
+
+        function drawBonds(p) {
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 2.5;
+
+            const pos = (id) => {
+                const a = atoms.find(atom => atom.id === id);
+                return getAtomCurrentPos(a, p);
+            };
+
+            const c1 = pos('C1'); const c2 = pos('C2');
+            const o1 = pos('O1'); const hAld = pos('H_ald');
+            const oOH1 = pos('O_OH1'); const hOH1 = pos('H_OH1');
+            const oOH2 = pos('O_OH2'); const hOH2 = pos('H_OH2');
+
+            // Methyl
+            ['H_m1', 'H_m2', 'H_m3'].forEach(id => {
+                const h = pos(id);
+                ctx.beginPath(); ctx.moveTo(c1.x, c1.y); ctx.lineTo(h.x, h.y); ctx.stroke();
+            });
+            ctx.beginPath(); ctx.moveTo(c1.x, c1.y); ctx.lineTo(c2.x, c2.y); ctx.stroke();
+
+            // C=O
+            ctx.beginPath();
+            ctx.moveTo(c2.x-3, c2.y); ctx.lineTo(o1.x-3, o1.y);
+            ctx.moveTo(c2.x+3, c2.y); ctx.lineTo(o1.x+3, o1.y);
+            ctx.stroke();
+
+            // Komplex-Bindungen lösen sich
+            if (p < 0.5) {
+                const factor = 1 - (p / 0.5);
+                ctx.globalAlpha = factor;
+                // Komplex 1
+                const ag1 = pos('Ag1');
+                ctx.beginPath(); ctx.moveTo(ag1.x, ag1.y); ctx.lineTo(pos('N1a').x, pos('N1a').y); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(ag1.x, ag1.y); ctx.lineTo(pos('N1b').x, pos('N1b').y); ctx.stroke();
+                // Komplex 2
+                const ag2 = pos('Ag2');
+                ctx.beginPath(); ctx.moveTo(ag2.x, ag2.y); ctx.lineTo(pos('N2a').x, pos('N2a').y); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(ag2.x, ag2.y); ctx.lineTo(pos('N2b').x, pos('N2b').y); ctx.stroke();
+                // Aldehyd-H
+                ctx.beginPath(); ctx.moveTo(c2.x, c2.y); ctx.lineTo(hAld.x, hAld.y); ctx.stroke();
+                // OH
+                ctx.beginPath(); ctx.moveTo(oOH1.x, oOH1.y); ctx.lineTo(hOH1.x, hOH1.y); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(oOH2.x, oOH2.y); ctx.lineTo(hOH2.x, hOH2.y); ctx.stroke();
+                ctx.globalAlpha = 1;
+            }
+
+            // Essigsäure Bildung
+            if (p > 0.4) {
+                ctx.beginPath(); ctx.moveTo(c2.x, c2.y); ctx.lineTo(oOH1.x, oOH1.y); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(oOH1.x, oOH1.y); ctx.lineTo(hOH1.x, hOH1.y); ctx.stroke();
+            }
+
+            // Wasser Bildung
+            if (p > 0.6) {
+                ctx.beginPath(); ctx.moveTo(oOH2.x, oOH2.y); ctx.lineTo(hOH2.x, hOH2.y); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(oOH2.x, oOH2.y); ctx.lineTo(hAld.x, hAld.y); ctx.stroke();
+            }
+        }
+
+        function updateStatus() {
+            if (progress === 0) statusText.innerText = 'Edukte: Ethanal, Diamminsilber(I)-Ionen und Hydroxid-Ionen';
+            else if (progress < 0.4) statusText.innerText = 'Reaktion: Die Silber-Komplexe zerfallen; Hydroxid greift das Carbonyl-C an';
+            else if (progress < 0.8) statusText.innerText = 'Redox: Silber wird reduziert; Kohlenstoff wird oxidiert; NH3 entweicht';
+            else statusText.innerText = 'Produkte: Essigsäure, Silber-Spiegel, Ammoniak-Gas und Wasser';
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Silberspiegel Effekt unten
+            if (progress > 0.8) {
+                ctx.save();
+                ctx.globalAlpha = (progress - 0.8) * 5;
+                ctx.fillStyle = '#cbd5e1';
+                ctx.fillRect(0, 500, canvas.width, 50);
+                ctx.restore();
+            }
+
+            drawBonds(progress);
+            atoms.forEach(atom => drawAtom(atom, progress));
+            
+            if (isRunning) {
+                progress += speed * parseFloat(speedSlider.value);
+                if (progress >= 1) {
+                    progress = 1;
+                    isRunning = false;
+                    playPauseBtn.innerText = 'Start';
+                }
+            }
+            updateStatus();
+            requestAnimationFrame(animate);
+        }
+
+        function getMousePos(evt) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            return {
+                x: ((evt.clientX || (evt.touches && evt.touches[0].clientX)) - rect.left) * scaleX,
+                y: ((evt.clientY || (evt.touches && evt.touches[0].clientY)) - rect.top) * scaleY
+            };
+        }
+
+        function handleStart(evt) {
+            const pos = getMousePos(evt);
+            for (let i = atoms.length - 1; i >= 0; i--) {
+                const atomPos = getAtomCurrentPos(atoms[i], progress);
+                const dx = pos.x - atomPos.x;
+                const dy = pos.y - atomPos.y;
+                if (dx * dx + dy * dy < 20 * 20) {
+                    const atomId = atoms[i].id;
+                    const groupIds = atomGroups.find(g => g.includes(atomId));
+                    if (groupIds) {
+                        draggedGroup = groupIds.map(id => atoms.find(a => a.id === id));
+                    } else {
+                        draggedGroup = [atoms[i]];
+                    }
+                    lastMousePos = pos;
+                    break;
+                }
+            }
+        }
+
+        function handleMove(evt) {
+            if (draggedGroup.length === 0) return;
+            evt.preventDefault();
+            const pos = getMousePos(evt);
+            const dx = pos.x - lastMousePos.x;
+            const dy = pos.y - lastMousePos.y;
+            
+            draggedGroup.forEach(atom => {
+                atom.x += dx;
+                atom.targetX += dx;
+                atom.y += dy;
+                atom.targetY += dy;
+            });
+            
+            lastMousePos = pos;
+        }
+
+        function handleEnd() {
+            draggedGroup = [];
+        }
+
+        canvas.addEventListener('mousedown', handleStart);
+        window.addEventListener('mousemove', handleMove);
+        window.addEventListener('mouseup', handleEnd);
+        canvas.addEventListener('touchstart', handleStart);
+        window.addEventListener('touchmove', handleMove);
+        window.addEventListener('touchend', handleEnd);
+
+        playPauseBtn.addEventListener('click', () => {
+            if (progress >= 1) progress = 0;
+            isRunning = !isRunning;
+            playPauseBtn.innerText = isRunning ? 'Pause' : 'Start';
+        });
+
+        resetBtn.addEventListener('click', () => {
+            isRunning = false;
+            progress = 0;
+            playPauseBtn.innerText = 'Start';
+        });
+
+        animate();
+    </script>
+</body>
+</html>
