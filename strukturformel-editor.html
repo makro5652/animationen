@@ -1,0 +1,3212 @@
+<!DOCTYPE html>
+<html lang="de" class="paper-white">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Strukturformel-Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Catppuccin Mocha – Oberfläche */
+  --ink:#1e1e2e;           /* base */
+  --ink-0:#181825;         /* mantle */
+  --ink-2:#313244;         /* surface0 */
+  --ink-3:#45475a;         /* surface1 */
+  --ink-4:#585b70;         /* surface2 */
+  --text-on-ink:#cdd6f4;   /* text */
+  --text-dim:#a6adc8;      /* subtext0 */
+  --accent:#cba6f7;        /* mauve */
+  --on-accent:#11111b;     /* crust – Schrift auf Akzentflächen */
+  --danger:#f38ba8;        /* red */
+  --danger-bg:rgba(243,139,168,.12);
+  --danger-line:rgba(243,139,168,.45);
+  --warn:#fab387;          /* peach */
+  --alert:#f38ba8;
+  --ok:#a6e3a1;
+  --radius:6px;
+  /* Catppuccin Latte – Zeichenblatt (hell, gut druckbar) */
+  --paper:#eff1f5;         /* base */
+  --paper-line:#dce0e8;    /* crust */
+  --paper-line-strong:#ccd0da;
+  --paper-text:#4c4f69;
+  --paper-dim:#6c6f85;
+  --draw-accent:#1e66f5;   /* blue */
+  --draw-accent-soft:#dbe5fd;
+  --accent-soft:#dbe5fd;
+  --el-C:#1e1e2e;          /* Kohlenstoffgerüst bewusst fast schwarz (Druck, Kopie) */
+  --el-H:#5c5f77;
+  --el-O:#d20f39;
+  --el-N:#1e66f5;
+  --el-S:#df8e1d;
+  --el-P:#fe640b;
+  --el-Hal:#40a02b;
+  --el-R:#8839ef;
+  --el-X:#179299;          /* teal – weitere Elemente */
+  --ui-el-X:#94e2d5;
+  --ui-el-C:#cdd6f4; --ui-el-H:#9399b2; --ui-el-O:#f38ba8; --ui-el-N:#89b4fa;
+  --ui-el-S:#f9e2af; --ui-el-P:#fab387; --ui-el-Hal:#a6e3a1; --ui-el-R:#cba6f7;
+}
+html.paper-white{
+  --paper:#FFFFFF;
+  --paper-line:#E6E9EF;
+  --paper-line-strong:#DCE0E8;
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{height:100%}
+body{
+  margin:0;display:flex;flex-direction:column;
+  background:var(--ink);
+  color:var(--text-on-ink);
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:14px;
+  -webkit-text-size-adjust:100%;
+}
+header{
+  display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+  padding:7px 16px 6px;border-bottom:1px solid var(--ink-3);flex:none;
+}
+header h1{
+  margin:0;font-size:15px;font-weight:600;letter-spacing:-0.01em;
+}
+header .sub{
+  font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--text-dim);
+  letter-spacing:0.06em;text-transform:uppercase;
+}
+.layout{
+  display:grid;
+  grid-template-columns:212px minmax(0,1fr) 268px;
+  gap:1px;background:var(--ink-3);
+  flex:1;min-height:0;
+}
+.panel{background:var(--ink);overflow-y:auto;padding:14px 14px 40px}
+.stage{background:var(--ink);display:flex;flex-direction:column;min-width:0;min-height:0;padding:8px 10px 6px}
+
+/* ---- Panelstruktur ---- */
+.group{margin-bottom:18px}
+.group > h2{
+  margin:0 0 8px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;
+  letter-spacing:0.13em;text-transform:uppercase;color:var(--text-dim);
+  border-bottom:1px solid var(--ink-3);padding-bottom:5px;
+}
+.stack{display:flex;flex-direction:column;gap:5px}
+.row{display:flex;flex-wrap:wrap;gap:5px}
+
+button, select{
+  font-family:inherit;font-size:13px;color:var(--text-on-ink);
+  background:var(--ink-2);border:1px solid var(--ink-3);border-radius:var(--radius);
+  padding:7px 9px;cursor:pointer;text-align:left;line-height:1.25;
+}
+button:hover{border-color:var(--ink-4)}
+button:focus-visible, select:focus-visible, input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+button.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+button.tool{display:flex;align-items:baseline;gap:7px}
+button.tool .key{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--text-dim)}
+button.on .key{color:var(--on-accent);opacity:.7}
+button.el{
+  font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:14px;
+  width:38px;text-align:center;padding:7px 0;
+}
+button.ghost{background:transparent}
+button.wide{width:100%}
+
+button.sw{
+  width:28px;height:26px;padding:0;border-radius:5px;border:1px solid var(--ink-3);
+}
+button.sw.on{outline:2px solid var(--accent);outline-offset:1px}
+input[type=range]{width:100%;accent-color:var(--accent);background:transparent}
+
+label.check{display:flex;align-items:flex-start;gap:8px;cursor:pointer;padding:3px 0;line-height:1.35}
+label.check input{margin:2px 0 0;accent-color:var(--accent);flex:none}
+label.check.off{opacity:.45;cursor:default}
+
+details{border:1px solid var(--ink-3);border-radius:var(--radius);padding:7px 9px;background:var(--ink-2)}
+details summary{cursor:pointer;font-size:12.5px;color:var(--text-dim);list-style:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"▸ ";}
+details[open] summary::before{content:"▾ ";}
+details .stack{margin-top:8px}
+textarea{
+  width:100%;min-height:70px;resize:vertical;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;line-height:1.45;
+  color:var(--text-on-ink);background:var(--ink);border:1px solid var(--ink-3);
+  border-radius:var(--radius);padding:6px 7px;
+}
+
+/* ---- Darstellungs-Reiter ---- */
+.modes{display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap;flex:none}
+.modes button{
+  flex:1 1 0;min-width:118px;text-align:center;padding:5px 8px;
+  font-weight:500;letter-spacing:-0.005em;
+}
+.modes button small{display:block;font-family:"IBM Plex Mono",monospace;font-size:9.5px;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim);margin-top:1px}
+.modes button.on small{color:var(--on-accent);opacity:.7}
+
+/* ---- Zeichenfläche ---- */
+.board{
+  position:relative;flex:1;min-height:0;border-radius:8px;overflow:hidden;
+  background:var(--paper);border:1px solid var(--ink-3);
+}
+canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.hint{
+  margin-top:5px;font-size:11.5px;color:var(--text-dim);min-height:15px;flex:none;
+  display:flex;justify-content:space-between;gap:12px;line-height:1.3;
+}
+.hint #hint{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.hint .warn{white-space:nowrap}
+
+/* ---- Text direkt auf der Fläche ---- */
+#labelEditor{
+  position:absolute;transform:translate(-50%,-50%);z-index:3;
+  font:500 16.5px "IBM Plex Sans",-apple-system,"Segoe UI",sans-serif;
+  width:14ch;min-width:90px;padding:3px 6px;text-align:center;
+  background:#fff;color:var(--paper-text);border:1.5px solid var(--draw-accent);border-radius:5px;
+  box-shadow:0 2px 10px rgba(17,17,27,.22);outline:none;
+}
+
+/* ---- Schwebende Leiste an der Auswahl ---- */
+#selBar{
+  position:absolute;z-index:2;display:flex;gap:3px;padding:3px;
+  background:var(--ink);border:1px solid var(--ink-3);border-radius:7px;
+  box-shadow:0 3px 12px rgba(17,17,27,.35);
+}
+#selBar button{padding:5px 9px;font-size:12.5px;text-align:center;line-height:1.1}
+#selBar button.danger{color:var(--danger);border-color:var(--danger-line)}
+#selBar button.danger:hover{background:var(--danger-bg)}
+.hint .warn{color:var(--warn)}
+
+/* ---- Textausgabe (Halbstruktur-/Summenformel) ---- */
+.textout{
+  flex:1;min-height:0;border-radius:8px;border:1px solid var(--ink-3);
+  background:var(--paper);color:var(--paper-text);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:18px;padding:26px;text-align:center;overflow:auto;
+}
+.textout .eyebrow{
+  font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--paper-dim);
+}
+.formula{
+  font-family:"IBM Plex Mono",monospace;font-weight:500;
+  font-size:clamp(20px,3.6vw,38px);line-height:1.5;color:var(--paper-text);
+  word-break:break-word;max-width:100%;
+}
+.formula sub{font-size:.62em;vertical-align:-0.22em;font-weight:600}
+.formula sup{font-size:.62em;vertical-align:0.42em;font-weight:600}
+.formula .frag{display:block;margin:6px 0}
+.textout .note{font-size:12.5px;color:var(--paper-dim);max-width:44ch;line-height:1.5}
+.textout button{background:#fff;color:var(--paper-text);border-color:var(--paper-line-strong)}
+.textout button:hover{border-color:var(--accent)}
+
+/* ---- Auswertung rechts ---- */
+.readout{background:var(--ink-2);border:1px solid var(--ink-3);border-radius:var(--radius);padding:10px 11px;margin-bottom:8px}
+.readout .k{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
+.readout .v{font-family:"IBM Plex Mono",monospace;font-size:17px;margin-top:3px;word-break:break-word}
+.readout .v.small{font-size:13.5px;line-height:1.5}
+.readout .v sub{font-size:.65em;vertical-align:-0.2em}
+.msg{font-size:12.5px;line-height:1.45;padding:8px 10px;border-radius:var(--radius);margin-bottom:6px}
+.msg.err{background:var(--danger-bg);border:1px solid var(--danger-line);color:var(--danger)}
+.msg.info{background:var(--ink-2);border:1px solid var(--ink-3);color:var(--text-dim)}
+
+/* =====================================================================
+   Layout: Werkzeugleiste, Kontextzeile, einklappbare Auswertung
+   ===================================================================== */
+header{align-items:center;gap:10px 14px;padding:6px 12px}
+header h1{font-size:15px;white-space:nowrap}
+header .modes{margin:0;gap:3px;flex:0 1 auto}
+header .modes button{flex:none;min-width:0;padding:5px 8px;font-size:12.5px}
+header .modes button small{display:none}
+.hdr-actions{margin-left:auto;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.hdr-actions > button, .hdr-actions > select, .hdr-actions .seg button, .menu > summary{padding:5px 9px;font-size:12.5px}
+.hdr-actions > select{max-width:170px}
+.hdr-actions > select#flavor{width:100px}
+.hdr-actions > select#templates{width:140px}
+button.on.ghost{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+button.danger{color:var(--danger);border-color:var(--danger-line)}
+button.danger:hover{background:var(--danger-bg)}
+
+.seg{display:flex;gap:0 !important}
+.seg button{border-radius:0;margin-left:-1px;text-align:center}
+.seg button:first-child{border-radius:var(--radius) 0 0 var(--radius);margin-left:0}
+.seg button:last-child{border-radius:0 var(--radius) var(--radius) 0}
+
+details.menu{position:relative;border:none;padding:0;background:none}
+.menu > summary{display:block;cursor:pointer;color:var(--text-on-ink);background:var(--ink-2);
+  border:1px solid var(--ink-3);border-radius:var(--radius);line-height:1.25}
+.menu > summary::before{content:none}
+.menu > summary::after{content:" ▾";color:var(--text-dim)}
+.menu-pop{position:absolute;right:0;top:calc(100% + 5px);z-index:30;width:260px;
+  background:var(--ink);border:1px solid var(--ink-3);border-radius:8px;padding:8px;
+  display:flex;flex-direction:column;gap:5px;box-shadow:0 8px 24px rgba(17,17,27,.5)}
+.menu-sep{margin-top:6px;padding-top:7px;border-top:1px solid var(--ink-3);font-size:11.5px;color:var(--text-dim)}
+
+.layout{display:grid;grid-template-columns:auto minmax(0,1fr) auto;position:relative}
+.rail{background:var(--ink-0);display:flex;flex-direction:column;gap:4px;padding:8px 6px;overflow-y:auto;width:56px}
+.rail-tools{display:flex;flex-direction:column;gap:inherit}
+.rail button.tool{flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  padding:8px 0;text-align:center;width:100%;position:relative}
+.rail svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.rail .tl{display:none}
+.rail .key{position:absolute;right:4px;top:2px;font-size:9px;opacity:.8}
+
+.stage{padding:6px 10px 6px}
+.ctx{display:flex;flex-wrap:wrap;align-items:center;align-content:flex-start;gap:6px 18px;padding:0 0 6px;flex:none;
+  min-height:70px}   /* feste Höhe für zwei Zeilen: die Zeichenfläche springt beim Werkzeugwechsel nicht */
+.cg{display:none;align-items:center;gap:6px;flex-wrap:wrap}
+.cl{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim)}
+.ctx-note{font-size:12.5px;color:var(--text-dim)}
+.ctx .row{gap:4px}
+.ctx button{padding:5px 9px;font-size:12.5px;text-align:center}
+.ctx button.el{width:32px;padding:5px 0;font-size:13px}
+.ctx button.el.wide-el{width:42px}
+.ctx input[type=number]{width:104px;font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--text-on-ink);
+  background:var(--ink-2);border:1px solid var(--ink-3);border-radius:6px;padding:6px 8px}
+#elCustom{width:84px !important}
+html:not(.view-classic) #ctx:not(.show-custom) .cg.custom-el{display:none !important}
+html.view-classic #btnElMore{display:none}
+#qCustom{width:70px !important}
+.ctx input.bad{border-color:var(--danger)}
+.ctx input[type=text]{width:150px;font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--text-on-ink);
+  background:var(--ink-2);border:1px solid var(--ink-3);border-radius:6px;padding:6px 8px}
+#bendRange{width:130px}
+body[data-tool="build"]   .cg[data-for~="build"],
+body[data-tool="select"]  .cg[data-for~="select"],
+body[data-tool="element"] .cg[data-for~="element"],
+body[data-tool="bond"]    .cg[data-for~="bond"],
+body[data-tool="charge"]  .cg[data-for~="charge"],
+body[data-tool="arrow"]   .cg[data-for~="arrow"],
+body[data-tool="text"]    .cg[data-for~="text"],
+body[data-tool="erase"]   .cg[data-for~="erase"]{display:flex}
+
+.side{width:260px}
+.layout.side-closed .side{display:none}
+.hint .warn{cursor:pointer;text-decoration:underline dotted}
+
+/* ---- Klassische Ansicht: breite Leiste, alle Optionen sichtbar ---- */
+html.view-classic .rail{width:236px;padding:10px 12px 40px;gap:0}
+html.view-classic .rail-tools{display:flex;flex-direction:column;gap:5px;margin-bottom:16px}
+html.view-classic .rail button.tool{flex-direction:row;justify-content:flex-start;gap:9px;padding:7px 9px;text-align:left}
+html.view-classic .rail svg{width:18px;height:18px}
+html.view-classic .rail .tl{display:inline;font-size:13px}
+html.view-classic .rail .key{position:static;margin-left:auto;font-size:10px}
+html.view-classic #classicSlot .ctx{display:block;padding:0;min-height:0}
+html.view-classic #classicSlot .cg{display:flex !important;flex-direction:column;align-items:stretch;gap:6px;margin-bottom:16px}
+html.view-classic #classicSlot .cg[data-for="bond"],
+html.view-classic #classicSlot #cgErase .ctx-note{display:none !important}
+html.view-classic #classicSlot .cl{display:block;border-bottom:1px solid var(--ink-3);padding-bottom:5px;font-size:10.5px}
+html.view-classic #classicSlot .row{flex-wrap:wrap}
+html.view-classic #classicSlot .seg button{flex:1}
+html.view-classic #classicSlot input[type=text], html.view-classic #classicSlot input[type=number]{width:100% !important}
+html.view-classic #classicSlot #bendRange{width:100%}
+html.view-classic #classicSlot #arrowKinds button{flex:1 1 45%}
+html.view-classic .ctx button.el{width:36px}
+
+/* ---- Touch-Ansicht: beschriftet und mit großen Zielen ---- */
+html.view-touch .rail{width:80px;gap:5px}
+html.view-touch .rail button.tool{padding:9px 2px;min-height:60px}
+html.view-touch .rail .tl{display:block;font-size:11.5px;line-height:1.15}
+html.view-touch .rail .key{display:none}
+html.view-touch .rail svg{width:24px;height:24px}
+html.view-touch .ctx{gap:8px 20px;padding-bottom:8px;min-height:100px}
+html.view-touch .ctx button{padding:9px 13px;font-size:14px;min-height:42px}
+html.view-touch .ctx button.el{width:44px;padding:9px 0;font-size:15px}
+html.view-touch .ctx button.el.wide-el{width:54px}
+html.view-touch .ctx input[type=text], html.view-touch .ctx input[type=number]{padding:10px;font-size:14px}
+html.view-touch button.sw{width:38px;height:38px}
+html.view-touch .hdr-actions > button, html.view-touch .hdr-actions > select,
+html.view-touch .hdr-actions .seg button, html.view-touch .menu > summary,
+html.view-touch header .modes button{padding:9px 12px;font-size:14px}
+html.view-touch #selBar button{padding:9px 13px;font-size:14px}
+html.view-touch .side button{padding:10px 11px}
+html.view-touch .ctx-note{font-size:14px}
+
+/* ---- Schmale Fenster: Auswertung schwebt über der Fläche ---- */
+@media (max-width:1100px){
+  .side{position:absolute;right:0;top:0;bottom:0;z-index:15;box-shadow:-10px 0 28px rgba(17,17,27,.5)}
+  .hdr-actions .lbl{display:none}
+}
+@media (max-width:640px){
+  header h1{display:none}
+}
+
+/* =====================================================================
+   Catppuccin-Varianten für die Oberfläche (das Zeichenblatt bleibt hell)
+   ===================================================================== */
+:root{color-scheme:dark}
+html[data-flavor="macchiato"]{
+  --ink:#24273a; --ink-0:#1e2030; --ink-2:#363a4f; --ink-3:#494d64; --ink-4:#5b6078;
+  --text-on-ink:#cad3f5; --text-dim:#a5adcb; --accent:#c6a0f6; --on-accent:#181926;
+  --danger:#ed8796; --danger-bg:rgba(237,135,150,.12); --danger-line:rgba(237,135,150,.45);
+  --warn:#f5a97f; --ok:#a6da95;
+  --ui-el-C:#cad3f5; --ui-el-H:#939ab7; --ui-el-O:#ed8796; --ui-el-N:#8aadf4;
+  --ui-el-S:#eed49f; --ui-el-P:#f5a97f; --ui-el-Hal:#a6da95; --ui-el-R:#c6a0f6; --ui-el-X:#8bd5ca;
+}
+html[data-flavor="frappe"]{
+  --ink:#303446; --ink-0:#292c3c; --ink-2:#414559; --ink-3:#51576d; --ink-4:#626880;
+  --text-on-ink:#c6d0f5; --text-dim:#a5adce; --accent:#ca9ee6; --on-accent:#232634;
+  --danger:#e78284; --danger-bg:rgba(231,130,132,.12); --danger-line:rgba(231,130,132,.45);
+  --warn:#ef9f76; --ok:#a6d189;
+  --ui-el-C:#c6d0f5; --ui-el-H:#949cbb; --ui-el-O:#e78284; --ui-el-N:#8caaee;
+  --ui-el-S:#e5c890; --ui-el-P:#ef9f76; --ui-el-Hal:#a6d189; --ui-el-R:#ca9ee6; --ui-el-X:#81c8be;
+}
+html[data-flavor="latte"]{
+  color-scheme:light;
+  --ink:#eff1f5; --ink-0:#e6e9ef; --ink-2:#dce0e8; --ink-3:#bcc0cc; --ink-4:#9ca0b0;
+  --text-on-ink:#4c4f69; --text-dim:#6c6f85; --accent:#8839ef; --on-accent:#eff1f5;
+  --danger:#d20f39; --danger-bg:rgba(210,15,57,.08); --danger-line:rgba(210,15,57,.40);
+  --warn:#fe640b; --ok:#40a02b;
+  --ui-el-C:#4c4f69; --ui-el-H:#7c7f93; --ui-el-O:#d20f39; --ui-el-N:#1e66f5;
+  --ui-el-S:#df8e1d; --ui-el-P:#fe640b; --ui-el-Hal:#40a02b; --ui-el-R:#8839ef; --ui-el-X:#179299;
+}
+html[data-flavor="latte"] .board, html[data-flavor="latte"] .textout{border-color:var(--ink-3)}
+html[data-flavor="latte"] .menu-pop, html[data-flavor="latte"] .side{box-shadow:0 8px 24px rgba(76,79,105,.18)}
+#flavor{max-width:132px}
+@media (max-width:1500px){ .hdr-actions .lbl{display:none} }
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body data-tool="build">
+
+<header>
+  <h1>Strukturformel-Editor</h1>
+  <nav class="modes" id="modes" aria-label="Darstellung">
+    <button class="on" data-mode="skelett" title="Skelettschreibweise (Zeichnung)">Skelett<small>Zeichnung</small></button>
+    <button data-mode="struktur" title="Strukturformel (Zeichnung)">Strukturformel<small>Zeichnung</small></button>
+    <button data-mode="halb" title="Halbstrukturformel (Text)">Halbstruktur<small>Text</small></button>
+    <button data-mode="summe" title="Summenformel (Text)">Summenformel<small>Text</small></button>
+  </nav>
+  <div class="hdr-actions">
+    <button class="ghost" id="btnUndo" title="Rückgängig (Strg+Z)">↶ <span class="lbl">Rückgängig</span></button>
+    <button class="ghost" id="btnRedo" title="Wiederholen (Strg+Y)">↷</button>
+    <button class="ghost" id="btnCenter" title="Zeichnung in die Mitte der Fläche setzen">Zentrieren</button>
+    <select id="templates" title="Beispielmolekül laden">
+      <option value="">Beispiel laden …</option>
+      <option value="methan">Methan</option>
+      <option value="ethan">Ethan</option>
+      <option value="propan">Propan</option>
+      <option value="ethanol">Ethanol</option>
+      <option value="ethanal">Ethanal</option>
+      <option value="essigsaeure">Essigsäure</option>
+      <option value="aceton">Aceton (Propanon)</option>
+      <option value="ethen">Ethen</option>
+      <option value="ethin">Ethin</option>
+      <option value="isobutan">2-Methylpropan</option>
+      <option value="glycerin">Glycerin</option>
+      <option value="alanin">Alanin</option>
+      <option value="cyclohexan">Cyclohexan</option>
+      <option value="benzol">Benzol</option>
+      <option value="wasser">Wasser</option>
+      <option value="ammoniak">Ammoniak</option>
+      <option value="co2">Kohlenstoffdioxid</option>
+    </select>
+    <details class="menu" id="exportMenu">
+      <summary>Exportieren</summary>
+      <div class="menu-pop">
+        <button class="ghost" id="btnPng">Als PNG speichern</button>
+        <button class="ghost" id="btnSvg">Als SVG speichern (Vektor)</button>
+        <button class="ghost" id="btnCopyImg">Bild in Zwischenablage</button>
+        <div class="menu-sep">Molekül-Code (speichern und laden)</div>
+        <textarea id="code" spellcheck="false" placeholder="Code erzeugen oder hier einfügen …"></textarea>
+        <div class="row">
+          <button class="ghost" id="btnCodeGet" style="flex:1;text-align:center">Erzeugen</button>
+          <button class="ghost" id="btnCodeSet" style="flex:1;text-align:center">Laden</button>
+        </div>
+      </div>
+    </details>
+    <select id="flavor" title="Farbthema der Oberfläche (Catppuccin): Latte hell, Frappé und Macchiato mittel, Mocha dunkel. Das Zeichenblatt bleibt hell und druckfreundlich.">
+      <option value="latte">Latte</option>
+      <option value="frappe">Frappé</option>
+      <option value="macchiato">Macchiato</option>
+      <option value="mocha">Mocha</option>
+    </select>
+    <div class="seg" id="viewMode" title="Klassisch: alle Optionen links sichtbar. Kompakt: kleine Knöpfe, Optionen je Werkzeug. Touch: beschriftete, große Knöpfe für Tablets.">
+      <button data-view="classic">Klassisch</button>
+      <button data-view="compact">Kompakt</button>
+      <button data-view="touch">Touch</button>
+    </div>
+    <button class="ghost" id="btnPanel" title="Auswertung und Anzeigeoptionen ein- oder ausblenden">Auswertung</button>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- ============ WERKZEUGLEISTE ============ -->
+  <nav class="rail" aria-label="Werkzeuge">
+    <div class="rail-tools" id="tools">
+    <button class="tool on" data-tool="build" title="Bauen (B)"><svg viewBox="0 0 24 24"><path d="M12 3l7.8 4.5v9L12 21l-7.8-4.5v-9z"/></svg><span class="tl">Bauen</span><span class="key">B</span></button>
+    <button class="tool" data-tool="select" title="Auswählen (A)"><svg viewBox="0 0 24 24"><path d="M6 3l12 7.5-5.2 1.3L10 17.5z"/><path d="M3 20h3M9 20h3M15 20h3M21 20v-3"/></svg><span class="tl">Auswählen</span><span class="key">A</span></button>
+    <button class="tool" data-tool="element" title="Element ändern (E)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><text x="12" y="16" text-anchor="middle" font-size="11" font-weight="600" stroke="none" fill="currentColor">N</text></svg><span class="tl">Element</span><span class="key">E</span></button>
+    <button class="tool" data-tool="bond" title="Bindung ändern (V)"><svg viewBox="0 0 24 24"><path d="M4 16.5L16.5 4M7.5 20L20 7.5"/></svg><span class="tl">Bindung</span><span class="key">V</span></button>
+    <button class="tool" data-tool="charge" title="Ladung setzen (L)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M8 12h8"/></svg><span class="tl">Ladung</span><span class="key">L</span></button>
+    <button class="tool" data-tool="arrow" title="Pfeil zeichnen (P)"><svg viewBox="0 0 24 24"><path d="M4 17c2.5-8.5 10.5-10 15-5"/><path d="M19.5 6.5v5.5H14"/></svg><span class="tl">Pfeil</span><span class="key">P</span></button>
+    <button class="tool" data-tool="text" title="Text setzen (T)"><svg viewBox="0 0 24 24"><path d="M5 7V4.5h14V7M12 4.5v15M9 19.5h6"/></svg><span class="tl">Text</span><span class="key">T</span></button>
+    <button class="tool" data-tool="erase" title="Löschen (X)"><svg viewBox="0 0 24 24"><path d="M15 4.5l5 5-9.5 9.5H6l-3-3z"/><path d="M10 9.5l5 5M11 20h9"/></svg><span class="tl">Löschen</span><span class="key">X</span></button>
+    </div>
+    <div id="classicSlot"></div>
+  </nav>
+
+  <!-- ============ BÜHNE ============ -->
+  <section class="stage">
+    <div class="ctx" id="ctx">
+      <div class="cg" data-for="build element"><span class="cl">Element</span><div class="row" id="elements"></div>
+        <button class="ghost" id="btnElMore" title="Weiteres Element per Symbol eingeben, z. B. Rb, Fe, Xe">+ weiteres</button></div>
+      <div class="cg custom-el" data-for="build element">
+        <span class="cl">Weiteres Element</span>
+        <input id="elCustom" type="text" maxlength="3" placeholder="z. B. Rb" title="Elementsymbol eintippen, Enter übernimmt" autocomplete="off" spellcheck="false">
+        <input id="elCustomV" type="number" min="0" max="8" step="1" placeholder="Bindigkeit" title="optional: Zahl der Bindungen. Leer lassen = übliche Bindigkeit der Gruppe">
+        <button id="btnElCustom">Hinzufügen</button>
+      </div>
+      <div class="cg" data-for="build element"><span class="cl">Rest</span><div class="row" id="rests"></div></div>
+      <div class="cg" data-for="build">
+        <span class="cl">Ring</span>
+        <div class="row">
+          <button class="ghost" data-ring="3">3</button>
+          <button class="ghost" data-ring="4">4</button>
+          <button class="ghost" data-ring="5">5</button>
+          <button class="ghost" data-ring="6">6</button>
+          <button class="ghost" data-ring="7">7</button>
+          <button class="ghost" id="btnBenzol">Benzol</button>
+        </div>
+      </div>
+
+      <div class="cg" data-for="select">
+        <span class="cl">Auswahlform</span>
+        <div class="row seg" id="selShape" title="Form beim Aufziehen einer Auswahl; mit gedrückter Alt-Taste wird die andere Form verwendet">
+          <button data-shape="rect" class="on">Rahmen</button>
+          <button data-shape="lasso">Lasso</button>
+        </div>
+      </div>
+      <div class="cg" data-for="select">
+        <span class="cl">Auswahl drehen</span>
+        <div class="row" id="transform">
+          <button data-rot="-15" title="15° gegen den Uhrzeigersinn">↺ 15°</button>
+          <button data-rot="15" title="15° im Uhrzeigersinn">↻ 15°</button>
+          <button id="btnMirror" title="waagerecht spiegeln">⇋ Spiegeln</button>
+        </div>
+      </div>
+      <div class="cg" data-for="select">
+        <span class="cl">Kette ausrichten</span>
+        <div class="row seg" id="alignMode">
+          <button data-align="90" class="on">gerade 90°</button>
+          <button data-align="45">gerade 45°</button>
+          <button data-align="zz">Zickzack</button>
+        </div>
+        <button id="btnStraight">Ausrichten</button>
+      </div>
+
+      <div class="cg" data-for="bond"><span class="ctx-note">Tipp auf eine Bindung: Einfach- → Doppel- → Dreifachbindung. Ziehen mit „Bauen“ zwischen zwei Atomen erzeugt eine neue Bindung.</span></div>
+
+      <div class="cg" data-for="charge">
+        <span class="cl">Ladung</span>
+        <div class="row" id="charges">
+          <button class="el on" data-q="1" title="einfach positiv, z. B. Carbenium-Ion">+</button>
+          <button class="el" data-q="-1" title="einfach negativ, z. B. Carbanion">−</button>
+          <button class="el" data-q="2" title="zweifach positiv">2+</button>
+          <button class="el" data-q="-2" title="zweifach negativ">2−</button>
+          <button class="el wide-el" data-d="+" title="Partialladung positiv">δ+</button>
+          <button class="el wide-el" data-d="-" title="Partialladung negativ">δ−</button>
+          <button class="el wide-el" data-q="0" title="Ladung entfernen">ohne</button>
+        </div>
+      </div>
+
+      <div class="cg" data-for="charge">
+        <span class="cl">Eigene Ladung</span>
+        <input id="qCustom" type="text" maxlength="4" placeholder="z. B. 3+" title="Ladung eintippen, z. B. 3+, 2−, -4 oder 0. Enter übernimmt" autocomplete="off" spellcheck="false">
+        <button id="btnQCustom">Übernehmen</button>
+      </div>
+      <div class="cg" data-for="arrow"><span class="cl">Pfeilart</span><div class="row" id="arrowKinds"></div></div>
+      <div class="cg" data-for="arrow"><span class="cl">Pfeilfarbe</span><div class="row" id="arrowColors"></div></div>
+      <div class="cg" data-for="arrow">
+        <span class="cl">Krümmung <span id="bendVal">0</span></span>
+        <input type="range" id="bendRange" min="-80" max="80" step="5" value="0">
+      </div>
+
+      <div class="cg" data-for="text">
+        <span class="cl">Textvorlage</span>
+        <input id="textVal" type="text" placeholder="optional, z. B. Δ" title="Wird beim Anlegen eines neuen Textes vorausgefüllt">
+      </div>
+      <div class="cg" data-for="text"><span class="cl">Textfarbe</span><div class="row" id="textColors"></div></div>
+
+      <div class="cg" data-for="erase" id="cgErase">
+        <span class="ctx-note">Tippen oder wischen löscht. Entf löscht die Auswahl.</span>
+        <button class="danger" id="btnClear">Alles löschen</button>
+      </div>
+    </div>
+
+    <div class="board" id="board">
+      <canvas id="cv"></canvas>
+    </div>
+
+    <div class="textout" id="textout" hidden>
+      <div class="eyebrow" id="toEyebrow">Halbstrukturformel</div>
+      <div class="formula" id="toFormula"></div>
+      <div class="note" id="toNote"></div>
+      <button id="btnCopy">Formel kopieren</button>
+    </div>
+
+    <div class="hint">
+      <span id="hint"></span>
+      <span id="hintWarn" class="warn"></span>
+    </div>
+  </section>
+
+  <!-- ============ AUSWERTUNG + ANZEIGE ============ -->
+  <aside class="panel side" id="side">
+    <div class="group">
+      <h2>Auswertung</h2>
+      <div class="readout"><div class="k">Summenformel</div><div class="v" id="outSum">—</div></div>
+      <div class="readout"><div class="k">Molare Masse</div><div class="v" id="outMass">—</div></div>
+      <div class="readout"><div class="k">Halbstrukturformel</div><div class="v small" id="outCond">—</div></div>
+      <div id="checks"></div>
+    </div>
+
+    <div class="group">
+      <h2>Anzeige</h2>
+      <div class="stack">
+        <label class="check" id="lblShowC"><input type="checkbox" id="showC"><span>C-Symbole schreiben</span></label>
+        <label class="check" title="Atomsymbole, Ladungen, δ-Zeichen und freie Elektronenpaare schwarz statt farbig – auch im Export"><input type="checkbox" id="mono"><span>Alle Symbole schwarz (ohne Farbe)</span></label>
+        <label class="check"><input type="checkbox" id="showGrid"><span>Raster</span></label>
+        <label class="check"><input type="checkbox" id="whiteBg" checked><span>Weißer Hintergrund</span></label>
+      </div>
+    </div>
+
+    <div class="group">
+      <h2>Freie Elektronenpaare</h2>
+      <div class="row" id="lpMode">
+        <button data-lp="none" class="on" style="flex:1;text-align:center">aus</button>
+        <button data-lp="dots" style="flex:1;text-align:center">Punkte</button>
+        <button data-lp="line" style="flex:1;text-align:center">Strich</button>
+      </div>
+    </div>
+
+    <div class="group">
+      <h2>Wasserstoff-Atome</h2>
+      <div class="stack" id="hmodes">
+        <button data-h="none">keine (reines Gerüst)</button>
+        <button class="on" data-h="hetero">nur an O, N, S … (OH)</button>
+        <button data-h="allText">alle als Text (CH<sub>3</sub>)</button>
+        <button data-h="allLine">alle mit Bindungsstrich</button>
+      </div>
+      <div class="stack" style="margin-top:7px">
+        <button id="btnManualH">H ausschreiben und einzeln bearbeiten</button>
+        <button id="btnAutoH" class="ghost">zurück zu automatischen H</button>
+      </div>
+      <div class="msg info" id="manualNote" hidden>
+        Manueller Modus: H-Atome werden nicht mehr ergänzt. Du kannst sie einzeln
+        setzen (Element H), verschieben und löschen.
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+"use strict";
+
+/* =======================================================================
+   1. Elementdaten
+   v  = Bindigkeit (übliche Zahl der Bindungen)
+   ve = Valenzelektronen (für freie Elektronenpaare)
+   m  = molare Masse in g/mol
+   ======================================================================= */
+const EL = {
+  H : {v:1, ve:1, m:1.008,   col:'var(--el-H)'},
+  C : {v:4, ve:4, m:12.011,  col:'var(--el-C)'},
+  N : {v:3, ve:5, m:14.007,  col:'var(--el-N)'},
+  O : {v:2, ve:6, m:15.999,  col:'var(--el-O)'},
+  S : {v:2, ve:6, m:32.06,   col:'var(--el-S)'},
+  P : {v:3, ve:5, m:30.974,  col:'var(--el-P)'},
+  F : {v:1, ve:7, m:18.998,  col:'var(--el-Hal)'},
+  Cl: {v:1, ve:7, m:35.45,   col:'var(--el-Hal)'},
+  Br: {v:1, ve:7, m:79.904,  col:'var(--el-Hal)'},
+  I : {v:1, ve:7, m:126.904, col:'var(--el-Hal)'}
+};
+const EL_ORDER = ['C','H','O','N','S','P','F','Cl','Br','I'];
+/* Reste: Platzhalter für beliebige Gruppen. Einbindig, ohne Masse und ohne
+   freie Elektronenpaare; der Index dient nur der Unterscheidung. */
+const R_ORDER = ['R','R1','R2','R3','R4'];
+R_ORDER.forEach(r => { EL[r] = {v:1, ve:0, m:0, col:'var(--el-R)'}; });
+const isR = el => typeof el === 'string' && /^R\d?$/.test(el);
+
+/* ---- Periodensystem für frei eingegebene Elemente ------------------------
+   Symbol|Name|molare Masse (g/mol)|Gruppe (1–18; f-Block als „f“)
+   Massen: IUPAC-Standardatomgewichte, gekürzt. Für Elemente ohne stabiles
+   Isotop steht die Massenzahl des langlebigsten Isotops (ganzzahlig). */
+const PT_DATA = ('H|Wasserstoff|1.008|1 He|Helium|4.0026|18 Li|Lithium|6.94|1 Be|Beryllium|9.0122|2 ' +
+  'B|Bor|10.81|13 C|Kohlenstoff|12.011|14 N|Stickstoff|14.007|15 O|Sauerstoff|15.999|16 F|Fluor|18.998|17 ' +
+  'Ne|Neon|20.180|18 Na|Natrium|22.990|1 Mg|Magnesium|24.305|2 Al|Aluminium|26.982|13 Si|Silicium|28.085|14 ' +
+  'P|Phosphor|30.974|15 S|Schwefel|32.06|16 Cl|Chlor|35.45|17 Ar|Argon|39.95|18 K|Kalium|39.098|1 ' +
+  'Ca|Calcium|40.078|2 Sc|Scandium|44.956|3 Ti|Titan|47.867|4 V|Vanadium|50.942|5 Cr|Chrom|51.996|6 ' +
+  'Mn|Mangan|54.938|7 Fe|Eisen|55.845|8 Co|Cobalt|58.933|9 Ni|Nickel|58.693|10 Cu|Kupfer|63.546|11 ' +
+  'Zn|Zink|65.38|12 Ga|Gallium|69.723|13 Ge|Germanium|72.630|14 As|Arsen|74.922|15 Se|Selen|78.971|16 ' +
+  'Br|Brom|79.904|17 Kr|Krypton|83.798|18 Rb|Rubidium|85.468|1 Sr|Strontium|87.62|2 Y|Yttrium|88.906|3 ' +
+  'Zr|Zirconium|91.224|4 Nb|Niob|92.906|5 Mo|Molybdän|95.95|6 Tc|Technetium|98|7 Ru|Ruthenium|101.07|8 ' +
+  'Rh|Rhodium|102.91|9 Pd|Palladium|106.42|10 Ag|Silber|107.87|11 Cd|Cadmium|112.41|12 In|Indium|114.82|13 ' +
+  'Sn|Zinn|118.71|14 Sb|Antimon|121.76|15 Te|Tellur|127.60|16 I|Iod|126.90|17 Xe|Xenon|131.29|18 ' +
+  'Cs|Caesium|132.91|1 Ba|Barium|137.33|2 La|Lanthan|138.91|f Ce|Cer|140.12|f Pr|Praseodym|140.91|f ' +
+  'Nd|Neodym|144.24|f Pm|Promethium|145|f Sm|Samarium|150.36|f Eu|Europium|151.96|f Gd|Gadolinium|157.25|f ' +
+  'Tb|Terbium|158.93|f Dy|Dysprosium|162.50|f Ho|Holmium|164.93|f Er|Erbium|167.26|f Tm|Thulium|168.93|f ' +
+  'Yb|Ytterbium|173.05|f Lu|Lutetium|174.97|3 Hf|Hafnium|178.49|4 Ta|Tantal|180.95|5 W|Wolfram|183.84|6 ' +
+  'Re|Rhenium|186.21|7 Os|Osmium|190.23|8 Ir|Iridium|192.22|9 Pt|Platin|195.08|10 Au|Gold|196.97|11 ' +
+  'Hg|Quecksilber|200.59|12 Tl|Thallium|204.38|13 Pb|Blei|207.2|14 Bi|Bismut|208.98|15 Po|Polonium|209|16 ' +
+  'At|Astat|210|17 Rn|Radon|222|18 Fr|Francium|223|1 Ra|Radium|226|2 Ac|Actinium|227|f Th|Thorium|232.04|f ' +
+  'Pa|Protactinium|231.04|f U|Uran|238.03|f Np|Neptunium|237|f Pu|Plutonium|244|f Am|Americium|243|f ' +
+  'Cm|Curium|247|f Bk|Berkelium|247|f Cf|Californium|251|f Es|Einsteinium|252|f Fm|Fermium|257|f ' +
+  'Md|Mendelevium|258|f No|Nobelium|259|f Lr|Lawrencium|266|3 Rf|Rutherfordium|267|4 Db|Dubnium|268|5 ' +
+  'Sg|Seaborgium|269|6 Bh|Bohrium|270|7 Hs|Hassium|269|8 Mt|Meitnerium|278|9 Ds|Darmstadtium|281|10 ' +
+  'Rg|Roentgenium|282|11 Cn|Copernicium|285|12 Nh|Nihonium|286|13 Fl|Flerovium|289|14 Mc|Moscovium|290|15 ' +
+  'Lv|Livermorium|293|16 Ts|Tenness|294|17 Og|Oganesson|294|18').split(' ');
+const PT = {};
+PT_DATA.forEach((row, i) => {
+  const [sym, name, m, g] = row.split('|');
+  PT[sym] = {z: i + 1, name, m: +m, g: g === 'f' ? 3 : +g, fblock: g === 'f'};
+});
+/* Übliche Bindigkeit und Valenzelektronen aus der Gruppe (Hauptgruppen);
+   Nebengruppen und f-Block: keine feste Bindigkeit, keine Prüfung. */
+function ptDefaults(sym){
+  const p = PT[sym];
+  if (p.g >= 3 && p.g <= 12) return {v: null, ve: 0};
+  const ve = p.g <= 2 ? p.g : p.g - 10;
+  const v  = {1:1, 2:2, 13:3, 14:4, 15:3, 16:2, 17:1, 18:0}[p.g];
+  return {v, ve: sym === 'He' ? 2 : ve};
+}
+/* Registriert ein Element aus dem Periodensystem in EL (falls nötig) */
+function ensureEl(sym, vOverride){
+  if (!PT[sym] && !EL[sym]) return false;
+  if (!EL[sym]){
+    const d = ptDefaults(sym);
+    EL[sym] = {v: d.v, ve: d.ve, m: PT[sym].m, custom: true};
+  }
+  if (vOverride != null && EL[sym].custom) EL[sym].v = vOverride;
+  return true;
+}
+/* Schreibweise normalisieren: „rb“, „RB“ → „Rb“ */
+const normSym = t => { t = String(t).trim(); return t ? t[0].toUpperCase() + t.slice(1).toLowerCase() : ''; };
+/* Reihenfolge in Summenformeln ohne Kohlenstoff (nach IUPAC-Elementsequenz,
+   Red Book 2005, Tab. VI): Gruppe 18, 1, 2, 3–12, 13, 14, 15, H, 16, 17;
+   innerhalb einer Gruppe das schwerere Element zuerst. */
+function seqKey(sym){
+  const p = PT[sym]; if (!p) return 1e6;
+  let g = sym === 'H' ? 15.5 : (p.g === 18 ? 0 : p.g);
+  return g * 1000 - p.z;
+}
+
+
+/* =======================================================================
+   2. Datenmodell
+   ======================================================================= */
+let atoms = [];          // {id, el, x, y, q?, d?}
+let bonds = [];          // {id, a, b, order}
+let arrows = [];         // {id, kind, x1, y1, x2, y2, bend}
+let labels = [];         // {id, x, y, t}
+let nid = 1;
+const L = 54;            // Bindungslänge in px
+
+const byId = id => atoms.find(a => a.id === id);
+const bondsOf = id => bonds.filter(b => b.a === id || b.b === id);
+const partner = (b, id) => (b.a === id ? b.b : b.a);
+const neighbors = id => bondsOf(id).map(b => byId(partner(b, id)));
+const bondSum = id => bondsOf(id).reduce((s, b) => s + b.order, 0);
+const findBond = (i, j) => bonds.find(b => (b.a===i&&b.b===j) || (b.a===j&&b.b===i));
+
+function addAtom(el, x, y){ const a = {id:nid++, el, x, y}; atoms.push(a); return a; }
+function addBond(i, j, order=1){
+  if (i === j) return null;
+  const ex = findBond(i, j);
+  if (ex) return ex;
+  const b = {id:nid++, a:i, b:j, order};
+  bonds.push(b); return b;
+}
+function removeAtom(id){
+  atoms = atoms.filter(a => a.id !== id);
+  bonds = bonds.filter(b => b.a !== id && b.b !== id);
+}
+
+/* Ladungen: q = formale Ladung (…, -1, 0, +1, …), d = Partialladung ('+'/'-') */
+const qOf = a => a.q || 0;
+/* Bindigkeit unter Berücksichtigung der Ladung.
+   Für N, O, S, P, Halogene gilt Bindigkeit + Ladung (NH₄⁺: 4, O⁻: 1);
+   Kohlenstoff verliert in beiden Richtungen eine Bindung (Carbenium und
+   Carbanion sind jeweils dreibindig). */
+function valenceOf(a){
+  if (isR(a.el)) return 1;
+  const e = EL[a.el], q = qOf(a);
+  if (e.v == null) return bondSum(a.id);            // Nebengruppe: keine feste Bindigkeit
+  let v;
+  if (a.el === 'H' || e.ve === 4) v = e.v - Math.abs(q);   // H⁺/H⁻, Carbenium/Carbanion
+  else if (e.ve >= 5) v = e.v + q;                          // NH₄⁺: 4, O⁻: 1
+  else v = e.v - q;                                         // Na⁺: 0, Mg²⁺: 0, BH₄⁻: 4
+  return Math.max(0, v);
+}
+
+/* Zahl der nicht gezeichneten (impliziten) H-Atome */
+function implicitH(a){
+  if (state.manualH) return 0;          // manueller Modus: nichts wird ergänzt
+  if (a.el === 'H' || isR(a.el)) return 0;
+  return Math.max(0, valenceOf(a) - bondSum(a.id));
+}
+/* offene Bindungsstellen – im manuellen Modus für die Prüfung interessant */
+function openSlots(a){
+  if (a.el === 'H' || isR(a.el)) return Math.max(0, valenceOf(a) - bondSum(a.id));
+  return Math.max(0, valenceOf(a) - bondSum(a.id));
+}
+/* gezeichnete H-Nachbarn */
+function explicitH(a){ return neighbors(a.id).filter(n => n.el === 'H').length; }
+/* Gesamtzahl H an diesem Atom */
+function totalH(a){ return implicitH(a) + explicitH(a); }
+/* freie Elektronenpaare */
+function lonePairs(a){
+  if (isR(a.el)) return 0;
+  const used = bondSum(a.id) + implicitH(a);
+  return Math.max(0, Math.floor((EL[a.el].ve - qOf(a) - used) / 2));
+}
+
+/* =======================================================================
+   3. Zustand der Oberfläche
+   ======================================================================= */
+const state = {
+  tool: 'build',
+  el: 'C',
+  mode: 'skelett',
+  showC: false,
+  hMode: 'hetero',
+  lp: 'none',          // 'none' | 'dots' | 'line'
+  showGrid: false,
+  white: true,
+  align: '90',         // '90' | '45' | 'zz'
+  charge: {q:1, d:null},
+  manualH: false,
+  arrowKind: 'reaction',
+  arrowColor: 'ink',
+  bend: 0,
+  text: '',
+  textColor: 'ink',
+  selShape: 'rect',    // 'rect' | 'lasso'
+  mono: false          // alle Symbole schwarz (ohne Elementfarben)
+};
+/* Farbwahl für Pfeile und Texte. 'ink' folgt dem Zeichenstil, die übrigen
+   sind feste Werte, damit sie auch im Export erhalten bleiben. */
+const PALETTE = [
+  {key:'ink',    hex:null,      name:'Schwarz (wie die Struktur)'},
+  {key:'blue',   hex:'#1e66f5', name:'Blau – Elektronen'},
+  {key:'red',    hex:'#d20f39', name:'Rot'},
+  {key:'green',  hex:'#40a02b', name:'Grün'},
+  {key:'orange', hex:'#fe640b', name:'Orange'},
+  {key:'violet', hex:'#8839ef', name:'Violett'}
+];
+const paletteHex = key => (PALETTE.find(p => p.key === key) || {}).hex || null;
+const effShowC = () => state.showC || state.hMode === 'allText' || state.hMode === 'allLine';
+const undoStack = [];
+const redoStack = [];
+const snapshot = () => JSON.stringify({atoms, bonds, arrows, labels, nid});
+function apply(s){
+  const d = JSON.parse(s);
+  atoms = d.atoms; bonds = d.bonds; nid = d.nid;
+  arrows = d.arrows || []; labels = d.labels || [];
+  clearSel(); selArrow = null;
+}
+function pushUndo(){
+  const s = snapshot();
+  if (undoStack.length && undoStack[undoStack.length - 1] === s) return;   // nichts geändert
+  undoStack.push(s);
+  if (undoStack.length > 60) undoStack.shift();
+  redoStack.length = 0;
+}
+function undo(){
+  const s = undoStack.pop();
+  if (!s) return;
+  redoStack.push(snapshot());
+  apply(s);
+  refresh();
+}
+function redo(){
+  const s = redoStack.pop();
+  if (!s) return;
+  undoStack.push(snapshot());
+  apply(s);
+  refresh();
+}
+
+/* =======================================================================
+   4. Geometrie
+   ======================================================================= */
+const TAU = Math.PI * 2;
+const angleTo = (a, b) => Math.atan2(b.y - a.y, b.x - a.x);
+function angDiff(a, b){
+  let d = Math.abs(a - b) % TAU;
+  return d > Math.PI ? TAU - d : d;
+}
+function occupiedAngles(a){
+  return neighbors(a.id).map(n => angleTo(a, n));
+}
+/* Bewertet eine Richtung: möglichst weit weg von bestehenden Bindungen,
+   keine Kollision mit vorhandenen Atomen, leichte Vorliebe für „waagerecht“ */
+function dirScore(a, ang, occ, len){
+  const d = occ.length ? Math.min(...occ.map(o => angDiff(ang, o))) : Math.PI;
+  const px = a.x + len * Math.cos(ang), py = a.y + len * Math.sin(ang);
+  let pen = 0;
+  for (const o of atoms){
+    if (o.id === a.id) continue;
+    const dist = Math.hypot(o.x - px, o.y - py);
+    if (dist < len * 0.7) pen += 6;                       // echte Kollision
+    else if (dist < len * 1.5) pen += (len*1.5 - dist) / len * 1.6;   // Enge
+  }
+  return d - pen - Math.abs(Math.sin(ang)) * 0.06;
+}
+/* Vorschlag für die nächste Bindungsrichtung (Zickzack-Kette) */
+function suggestDir(a){
+  const occ = occupiedAngles(a);
+  if (occ.length === 0) return -Math.PI / 6;
+  let cands;
+  if (occ.length === 1) cands = [occ[0] + TAU/3, occ[0] - TAU/3];
+  else { cands = []; for (let d = 0; d < 360; d += 10) cands.push(d * Math.PI / 180); }
+  let best = cands[0], bs = -1e9;
+  for (const c of cands){
+    const s = dirScore(a, c, occ, L);
+    if (s > bs){ bs = s; best = c; }
+  }
+  return best;
+}
+/* n freie Richtungen (für gezeichnete H-Atome und Elektronenpaare) */
+function freeDirs(a, n, extra = [], len = L){
+  const occ = occupiedAngles(a).concat(extra);
+  const out = [];
+  for (let k = 0; k < n; k++){
+    let best = 0, bs = -1e9;
+    for (let d = 0; d < 360; d += 6){
+      const ang = d * Math.PI / 180;
+      const s = dirScore(a, ang, occ.concat(out), len);
+      if (s > bs){ bs = s; best = ang; }
+    }
+    out.push(best);
+  }
+  return out;
+}
+/* Pfad zwischen zwei Atomen unter Auslassung einer Bindung (Ringerkennung) */
+function pathBetween(i, j, skipBondId){
+  const prev = new Map([[i, null]]);
+  const q = [i];
+  while (q.length){
+    const cur = q.shift();
+    if (cur === j) break;
+    for (const b of bondsOf(cur)){
+      if (b.id === skipBondId) continue;
+      const nx = partner(b, cur);
+      if (!prev.has(nx)){ prev.set(nx, cur); q.push(nx); }
+    }
+  }
+  if (!prev.has(j)) return null;
+  const path = []; let c = j;
+  while (c != null){ path.push(c); c = prev.get(c); }
+  return path;
+}
+
+/* =======================================================================
+   5. Beschriftung
+   ======================================================================= */
+/* Liefert die Textbausteine eines Atoms oder null (= nur Knick zeichnen) */
+/* Ladungszeichen als hochgestellter Zusatz: ⁺, ⁻, ²⁺ … */
+function chargeText(q){
+  if (!q) return '';
+  const n = Math.abs(q);
+  return (n > 1 ? n : '') + (q > 0 ? '+' : '\u2212');
+}
+function labelRuns(a){
+  const q = qOf(a);
+  const qRun = q ? [{t: chargeText(q), sup:true}] : [];
+  if (isR(a.el)){
+    const idx = a.el.slice(1);
+    return [{t:'R'}].concat(idx ? [{t:idx, sup:true}] : []).concat(qRun);
+  }
+  const showC = effShowC();
+  const nb = bondsOf(a.id).length;
+  if (a.el === 'C' && !showC && nb > 0 && !q) return null;
+
+  let hCount = 0;
+  if (a.el !== 'H'){
+    if (state.hMode === 'hetero' && a.el !== 'C') hCount = implicitH(a);
+    else if (state.hMode === 'allText') hCount = implicitH(a);
+    // 'none' und 'allLine' schreiben kein Text-H
+  }
+  // Ein isoliertes Atom bekommt immer sein H dazu (sonst stünde dort nur „C“)
+  if (nb === 0 && state.hMode !== 'allLine' && state.hMode !== 'none' && a.el !== 'H'){
+    hCount = implicitH(a);
+  }
+
+  const sym = [{t:a.el}];
+  const hs = [];
+  if (hCount > 0){
+    hs.push({t:'H'});
+    if (hCount > 1) hs.push({t:String(hCount), sub:true});
+  }
+  if (!hs.length) return sym.concat(qRun);
+
+  // Terminale Gruppe nach links spiegeln: H₃C– statt –CH₃
+  if (nb === 1){
+    const ang = angleTo(a, neighbors(a.id)[0]);
+    if (Math.cos(ang) > 0.35) return hs.concat(sym).concat(qRun);
+  }
+  return sym.concat(hs).concat(qRun);
+}
+
+const FS = 16.5;                       // Schriftgröße der Atomsymbole
+const FONT = w => w + 'px "IBM Plex Sans", -apple-system, Segoe UI, sans-serif';
+
+function measureRuns(ctx, runs, fs = FS){
+  let w = 0;
+  for (const r of runs){
+    ctx.font = FONT(r.sub || r.sup ? fs * 0.72 : fs);
+    w += ctx.measureText(r.t).width;
+  }
+  return {w, h: fs * 1.02};
+}
+function drawRuns(ctx, x, y, runs, color, fs = FS){
+  const {w} = measureRuns(ctx, runs, fs);
+  let cx = x - w / 2;
+  ctx.fillStyle = color;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  for (const r of runs){
+    const size = r.sub || r.sup ? fs * 0.72 : fs;
+    ctx.font = FONT(size);
+    ctx.fillText(r.t, cx, r.sub ? y + fs * 0.26 : (r.sup ? y - fs * 0.32 : y));
+    cx += ctx.measureText(r.t).width;
+  }
+}
+
+/* =======================================================================
+   6. Zeichnen der Szene
+   ======================================================================= */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const board = document.getElementById('board');
+let W = 800, H = 500, dpr = 1;
+
+function css(name){
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+/* Schwarzweiß-Darstellung: alle Symbole in der Gerüstfarbe */
+const paint = v => css(state.mono ? '--el-C' : v);
+function colorOf(el){
+  if (state.mono) return css('--el-C');
+  if (isR(el)) return css('--el-R');
+  const map = {H:'--el-H', C:'--el-C', N:'--el-N', O:'--el-O', S:'--el-S', P:'--el-P',
+               F:'--el-Hal', Cl:'--el-Hal', Br:'--el-Hal', I:'--el-Hal'};
+  return css(map[el] || '--el-X');
+}
+
+/* Ausschnitt der Bindungslinie, damit sie nicht in die Beschriftung läuft */
+function boxCut(dx, dy, hw, hh){
+  const tx = dx !== 0 ? hw / Math.abs(dx) : Infinity;
+  const ty = dy !== 0 ? hh / Math.abs(dy) : Infinity;
+  return Math.min(tx, ty, 0.45);
+}
+
+/* --- Pfeile ----------------------------------------------------------
+   kind: reaction  →   equilibrium ⇌   resonance ↔
+         pair (gebogen, ganze Spitze: Elektronenpaar)
+         single (gebogen, halbe Spitze/Fischhaken: einzelnes Elektron)
+         plain (dünner Zeiger für Beschriftungen)                        */
+const ARROW_KINDS = {
+  reaction:   {label:'Reaktion  →',        curved:false, def:0},
+  equilibrium:{label:'Gleichgewicht  ⇌',   curved:false, def:0},
+  resonance:  {label:'Mesomerie  ↔',       curved:false, def:0},
+  pair:       {label:'Elektronenpaar  ⤻',  curved:true,  def:0.30},
+  single:     {label:'Einzelelektron  ⤺',  curved:true,  def:0.30},
+  plain:      {label:'Zeiger  →',          curved:false, def:0}
+};
+const isElectronArrow = k => k === 'pair' || k === 'single';
+
+function arrowGeom(ar){
+  const dx = ar.x2-ar.x1, dy = ar.y2-ar.y1;
+  const len = Math.hypot(dx, dy) || 1;
+  const nx = -dy/len, ny = dx/len;
+  const b = ar.bend || 0;
+  return {
+    len, nx, ny,
+    cx: (ar.x1+ar.x2)/2 + nx*b*len,
+    cy: (ar.y1+ar.y2)/2 + ny*b*len
+  };
+}
+/* Punkt und Steigung auf der quadratischen Kurve */
+function arrowPoint(ar, t){
+  const g = arrowGeom(ar), u = 1-t;
+  return {
+    x: u*u*ar.x1 + 2*u*t*g.cx + t*t*ar.x2,
+    y: u*u*ar.y1 + 2*u*t*g.cy + t*t*ar.y2
+  };
+}
+function drawHead(c, x, y, ang, full, size, side){
+  const s = size || 10, a = 0.40;
+  const p1x = x - s*Math.cos(ang - a), p1y = y - s*Math.sin(ang - a);
+  const p2x = x - s*Math.cos(ang + a), p2y = y - s*Math.sin(ang + a);
+  if (full){
+    c.beginPath();
+    c.moveTo(x, y); c.lineTo(p1x, p1y); c.lineTo(p2x, p2y); c.closePath();
+    c.fill();
+  } else if (side === 1){
+    c.beginPath(); c.moveTo(x, y); c.lineTo(p2x, p2y); c.stroke();
+  } else {
+    c.beginPath(); c.moveTo(x, y); c.lineTo(p1x, p1y); c.stroke();
+  }
+}
+function drawArrow(c, ar, ext){
+  const col = ar.color ? ar.color
+            : (isElectronArrow(ar.kind) ? paint('--draw-accent') : css('--el-C'));
+  c.strokeStyle = col; c.fillStyle = col;
+  c.lineWidth = ar.kind === 'plain' ? 1.5 : 2;
+  c.lineCap = 'round'; c.lineJoin = 'round';
+  const g = arrowGeom(ar);
+  if (ext){ ext(ar.x1, ar.y1, 12); ext(ar.x2, ar.y2, 12); ext(g.cx, g.cy, 12); }
+
+  if (ar.kind === 'equilibrium'){
+    const o = 3.4, ang = Math.atan2(ar.y2-ar.y1, ar.x2-ar.x1);
+    // Hinpfeil oben, Rückpfeil unten; die Haken zeigen jeweils nach außen
+    c.beginPath();
+    c.moveTo(ar.x1 - g.nx*o, ar.y1 - g.ny*o);
+    c.lineTo(ar.x2 - g.nx*o, ar.y2 - g.ny*o);
+    c.stroke();
+    drawHead(c, ar.x2 - g.nx*o, ar.y2 - g.ny*o, ang, false, 11, 1);
+    c.beginPath();
+    c.moveTo(ar.x2 + g.nx*o, ar.y2 + g.ny*o);
+    c.lineTo(ar.x1 + g.nx*o, ar.y1 + g.ny*o);
+    c.stroke();
+    drawHead(c, ar.x1 + g.nx*o, ar.y1 + g.ny*o, ang + Math.PI, false, 11, 1);
+    return;
+  }
+  c.beginPath();
+  c.moveTo(ar.x1, ar.y1);
+  if (ar.bend) c.quadraticCurveTo(g.cx, g.cy, ar.x2, ar.y2);
+  else c.lineTo(ar.x2, ar.y2);
+  c.stroke();
+  const angEnd = ar.bend ? Math.atan2(ar.y2-g.cy, ar.x2-g.cx)
+                         : Math.atan2(ar.y2-ar.y1, ar.x2-ar.x1);
+  drawHead(c, ar.x2, ar.y2, angEnd, ar.kind !== 'single', ar.kind === 'plain' ? 8 : 10);
+  if (ar.kind === 'resonance'){
+    const angStart = ar.bend ? Math.atan2(ar.y1-g.cy, ar.x1-g.cx)
+                             : Math.atan2(ar.y1-ar.y2, ar.x1-ar.x2);
+    drawHead(c, ar.x1, ar.y1, angStart, true, 10);
+  }
+}
+
+/* --- Textmarken ------------------------------------------------------
+   „H2O“ wird zu H₂O, „^+“ setzt hoch, „_2“ tief.                       */
+function parseLabelText(t){
+  const runs = [];
+  for (let i = 0; i < t.length; i++){
+    const ch = t[i];
+    if ((ch === '^' || ch === '_') && i+1 < t.length){
+      runs.push({t:t[++i], sup: ch === '^', sub: ch === '_'});
+      continue;
+    }
+    const prev = runs.length ? runs[runs.length-1] : null;
+    if (/\d/.test(ch) && prev && !prev.sup && /[A-Za-z)\]]/.test(prev.t)){
+      runs.push({t:ch, sub:true});
+      continue;
+    }
+    runs.push({t:ch});
+  }
+  // gleichartige Abschnitte zusammenfassen (kürzerer SVG-Export, saubere Laufweite)
+  const merged = [];
+  for (const r of runs){
+    const last = merged[merged.length-1];
+    if (last && !!last.sub === !!r.sub && !!last.sup === !!r.sup) last.t += r.t;
+    else merged.push({t:r.t, sub:r.sub, sup:r.sup});
+  }
+  return merged.length ? merged : [{t:''}];
+}
+
+function drawScene(c, opt){
+  const B = opt && opt.bounds;
+  const ext = (x, y, rx, ry) => {
+    if (!B) return;
+    rx = rx || 0; ry = ry === undefined ? rx : ry;
+    B.x0 = Math.min(B.x0, x-rx); B.x1 = Math.max(B.x1, x+rx);
+    B.y0 = Math.min(B.y0, y-ry); B.y1 = Math.max(B.y1, y+ry);
+  };
+  const halos = new Map();   // id -> {w,h} halbe Ausdehnung der Beschriftung
+  const runsMap = new Map();
+
+  for (const a of atoms){
+    const runs = labelRuns(a);
+    runsMap.set(a.id, runs);
+    if (runs){
+      const m = measureRuns(c, runs);
+      halos.set(a.id, {hw: m.w / 2 + 3.5, hh: m.h / 2 + 2.5});
+      ext(a.x, a.y, m.w/2 + 1, m.h/2 + 1);
+    } else ext(a.x, a.y, 1);
+  }
+  // Zusätzlich gezeichnete H-Atome vorbereiten
+  const hAtoms = [];
+  if (state.hMode === 'allLine'){
+    for (const a of atoms){
+      if (a.el === 'H') continue;
+      const n = implicitH(a);
+      if (!n) continue;
+      const dirs = freeDirs(a, n, [], L * 0.74);
+      for (const d of dirs){
+        hAtoms.push({parent:a, x:a.x + L*0.74*Math.cos(d), y:a.y + L*0.74*Math.sin(d)});
+        ext(a.x + L*0.74*Math.cos(d), a.y + L*0.74*Math.sin(d), 8, 9);
+      }
+    }
+  }
+
+  c.lineCap = 'round';
+  c.lineJoin = 'round';
+
+  /* --- Bindungen --- */
+  for (const b of bonds){
+    const A = byId(b.a), B = byId(b.b);
+    if (!A || !B) continue;
+    const dx = B.x - A.x, dy = B.y - A.y;
+    const len = Math.hypot(dx, dy) || 1;
+    const ha = halos.get(A.id), hb = halos.get(B.id);
+    let t0 = 0, t1 = 1;
+    if (ha) t0 = boxCut(dx, dy, ha.hw, ha.hh);
+    if (hb) t1 = 1 - boxCut(dx, dy, hb.hw, hb.hh);
+    if (t1 <= t0) continue;
+    const x0 = A.x + dx*t0, y0 = A.y + dy*t0;
+    const x1 = A.x + dx*t1, y1 = A.y + dy*t1;
+    const nx = -dy/len, ny = dx/len;
+
+    c.strokeStyle = css('--el-C');
+    c.lineWidth = 1.9;
+
+    if (b.order === 1){
+      c.beginPath(); c.moveTo(x0,y0); c.lineTo(x1,y1); c.stroke();
+    } else if (b.order === 2){
+      // Im Ring: zweite Linie nach innen; sonst symmetrisch
+      const ring = pathBetween(b.a, b.b, b.id);
+      if (ring && ring.length > 2){
+        let cxs = 0, cys = 0;
+        ring.forEach(id => { const p = byId(id); cxs += p.x; cys += p.y; });
+        cxs /= ring.length; cys /= ring.length;
+        const mx = (x0+x1)/2, my = (y0+y1)/2;
+        const s = ((cxs-mx)*nx + (cys-my)*ny) >= 0 ? 1 : -1;
+        const o = 5.2 * s, sh = 0.16;
+        c.beginPath(); c.moveTo(x0,y0); c.lineTo(x1,y1); c.stroke();
+        c.beginPath();
+        c.moveTo(x0 + dx*sh + nx*o, y0 + dy*sh + ny*o);
+        c.lineTo(x1 - dx*sh + nx*o, y1 - dy*sh + ny*o);
+        c.stroke();
+      } else {
+        const o = 3.1;
+        c.beginPath(); c.moveTo(x0+nx*o,y0+ny*o); c.lineTo(x1+nx*o,y1+ny*o); c.stroke();
+        c.beginPath(); c.moveTo(x0-nx*o,y0-ny*o); c.lineTo(x1-nx*o,y1-ny*o); c.stroke();
+      }
+    } else {
+      const o = 5.0;
+      c.beginPath(); c.moveTo(x0,y0); c.lineTo(x1,y1); c.stroke();
+      c.beginPath(); c.moveTo(x0+nx*o,y0+ny*o); c.lineTo(x1+nx*o,y1+ny*o); c.stroke();
+      c.beginPath(); c.moveTo(x0-nx*o,y0-ny*o); c.lineTo(x1-nx*o,y1-ny*o); c.stroke();
+    }
+  }
+
+  /* --- Bindungen zu gezeichneten H-Atomen --- */
+  const hRuns = [{t:'H'}];
+  const hHalo = (() => { const m = measureRuns(c, hRuns); return {hw:m.w/2+3, hh:m.h/2+2}; })();
+  for (const h of hAtoms){
+    const A = h.parent;
+    const dx = h.x - A.x, dy = h.y - A.y;
+    const ha = halos.get(A.id);
+    let t0 = 0;
+    if (ha) t0 = boxCut(dx, dy, ha.hw, ha.hh);
+    const t1 = 1 - boxCut(dx, dy, hHalo.hw, hHalo.hh);
+    if (t1 <= t0) continue;
+    c.strokeStyle = css('--el-C'); c.lineWidth = 1.6;
+    c.beginPath();
+    c.moveTo(A.x + dx*t0, A.y + dy*t0);
+    c.lineTo(A.x + dx*t1, A.y + dy*t1);
+    c.stroke();
+  }
+
+  /* --- Freie Elektronenpaare --- */
+  const lpDirs = new Map();
+  if (state.lp !== 'none'){
+    for (const a of atoms){
+      const lp = lonePairs(a);
+      if (!lp) continue;
+      const extra = state.hMode === 'allLine'
+        ? hAtoms.filter(h => h.parent.id === a.id).map(h => angleTo(a, h))
+        : [];
+      const dirs = freeDirs(a, lp, extra, L * 0.55);
+      lpDirs.set(a.id, dirs);
+      const halo = halos.get(a.id);
+      const r = (halo ? Math.max(halo.hw, halo.hh) : 3) + (state.lp === 'line' ? 8 : 7);
+      c.fillStyle = paint('--draw-accent');
+      c.strokeStyle = paint('--draw-accent');
+      c.lineWidth = 2;
+      for (const d of dirs){
+        const px = a.x + r*Math.cos(d), py = a.y + r*Math.sin(d);
+        const nx = -Math.sin(d), ny = Math.cos(d);
+        ext(px, py, 7);
+        if (state.lp === 'line'){                     // Valenzstrich quer zur Richtung
+          const h = 5.6;
+          c.beginPath();
+          c.moveTo(px - nx*h, py - ny*h);
+          c.lineTo(px + nx*h, py + ny*h);
+          c.stroke();
+        } else {
+          for (const s of [-1, 1]){
+            c.beginPath();
+            c.arc(px + nx*3.1*s, py + ny*3.1*s, 1.6, 0, TAU);
+            c.fill();
+          }
+        }
+      }
+    }
+  }
+
+  /* --- Partialladungen δ+ / δ− --- */
+  for (const a of atoms){
+    if (!a.d) continue;
+    const extra = (state.hMode === 'allLine'
+        ? hAtoms.filter(h => h.parent.id === a.id).map(h => angleTo(a, h)) : [])
+      .concat(lpDirs.get(a.id) || []);
+    const d = freeDirs(a, 1, extra, L * 0.6)[0];
+    const halo = halos.get(a.id);
+    const r = (halo ? Math.max(halo.hw, halo.hh) : 3) + 14;
+    const px = a.x + r*Math.cos(d), py = a.y + r*Math.sin(d);
+    const runs = [{t:'\u03B4'}, {t: a.d === '+' ? '+' : '\u2212', sup:true}];
+    ext(px, py, 12, 10);
+    drawRuns(c, px, py, runs, paint(a.d === '+' ? '--el-O' : '--draw-accent'), FS * 0.86);
+  }
+
+  /* --- Beschriftungen --- */
+  for (const a of atoms){
+    const runs = runsMap.get(a.id);
+    if (!runs) continue;
+    drawRuns(c, a.x, a.y, runs, colorOf(a.el));
+  }
+  for (const h of hAtoms){
+    drawRuns(c, h.x, h.y, hRuns, colorOf('H'));
+  }
+
+  /* --- Pfeile und Textmarken liegen über der Struktur --- */
+  for (const ar of arrows) drawArrow(c, ar, ext);
+  for (const lb of labels){
+    if (!opt.export && editLabel && lb.id === editLabel.id) continue;
+    const runs = parseLabelText(lb.t);
+    const m = measureRuns(c, runs);
+    ext(lb.x, lb.y, m.w/2 + 2, m.h/2 + 2);
+    drawRuns(c, lb.x, lb.y, runs, lb.color || css('--el-C'));
+  }
+}
+
+function drawGrid(){
+  if (!state.showGrid) return;
+  const step = 24;
+  ctx.strokeStyle = css('--paper-line');
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  for (let x = 0; x <= W; x += step){ ctx.moveTo(x + .5, 0); ctx.lineTo(x + .5, H); }
+  for (let y = 0; y <= H; y += step){ ctx.moveTo(0, y + .5); ctx.lineTo(W, y + .5); }
+  ctx.stroke();
+}
+
+let hover = null;     // {type:'atom'|'bond'|'arrow'|'label', id}
+let drag = null;      // {from} | {selMove} | {area} | {erase} | {arrowNew} …
+let selection = new Set();   // markierte Atome
+let selArrows = new Set();   // markierte Pfeile
+let selLabels = new Set();   // markierte Texte
+let selArrow = null;         // ausgewählter Pfeil (Werkzeug „Pfeil“)
+
+function arrowMidAt(p, r = 14 * hitScale()){
+  for (let i = arrows.length-1; i >= 0; i--){
+    const m = arrowPoint(arrows[i], 0.5);
+    if (Math.hypot(m.x-p.x, m.y-p.y) < r) return arrows[i];
+  }
+  return null;
+}
+
+function inPoly(pt, poly){
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++){
+    const xi = poly[i].x, yi = poly[i].y, xj = poly[j].x, yj = poly[j].y;
+    if (((yi > pt.y) !== (yj > pt.y)) &&
+        (pt.x < (xj - xi) * (pt.y - yi) / (yj - yi) + xi)) inside = !inside;
+  }
+  return inside;
+}
+
+function render(){
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle = css('--paper');
+  ctx.fillRect(0,0,W,H);
+  drawGrid();
+
+  // Markierung unter der Zeichnung
+  const tracePath = ar => {
+    const g = arrowGeom(ar);
+    ctx.beginPath(); ctx.moveTo(ar.x1, ar.y1);
+    if (ar.bend) ctx.quadraticCurveTo(g.cx, g.cy, ar.x2, ar.y2); else ctx.lineTo(ar.x2, ar.y2);
+  };
+  const labelRect = lb => { const b = labelBox(lb); ctx.beginPath(); ctx.rect(lb.x-b.hw, lb.y-b.hh, 2*b.hw, 2*b.hh); };
+  if (selCount()){
+    const soft = css('--draw-accent-soft');
+    ctx.fillStyle = soft; ctx.strokeStyle = soft; ctx.lineCap = 'round';
+    ctx.lineWidth = 14;
+    for (const b of bonds) if (selection.has(b.a) && selection.has(b.b)){
+      const A = byId(b.a), B = byId(b.b);
+      ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
+    }
+    for (const id of selection){
+      const a = byId(id); if (!a) continue;
+      ctx.beginPath(); ctx.arc(a.x, a.y, 16, 0, TAU); ctx.fill();
+    }
+    ctx.lineWidth = 12;
+    for (const ar of arrows) if (selArrows.has(ar.id)){ tracePath(ar); ctx.stroke(); }
+    for (const lb of labels) if (selLabels.has(lb.id)){ labelRect(lb); ctx.fill(); }
+  }
+  if (hover){
+    const red = state.tool === 'erase';
+    ctx.fillStyle   = red ? 'rgba(210,15,57,.16)' : 'rgba(30,102,245,.14)';
+    ctx.strokeStyle = red ? 'rgba(210,15,57,.30)' : 'rgba(30,102,245,.24)';
+    ctx.lineCap = 'round';
+    if (hover.type === 'atom'){
+      const a = byId(hover.id);
+      if (a){ ctx.beginPath(); ctx.arc(a.x, a.y, 15, 0, TAU); ctx.fill(); }
+    } else if (hover.type === 'bond'){
+      const b = bondById(hover.id);
+      if (b){
+        const A = byId(b.a), B = byId(b.b);
+        ctx.lineWidth = 12;
+        ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
+      }
+    } else if (hover.type === 'arrow'){
+      const ar = arrows.find(x => x.id === hover.id);
+      if (ar){ ctx.lineWidth = 12; tracePath(ar); ctx.stroke(); }
+    } else if (hover.type === 'label'){
+      const lb = labels.find(x => x.id === hover.id);
+      if (lb){ labelRect(lb); ctx.fill(); }
+    }
+  }
+
+  drawScene(ctx, {});
+
+  // Vorschau beim Ziehen
+  if (state.tool === 'arrow' && selArrow != null){
+    const ar = arrows.find(x => x.id === selArrow);
+    if (ar){
+      const g = arrowGeom(ar);
+      ctx.strokeStyle = 'rgba(30,102,245,.25)';
+      ctx.lineWidth = 11; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(ar.x1, ar.y1);
+      if (ar.bend) ctx.quadraticCurveTo(g.cx, g.cy, ar.x2, ar.y2); else ctx.lineTo(ar.x2, ar.y2);
+      ctx.stroke();
+      const m = arrowPoint(ar, 0.5);
+      ctx.fillStyle = css('--draw-accent');
+      for (const [x, y, r] of [[ar.x1, ar.y1, 3.5], [ar.x2, ar.y2, 3.5], [m.x, m.y, 5]]){
+        ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill();
+      }
+    }
+  }
+  if (drag && drag.arrowNew){
+    const n = drag.arrowNew;
+    drawArrow(ctx, {kind:state.arrowKind, x1:n.x1, y1:n.y1, x2:n.x2, y2:n.y2,
+                    bend: state.bend, color: paletteHex(state.arrowColor)}, null);
+  }
+  if (state.tool === 'select' && selCount() && !(drag && drag.area)){
+    const bx = selBox(14);
+    if (bx){
+      ctx.strokeStyle = css('--draw-accent'); ctx.lineWidth = 1; ctx.setLineDash([4,4]);
+      ctx.strokeRect(bx.x0 + .5, bx.y0 + .5, bx.x1 - bx.x0, bx.y1 - bx.y0);
+      ctx.setLineDash([]);
+    }
+  }
+  if (drag && drag.area){
+    const ar = drag.area;
+    ctx.beginPath();
+    if (ar.shape === 'rect') ctx.rect(Math.min(ar.x0, ar.x1), Math.min(ar.y0, ar.y1), Math.abs(ar.x1-ar.x0), Math.abs(ar.y1-ar.y0));
+    else if (ar.pts.length > 1){
+      ctx.moveTo(ar.pts[0].x, ar.pts[0].y);
+      for (const q of ar.pts.slice(1)) ctx.lineTo(q.x, q.y);
+      ctx.closePath();
+    }
+    ctx.fillStyle = 'rgba(30,102,245,.09)';
+    ctx.fill();
+    ctx.strokeStyle = css('--draw-accent');
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([6,4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  if (drag && drag.from){
+    const A = byId(drag.from);
+    ctx.strokeStyle = css('--draw-accent');
+    ctx.lineWidth = 1.6;
+    ctx.setLineDash([5,4]);
+    ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(drag.x, drag.y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = css('--draw-accent');
+    ctx.beginPath(); ctx.arc(drag.x, drag.y, 3.2, 0, TAU); ctx.fill();
+  }
+  placeSelBar();
+}
+
+/* =======================================================================
+   7. Auswertung: Summenformel, Molmasse, Halbstrukturformel
+   ======================================================================= */
+const SUBS = {'0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉'};
+/* Elemente, bei denen H üblicherweise vorn steht: H₂O, H₂S, HCl (aber NH₃, CH₄) */
+const H_FIRST = ['O','S','F','Cl','Br','I'];
+const uniSub = n => String(n).split('').map(d => SUBS[d]).join('');
+
+const SUPS = {'1':'¹','2':'²','3':'³','4':'⁴','+':'⁺','-':'⁻','\u2212':'⁻'};
+const uniSup = s => String(s).split('').map(d => SUPS[d] || d).join('');
+const totalCharge = () => atoms.reduce((s, a) => s + qOf(a), 0);
+function chargeMarkup(q, mode){
+  if (!q) return '';
+  return mode === 'html' ? '<sup>' + chargeText(q) + '</sup>' : uniSup(chargeText(q));
+}
+/* R, R¹, R² … – Index hochgestellt, damit er nicht mit einer Anzahl verwechselt wird */
+function rLabel(el, count, mode){
+  const idx = el.slice(1);
+  const sup = idx ? (mode === 'html' ? '<sup>'+idx+'</sup>' : uniSup(idx)) : '';
+  const cnt = count > 1 ? (mode === 'html' ? '<sub>'+count+'</sub>' : uniSub(count)) : '';
+  return 'R' + sup + cnt;
+}
+
+function counts(){
+  const c = {};
+  for (const a of atoms){
+    c[a.el] = (c[a.el] || 0) + 1;
+    const ih = implicitH(a);
+    if (ih) c.H = (c.H || 0) + ih;
+  }
+  return c;
+}
+function sumFormula(){
+  const c = counts();
+  const keys = Object.keys(c);
+  if (!keys.length) return {html:'—', text:'—'};
+  const rKeys = keys.filter(isR).sort();
+  const plain = keys.filter(k => !isR(k));
+  const order = [];
+  if (c.C){ order.push('C'); if (c.H) order.push('H'); }
+  else if (c.H && plain.length === 2){
+    // ohne Kohlenstoff: H₂O, H₂S, HCl – aber NH₃, PH₃ und als Anion OH⁻
+    const x = plain.find(k => k !== 'H');
+    const anionO = x === 'O' && totalCharge() < 0;
+    if (H_FIRST.includes(x) && !anionO) order.push('H', x); else order.push(x, 'H');
+  }
+  const rest = plain.filter(k => !order.includes(k));
+  if (c.C) rest.sort();                                   // Hill-System: C, H, dann alphabetisch
+  else rest.sort((x, y) => seqKey(x) - seqKey(y));        // anorganisch: elektropositiv zuerst
+  rest.forEach(k => order.push(k));
+  let html = '', text = '';
+  for (const k of order){
+    html += k + (c[k] > 1 ? '<sub>' + c[k] + '</sub>' : '');
+    text += k + (c[k] > 1 ? uniSub(c[k]) : '');
+  }
+  for (const k of rKeys){
+    html += rLabel(k, c[k], 'html');
+    text += rLabel(k, c[k], 'text');
+  }
+  const q = totalCharge();
+  if (q){ html += chargeMarkup(q, 'html'); text += chargeMarkup(q, 'text'); }
+  return {html, text};
+}
+function molarMass(){
+  const c = counts();
+  let m = 0, hasR = false;
+  for (const k in c){
+    if (isR(k)){ hasR = true; continue; }
+    m += EL[k].m * c[k];
+  }
+  return {m, hasR};
+}
+function massText(){
+  if (!atoms.length) return '—';
+  const {m, hasR} = molarMass();
+  return m.toFixed(2) + ' g/mol' + (hasR ? ' (ohne Reste)' : '');
+}
+
+/* --- Halbstrukturformel --------------------------------------------- */
+/* Schweratome (ohne H) als Graph; gezeichnete H zählen als H am Nachbarn */
+function heavyNeighbors(id){
+  return neighbors(id).filter(n => n.el !== 'H').map(n => n.id);
+}
+function heavyAtoms(){ return atoms.filter(a => a.el !== 'H'); }
+
+function componentsHeavy(){
+  const seen = new Set(), comps = [];
+  for (const a of heavyAtoms()){
+    if (seen.has(a.id)) continue;
+    const comp = [], q = [a.id];
+    seen.add(a.id);
+    while (q.length){
+      const cur = q.shift(); comp.push(cur);
+      for (const n of heavyNeighbors(cur)) if (!seen.has(n)){ seen.add(n); q.push(n); }
+    }
+    comps.push(comp);
+  }
+  return comps;
+}
+function isTree(comp){
+  const set = new Set(comp);
+  let e = 0;
+  for (const b of bonds){
+    const A = byId(b.a), B = byId(b.b);
+    if (A.el === 'H' || B.el === 'H') continue;
+    if (set.has(b.a) && set.has(b.b)) e++;
+  }
+  return e === comp.length - 1;
+}
+function bfsFar(start, allowed){
+  const dist = new Map([[start,0]]), prev = new Map([[start,null]]), lastOrd = new Map([[start,1]]);
+  const q = [start]; let far = start;
+  // Bei gleicher Kettenlänge endet die Hauptkette lieber an einer Einfach-
+  // bindung und an einer H-reichen Gruppe: CH₃–C(=O)–OH statt CH₃–C(–OH)=O
+  const pref = id => (lastOrd.get(id) === 1 ? 2 : 0) + Math.min(totalH(byId(id)), 3) * 0.1;
+  while (q.length){
+    const cur = q.shift();
+    const d = dist.get(cur) - dist.get(far);
+    if (d > 0 || (d === 0 && pref(cur) > pref(far))) far = cur;
+    for (const n of heavyNeighbors(cur)){
+      if (!allowed.has(n) || dist.has(n)) continue;
+      dist.set(n, dist.get(cur)+1); prev.set(n, cur);
+      lastOrd.set(n, findBond(cur, n).order);
+      q.push(n);
+    }
+  }
+  return {far, prev};
+}
+function longestPath(comp){
+  const allowed = new Set(comp);
+  const a = bfsFar(comp[0], allowed).far;
+  const {far:b, prev} = bfsFar(a, allowed);
+  const path = []; let c = b;
+  while (c != null){ path.push(c); c = prev.get(c); }
+  return path;                       // von b nach a
+}
+function depthFrom(id, parent, allowed){
+  let best = 0;
+  for (const n of heavyNeighbors(id)){
+    if (n === parent || !allowed.has(n)) continue;
+    best = Math.max(best, 1 + depthFrom(n, id, allowed));
+  }
+  return best;
+}
+const BONDSYM = {1:'–', 2:'=', 3:'≡'};
+const EN_FIRST = ['O','N','S','F','Cl','Br','I'];   // H₂O, NH₃, HCl … statt OH₂
+function groupStr(id, mode, reverse){
+  const a = byId(id);
+  const qm = chargeMarkup(qOf(a), mode);
+  if (isR(a.el)) return rLabel(a.el, 1, mode) + qm;
+  const h = totalH(a);
+  if (!h) return a.el + qm;
+  const hs = 'H' + (h > 1 ? (mode === 'html' ? '<sub>'+h+'</sub>' : uniSub(h)) : '');
+  return (reverse ? hs + a.el : a.el + hs) + qm;
+}
+/* Klammerinhalt: (OH), (CH₃), aber (=O) mit Bindungszeichen */
+const branchPrefix = order => (order === 1 ? '' : BONDSYM[order]);
+function branchStr(id, parent, allowed, mode, visited){
+  visited.add(id);
+  const kids = heavyNeighbors(id)
+      .filter(n => n !== parent && allowed.has(n) && !visited.has(n))
+      .sort((x,y) => depthFrom(y, id, allowed) - depthFrom(x, id, allowed));
+  const main = kids.shift();
+  let s = groupStr(id, mode);
+  for (const k of kids){
+    s += '(' + branchPrefix(findBond(id,k).order) + branchStr(k, id, allowed, mode, visited) + ')';
+  }
+  if (main !== undefined){
+    s += BONDSYM[findBond(id,main).order] + branchStr(main, id, allowed, mode, visited);
+  }
+  return s;
+}
+function condensed(mode){
+  const comps = componentsHeavy();
+  const onlyH = atoms.length && !heavyAtoms().length;
+  if (onlyH){
+    const n = atoms.length;
+    return {ok:true, text: n === 2 && bonds.length === 1 ? 'H'+(mode==='html'?'<sub>2</sub>':'₂') : 'H'};
+  }
+  if (!comps.length) return {ok:false, text:'—', reason:'leer'};
+
+  const parts = [];
+  let ringWarn = false;
+  for (const comp of comps){
+    if (!isTree(comp)){ ringWarn = true; continue; }
+    const path = longestPath(comp);
+    const allowed = new Set(comp);
+    const visited = new Set();
+    let s = '';
+    for (let i = 0; i < path.length; i++){
+      const id = path[i];
+      visited.add(id);
+      const prev = i > 0 ? path[i-1] : null;
+      const next = i < path.length-1 ? path[i+1] : null;
+      // Am Kettenanfang steht H vorn, wenn das Atom elektronegativer ist: HO–CH₂…
+      const el0 = byId(id).el;
+      const rev = i === 0 && totalH(byId(id)) > 0 && qOf(byId(id)) >= 0 &&
+                  (path.length > 1 ? EN_FIRST.includes(el0) : H_FIRST.includes(el0));
+      s += groupStr(id, mode, rev);
+      const branches = heavyNeighbors(id).filter(n => n !== prev && n !== next && !visited.has(n));
+      for (const br of branches){
+        s += '(' + branchPrefix(findBond(id,br).order) + branchStr(br, id, allowed, mode, visited) + ')';
+      }
+      if (next !== null) s += BONDSYM[findBond(id,next).order];
+    }
+    parts.push(s);
+  }
+  if (!parts.length) return {ok:false, text:'—', ring:true};
+  return {ok:true, text: parts.join('  +  '), ring: ringWarn};
+}
+
+/* --- Prüfungen ------------------------------------------------------- */
+function checks(){
+  const out = [];
+  let hasR = false;
+  for (const a of atoms){
+    const s = bondSum(a.id);
+    if (isR(a.el)){
+      hasR = true;
+      if (s > 1) out.push({type:'err', text:'Ein Rest (R) steht für eine Gruppe und kann nur eine Bindung eingehen.'});
+      continue;
+    }
+    if (s > valenceOf(a)){
+      const q = qOf(a);
+      out.push({type:'err', text:`${a.el}${q ? chargeText(q) : ''}-Atom hat ${s} Bindungen, üblich sind ${valenceOf(a)}.`});
+    }
+  }
+  const tq = totalCharge();
+  if (tq) out.push({type:'info', text:'Gesamtladung des Teilchens: ' + (tq > 0 ? '+' : '\u2212') + Math.abs(tq) + '.'});
+  if (atoms.some(a => a.d)) out.push({type:'info', text:'δ-Zeichen kennzeichnen Partialladungen und verändern weder Formel noch Bindigkeit.'});
+  if (hasR) out.push({type:'info', text:'Reste (R) sind Platzhalter: Sie liefern keine H-Atome und gehen nicht in die molare Masse ein.'});
+  const open = atoms.filter(a => a.el === 'C' && implicitH(a) > 0).length;
+  if (state.manualH){
+    const slots = atoms.reduce((s, a) => s + (isR(a.el) ? 0 : Math.max(0, valenceOf(a) - bondSum(a.id))), 0);
+    out.push({type:'info', text: slots
+      ? `Manueller H-Modus: ${slots} offene Bindungsstelle(n) werden nicht ergänzt.`
+      : 'Manueller H-Modus: alle Bindungsstellen sind besetzt.'});
+  }
+  else if (!out.length && open){
+    out.push({type:'info', text:`Freie Bindungsstellen an ${open} C-Atom(en) werden automatisch mit H aufgefüllt.`});
+  }
+  const comps = componentsHeavy();
+  if (comps.length > 1) out.push({type:'info', text:`Die Zeichnung enthält ${comps.length} getrennte Teilchen.`});
+  return out;
+}
+
+/* =======================================================================
+   8. Oberfläche aktualisieren
+   ======================================================================= */
+const $ = s => document.querySelector(s);
+
+function refresh(){
+  render();
+  const sf = sumFormula();
+  $('#outSum').innerHTML = sf.html;
+  $('#outMass').textContent = massText();
+  const cd = condensed('html');
+  $('#outCond').innerHTML = atoms.length ? (cd.ok ? cd.text : 'für Ringe nicht möglich') : '—';
+
+  const box = $('#checks');
+  box.innerHTML = '';
+  for (const c of checks()){
+    const d = document.createElement('div');
+    d.className = 'msg ' + (c.type === 'err' ? 'err' : 'info');
+    d.textContent = c.text;
+    box.appendChild(d);
+  }
+  const errs = checks().filter(c => c.type === 'err').length;
+  const sideClosed = document.querySelector('.layout').classList.contains('side-closed');
+  $('#hintWarn').textContent = errs ? (sideClosed ? 'Bindigkeit prüfen (Auswertung öffnen)' : 'Bindigkeit prüfen (siehe rechts)') : '';
+
+  if (state.mode === 'halb' || state.mode === 'summe') renderTextMode();
+}
+
+function renderTextMode(){
+  const eyebrow = $('#toEyebrow'), form = $('#toFormula'), note = $('#toNote');
+  if (!atoms.length){
+    eyebrow.textContent = state.mode === 'halb' ? 'Halbstrukturformel' : 'Summenformel';
+    form.innerHTML = '—';
+    note.textContent = 'Wechsle zu „Skelettschreibweise“ oder „Strukturformel“ und zeichne zuerst ein Molekül.';
+    return;
+  }
+  if (state.mode === 'summe'){
+    eyebrow.textContent = 'Summenformel';
+    form.innerHTML = sumFormula().html;
+    note.textContent = 'Molare Masse: ' + massText();
+  } else {
+    eyebrow.textContent = 'Halbstrukturformel';
+    const cd = condensed('html');
+    if (cd.ok){
+      form.innerHTML = cd.text.split('  +  ').map(p => '<span class="frag">'+p+'</span>').join('');
+      note.textContent = cd.ring
+        ? 'Ringförmige Teilchen sind hier nicht enthalten: Für Ringe gibt es keine eindeutige Halbstrukturformel in einer Zeile.'
+        : 'Die Hauptkette ist die längste Kette; Seitengruppen stehen in Klammern.';
+    } else {
+      form.innerHTML = '—';
+      note.textContent = 'Das Molekül enthält einen Ring. Eine Halbstrukturformel in einer Zeile ist dafür nicht eindeutig – nutze die Skelettschreibweise.';
+    }
+  }
+}
+
+const HINTS = {
+  build : 'Tippen auf leere Fläche: neues Atom. Tippen auf ein Atom: Kette verlängern. Ziehen: Bindung in gewünschte Richtung.',
+  select: 'Klick markiert, Umschalt+Klick ergänzt, Ziehen auf freier Fläche zieht einen Rahmen (Alt: Lasso). Doppelklick: ganzes Teilchen bzw. Text bearbeiten.',
+  element:'Auf ein Atom tippen, um es in das oben gewählte Element zu ändern. Bei markierten Atomen gilt es für die ganze Auswahl.',
+  bond  : 'Auf eine Bindung tippen: Einfach- → Doppel- → Dreifachbindung.',
+  charge: 'Ladung oben wählen, dann auf ein Atom tippen (bei Auswahl: für alle markierten). „ohne“ entfernt die Ladung.',
+  arrow : 'Von der Elektronenquelle zum Ziel ziehen. Ein Tipp wählt einen Pfeil aus, der Mittelpunkt biegt ihn.',
+  text  : 'Auf die Fläche tippen und direkt schreiben, Enter übernimmt. Tipp auf einen Text bearbeitet ihn; leeren und Enter löscht ihn.',
+  erase : 'Tippen oder über Objekte wischen löscht Atome, Bindungen, Pfeile und Texte. Tipp in eine Auswahl löscht die ganze Auswahl.'
+};
+
+
+/* =======================================================================
+   9. Eingabe auf der Zeichenfläche
+   ======================================================================= */
+function pos(e){
+  const r = cv.getBoundingClientRect();
+  return {x: e.clientX - r.left, y: e.clientY - r.top};
+}
+const hitScale = () => document.documentElement.classList.contains('view-touch') ? 1.4 : 1;
+function atomAt(p, r = 17 * hitScale()){
+  let best = null, bd = r;
+  for (const a of atoms){
+    const d = Math.hypot(a.x - p.x, a.y - p.y);
+    if (d < bd){ bd = d; best = a; }
+  }
+  return best;
+}
+function bondAt(p, r = 9 * hitScale()){
+  for (const b of bonds){
+    const A = byId(b.a), B = byId(b.b);
+    const dx = B.x-A.x, dy = B.y-A.y;
+    const len2 = dx*dx + dy*dy;
+    if (!len2) continue;
+    let t = ((p.x-A.x)*dx + (p.y-A.y)*dy) / len2;
+    t = Math.max(0, Math.min(1, t));
+    const d = Math.hypot(A.x + dx*t - p.x, A.y + dy*t - p.y);
+    if (d < r) return b;
+  }
+  return null;
+}
+function labelBox(lb){
+  const m = measureRuns(ctx, parseLabelText(lb.t));
+  return {hw: m.w/2 + 6, hh: m.h/2 + 6};
+}
+function labelAt(p){
+  for (let i = labels.length-1; i >= 0; i--){
+    const lb = labels[i];
+    const {hw, hh} = labelBox(lb);
+    if (Math.abs(p.x-lb.x) < hw && Math.abs(p.y-lb.y) < hh) return lb;
+  }
+  return null;
+}
+function arrowAt(p, r = 10 * hitScale()){
+  for (let i = arrows.length-1; i >= 0; i--){
+    const ar = arrows[i];
+    for (let t = 0; t <= 1.0001; t += 0.05){
+      const q = arrowPoint(ar, t);
+      if (Math.hypot(q.x-p.x, q.y-p.y) < r) return ar;
+    }
+  }
+  return null;
+}
+function arrowEndAt(p, r = 12 * hitScale(), only = null){
+  for (let i = arrows.length-1; i >= 0; i--){
+    const ar = arrows[i];
+    if (only && !only.has(ar.id)) continue;
+    if (Math.hypot(ar.x1-p.x, ar.y1-p.y) < r) return {ar, end:1};
+    if (Math.hypot(ar.x2-p.x, ar.y2-p.y) < r) return {ar, end:2};
+  }
+  return null;
+}
+function snapAngle(a){
+  const step = Math.PI / 6;                 // 30°
+  return Math.round(a / step) * step;
+}
+
+/* ---- Treffer: ein Objekt unter dem Zeiger, gleich welcher Art ---- */
+function hitAt(p){
+  const lb = labelAt(p); if (lb) return {type:'label', id:lb.id};
+  const a = atomAt(p);   if (a)  return {type:'atom',  id:a.id};
+  const ar = arrowAt(p); if (ar) return {type:'arrow', id:ar.id};
+  const b = bondAt(p);   if (b)  return {type:'bond',  id:b.id};
+  return null;
+}
+const sameHit = (h, k) => (!h && !k) || (h && k && h.type === k.type && h.id === k.id);
+const bondById = id => bonds.find(b => b.id === id);
+
+/* ---- Auswahl über alle Objektarten ---- */
+const selCount = () => selection.size + selArrows.size + selLabels.size;
+function clearSel(){ selection.clear(); selArrows.clear(); selLabels.clear(); }
+function isSelected(h){
+  if (!h) return false;
+  if (h.type === 'atom')  return selection.has(h.id);
+  if (h.type === 'arrow') return selArrows.has(h.id);
+  if (h.type === 'label') return selLabels.has(h.id);
+  const b = bondById(h.id);
+  return !!b && selection.has(b.a) && selection.has(b.b);
+}
+function setHit(h, on){
+  const f = (set, id) => on ? set.add(id) : set.delete(id);
+  if (h.type === 'atom')  f(selection, h.id);
+  else if (h.type === 'arrow') f(selArrows, h.id);
+  else if (h.type === 'label') f(selLabels, h.id);
+  else { const b = bondById(h.id); if (b){ f(selection, b.a); f(selection, b.b); } }
+}
+function selectAll(){
+  selection = new Set(atoms.map(a => a.id));
+  selArrows = new Set(arrows.map(a => a.id));
+  selLabels = new Set(labels.map(l => l.id));
+}
+/* Umrandung der Auswahl (für das Greifen innerhalb der Auswahl) */
+function selBox(pad = 16){
+  if (!selCount()) return null;
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  const put = (x,y,hw=0,hh=0) => { x0=Math.min(x0,x-hw); y0=Math.min(y0,y-hh); x1=Math.max(x1,x+hw); y1=Math.max(y1,y+hh); };
+  for (const id of selection){ const a = byId(id); if (a) put(a.x, a.y); }
+  for (const ar of arrows) if (selArrows.has(ar.id)){
+    put(ar.x1, ar.y1); put(ar.x2, ar.y2); const m = arrowPoint(ar, 0.5); put(m.x, m.y);
+  }
+  for (const lb of labels) if (selLabels.has(lb.id)){ const b = labelBox(lb); put(lb.x, lb.y, b.hw, b.hh); }
+  if (x0 > x1) return null;
+  return {x0:x0-pad, y0:y0-pad, x1:x1+pad, y1:y1+pad};
+}
+function inSelBox(p){
+  const b = selBox();
+  return !!b && p.x >= b.x0 && p.x <= b.x1 && p.y >= b.y0 && p.y <= b.y1;
+}
+function moveSel(dx, dy){
+  for (const id of selection){ const a = byId(id); if (a){ a.x += dx; a.y += dy; } }
+  for (const ar of arrows) if (selArrows.has(ar.id)){ ar.x1 += dx; ar.y1 += dy; ar.x2 += dx; ar.y2 += dy; }
+  for (const lb of labels) if (selLabels.has(lb.id)){ lb.x += dx; lb.y += dy; }
+}
+/* Bereichsauswahl: Rechteck oder Freihand-Lasso */
+function selectArea(area, add){
+  if (!add) clearSel();
+  let inside;
+  if (area.shape === 'rect'){
+    const x0 = Math.min(area.x0, area.x1), x1 = Math.max(area.x0, area.x1);
+    const y0 = Math.min(area.y0, area.y1), y1 = Math.max(area.y0, area.y1);
+    inside = q => q.x >= x0 && q.x <= x1 && q.y >= y0 && q.y <= y1;
+  } else inside = q => inPoly(q, area.pts);
+  atoms.forEach(a => { if (inside(a)) selection.add(a.id); });
+  arrows.forEach(ar => { if (inside({x:ar.x1, y:ar.y1}) && inside({x:ar.x2, y:ar.y2})) selArrows.add(ar.id); });
+  labels.forEach(lb => { if (inside(lb)) selLabels.add(lb.id); });
+}
+function selHint(){
+  const n = selCount();
+  if (!n){ $('#hint').textContent = HINTS[state.tool]; return; }
+  const parts = [];
+  if (selection.size) parts.push(selection.size + (selection.size === 1 ? ' Atom' : ' Atome'));
+  if (selArrows.size) parts.push(selArrows.size + (selArrows.size === 1 ? ' Pfeil' : ' Pfeile'));
+  if (selLabels.size) parts.push(selLabels.size + (selLabels.size === 1 ? ' Text' : ' Texte'));
+  $('#hint').textContent = parts.join(', ') + ' markiert. Ziehen verschiebt, Entf löscht, Esc hebt auf.';
+}
+
+/* ---- Löschen ---- */
+/* Ein Atom samt der expliziten H-Atome, die nur an ihm hängen – sonst blieben
+   sie als isolierte Atome zurück und verfälschten die Summenformel. */
+function deleteAtomDeep(id){
+  const a = byId(id); if (!a) return;
+  if (a.el !== 'H'){
+    neighbors(id).filter(n => n && n.el === 'H' && bondsOf(n.id).length === 1)
+                 .forEach(h => removeAtom(h.id));
+  }
+  removeAtom(id);
+}
+function deleteBond(id){
+  const b = bondById(id); if (!b) return;
+  bonds = bonds.filter(x => x.id !== id);
+  for (const end of [b.a, b.b]){                 // verwaiste H-Atome mit entfernen
+    const at = byId(end);
+    if (at && at.el === 'H' && bondsOf(end).length === 0) removeAtom(end);
+  }
+}
+function deleteHit(h){
+  if (h.type === 'label') labels = labels.filter(x => x.id !== h.id);
+  else if (h.type === 'arrow'){ arrows = arrows.filter(x => x.id !== h.id); if (selArrow === h.id) selArrow = null; }
+  else if (h.type === 'atom') deleteAtomDeep(h.id);
+  else deleteBond(h.id);
+  selection.forEach(id => { if (!byId(id)) selection.delete(id); });
+  selArrows.forEach(id => { if (!arrows.some(a => a.id === id)) selArrows.delete(id); });
+  selLabels.forEach(id => { if (!labels.some(l => l.id === id)) selLabels.delete(id); });
+}
+function deleteSelection(){
+  if (!selCount()) return false;
+  pushUndo();
+  [...selection].forEach(id => deleteAtomDeep(id));
+  arrows = arrows.filter(a => !selArrows.has(a.id));
+  labels = labels.filter(l => !selLabels.has(l.id));
+  if (selArrows.has(selArrow)) selArrow = null;
+  clearSel();
+  hover = null;
+  refresh();
+  $('#hint').textContent = 'Auswahl gelöscht. Rückgängig mit Strg+Z.';
+  return true;
+}
+
+/* ---- Text direkt auf der Fläche bearbeiten ---- */
+let editLabel = null;          // {id} beim Bearbeiten, {id:null, x, y} beim Neuanlegen
+const editor = document.createElement('input');
+editor.type = 'text';
+editor.id = 'labelEditor';
+editor.spellcheck = false;
+editor.autocomplete = 'off';
+editor.hidden = true;
+editor.setAttribute('aria-label', 'Text auf der Zeichenfläche');
+board.appendChild(editor);
+
+function openEditor(lb, p){
+  if (editLabel) commitEdit();
+  const x = lb ? lb.x : p.x, y = lb ? lb.y : p.y;
+  editLabel = lb ? {id: lb.id} : {id: null, x, y};
+  editor.value = lb ? lb.t : $('#textVal').value.trim();
+  editor.style.left = x + 'px';
+  editor.style.top  = y + 'px';
+  const col = lb ? lb.color : paletteHex(state.textColor);
+  editor.style.color = col || '#1e1e2e';
+  editor.hidden = false;
+  render();
+  editor.focus();
+  editor.select();
+  $('#hint').textContent = 'Text eingeben, Enter übernimmt, Esc bricht ab. H2O → H₂O, ^ stellt hoch, _ tief.';
+}
+function commitEdit(){
+  if (!editLabel) return;
+  const e = editLabel, val = editor.value.trim();
+  editLabel = null;
+  editor.hidden = true;
+  if (e.id != null){
+    const lb = labels.find(x => x.id === e.id);
+    if (lb && !val){ pushUndo(); labels = labels.filter(x => x.id !== e.id); selLabels.delete(e.id); }
+    else if (lb && val !== lb.t){ pushUndo(); lb.t = val; }
+  } else if (val){
+    pushUndo();
+    labels.push({id:nid++, x:e.x, y:e.y, t:val, color: paletteHex(state.textColor)});
+  }
+  $('#hint').textContent = HINTS[state.tool];
+  refresh();
+}
+function cancelEdit(){
+  if (!editLabel) return;
+  editLabel = null;
+  editor.hidden = true;
+  $('#hint').textContent = HINTS[state.tool];
+  render();
+}
+editor.addEventListener('keydown', e => {
+  e.stopPropagation();
+  if (e.key === 'Enter'){ e.preventDefault(); commitEdit(); }
+  else if (e.key === 'Escape'){ e.preventDefault(); cancelEdit(); }
+});
+editor.addEventListener('blur', () => commitEdit());
+
+/* ---- Zeigerereignisse ---- */
+const HOVER_TYPES = {
+  build:['atom','bond'], element:['atom'], charge:['atom'], bond:['bond'],
+  text:['label'], arrow:['arrow'], select:['atom','bond','arrow','label'],
+  erase:['atom','bond','arrow','label']
+};
+let downPt = null, moved = false, swallowUp = false, lastTap = {hit:null, t:0};
+const firstMove = d => { if (!d.undo){ pushUndo(); d.undo = true; } };
+
+function eraseAt(p){
+  const h = hitAt(p);
+  if (!h) return;
+  firstMove(drag);
+  deleteHit(h);
+  hover = null;
+  render();
+}
+
+cv.addEventListener('pointerdown', e => {
+  if (editLabel){ e.preventDefault(); commitEdit(); swallowUp = true; return; }   // Klick daneben schließt nur das Textfeld
+  if (e.button > 0) return;
+  e.preventDefault();                 // verhindert nachträgliche Maus-Ereignisse (Fokusverlust auf Tablets)
+  cv.setPointerCapture(e.pointerId);
+  const p = pos(e);
+  downPt = p; moved = false;
+  const a = atomAt(p);
+  const h = hitAt(p);
+
+  if (state.tool === 'arrow'){
+    const am = arrowMidAt(p);
+    if (am){ selArrow = am.id; drag = {bendArrow:am}; }
+    else drag = {arrowNew:{x1:p.x, y1:p.y, x2:p.x, y2:p.y}};
+  }
+  else if (state.tool === 'select'){
+    const ae = arrowEndAt(p, 12, selCount() > 1 ? new Set() : null);
+    if (e.shiftKey)                      drag = {toggle:h, area: h ? null : newArea(p, e), add:true};
+    else if (ae && !a)                   drag = {arrowEnd:ae};
+    else if (h){
+      if (!isSelected(h)){ clearSel(); setHit(h, true); }
+      drag = {selMove:true, lx:p.x, ly:p.y, hit:h};
+    }
+    else if (inSelBox(p))                drag = {selMove:true, lx:p.x, ly:p.y, hit:null};
+    else                                 drag = {area:newArea(p, e), add:false};
+  }
+  else if (state.tool === 'erase'){
+    if (h && isSelected(h) && selCount() > 1){ deleteSelection(); swallowUp = true; return; }
+    drag = {erase:true};
+    eraseAt(p);
+  }
+  else if (state.tool === 'build' && a){ drag = {from:a.id, x:p.x, y:p.y}; }
+  render();
+});
+
+function newArea(p, e){
+  const shape = e.altKey ? (state.selShape === 'rect' ? 'lasso' : 'rect') : state.selShape;
+  return shape === 'rect' ? {shape, x0:p.x, y0:p.y, x1:p.x, y1:p.y} : {shape, pts:[p]};
+}
+
+cv.addEventListener('pointermove', e => {
+  const p = pos(e);
+  if (downPt && Math.hypot(p.x-downPt.x, p.y-downPt.y) > 5) moved = true;
+
+  if (drag && drag.bendArrow){
+    if (!moved) return;
+    firstMove(drag);
+    const ar = drag.bendArrow;
+    const dx = ar.x2-ar.x1, dy = ar.y2-ar.y1, len = Math.hypot(dx, dy) || 1;
+    const nx = -dy/len, ny = dx/len;
+    const mx = (ar.x1+ar.x2)/2, my = (ar.y1+ar.y2)/2;
+    // Die Kurve läuft bei t = 0,5 durch Mitte + n·bend·len/2
+    const b = 2 * ((p.x-mx)*nx + (p.y-my)*ny) / len;
+    ar.bend = Math.max(-1.2, Math.min(1.2, b));
+    state.bend = ar.bend;
+    syncArrowUI();
+    render();
+    return;
+  }
+  if (drag && drag.arrowNew){ drag.arrowNew.x2 = p.x; drag.arrowNew.y2 = p.y; render(); return; }
+  if (drag && drag.arrowEnd){
+    if (!moved) return;
+    firstMove(drag);
+    const {ar, end} = drag.arrowEnd;
+    if (end === 1){ ar.x1 = p.x; ar.y1 = p.y; } else { ar.x2 = p.x; ar.y2 = p.y; }
+    render(); return;
+  }
+  if (drag && drag.selMove){
+    if (!moved) return;                 // kleines Zittern ist noch kein Verschieben
+    firstMove(drag);
+    moveSel(p.x - drag.lx, p.y - drag.ly);
+    drag.lx = p.x; drag.ly = p.y;
+    render(); return;
+  }
+  if (drag && drag.area){
+    const ar = drag.area;
+    if (ar.shape === 'rect'){ ar.x1 = p.x; ar.y1 = p.y; }
+    else {
+      const last = ar.pts[ar.pts.length - 1];
+      if (Math.hypot(p.x - last.x, p.y - last.y) > 3) ar.pts.push(p);
+    }
+    render(); return;
+  }
+  if (drag && drag.erase){ eraseAt(p); return; }
+  if (drag && drag.from != null){
+    const A = byId(drag.from);
+    const target = atomAt(p);
+    if (target && target.id !== A.id){ drag.x = target.x; drag.y = target.y; }
+    else {
+      const ang = snapAngle(Math.atan2(p.y-A.y, p.x-A.x));
+      drag.x = A.x + L*Math.cos(ang);
+      drag.y = A.y + L*Math.sin(ang);
+    }
+    render();
+    return;
+  }
+  if (drag) return;
+  let nh = hitAt(p);
+  if (nh && !(HOVER_TYPES[state.tool] || []).includes(nh.type)) nh = null;
+  if (!sameHit(nh, hover)){ hover = nh; render(); }
+});
+
+cv.addEventListener('pointerup', e => {
+  const p = pos(e);
+  const wasDrag = drag;
+  drag = null;
+  if (swallowUp){ swallowUp = false; downPt = null; return; }
+  if (!downPt){ return; }
+  downPt = null;
+
+  if (wasDrag && wasDrag.bendArrow){ if (wasDrag.undo) refresh(); else render(); return; }
+  if (wasDrag && wasDrag.arrowNew){
+    const n = wasDrag.arrowNew;
+    if (Math.hypot(n.x2-n.x1, n.y2-n.y1) > 16){
+      pushUndo();
+      const ar = {id:nid++, kind:state.arrowKind, x1:n.x1, y1:n.y1, x2:n.x2, y2:n.y2,
+                  bend: state.bend, color: paletteHex(state.arrowColor)};
+      arrows.push(ar);
+      selArrow = ar.id;
+      refresh();
+    } else {                                  // kurzer Tipp: Pfeil auswählen
+      const ar = arrowAt(p);
+      selArrow = ar ? ar.id : null;
+      if (ar){
+        state.arrowKind = ar.kind;
+        state.bend = ar.bend || 0;
+        state.arrowColor = (PALETTE.find(x => x.hex === ar.color) || PALETTE[0]).key;
+      }
+      syncArrowUI();
+      render();
+    }
+    return;
+  }
+  if (wasDrag && wasDrag.arrowEnd){ if (wasDrag.undo) refresh(); return; }
+  if (wasDrag && wasDrag.erase){ if (wasDrag.undo) refresh(); else render(); return; }
+
+  if (wasDrag && (wasDrag.toggle !== undefined || wasDrag.area)){
+    if (wasDrag.area){
+      const ar = wasDrag.area;
+      const big = ar.shape === 'rect'
+        ? Math.abs(ar.x1-ar.x0) > 4 || Math.abs(ar.y1-ar.y0) > 4
+        : ar.pts.length > 2;
+      if (big) selectArea(ar, wasDrag.add);
+      else if (!wasDrag.add) clearSel();
+    } else if (wasDrag.toggle){
+      setHit(wasDrag.toggle, !isSelected(wasDrag.toggle));
+    }
+    render(); selHint(); return;
+  }
+
+  if (wasDrag && wasDrag.selMove){
+    if (wasDrag.undo){ refresh(); selHint(); return; }
+    // Tippen ohne Bewegung: Doppeltipp prüfen
+    const h = wasDrag.hit, now = Date.now();
+    if (h && sameHit(h, lastTap.hit) && now - lastTap.t < 450){
+      lastTap = {hit:null, t:0};
+      if (h.type === 'label'){ openEditor(labels.find(x => x.id === h.id)); return; }
+      if (h.type === 'atom' || h.type === 'bond'){
+        const start = h.type === 'atom' ? h.id : bondById(h.id).a;
+        clearSel(); selection = componentOf(start);
+        render();
+        $('#hint').textContent = selection.size + ' Atome markiert (ganzes Teilchen). Ziehen verschiebt, Entf löscht.';
+        return;
+      }
+    }
+    lastTap = {hit:h, t:now};
+    render(); selHint(); return;
+  }
+
+  if (wasDrag && wasDrag.from != null && moved){
+    pushUndo();
+    const A = byId(wasDrag.from);
+    const target = atomAt(p);
+    if (target && target.id !== A.id){
+      const ex = findBond(A.id, target.id);
+      if (ex) ex.order = ex.order % 3 + 1;
+      else addBond(A.id, target.id, 1);
+    } else {
+      const ang = snapAngle(Math.atan2(p.y-A.y, p.x-A.x));
+      const nx = A.x + L*Math.cos(ang), ny = A.y + L*Math.sin(ang);
+      const near = atomAt({x:nx, y:ny}, 14);
+      if (near && near.id !== A.id) addBond(A.id, near.id, 1);
+      else { const na = addAtom(state.el, nx, ny); addBond(A.id, na.id, 1); }
+    }
+    refresh(); return;
+  }
+
+  if (moved) return;
+
+  // --- einfaches Tippen ---
+  const a = atomAt(p), b = a ? null : bondAt(p);
+  /* Wirkt ein Tipp auf ein markiertes Atom, gilt er für die ganze Auswahl */
+  const targets = at => (selection.has(at.id) && selection.size > 1)
+    ? [...selection].map(byId).filter(Boolean) : [at];
+
+  if (state.tool === 'build'){
+    pushUndo();
+    if (a){
+      const dir = suggestDir(a);
+      const na = addAtom(state.el, a.x + L*Math.cos(dir), a.y + L*Math.sin(dir));
+      addBond(a.id, na.id, 1);
+    } else if (!b){
+      addAtom(state.el, p.x, p.y);
+    }
+  } else if (state.tool === 'element' && a){
+    pushUndo(); targets(a).forEach(t => { t.el = state.el; });
+  } else if (state.tool === 'bond' && b){
+    pushUndo(); b.order = b.order % 3 + 1;
+  } else if (state.tool === 'charge' && a){
+    pushUndo();
+    const ch = state.charge;
+    targets(a).forEach(t => {
+      if (ch.d){ t.d = ch.d; t.q = 0; }
+      else if (ch.q === 0){ t.q = 0; t.d = null; }
+      else { t.q = ch.q; t.d = null; }
+    });
+  } else if (state.tool === 'text'){
+    openEditor(labelAt(p), p);
+    return;
+  }
+  refresh();
+});
+
+cv.addEventListener('pointerleave', () => { if (hover && !drag){ hover = null; render(); } });
+
+/* ---- Schwebende Leiste an der Auswahl ---- */
+const selBar = document.createElement('div');
+selBar.id = 'selBar';
+selBar.hidden = true;
+selBar.innerHTML =
+  '<button data-sb="rotL" title="15° gegen den Uhrzeigersinn">↺</button>' +
+  '<button data-sb="rotR" title="15° im Uhrzeigersinn">↻</button>' +
+  '<button data-sb="mirror" title="waagerecht spiegeln">⇋</button>' +
+  '<button data-sb="del" class="danger" title="Auswahl löschen (Entf)">Löschen</button>' +
+  '<button data-sb="none" title="Auswahl aufheben (Esc)">Aufheben</button>';
+board.appendChild(selBar);
+selBar.addEventListener('pointerdown', e => e.stopPropagation());
+selBar.addEventListener('click', e => {
+  const k = e.target.closest('button'); if (!k) return;
+  const act = k.dataset.sb;
+  if (act === 'del') deleteSelection();
+  else if (act === 'none'){ clearSel(); render(); selHint(); }
+  else if (act === 'mirror') transformSel((x, y) => [-x, y], true);
+  else {
+    const r = (act === 'rotL' ? -15 : 15) * Math.PI/180, co = Math.cos(r), si = Math.sin(r);
+    transformSel((x, y) => [x*co - y*si, x*si + y*co]);
+  }
+});
+function placeSelBar(){
+  const b = (!drag && !editLabel && selCount()) ? selBox(20) : null;
+  if (!b){ selBar.hidden = true; return; }
+  selBar.hidden = false;
+  const bw = selBar.offsetWidth, bh = selBar.offsetHeight;
+  let x = (b.x0 + b.x1)/2 - bw/2;
+  let y = b.y0 - bh - 8;
+  if (y < 6) y = b.y1 + 8;
+  if (y + bh > H - 6) y = Math.max(6, H - bh - 6);
+  x = Math.max(6, Math.min(W - bw - 6, x));
+  selBar.style.left = x + 'px';
+  selBar.style.top  = y + 'px';
+}
+
+/* =======================================================================
+   10. Bedienelemente
+   ======================================================================= */
+// Werkzeuge
+document.querySelectorAll('#tools button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (editLabel) commitEdit();
+    state.tool = btn.dataset.tool;
+    document.body.dataset.tool = state.tool;
+    if (state.tool !== 'arrow') selArrow = null;
+    hover = null;
+    document.querySelectorAll('#tools button').forEach(b => b.classList.toggle('on', b === btn));
+    if (selCount()) selHint(); else $('#hint').textContent = HINTS[state.tool];
+    cv.style.cursor = state.tool === 'select' ? 'default' : (state.tool === 'text' ? 'text' : 'crosshair');
+    render();
+  });
+});
+
+// Form der Bereichsauswahl
+document.querySelectorAll('#selShape button').forEach(b => {
+  b.addEventListener('click', () => {
+    state.selShape = b.dataset.shape;
+    document.querySelectorAll('#selShape button').forEach(x => x.classList.toggle('on', x === b));
+    if (state.tool !== 'select') document.querySelector('#tools [data-tool="select"]').click();
+  });
+});
+
+// Elementknöpfe
+const EL_NAMES = {H:'Wasserstoff', C:'Kohlenstoff', N:'Stickstoff', O:'Sauerstoff', S:'Schwefel',
+                  P:'Phosphor', F:'Fluor', Cl:'Chlor', Br:'Brom', I:'Iod'};
+const elName = el => EL_NAMES[el] || (PT[el] ? PT[el].name : el);
+const valText = el => EL[el].v == null ? 'Bindigkeit frei (keine Prüfung)' : 'Bindigkeit ' + EL[el].v;
+const COLVAR = {H:'--el-H',C:'--el-C',N:'--el-N',O:'--el-O',S:'--el-S',P:'--el-P'};
+/* Knopffarben in der Oberfläche: Catppuccin-Mocha-Töne, gut lesbar auf dunklem Grund */
+const elVar = el => 'var(--ui' + (isR(el) ? '--el-R' : (COLVAR[el] || (['F','Cl','Br','I'].includes(el) ? '--el-Hal' : '--el-X'))).slice(1) + ')';
+const allElButtons = () => document.querySelectorAll('#elements button, #rests button');
+
+function makeElButton(el, box){
+  const b = document.createElement('button');
+  b.className = 'el' + (el === 'C' ? ' on' : '');
+  b.dataset.el = el;
+  if (isR(el)){
+    const idx = el.slice(1);
+    b.innerHTML = 'R' + (idx ? '<sup style="font-size:.66em">' + idx + '</sup>' : '');
+    b.title = idx ? 'Rest R' + idx + ' – beliebige Gruppe' : 'Rest R – beliebige Gruppe';
+  } else {
+    b.textContent = el;
+    b.title = elName(el) + ' – ' + valText(el);
+  }
+  b.style.color = el === 'C' ? '' : elVar(el);
+  b.addEventListener('click', () => {
+    state.el = el;
+    $('#hint').textContent = (isR(el)
+        ? 'Rest ' + el.replace(/^R/, 'R') + ' – Platzhalter für eine beliebige Gruppe, einbindig. '
+        : elName(el) + ' (' + el + '), ' + valText(el) + '. ') + HINTS[state.tool];
+    allElButtons().forEach(x => {
+      x.classList.toggle('on', x === b);
+      x.style.color = x.classList.contains('on') ? '' : elVar(x.dataset.el);
+    });
+  });
+  box.appendChild(b);
+}
+EL_ORDER.forEach(el => makeElButton(el, $('#elements')));
+R_ORDER.forEach(el => makeElButton(el, $('#rests')));
+
+// Pfeilarten, Farbe und Krümmung
+const selectedArrow = () => (selArrow == null ? null : arrows.find(x => x.id === selArrow));
+function syncArrowUI(){
+  document.querySelectorAll('#arrowKinds button')
+    .forEach(x => x.classList.toggle('on', x.dataset.kind === state.arrowKind));
+  document.querySelectorAll('#arrowColors button')
+    .forEach(x => x.classList.toggle('on', x.dataset.col === state.arrowColor));
+  $('#bendRange').value = Math.round(state.bend * 100);
+  $('#bendVal').textContent = Math.round(state.bend * 100);
+}
+const arrowBox = $('#arrowKinds');
+Object.keys(ARROW_KINDS).forEach(k => {
+  const b = document.createElement('button');
+  b.textContent = ARROW_KINDS[k].label;
+  b.dataset.kind = k;
+  if (k === 'reaction') b.classList.add('on');
+  b.addEventListener('click', () => {
+    state.arrowKind = k;
+    const ar = selectedArrow();
+    if (ar){ pushUndo(); ar.kind = k; refresh(); }
+    else state.bend = ARROW_KINDS[k].def;      // sinnvolle Voreinstellung je Art
+    syncArrowUI();
+    if (state.tool !== 'arrow') document.querySelector('#tools [data-tool="arrow"]').click();
+  });
+  arrowBox.appendChild(b);
+});
+const colBox = $('#arrowColors');
+PALETTE.forEach(p => {
+  const b = document.createElement('button');
+  b.className = 'sw' + (p.key === 'ink' ? ' on' : '');
+  b.dataset.col = p.key;
+  b.title = p.name;
+  b.style.background = p.hex || 'var(--el-C)';
+  b.addEventListener('click', () => {
+    state.arrowColor = p.key;
+    const ar = selectedArrow();
+    if (ar){ pushUndo(); ar.color = p.hex; refresh(); }
+    syncArrowUI();
+  });
+  colBox.appendChild(b);
+});
+// Textfarbe (unabhängig von der Pfeilfarbe)
+const txtColBox = $('#textColors');
+PALETTE.forEach(p => {
+  const b = document.createElement('button');
+  b.className = 'sw' + (p.key === 'ink' ? ' on' : '');
+  b.dataset.col = p.key;
+  b.title = p.name.replace(' – Elektronen', '');
+  b.style.background = p.hex || 'var(--el-C)';
+  b.addEventListener('click', () => {
+    state.textColor = p.key;
+    if (selLabels.size){
+      pushUndo();
+      labels.forEach(l => { if (selLabels.has(l.id)) l.color = p.hex; });
+      refresh();
+    }
+    txtColBox.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+  });
+  txtColBox.appendChild(b);
+});
+$('#bendRange').addEventListener('input', e => {
+  state.bend = +e.target.value / 100;
+  const ar = selectedArrow();
+  if (ar){ ar.bend = state.bend; render(); }
+  $('#bendVal').textContent = e.target.value;
+});
+$('#bendRange').addEventListener('change', () => { if (selectedArrow()) refresh(); });
+
+// Wasserstoff: automatisch oder manuell
+function setManualH(on){
+  state.manualH = on;
+  $('#manualNote').hidden = !on;
+  document.querySelectorAll('#hmodes button').forEach(b => {
+    b.disabled = on;
+    b.style.opacity = on ? .45 : 1;
+  });
+  $('#btnManualH').classList.toggle('on', on);
+}
+$('#btnManualH').addEventListener('click', () => {
+  pushUndo();
+  for (const a of atoms.slice()){
+    const n = implicitH(a);
+    if (!n) continue;
+    const dirs = freeDirs(a, n, [], L * 0.74);
+    for (const d of dirs){
+      const h = addAtom('H', a.x + L*0.74*Math.cos(d), a.y + L*0.74*Math.sin(d));
+      addBond(a.id, h.id, 1);
+    }
+  }
+  setManualH(true);
+  setH('allLine');
+  syncControls();
+  refresh();
+  $('#hint').textContent = 'H-Atome sind jetzt eigenständig: verschieben, löschen oder mit Element H ergänzen.';
+});
+$('#btnAutoH').addEventListener('click', () => {
+  pushUndo();
+  const drop = atoms.filter(a => a.el === 'H' && bondsOf(a.id).length === 1
+                                && byId(partner(bondsOf(a.id)[0], a.id)).el !== 'H');
+  drop.forEach(h => removeAtom(h.id));
+  setManualH(false);
+  setH('hetero');
+  syncControls();
+  refresh();
+});
+
+// Ladungsknöpfe
+document.querySelectorAll('#charges button').forEach(b => {
+  b.addEventListener('click', () => {
+    state.charge = b.dataset.d ? {q:0, d:b.dataset.d} : {q:+b.dataset.q, d:null};
+    document.querySelectorAll('#charges button').forEach(x => x.classList.toggle('on', x === b));
+    const t = document.querySelector('#tools [data-tool="charge"]');
+    if (state.tool !== 'charge') t.click();
+  });
+});
+
+
+// Weiteres Element per Texteingabe
+function addCustomElement(){
+  const inp = $('#elCustom'), vInp = $('#elCustomV');
+  const sym = normSym(inp.value);
+  const vRaw = vInp.value.trim();
+  const vOv = vRaw === '' ? null : Math.max(0, Math.min(8, Math.round(+vRaw)));
+  if (!sym){ inp.focus(); return; }
+  if (isR(sym) || !PT[sym]){
+    inp.classList.add('bad');
+    $('#hint').textContent = '„' + inp.value.trim() + '“ ist kein Elementsymbol. Groß-/Kleinschreibung wird automatisch angepasst (rb → Rb).';
+    return;
+  }
+  inp.classList.remove('bad');
+  const known = !!EL[sym] && !EL[sym].custom;
+  ensureEl(sym, vOv);
+  if (!document.querySelector('#elements [data-el="' + sym + '"]')) makeElButton(sym, $('#elements'));
+  document.querySelector('#elements [data-el="' + sym + '"]').click();
+  inp.value = ''; vInp.value = '';
+  closeCustomEl();
+  let msg = elName(sym) + ' (' + sym + ') gewählt, ' + valText(sym) + '.';
+  if (known && vOv != null) msg += ' Die Bindigkeit der Standardelemente bleibt unverändert.';
+  else if (vOv != null) msg += ' Die Bindigkeit gilt für alle ' + sym + '-Atome.';
+  if (EL[sym].v == null) msg += ' Für Nebengruppenelemente ergänzt der Editor keine H-Atome.';
+  $('#hint').textContent = msg;
+  refresh();
+}
+$('#btnElCustom').addEventListener('click', addCustomElement);
+$('#btnElMore').addEventListener('click', () => {
+  const box = $('#ctx');
+  box.classList.toggle('show-custom');
+  $('#btnElMore').classList.toggle('on', box.classList.contains('show-custom'));
+  if (box.classList.contains('show-custom')) $('#elCustom').focus();
+});
+function closeCustomEl(){ $('#ctx').classList.remove('show-custom'); $('#btnElMore').classList.remove('on'); }
+['#elCustom', '#elCustomV'].forEach(id => $(id).addEventListener('keydown', e => {
+  if (e.key === 'Enter'){ e.preventDefault(); addCustomElement(); }
+  else if (e.key === 'Escape'){ e.preventDefault(); closeCustomEl(); }
+}));
+$('#elCustom').addEventListener('input', e => e.target.classList.remove('bad'));
+
+// Eigene Ladung per Texteingabe: 3+, +3, 3−, -3, +, −, 0
+function parseCharge(t){
+  t = String(t).replace(/\s+/g, '').replace(/[\u2212\u2013]/g, '-');
+  if (t === '0') return 0;
+  const m = t.match(/^([+-])?(\d*)([+-])?$/);
+  if (!m || (!m[1] && !m[3]) || (m[1] && m[3])) return null;
+  const n = m[2] === '' ? 1 : +m[2];
+  if (n > 8) return null;
+  return n * ((m[1] || m[3]) === '+' ? 1 : -1);
+}
+function applyCustomCharge(){
+  const inp = $('#qCustom');
+  const q = parseCharge(inp.value);
+  if (q == null){
+    inp.classList.add('bad');
+    $('#hint').textContent = 'Ladung nicht erkannt. Beispiele: 3+, 2−, -4, + oder 0 (höchstens 8).';
+    return;
+  }
+  inp.classList.remove('bad');
+  state.charge = {q, d:null};
+  document.querySelectorAll('#charges button').forEach(x =>
+    x.classList.toggle('on', !x.dataset.d && +x.dataset.q === q));
+  if (state.tool !== 'charge') document.querySelector('#tools [data-tool="charge"]').click();
+  $('#hint').textContent = (q ? 'Ladung ' + chargeText(q) : 'Ladung entfernen') +
+    ' gewählt – auf ein Atom tippen (bei Auswahl: für alle markierten).';
+}
+$('#btnQCustom').addEventListener('click', applyCustomCharge);
+$('#qCustom').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); applyCustomCharge(); } });
+$('#qCustom').addEventListener('input', e => e.target.classList.remove('bad'));
+
+// Darstellungsarten
+document.querySelectorAll('#modes button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    state.mode = btn.dataset.mode;
+    document.querySelectorAll('#modes button').forEach(b => b.classList.toggle('on', b === btn));
+    if (state.mode === 'skelett'){ state.showC = false; setH('hetero'); }
+    if (state.mode === 'struktur'){ state.showC = true;  setH('allLine'); }
+    const textMode = (state.mode === 'halb' || state.mode === 'summe');
+    board.hidden = textMode;
+    $('#textout').hidden = !textMode;
+    $('#hint').textContent = textMode
+      ? 'Textansicht – die Zeichnung bleibt erhalten.'
+      : HINTS[state.tool];
+    syncControls();
+    if (!textMode) resize();
+    refresh();
+  });
+});
+
+function setH(mode){
+  state.hMode = mode;
+  document.querySelectorAll('#hmodes button').forEach(b => b.classList.toggle('on', b.dataset.h === mode));
+}
+document.querySelectorAll('#hmodes button').forEach(btn => {
+  btn.addEventListener('click', () => { setH(btn.dataset.h); syncControls(); refresh(); });
+});
+
+function syncControls(){
+  const forced = state.hMode === 'allText' || state.hMode === 'allLine';
+  const cb = $('#showC');
+  cb.checked = effShowC();
+  cb.disabled = forced;
+  $('#lblShowC').classList.toggle('off', forced);
+  $('#showGrid').checked = state.showGrid;
+  $('#whiteBg').checked = state.white;
+  document.querySelectorAll('#lpMode button').forEach(b => b.classList.toggle('on', b.dataset.lp === state.lp));
+}
+$('#showC').addEventListener('change', e => { state.showC = e.target.checked; refresh(); });
+document.querySelectorAll('#lpMode button').forEach(b => {
+  b.addEventListener('click', () => { state.lp = b.dataset.lp; syncControls(); refresh(); });
+});
+$('#showGrid').addEventListener('change', e => { state.showGrid = e.target.checked; refresh(); });
+$('#mono').addEventListener('change', e => {
+  state.mono = e.target.checked;
+  store.set('sfe-mono', state.mono ? '1' : '0');
+  refresh();
+});
+$('#whiteBg').addEventListener('change', e => {
+  state.white = e.target.checked;
+  document.documentElement.classList.toggle('paper-white', state.white);
+  refresh();
+});
+
+// Blattfunktionen
+$('#btnUndo').addEventListener('click', undo);
+$('#btnRedo').addEventListener('click', redo);
+$('#btnClear').addEventListener('click', () => {
+  pushUndo(); atoms = []; bonds = []; arrows = []; labels = []; clearSel(); selArrow = null; refresh();
+});
+$('#btnCenter').addEventListener('click', () => { centerView(); refresh(); });
+
+function bbox(){
+  if (!atoms.length && !arrows.length && !labels.length) return null;
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  const put = (x,y) => { x0=Math.min(x0,x); y0=Math.min(y0,y); x1=Math.max(x1,x); y1=Math.max(y1,y); };
+  for (const a of atoms) put(a.x, a.y);
+  for (const a of arrows){ put(a.x1, a.y1); put(a.x2, a.y2); }
+  for (const l of labels) put(l.x, l.y);
+  return {x0,y0,x1,y1};
+}
+function centerView(){
+  const bb = bbox(); if (!bb) return;
+  const dx = W/2 - (bb.x0+bb.x1)/2, dy = H/2 - (bb.y0+bb.y1)/2;
+  atoms.forEach(a => { a.x += dx; a.y += dy; });
+  arrows.forEach(a => { a.x1 += dx; a.y1 += dy; a.x2 += dx; a.y2 += dy; });
+  labels.forEach(l => { l.x += dx; l.y += dy; });
+}
+
+/* --- Begradigen ------------------------------------------------------
+   Die längste Kette wird waagerecht ausgerichtet, Seitenketten zweigen im
+   eingestellten Winkel (90° oder 45°) ab und laufen dann geradlinig weiter. */
+const allNeighbors = id => neighbors(id).map(n => n.id);
+
+function componentOf(start){
+  const seen = new Set([start]), q = [start];
+  while (q.length){
+    const cur = q.shift();
+    for (const n of allNeighbors(cur)) if (!seen.has(n)){ seen.add(n); q.push(n); }
+  }
+  return seen;
+}
+/* Dreht bzw. spiegelt die Auswahl (Atome, Pfeile, Texte) – ohne Auswahl die ganze Zeichnung */
+function transformSel(fn, mirror = false){
+  const all = !selCount();
+  const at  = all ? atoms.slice() : [...selection].map(byId).filter(Boolean);
+  const ars = arrows.filter(a => all || selArrows.has(a.id));
+  const lbs = labels.filter(l => all || selLabels.has(l.id));
+  const pts = [...at, ...lbs];
+  ars.forEach(a => pts.push({x:a.x1, y:a.y1}, {x:a.x2, y:a.y2}));
+  if (!pts.length) return;
+  pushUndo();
+  let cx = 0, cy = 0;
+  pts.forEach(q => { cx += q.x; cy += q.y; });
+  cx /= pts.length; cy /= pts.length;
+  const tf = (x, y) => { const [u, v] = fn(x - cx, y - cy); return [cx + u, cy + v]; };
+  at.forEach(a => { [a.x, a.y] = tf(a.x, a.y); });
+  lbs.forEach(l => { [l.x, l.y] = tf(l.x, l.y); });
+  ars.forEach(a => {
+    [a.x1, a.y1] = tf(a.x1, a.y1);
+    [a.x2, a.y2] = tf(a.x2, a.y2);
+    if (mirror) a.bend = -(a.bend || 0);   // Spiegelung kehrt die Krümmungsrichtung um
+  });
+  refresh();
+}
+document.querySelectorAll('#transform [data-rot]').forEach(b => {
+  b.addEventListener('click', () => {
+    const r = +b.dataset.rot * Math.PI/180, co = Math.cos(r), si = Math.sin(r);
+    transformSel((x, y) => [x*co - y*si, x*si + y*co]);
+  });
+});
+$('#btnMirror').addEventListener('click', () => transformSel((x, y) => [-x, y], true));
+
+function componentsAll(){
+  const seen = new Set(), comps = [];
+  for (const a of atoms){
+    if (seen.has(a.id)) continue;
+    const comp = [], q = [a.id];
+    seen.add(a.id);
+    while (q.length){
+      const cur = q.shift(); comp.push(cur);
+      for (const n of allNeighbors(cur)) if (!seen.has(n)){ seen.add(n); q.push(n); }
+    }
+    comps.push(comp);
+  }
+  return comps;
+}
+function treeDepth(id, parent){
+  let best = 0;
+  for (const n of allNeighbors(id)){
+    if (n === parent) continue;
+    best = Math.max(best, 1 + treeDepth(n, id));
+  }
+  return best;
+}
+
+function straighten(){
+  if (!atoms.length) return;
+  pushUndo();
+  const zz = state.align === 'zz';
+  const offs = state.align === '45' ? [45, 90, 135] : (zz ? [60, 120, 90] : [90, 45, 135]);
+  const TURN = Math.PI/3;                 // Knick im Zickzack: 120°-Bindungswinkel
+  const pts = [];
+  const isFree = (x, y) => !pts.some(p => Math.hypot(p.x-x, p.y-y) < L*0.72);
+  const put = (id, x, y) => { const a = byId(id); a.x = x; a.y = y; pts.push({x, y}); };
+  /* Abzweigwinkel relativ zur Laufrichtung, abwechselnd nach oben/unten */
+  function cands(dir, flip){
+    const list = [];
+    for (const o of offs){
+      const r = o * Math.PI/180;
+      list.push(dir + (flip ? -r : r), dir - (flip ? -r : r));
+    }
+    return list;
+  }
+  /* setzt alle Nachbarn von id (außer parent) und deren Teilbäume */
+  function spread(id, parent, dir, flip, turn){
+    const p = byId(id);
+    const kids = allNeighbors(id).filter(n => n !== parent)
+                   .sort((a, b) => treeDepth(b, id) - treeDepth(a, id));
+    const list = cands(dir, flip);
+    let ci = 0;
+    kids.forEach((kid, idx) => {
+      let ang = null, x = 0, y = 0;
+      // längster Ast läuft geradeaus weiter (bzw. im Zickzack knickend)
+      const cont = zz ? dir + turn * TURN : dir;
+      if (idx === 0){
+        const tx = p.x + L*Math.cos(cont), ty = p.y + L*Math.sin(cont);
+        if (isFree(tx, ty)){ ang = cont; x = tx; y = ty; }
+      }
+      while (ang === null && ci < list.length){
+        const c = list[ci++];
+        const tx = p.x + L*Math.cos(c), ty = p.y + L*Math.sin(c);
+        if (isFree(tx, ty)){ ang = c; x = tx; y = ty; }
+      }
+      if (ang === null){                              // Notfall: irgendwohin, Hauptsache sichtbar
+        ang = (dir || 0) + (idx + 1) * Math.PI/2;
+        x = p.x + L*Math.cos(ang); y = p.y + L*Math.sin(ang);
+      }
+      put(kid, x, y);
+      spread(kid, id, ang, flip, -turn);
+    });
+  }
+  /* Richtung, die vom Kettenknick nach außen zeigt (für Zickzack-Abzweige) */
+  function outward(id, chainNbrs){
+    let sx = 0, sy = 0;
+    const p = byId(id);
+    for (const n of chainNbrs){
+      const ang = angleTo(p, byId(n));
+      sx += Math.cos(ang); sy += Math.sin(ang);
+    }
+    if (Math.hypot(sx, sy) < 1e-6) return -Math.PI/2;
+    return Math.atan2(-sy, -sx);
+  }
+
+  let ringSkipped = false, row = 0;
+  for (const comp of componentsAll()){
+    const set = new Set(comp);
+    let edges = 0;
+    for (const b of bonds) if (set.has(b.a) && set.has(b.b)) edges++;
+    if (edges !== comp.length - 1){                   // enthält einen Ring
+      ringSkipped = true;
+      comp.forEach(id => pts.push({x: byId(id).x, y: byId(id).y}));
+      continue;
+    }
+    const heavy = comp.filter(id => byId(id).el !== 'H');
+    let path;
+    if (heavy.length >= 2) path = longestPath(heavy);
+    else if (heavy.length === 1) path = [heavy[0]];
+    else path = comp.slice(0, 2);
+
+    const y0 = row * L * 3;
+    if (zz){
+      const dx = L * Math.cos(Math.PI/6), dy = L * Math.sin(Math.PI/6);
+      path.forEach((id, i) => put(id, i*dx, y0 + (i % 2 === 1 ? -dy : 0)));
+    } else {
+      path.forEach((id, i) => put(id, i*L, y0));
+    }
+    const inPath = new Set(path);
+    path.forEach((id, i) => {
+      const p = byId(id);
+      const kids = allNeighbors(id).filter(n => !inPath.has(n))
+                     .sort((a, b) => treeDepth(b, id) - treeDepth(a, id));
+      const chainNbrs = allNeighbors(id).filter(n => inPath.has(n));
+      const base = zz ? outward(id, chainNbrs) : 0;
+      const flip = i % 2 === 1;
+      const list = zz ? [base, base + Math.PI].concat(cands(base, flip)) : cands(0, flip);
+      let ci = 0;
+      kids.forEach(kid => {
+        let ang = null, x = 0, y = 0;
+        while (ang === null && ci < list.length){
+          const c = list[ci++];
+          const tx = p.x + L*Math.cos(c), ty = p.y + L*Math.sin(c);
+          if (isFree(tx, ty)){ ang = c; x = tx; y = ty; }
+        }
+        if (ang === null){ ang = -Math.PI/2; x = p.x; y = p.y - L; }
+        put(kid, x, y);
+        spread(kid, id, ang, flip, i % 2 === 0 ? 1 : -1);
+      });
+    });
+    row++;
+  }
+  centerView();
+  refresh();
+  let msg = HINTS[state.tool];
+  if (ringSkipped) msg = 'Ringe bleiben unverändert – ausgerichtet werden nur offene Ketten.';
+  else if (!zz && !effShowC())
+    msg = 'Gerade Ketten sind ohne C-Symbole nicht ablesbar: C-Symbole einblenden oder „Zickzack“ wählen.';
+  $('#hint').textContent = msg;
+}
+$('#btnStraight').addEventListener('click', straighten);
+document.querySelectorAll('#alignMode button').forEach(b => {
+  b.addEventListener('click', () => {
+    state.align = b.dataset.align;
+    document.querySelectorAll('#alignMode button').forEach(x => x.classList.toggle('on', x === b));
+  });
+});
+
+/* --- Export ---------------------------------------------------------- */
+function download(blob, name){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+function flash(btn, text){
+  const old = btn.textContent;
+  btn.textContent = text;
+  setTimeout(() => btn.textContent = old, 1800);
+}
+function sceneBounds(){
+  const b = {x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9};
+  drawScene(new SvgCtx(), {bounds: b, export: true});
+  if (b.x0 > b.x1){ const bb = bbox(); return bb ? {x0:bb.x0, y0:bb.y0, x1:bb.x1, y1:bb.y1} : null; }
+  return b;
+}
+function renderToCanvas(scale){
+  const bb = sceneBounds(), m = 22;
+  const w = (bb.x1-bb.x0) + 2*m, h = (bb.y1-bb.y0) + 2*m;
+  const off = document.createElement('canvas');
+  off.width = Math.round(w*scale); off.height = Math.round(h*scale);
+  const c = off.getContext('2d');
+  c.setTransform(scale,0,0,scale,0,0);
+  c.fillStyle = '#FFFFFF'; c.fillRect(0,0,w,h);
+  c.translate(m - bb.x0, m - bb.y0);
+  drawScene(c, {export: true});
+  return off;
+}
+$('#btnPng').addEventListener('click', () => {
+  if (!bbox()) return;
+  renderToCanvas(3).toBlob(b => download(b, 'strukturformel.png'));
+});
+$('#btnCopyImg').addEventListener('click', () => {
+  const btn = $('#btnCopyImg');
+  if (!bbox()) return;
+  renderToCanvas(3).toBlob(async blob => {
+    try {
+      await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+      flash(btn, 'Bild kopiert');
+    } catch {
+      flash(btn, 'Nicht möglich – bitte PNG speichern');
+    }
+  });
+});
+
+/* Minimaler Zeichenkontext, der statt auf die Leinwand nach SVG schreibt.
+   So erzeugt dieselbe Zeichenroutine eine verlustfrei skalierbare Datei. */
+function SvgCtx(){
+  this.parts = []; this.tx = 0; this.ty = 0;
+  this.fillStyle = '#000'; this.strokeStyle = '#000'; this.lineWidth = 1;
+  this.lineCap = 'butt'; this.lineJoin = 'miter';
+  this.font = '16px sans-serif'; this.textAlign = 'left'; this.textBaseline = 'alphabetic';
+  this._d = ''; this._circles = [];
+  this._m = document.createElement('canvas').getContext('2d');
+}
+SvgCtx.prototype = {
+  _x(v){ return +(v + this.tx).toFixed(2); },
+  _y(v){ return +(v + this.ty).toFixed(2); },
+  setTransform(){}, save(){}, restore(){}, setLineDash(){}, closePath(){ this._d += 'Z '; },
+  translate(x, y){ this.tx += x; this.ty += y; },
+  beginPath(){ this._d = ''; this._circles = []; },
+  moveTo(x, y){ this._d += 'M' + this._x(x) + ' ' + this._y(y) + ' '; },
+  lineTo(x, y){ this._d += 'L' + this._x(x) + ' ' + this._y(y) + ' '; },
+  quadraticCurveTo(cx, cy, x, y){
+    this._d += 'Q' + this._x(cx) + ' ' + this._y(cy) + ' ' + this._x(x) + ' ' + this._y(y) + ' ';
+  },
+  arc(x, y, r){ this._circles.push({x:this._x(x), y:this._y(y), r}); },
+  fillRect(x, y, w, h){
+    this.parts.push('<rect x="'+this._x(x)+'" y="'+this._y(y)+'" width="'+w+'" height="'+h+
+                    '" fill="'+this.fillStyle+'"/>');
+  },
+  stroke(){
+    if (!this._d) return;
+    this.parts.push('<path d="'+this._d.trim()+'" fill="none" stroke="'+this.strokeStyle+
+      '" stroke-width="'+this.lineWidth+'" stroke-linecap="'+this.lineCap+
+      '" stroke-linejoin="'+this.lineJoin+'"/>');
+  },
+  fill(){
+    for (const c of this._circles)
+      this.parts.push('<circle cx="'+c.x+'" cy="'+c.y+'" r="'+c.r+'" fill="'+this.fillStyle+'"/>');
+    this._circles = [];
+    if (this._d) this.parts.push('<path d="'+this._d.trim()+'" fill="'+this.fillStyle+'"/>');
+  },
+  measureText(t){ this._m.font = this.font; return this._m.measureText(t); },
+  fillText(t, x, y){
+    const size = parseFloat((this.font.match(/([\d.]+)px/) || [0, 16])[1]);
+    const esc = String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    // textBaseline 'middle' wird bewusst ausgerechnet, damit auch Word korrekt setzt
+    const yy = this.textBaseline === 'middle' ? this._y(y) + size*0.35 : this._y(y);
+    this.parts.push('<text x="'+this._x(x)+'" y="'+yy.toFixed(2)+
+      '" font-family="IBM Plex Sans, Segoe UI, Helvetica, sans-serif" font-size="'+size+
+      '" fill="'+this.fillStyle+'">'+esc+'</text>');
+  }
+};
+$('#btnSvg').addEventListener('click', () => {
+  if (!bbox()) return;
+  const bb = sceneBounds(), m = 22;
+  const w = Math.round((bb.x1-bb.x0) + 2*m), h = Math.round((bb.y1-bb.y0) + 2*m);
+  const s = new SvgCtx();
+  s.translate(m - bb.x0, m - bb.y0);
+  drawScene(s, {export: true});
+  const svg = '<?xml version="1.0" encoding="UTF-8"?>\n' +
+    '<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'">' +
+    '<rect width="100%" height="100%" fill="#ffffff"/>' + s.parts.join('') + '</svg>';
+  download(new Blob([svg], {type:'image/svg+xml'}), 'strukturformel.svg');
+});
+
+/* --- Molekül-Code ---------------------------------------------------- */
+function qCode(a){
+  if (a.d) return a.d === '+' ? 'd+' : 'd-';
+  const q = qOf(a);
+  return q ? (Math.abs(q) > 1 ? Math.abs(q) : '') + (q > 0 ? '+' : '-') : '';
+}
+function applyQCode(atom, code){
+  if (!code) return;
+  if (code === 'd+'){ atom.d = '+'; return; }
+  if (code === 'd-'){ atom.d = '-'; return; }
+  const m = code.match(/^(\d*)([+-])$/);
+  if (!m) throw new Error('Ladung: ' + code);
+  atom.q = (m[1] ? +m[1] : 1) * (m[2] === '+' ? 1 : -1);
+}
+function encodeMol(){
+  if (!atoms.length && !arrows.length && !labels.length) return '';
+  const bb = sceneBounds() || {x0:0, y0:0};
+  const idx = new Map(atoms.map((a, i) => [a.id, i]));
+  const rx = v => Math.round(v - bb.x0), ry = v => Math.round(v - bb.y0);
+  const A = atoms.map(a => {
+    const c = qCode(a);
+    return a.el + (c ? '^' + c : '') + ':' + rx(a.x) + ',' + ry(a.y);
+  }).join(';');
+  const B = bonds.map(b => idx.get(b.a) + '-' + idx.get(b.b) + ':' + b.order).join(';');
+  const P = arrows.map(a => a.kind + ':' + rx(a.x1) + ',' + ry(a.y1) + ',' +
+                            rx(a.x2) + ',' + ry(a.y2) + ',' + (a.bend || 0).toFixed(2) +
+                            (a.color ? ',' + a.color.replace('#','') : '')).join(';');
+  const T = labels.map(l => rx(l.x) + ',' + ry(l.y) + ':' + encodeURIComponent(l.t) +
+                            (l.color ? ':' + l.color.replace('#','') : '')).join(';');
+  return 'MOL5|' + A + '|' + B + '|' + P + '|' + T;
+}
+function decodeMol(txt){
+  const p = txt.trim().split('|');
+  if (p.length < 3 || !['MOL1','MOL2','MOL3','MOL4','MOL5'].includes(p[0])) throw new Error('Format');
+  const re = p[0] === 'MOL1' ? /^([A-Z][a-z]?)(-?\d+),(-?\d+)$/
+                             : /^([A-Za-z0-9]+?)(?:\^([^:]+))?:(-?\d+),(-?\d+)$/;
+  const old = p[0] === 'MOL1';
+  const na = [], nb = [], np = [], nt = [];
+  let id = 1;
+  for (const t of p[1].split(';').filter(Boolean)){
+    const m = t.match(re);
+    if (!m || !(EL[m[1]] || ensureEl(m[1]))) throw new Error('Atom: ' + t);
+    const atom = old ? {id:id++, el:m[1], x:+m[2], y:+m[3]}
+                     : {id:id++, el:m[1], x:+m[3], y:+m[4]};
+    if (!old) applyQCode(atom, m[2]);
+    na.push(atom);
+  }
+  for (const t of p[2].split(';').filter(Boolean)){
+    const m = t.match(/^(\d+)-(\d+):([123])$/);
+    if (!m || !na[+m[1]] || !na[+m[2]]) throw new Error('Bindung: ' + t);
+    nb.push({id:id++, a:na[+m[1]].id, b:na[+m[2]].id, order:+m[3]});
+  }
+  for (const t of (p[3] || '').split(';').filter(Boolean)){
+    const m = t.match(/^([a-z]+):(-?\d+),(-?\d+),(-?\d+),(-?\d+),(-?[\d.]+)(?:,([0-9A-Fa-f]{6}))?$/);
+    if (!m || !ARROW_KINDS[m[1]]) throw new Error('Pfeil: ' + t);
+    const ar = {id:id++, kind:m[1], x1:+m[2], y1:+m[3], x2:+m[4], y2:+m[5], bend:+m[6]};
+    if (m[7]) ar.color = '#' + m[7];
+    np.push(ar);
+  }
+  for (const t of (p[4] || '').split(';').filter(Boolean)){
+    const m = t.match(/^(-?\d+),(-?\d+):([^:]*)(?::([0-9A-Fa-f]{6}))?$/);
+    if (!m) throw new Error('Text: ' + t);
+    const lb = {id:id++, x:+m[1], y:+m[2], t:decodeURIComponent(m[3])};
+    if (m[4]) lb.color = '#' + m[4];
+    nt.push(lb);
+  }
+  return {na, nb, np, nt, nid:id};
+}
+$('#btnCodeGet').addEventListener('click', () => {
+  $('#code').value = encodeMol();
+  $('#code').select();
+});
+$('#btnCodeSet').addEventListener('click', () => {
+  const btn = $('#btnCodeSet');
+  try {
+    const d = decodeMol($('#code').value);
+    pushUndo();
+    atoms = d.na; bonds = d.nb; arrows = d.np; labels = d.nt; nid = d.nid;
+    clearSel(); selArrow = null;
+    centerView(); refresh();
+    flash(btn, 'Geladen');
+  } catch (err){
+    flash(btn, 'Code ungültig');
+  }
+});
+
+// Formel kopieren
+$('#btnCopy').addEventListener('click', async () => {
+  const txt = state.mode === 'summe' ? sumFormula().text : condensed('text').text;
+  const btn = $('#btnCopy');
+  try {
+    await navigator.clipboard.writeText(txt);
+    btn.textContent = 'Kopiert';
+  } catch {
+    const ta = document.createElement('textarea');
+    ta.value = txt; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); btn.textContent = 'Kopiert'; }
+    catch { btn.textContent = 'Kopieren nicht möglich – Formel markieren'; }
+    ta.remove();
+  }
+  setTimeout(() => btn.textContent = 'Formel kopieren', 1600);
+});
+
+// Tastatur
+window.addEventListener('keydown', e => {
+  if (['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)) return;
+  const k = e.key.toLowerCase();
+  if (e.key === 'Escape'){
+    if (selCount() || selArrow != null){ clearSel(); selArrow = null; render(); $('#hint').textContent = HINTS[state.tool]; }
+    return;
+  }
+  if (e.key === 'Delete' || e.key === 'Backspace'){
+    e.preventDefault();
+    if (deleteSelection()) return;
+    if (state.tool === 'arrow' && selArrow != null){ pushUndo(); deleteHit({type:'arrow', id:selArrow}); refresh(); return; }
+    if (hover){ pushUndo(); deleteHit(hover); hover = null; refresh(); }
+    return;
+  }
+  if ((e.ctrlKey || e.metaKey) && k === 'z'){
+    e.preventDefault();
+    if (e.shiftKey) redo(); else undo();
+    return;
+  }
+  if ((e.ctrlKey || e.metaKey) && k === 'y'){ e.preventDefault(); redo(); return; }
+  if ((e.ctrlKey || e.metaKey) && k === 'a'){
+    e.preventDefault();
+    if (state.tool !== 'select') document.querySelector('#tools [data-tool="select"]').click();
+    selectAll(); render(); selHint();
+    return;
+  }
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  const toolKeys = {b:'build', a:'select', m:'select', e:'element', v:'bond', l:'charge', p:'arrow', t:'text', x:'erase'};
+  if (toolKeys[k]){ document.querySelector(`#tools [data-tool="${toolKeys[k]}"]`).click(); return; }
+  const elKeys = {c:'C', o:'O', n:'N', h:'H', s:'S', f:'F', r:'R'};
+  if (elKeys[k]){
+    const b = document.querySelector(`[data-el="${elKeys[k]}"]`);
+    if (b) b.click();
+  }
+});
+
+/* =======================================================================
+   11. Vorlagen
+   ======================================================================= */
+function seed(el){ return addAtom(el, W/2, H/2); }
+function grow(from, el, deg, order = 1){
+  const a = deg * Math.PI/180;
+  const na = addAtom(el, from.x + L*Math.cos(a), from.y + L*Math.sin(a));
+  addBond(from.id, na.id, order);
+  return na;
+}
+function makeRing(n, aromatic, cx, cy){
+  const r = L / (2*Math.sin(Math.PI/n));
+  const list = [];
+  for (let i = 0; i < n; i++){
+    const ang = -Math.PI/2 + i*TAU/n;
+    list.push(addAtom('C', cx + r*Math.cos(ang), cy + r*Math.sin(ang)));
+  }
+  for (let i = 0; i < n; i++){
+    const ord = aromatic && i % 2 === 0 ? 2 : 1;
+    addBond(list[i].id, list[(i+1)%n].id, ord);
+  }
+  return list;
+}
+function insertRing(n, aromatic){
+  pushUndo();
+  const bb = bbox();
+  const cx = bb ? bb.x1 + L*2.2 : W/2;
+  const cy = bb ? (bb.y0+bb.y1)/2 : H/2;
+  makeRing(n, aromatic, Math.min(cx, W - 90), cy);
+  refresh();
+}
+document.querySelectorAll('[data-ring]').forEach(b =>
+  b.addEventListener('click', () => insertRing(+b.dataset.ring, false)));
+$('#btnBenzol').addEventListener('click', () => insertRing(6, true));
+
+const TEMPLATES = {
+  methan: () => { seed('C'); },
+  ethan: () => { const a = seed('C'); grow(a,'C',-30); },
+  propan: () => { const a = seed('C'); const b = grow(a,'C',-30); grow(b,'C',30); },
+  ethanol: () => { const a = seed('C'); const b = grow(a,'C',-30); grow(b,'O',30); },
+  ethanal: () => { const a = seed('C'); const b = grow(a,'C',-30); grow(b,'O',-90,2); },
+  essigsaeure: () => { const a = seed('C'); const b = grow(a,'C',-30); grow(b,'O',-90,2); grow(b,'O',30); },
+  aceton: () => { const a = seed('C'); const b = grow(a,'C',-30); grow(b,'C',30); grow(b,'O',-90,2); },
+  ethen: () => { const a = seed('C'); grow(a,'C',-30,2); },
+  ethin: () => { const a = seed('C'); grow(a,'C',0,3); },
+  isobutan: () => { const a = seed('C'); const b = grow(a,'C',-30); grow(b,'C',30); grow(b,'C',-90); },
+  glycerin: () => {
+    const a = seed('C'); const b = grow(a,'C',-30); const c = grow(b,'C',30);
+    grow(a,'O',150); grow(b,'O',-90); grow(c,'O',-30);
+  },
+  alanin: () => {
+    const a = seed('C'); const b = grow(a,'C',-30); const c = grow(b,'C',30);
+    grow(b,'N',-90); grow(c,'O',-30,2); grow(c,'O',90);
+  },
+  cyclohexan: () => makeRing(6, false, W/2, H/2),
+  benzol: () => makeRing(6, true, W/2, H/2),
+  wasser: () => { seed('O'); },
+  ammoniak: () => { seed('N'); },
+  co2: () => { const c = seed('C'); grow(c,'O',180,2); grow(c,'O',0,2); }
+};
+$('#templates').addEventListener('change', e => {
+  const key = e.target.value;
+  if (!key) return;
+  pushUndo();
+  atoms = []; bonds = []; arrows = []; labels = []; clearSel(); selArrow = null;
+  TEMPLATES[key]();
+  centerView();
+  refresh();
+  e.target.value = '';
+});
+
+/* =======================================================================
+   12. Start
+   ======================================================================= */
+function resize(){
+  const r = board.getBoundingClientRect();
+  if (!r.width || !r.height) return;
+  dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+  W = r.width; H = r.height;
+  cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr);
+  cv.style.width = W + 'px'; cv.style.height = H + 'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  render();
+}
+new ResizeObserver(() => resize()).observe(board);
+window.addEventListener('resize', resize);
+
+document.fonts && document.fonts.ready.then(() => refresh());
+
+$('#hint').textContent = HINTS.build;
+
+/* =======================================================================
+   Ansicht (Kompakt/Touch), Auswertungsleiste, Exportmenü
+   ======================================================================= */
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v){ try { localStorage.setItem(k, v); } catch (e) {} }
+};
+const ctxBox = $('#ctx'), ctxHome = ctxBox.parentNode;
+function setView(v){
+  if (!['classic', 'compact', 'touch'].includes(v)) v = 'compact';
+  const root = document.documentElement;
+  root.classList.toggle('view-touch',   v === 'touch');
+  root.classList.toggle('view-compact', v === 'compact');
+  root.classList.toggle('view-classic', v === 'classic');
+  /* Klassisch: alle Optionen dauerhaft in der linken Leiste */
+  if (v === 'classic') $('#classicSlot').appendChild(ctxBox);
+  else if (ctxBox.parentNode !== ctxHome) ctxHome.insertBefore(ctxBox, $('#board'));
+  document.querySelectorAll('#viewMode button').forEach(b => b.classList.toggle('on', b.dataset.view === v));
+  store.set('sfe-view', v);
+  requestAnimationFrame(() => { resize(); render(); });
+}
+document.querySelectorAll('#viewMode button').forEach(b =>
+  b.addEventListener('click', () => setView(b.dataset.view)));
+const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+setView(store.get('sfe-view') || (coarse ? 'touch' : 'compact'));
+
+function setSide(open){
+  document.querySelector('.layout').classList.toggle('side-closed', !open);
+  $('#btnPanel').classList.toggle('on', open);
+  store.set('sfe-side', open ? '1' : '0');
+  refresh();
+}
+$('#btnPanel').addEventListener('click', () =>
+  setSide(document.querySelector('.layout').classList.contains('side-closed')));
+$('#hintWarn').addEventListener('click', () => setSide(true));
+{
+  const s = store.get('sfe-side');
+  setSide(s == null ? (window.innerWidth > 1100 || document.documentElement.classList.contains('view-classic')) : s === '1');
+}
+
+
+/* Catppuccin-Variante wählen: wirkt sofort und wird gemerkt */
+const FLAVORS = ['latte', 'frappe', 'macchiato', 'mocha'];
+function setFlavor(f){
+  if (!FLAVORS.includes(f)) f = 'mocha';
+  document.documentElement.dataset.flavor = f;
+  $('#flavor').value = f;
+  store.set('sfe-flavor', f);
+  refresh();
+}
+$('#flavor').addEventListener('change', e => setFlavor(e.target.value));
+setFlavor(store.get('sfe-flavor') || 'mocha');
+state.mono = store.get('sfe-mono') === '1';
+$('#mono').checked = state.mono;
+refresh();
+
+const exportMenu = $('#exportMenu');
+document.addEventListener('pointerdown', e => {
+  if (exportMenu.open && !exportMenu.contains(e.target)) exportMenu.open = false;
+});
+syncControls();
+syncArrowUI();
+resize();
+TEMPLATES.ethanol();
+centerView();
+refresh();
+</script>
+</body>
+</html>
