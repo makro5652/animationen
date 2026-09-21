@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membranfluss & Vesikeltransport</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: #f8fafc;
+        }
+
+        /* The magic SVG filter for organic membrane fusion */
+        .goo-layer {
+            filter: url(#goo);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 5;
+        }
+
+        /* Elements inside the goo layer must be the same color for perfect fusion */
+        .membrane-material {
+            background-color: #38bdf8; /* Sky 400 */
+            position: absolute;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+
+        /* Specific Organelles */
+        .plasma-membrane {
+            top: 15%;
+            left: -5%;
+            width: 110%;
+            height: 20px;
+            border-radius: 10px;
+        }
+
+        .golgi-sac {
+            left: 20%;
+            width: 60%;
+            height: 16px;
+            border-radius: 20px;
+        }
+        .golgi-trans { top: 45%; }
+        .golgi-medial { top: 52%; left: 25%; width: 50%; }
+        .golgi-cis { top: 59%; left: 22%; width: 56%; }
+
+        .er-membrane {
+            top: 85%;
+            left: 10%;
+            width: 80%;
+            height: 40px;
+            border-radius: 20px;
+        }
+
+        /* Vesicles and Cargo */
+        .vesicle {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            /* Background inherits from .membrane-material */
+        }
+
+        .cargo-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 10;
+            pointer-events: none; /* Let clicks pass through if needed */
+        }
+
+        .cargo {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #fbbf24; /* Amber 400 */
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.8);
+        }
+
+        /* Labels overlay */
+        .label-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .organelle-label {
+            position: absolute;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
+        }
+
+        /* Pulse animation for active transport zones */
+        @keyframes subtlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        .animate-pulse-subtle {
+            animation: subtlePulse 4s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center justify-center">
+
+    <!-- Hidden SVG for the Goo Filter -->
+    <svg style="width:0; height:0; position:absolute;">
+        <defs>
+            <filter id="goo">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="
+                    1 0 0 0 0  
+                    0 1 0 0 0  
+                    0 0 1 0 0  
+                    0 0 0 22 -10" result="goo" />
+                <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
+            </filter>
+        </defs>
+    </svg>
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        
+        <!-- Left/Top: Text Explanation -->
+        <div class="lg:col-span-1 space-y-6 bg-slate-800 p-6 rounded-2xl shadow-2xl border border-slate-700">
+            <div>
+                <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-sky-400 to-amber-400 mb-2">
+                    Membranfluss
+                </h1>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    Der Membranfluss ist der ständige intrazelluläre Transport von Membranen und darin eingeschlossenen Stoffen (Cargo) durch Vesikel.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <!-- ER -->
+                <div class="p-3 bg-slate-700/50 rounded-xl border border-slate-600/50">
+                    <h3 class="font-semibold text-sky-400 flex items-center gap-2">
+                        <span class="bg-sky-400 text-slate-900 w-5 h-5 rounded-full flex items-center justify-center text-xs">1</span>
+                        ER (Endoplasmatisches Retikulum)
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-1">Hier werden Proteine und Membranlipide synthetisiert und in Vesikel verpackt.</p>
+                </div>
+
+                <!-- Golgi -->
+                <div class="p-3 bg-slate-700/50 rounded-xl border border-slate-600/50">
+                    <h3 class="font-semibold text-sky-400 flex items-center gap-2">
+                        <span class="bg-sky-400 text-slate-900 w-5 h-5 rounded-full flex items-center justify-center text-xs">2</span>
+                        Golgi-Apparat
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-1">Die "Poststation". Vesikel vom ER verschmelzen hier. Stoffe werden modifiziert und weitertransportiert.</p>
+                </div>
+
+                <!-- Exozytose -->
+                <div class="p-3 bg-slate-700/50 rounded-xl border border-slate-600/50">
+                    <h3 class="font-semibold text-amber-400 flex items-center gap-2">
+                        <span class="bg-amber-400 text-slate-900 w-5 h-5 rounded-full flex items-center justify-center text-xs">3</span>
+                        Exozytose (Abgabe)
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-1">Vesikel verschmelzen mit der Plasmamembran. Der Inhalt wird nach außen abgegeben, die Vesikelmembran wird Teil der Zellmembran.</p>
+                </div>
+
+                <!-- Endozytose -->
+                <div class="p-3 bg-slate-700/50 rounded-xl border border-slate-600/50">
+                    <h3 class="font-semibold text-emerald-400 flex items-center gap-2">
+                        <span class="bg-emerald-400 text-slate-900 w-5 h-5 rounded-full flex items-center justify-center text-xs">4</span>
+                        Endozytose (Aufnahme)
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-1">Die Zellmembran stülpt sich ein (Vesikelbildung), um Stoffe von außen in die Zelle aufzunehmen.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right/Bottom: The Animation Canvas -->
+        <div class="lg:col-span-2 relative w-full aspect-[4/3] bg-slate-950 rounded-2xl shadow-2xl border border-slate-700 overflow-hidden" id="animation-container">
+            
+            <!-- Layer 1: Membrane structures with Goo Effect -->
+            <div class="goo-layer" id="goo-layer">
+                <!-- Cell Membrane -->
+                <div class="membrane-material plasma-membrane"></div>
+                
+                <!-- Golgi Apparatus -->
+                <div class="membrane-material golgi-sac golgi-trans animate-pulse-subtle"></div>
+                <div class="membrane-material golgi-sac golgi-medial"></div>
+                <div class="membrane-material golgi-sac golgi-cis animate-pulse-subtle"></div>
+                
+                <!-- Endoplasmic Reticulum -->
+                <div class="membrane-material er-membrane"></div>
+            </div>
+
+            <!-- Layer 2: Cargo (Proteins/Molecules) - No Goo Effect so they stay sharp -->
+            <div class="cargo-layer" id="cargo-layer"></div>
+
+            <!-- Layer 3: Text Labels -->
+            <div class="label-layer">
+                <div class="organelle-label" style="top: 8%; left: 5%;">Plasmamembran (Zellmembran)</div>
+                <div class="organelle-label" style="top: 25%; left: 75%; color: #fbbf24;">▲ Exozytose</div>
+                <div class="organelle-label" style="top: 25%; left: 15%; color: #34d399;">▼ Endozytose</div>
+                <div class="organelle-label" style="top: 50%; left: 5%;">Golgi-Apparat</div>
+                <div class="organelle-label" style="top: 88%; left: 5%;">ER</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const gooLayer = document.getElementById('goo-layer');
+        const cargoLayer = document.getElementById('cargo-layer');
+
+        // Animation configuration
+        const DURATION_FAST = 2000;
+        const DURATION_SLOW = 3500;
+
+        /**
+         * Helper: Creates a DOM element with specific classes
+         */
+        function createEl(type, classes, container) {
+            const el = document.createElement(type);
+            el.className = classes;
+            container.appendChild(el);
+            return el;
+        }
+
+        /**
+         * Wait utility
+         */
+        function wait(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        /**
+         * 1. ER to Golgi Transport
+         */
+        async function runERtoGolgi() {
+            // Random horizontal position for natural look
+            const startX = 35 + Math.random() * 30; // 35% to 65%
+            const endX = startX + (Math.random() * 10 - 5); // Slight drift
+
+            // Create Vesicle
+            const vesicle = createEl('div', 'membrane-material vesicle', gooLayer);
+            
+            // Cargo für das ER hinzufügen, damit es realistischer wirkt
+            const cargo = createEl('div', 'cargo', cargoLayer);
+            cargo.style.backgroundColor = '#60a5fa'; // Blaues Cargo
+            cargo.style.boxShadow = '0 0 10px rgba(96, 165, 250, 0.8)';
+            cargo.style.width = '6px';
+            cargo.style.height = '6px';
+
+            // Initial position (inside ER)
+            vesicle.style.left = `${startX}%`;
+            vesicle.style.top = `85%`;
+            cargo.style.left = `${startX}%`;
+            cargo.style.top = `85%`;
+
+            // Ziel-Position tiefer in den Cis-Golgi hinein, 
+            // damit der Goo-Filter eine durchgehende Verbindung hält
+            const golgiBottomEdge = '61%';
+
+            // Animate up to Golgi (cis face)
+            const moveOpts = { duration: DURATION_SLOW, easing: 'ease-in-out', fill: 'forwards' };
+            const vAnim = vesicle.animate([
+                { top: '85%', left: `${startX}%`, transform: 'translate(-50%, -50%) scale(1)' },
+                { top: golgiBottomEdge, left: `${endX}%`, transform: 'translate(-50%, -50%) scale(1)' } 
+            ], moveOpts);
+
+            const cAnim = cargo.animate([
+                { top: '85%', left: `${startX}%`, transform: 'translate(-50%, -50%) scale(1)' },
+                { top: golgiBottomEdge, left: `${endX}%`, transform: 'translate(-50%, -50%) scale(1)' }
+            ], moveOpts);
+
+            await Promise.all([vAnim.finished, cAnim.finished]);
+            
+            // Fusion: Vesikel flacht ab und verschmilzt optisch mit der Unterseite des Golgi
+            // Y-Skalierung auf 0.5 erhöht, damit die Membran nicht "reißt"
+            vesicle.animate([
+                { transform: 'translate(-50%, -50%) scale(1)', top: golgiBottomEdge },
+                { transform: 'translate(-50%, -50%) scale(2.5, 0.5)', top: golgiBottomEdge }
+            ], { duration: 500, easing: 'ease-out', fill: 'forwards' }).onfinish = () => vesicle.remove();
+
+            // Cargo verschwindet (wird im Golgi verarbeitet)
+            cargo.animate([
+                { opacity: 1, transform: 'translate(-50%, -50%) scale(1)', top: golgiBottomEdge }, 
+                { opacity: 0, transform: 'translate(-50%, -50%) scale(0.5)', top: golgiBottomEdge }
+            ], { duration: 500, fill: 'forwards' }).onfinish = () => cargo.remove();
+
+            // Loop
+            setTimeout(runERtoGolgi, Math.random() * 2000 + 1500);
+        }
+
+        /**
+         * 2. Exocytosis (Golgi to Plasma Membrane)
+         */
+        async function runExocytosis() {
+            const startX = 65 + Math.random() * 20; // Right side mostly
+            const endX = startX + (Math.random() * 5 - 2.5);
+
+            // Zielen auf die INNENSEITE / UNTERSEITE der Plasmamembran. Etwas tiefer eintauchen lassen, um Lücken durch den Filter zu vermeiden.
+            const innerMembraneTop = '17%';
+
+            // Create Vesicle (Membrane) and Cargo (Content)
+            const vesicle = createEl('div', 'membrane-material vesicle', gooLayer);
+            const cargo = createEl('div', 'cargo', cargoLayer);
+
+            // Start inside Golgi trans face
+            vesicle.style.left = `${startX}%`;
+            vesicle.style.top = `45%`;
+            cargo.style.left = `${startX}%`;
+            cargo.style.top = `45%`;
+
+            // Phase 1: Move from Golgi to PM Inner Side
+            const moveOpts = { duration: DURATION_SLOW, easing: 'ease-in-out', fill: 'forwards' };
+            const vAnim = vesicle.animate([
+                { top: '45%', left: `${startX}%`, transform: 'translate(-50%, -50%) scale(1)' },
+                { top: innerMembraneTop, left: `${endX}%`, transform: 'translate(-50%, -50%) scale(1)' } // Stop am inneren Rand
+            ], moveOpts);
+            
+            const cAnim = cargo.animate([
+                { top: '45%', left: `${startX}%`, transform: 'translate(-50%, -50%) scale(1)' },
+                { top: innerMembraneTop, left: `${endX}%`, transform: 'translate(-50%, -50%) scale(1)' }
+            ], moveOpts);
+
+            await Promise.all([vAnim.finished, cAnim.finished]);
+
+            // Phase 2: Fusion (Vesikelmembran flacht an der INNENSEITE der Membran ab)
+            // Y-Skalierung nicht zu klein machen (0.3 statt 0.1), sonst reißt der Goo-Filter auf und es entsteht ein Spalt
+            const fuseAnim = vesicle.animate([
+                { transform: 'translate(-50%, -50%) scale(1)', top: innerMembraneTop },
+                { transform: 'translate(-50%, -50%) scale(3.5, 0.3)', top: innerMembraneTop } 
+            ], { duration: 600, easing: 'ease-out', fill: 'forwards' });
+
+            // Kurzes Warten, bis die Pore sich öffnet
+            await wait(250);
+
+            // Phase 3: Cargo release (Cargo schießt von der Innenseite durch die geöffnete Pore nach außen)
+            cargo.animate([
+                { top: innerMembraneTop, left: `${endX}%`, opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
+                { top: '-10%', left: `${endX}%`, opacity: 0, transform: 'translate(-50%, -50%) scale(1.5)' }
+            ], {
+                duration: 1500,
+                easing: 'ease-out',
+                fill: 'forwards'
+            }).onfinish = () => cargo.remove();
+
+            await fuseAnim.finished;
+            // Vesicle ist jetzt visuell flach in der Membran eingebaut
+            vesicle.remove();
+
+            // Loop
+            setTimeout(runExocytosis, Math.random() * 3000 + 2000);
+        }
+
+        /**
+         * 3. Endocytosis (Plasma Membrane to Golgi/Endosome)
+         */
+        async function runEndocytosis() {
+            const xPos = 15 + Math.random() * 20; // Left side mostly
+            
+            // WICHTIG: Die X-Zielposition vorher berechnen, damit Vesikel und Cargo exakt am gleichen Punkt landen!
+            const targetX = xPos + (Math.random() * 10 - 5); 
+
+            // Create Cargo first (coming from outside)
+            const cargo = createEl('div', 'cargo', cargoLayer);
+            cargo.style.backgroundColor = '#34d399'; // Green cargo for endocytosis
+            cargo.style.boxShadow = '0 0 10px rgba(52, 211, 153, 0.8)';
+            cargo.style.left = `${xPos}%`;
+            
+            const pmCenter = '16%'; // Der Kern der Plasmamembran
+
+            // Phase 1: Cargo taucht direkt in die Membran ein, um den Prozess auszulösen
+            const arrivalAnim = cargo.animate([
+                { top: '-5%', opacity: 0, transform: 'translate(-50%, -50%) scale(1)' },
+                { top: pmCenter, opacity: 1, transform: 'translate(-50%, -50%) scale(1)' } 
+            ], {
+                duration: 1500,
+                easing: 'ease-out',
+                fill: 'forwards'
+            });
+
+            await arrivalAnim.finished;
+
+            // Phase 2: Vesicle formation (Invagination / Einstülpung)
+            // Vesikel entsteht direkt auf Position des Cargos (innerhalb der Membran), 
+            // wodurch der Goo-Effekt beim Herunterziehen eine Einstülpung erzeugt.
+            const vesicle = createEl('div', 'membrane-material vesicle', gooLayer);
+            vesicle.style.left = `${xPos}%`;
+            vesicle.style.top = pmCenter;
+            
+            const moveOpts = { duration: 2800, easing: 'ease-in-out', fill: 'forwards' };
+            
+            // Beide ziehen nach unten. Goo-Effekt erzeugt den "Hals" zur Plasmamembran, bis er reißt.
+            const vAnim = vesicle.animate([
+                { top: pmCenter, left: `${xPos}%`, transform: 'translate(-50%, -50%) scale(1)' },
+                { top: '28%', left: `${xPos}%`, transform: 'translate(-50%, -50%) scale(1)' }, // Einstülpung maximal gezogen
+                { top: '45%', left: `${targetX}%`, transform: 'translate(-50%, -50%) scale(1)' } // Abgeschnürt
+            ], moveOpts);
+
+            const cAnim = cargo.animate([
+                { top: pmCenter, left: `${xPos}%`, transform: 'translate(-50%, -50%) scale(1)' },
+                { top: '28%', left: `${xPos}%`, transform: 'translate(-50%, -50%) scale(1)' },
+                { top: '45%', left: `${targetX}%`, transform: 'translate(-50%, -50%) scale(1)' } // Exakt gleiches Ziel!
+            ], moveOpts);
+
+            await Promise.all([vAnim.finished, cAnim.finished]);
+            
+            // Phase 3: Merging with Golgi
+            vesicle.animate([
+                { transform: 'translate(-50%, -50%) scale(1)' },
+                { transform: 'translate(-50%, -50%) scale(2.5, 0.2)' }
+            ], { duration: 500, easing: 'ease-out', fill: 'forwards' }).onfinish = () => vesicle.remove();
+
+            cargo.animate([
+                { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
+                { opacity: 0, transform: 'translate(-50%, -50%) scale(0.5)' }
+            ], { duration: 500, fill: 'forwards' }).onfinish = () => cargo.remove();
+
+            // Loop
+            setTimeout(runEndocytosis, Math.random() * 4000 + 2500);
+        }
+
+        /**
+         * Start all processes
+         */
+        function startAnimation() {
+            // Stagger start times slightly for biological randomness
+            setTimeout(() => {
+                runERtoGolgi();
+                setTimeout(runERtoGolgi, 1500); // Run two ER processes for more action
+            }, 500);
+            
+            setTimeout(() => {
+                runExocytosis();
+                setTimeout(runExocytosis, 2000); // Multiple exocytosis streams
+            }, 1000);
+            
+            setTimeout(runEndocytosis, 2500);
+        }
+
+        // Initialize on load
+        window.onload = startAnimation;
+
+    </script>
+</body>
+</html>
