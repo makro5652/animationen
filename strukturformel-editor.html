@@ -3165,7 +3165,7 @@ function setView(v){
 document.querySelectorAll('#viewMode button').forEach(b =>
   b.addEventListener('click', () => setView(b.dataset.view)));
 const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-setView(store.get('sfe-view') || (coarse ? 'touch' : 'compact'));
+setView(store.get('sfe-view') || 'compact');
 
 function setSide(open){
   document.querySelector('.layout').classList.toggle('side-closed', !open);
