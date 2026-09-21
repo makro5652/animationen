@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interaktive Teilchen- und Gitter-Simulation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .glass-panel {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      background: transparent;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: #818cf8;
+      cursor: pointer;
+      margin-top: -6px;
+      box-shadow: 0 0 10px rgba(129, 140, 248, 0.5);
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 8px;
+      cursor: pointer;
+      background: #334155;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="text-slate-200 selection:bg-indigo-500/30">
+
+  <!-- Header -->
+  <header class="glass-panel border-b border-slate-700/50 px-6 py-4 flex items-center justify-between z-20">
+    <div>
+      <h1 class="text-xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-sm">
+        Teilchen- & Gitter-Simulation
+      </h1>
+      <p class="text-xs text-slate-400 mt-1">Interaktives Modell für Bindungskräfte, Thermodynamik & Umwelt</p>
+    </div>
+    <div class="flex gap-3">
+      <button id="btnCritique" class="flex items-center gap-2 px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-lg text-rose-300 text-sm font-semibold transition-colors">
+        <span class="text-base">⚠️</span> Grenzen des Modells
+      </button>
+      <button id="btnTheory" class="flex items-center gap-2 px-4 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 rounded-lg text-indigo-300 text-sm font-semibold transition-colors">
+        <span class="text-base">📚</span> Theorie & Kräfte
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <main class="flex-1 flex overflow-hidden relative">
+    
+    <!-- Left Sidebar: Controls -->
+    <aside class="w-80 glass-panel border-r border-slate-700/50 flex flex-col z-10 overflow-y-auto">
+      
+      <!-- Substance Selection -->
+      <div class="p-5 border-b border-slate-700/50 space-y-3">
+        <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-wider">Stoffauswahl</h2>
+        <div class="grid grid-cols-2 gap-2">
+          <button class="substance-btn active p-2 rounded bg-indigo-600 text-white border border-indigo-500 text-sm font-medium transition-all" data-substance="nacl">
+            NaCl <span class="block text-[10px] text-indigo-200">Natriumchlorid</span>
+          </button>
+          <button class="substance-btn p-2 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-sm font-medium transition-all" data-substance="cscl">
+            CsCl <span class="block text-[10px] text-slate-400">Cäsiumchlorid</span>
+          </button>
+          <button class="substance-btn p-2 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-sm font-medium transition-all" data-substance="h2o">
+            H₂O <span class="block text-[10px] text-slate-400">Wasser</span>
+          </button>
+          <button class="substance-btn p-2 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-sm font-medium transition-all" data-substance="n2">
+            N₂ <span class="block text-[10px] text-slate-400">Stickstoff</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Temperature Control -->
+      <div class="p-5 border-b border-slate-700/50 space-y-4">
+        <div class="flex items-end justify-between">
+          <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+            <span>🌡️</span> Thermostat
+          </h2>
+          <div class="text-right">
+            <div id="tempDisplayMain" class="text-xl font-mono font-bold text-amber-400">293 K</div>
+            <div id="tempDisplayCelsius" class="text-xs font-mono text-amber-200/70">+20 °C</div>
+          </div>
+        </div>
+        
+        <div class="relative pt-2">
+          <!-- Temp Slider from 0 to 1800 K -->
+          <input type="range" id="tempSlider" min="0" max="1800" value="293" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+          <div class="flex justify-between text-[10px] text-slate-500 mt-2 font-mono">
+            <span>0 K (-273°C)</span>
+            <span>1800 K (+1527°C)</span>
+          </div>
+        </div>
+
+        <!-- Dynamic Phase Indicator -->
+        <div id="sliderPhaseIndicator" class="p-2.5 rounded-lg bg-slate-900/50 border border-slate-800 flex items-center gap-3">
+          <span id="phaseIcon" class="text-xl">💧</span>
+          <div>
+            <div id="phaseText" class="text-sm font-bold text-slate-200">Flüssig</div>
+            <div id="phaseExplanationText" class="text-[10px] text-slate-400 leading-tight mt-0.5">Teilchen sind beweglich, aber durch Kohäsionskräfte verbunden.</div>
+          </div>
+        </div>
+
+        <!-- Quick Presets -->
+        <div class="space-y-2">
+          <div class="text-xs text-slate-500 mb-1">Schnellwahl:</div>
+          <div id="presetContainer" class="grid grid-cols-2 gap-1.5">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Environment & Physics -->
+      <div class="p-5 space-y-4 flex-1">
+        <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-wider">Ansicht & Umwelt</h2>
+        
+        <div class="space-y-2">
+          <label class="flex items-center justify-between p-2 rounded-lg bg-slate-900/50 hover:bg-slate-800/50 cursor-pointer border border-slate-800 transition-colors">
+            <span class="text-xs text-slate-300 flex items-center gap-2">
+              <span class="text-xs">🔗</span> Bindungskräfte zeigen
+            </span>
+            <input type="checkbox" id="chkShowBonds" checked class="rounded bg-slate-800 border-slate-700 text-indigo-600 focus:ring-indigo-500">
+          </label>
+
+          <label class="flex items-center justify-between p-2 rounded-lg bg-slate-900/50 hover:bg-slate-800/50 cursor-pointer border border-slate-800 transition-colors">
+            <span class="text-xs text-slate-300 flex items-center gap-2">
+              <span class="text-xs">➡️</span> Geschwindigkeitsvektoren
+            </span>
+            <input type="checkbox" id="chkShowVectors" class="rounded bg-slate-800 border-slate-700 text-indigo-600 focus:ring-indigo-500">
+          </label>
+        </div>
+
+        <div class="pt-2 border-t border-slate-800/80 space-y-3">
+          <label class="flex items-center justify-between p-2 rounded-lg bg-slate-900/50 hover:bg-slate-800/50 cursor-pointer border border-slate-800 transition-colors">
+            <span class="text-xs text-slate-300 flex items-center gap-2">
+              <span class="text-base leading-none">🌍</span> Schwerkraft (g)
+            </span>
+            <input type="checkbox" id="chkGravity" class="rounded bg-slate-800 border-slate-700 text-indigo-600 focus:ring-indigo-500">
+          </label>
+
+          <div class="p-2.5 rounded-lg bg-slate-900/50 border border-slate-800">
+            <div class="flex justify-between text-[11px] text-slate-400 mb-1.5">
+              <span class="flex items-center gap-1">
+                <span class="text-base leading-none">🗜️</span> Volumen (Kolben)
+              </span>
+              <span id="volumeDisplay" class="font-mono text-indigo-300 font-bold">100%</span>
+            </div>
+            <input type="range" id="volumeSlider" min="25" max="100" value="100" step="1" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-800/80">
+          <button id="btnPause" class="w-full py-2.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-semibold text-sm transition-colors flex justify-center items-center gap-2 shadow-lg">
+            <span>⏸️</span> Simulation pausieren
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Simulation Area -->
+    <section class="flex-1 relative bg-[#050505]">
+      <!-- Live HUD Overlays -->
+      <div class="absolute top-6 left-6 z-10 flex gap-4 pointer-events-none">
+        <!-- Kinetic Energy HUD -->
+        <div class="glass-panel p-3 rounded-xl shadow-lg border border-slate-700/50 w-48">
+          <div class="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Mittlere Kin. Energie</div>
+          <div class="font-mono text-lg font-bold text-emerald-400" id="hudKineticEnergy">0,00 J</div>
+          <div class="text-[9px] text-slate-500 mt-1">E_kin ∝ Temperatur (T)</div>
+        </div>
+
+        <!-- Order Parameter HUD -->
+        <div class="glass-panel p-3 rounded-xl shadow-lg border border-slate-700/50 w-48">
+          <div class="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Gitter-Ordnung</div>
+          <div class="flex items-center gap-2">
+            <div class="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div id="hudOrderBar" class="h-full bg-sky-400 transition-all duration-300" style="width: 100%"></div>
+            </div>
+            <span id="hudOrderPercent" class="font-mono text-sm font-bold text-sky-400">100%</span>
+          </div>
+          <div class="text-[9px] text-slate-500 mt-1">Nah-/Fernordnung der Teilchen</div>
+        </div>
+      </div>
+
+      <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none text-center opacity-60">
+        <div class="bg-black/50 backdrop-blur px-4 py-2 rounded-full border border-white/10 text-xs text-slate-300 flex items-center gap-2 shadow-xl">
+          <span class="text-sm">👆</span> Teilchen können mit der Maus gezogen werden
+        </div>
+      </div>
+
+      <!-- Canvas -->
+      <canvas id="simCanvas" class="w-full h-full block cursor-grab active:cursor-grabbing"></canvas>
+    </section>
+  </main>
+
+  <!-- Modals Overlay -->
+  <div id="modalOverlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+    
+    <!-- Theory Modal -->
+    <div id="theoryModal" class="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col hidden transform scale-95 transition-transform duration-300">
+      <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/50 rounded-t-2xl">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <span>📚</span> Theorie: Bindungskräfte & Thermodynamik
+        </h3>
+        <button class="close-modal text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors">✕</button>
+      </div>
+      
+      <div class="p-6 overflow-y-auto space-y-6 text-sm text-slate-300">
+        <p>Diese Simulation visualisiert, wie sich unterschiedliche Stoffe auf Teilchenebene verhalten, wenn sich Temperatur, Schwerkraft und Außendruck (Volumen) ändern.</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Ionengitter (NaCl / CsCl) -->
+          <div class="p-4 rounded-xl bg-slate-800/50 border border-slate-700 space-y-2">
+            <h4 class="font-bold text-indigo-300 flex items-center gap-2">1. Ionengitter (NaCl & CsCl)</h4>
+            <p>Salze bestehen aus Kationen (+) und Anionen (-). Zwischen ihnen wirken starke elektrostatische <strong>Coulomb-Kräfte</strong>.</p>
+            <ul class="list-disc list-inside text-slate-400 space-y-1 mt-2">
+              <li><strong>NaCl:</strong> Schmilzt bei 801 °C (1074 K) und siedet bei 1465 °C (1738 K).</li>
+              <li><strong>CsCl:</strong> Das Cs⁺-Kation ist viel größer als das Na⁺-Kation. Dadurch ist der Abstand zwischen den Ladungen größer, die Coulomb-Kraft schwächer und die Schmelz-/Siedepunkte sinken (645 °C / 1290 °C).</li>
+            </ul>
+          </div>
+
+          <!-- Dipol (Wasser) -->
+          <div class="p-4 rounded-xl bg-slate-800/50 border border-slate-700 space-y-2">
+            <h4 class="font-bold text-cyan-300 flex items-center gap-2">2. Dipol-Moleküle (Wasser, H₂O)</h4>
+            <p>Wassermoleküle sind polar. Es bilden sich <strong>Wasserstoffbrückenbindungen</strong> (cyan gestrichelt).</p>
+            <ul class="list-disc list-inside text-slate-400 space-y-1 mt-2">
+              <li>Bei 0 °C (273 K) schmilzt Eis zu flüssigem Wasser.</li>
+              <li>Siedepunkt: 100 °C (373 K). Ab hier reißen alle Brücken ab und die Moleküle fliegen völlig frei als unsichtbares Gas durch den Raum.</li>
+            </ul>
+          </div>
+
+          <!-- Van-der-Waals (Stickstoff) -->
+          <div class="p-4 rounded-xl bg-slate-800/50 border border-slate-700 space-y-2">
+            <h4 class="font-bold text-slate-300 flex items-center gap-2">3. Unpolare Moleküle (Stickstoff, N₂)</h4>
+            <p>Es wirken nur sehr schwache <strong>Van-der-Waals-Kräfte</strong>.</p>
+            <ul class="list-disc list-inside text-slate-400 space-y-1 mt-2">
+              <li>N₂ siedet bereits bei -196 °C (77 K). Bei normaler Raumtemperatur ist es also schon längst ein hochenergetisches Gas.</li>
+            </ul>
+          </div>
+
+          <!-- Umwelteinflüsse -->
+          <div class="p-4 rounded-xl bg-slate-800/50 border border-slate-700 space-y-2">
+            <h4 class="font-bold text-amber-300 flex items-center gap-2">4. Temperatur & Druck (Volumen)</h4>
+            <ul class="list-disc list-inside text-slate-400 space-y-1 mt-2">
+              <li><strong>0 K (-273 °C):</strong> Absoluter Nullpunkt. Die Bewegung stoppt komplett.</li>
+              <li><strong>Schwerkraft:</strong> Zieht flüssiges Wasser nach unten, wo es eine Oberfläche bildet (Kohäsion).</li>
+              <li><strong>Volumen verringern:</strong> Komprimiert Gase. Die Teilchen haben weniger Platz, stoßen öfter an die Wände – der Druck steigt (Boyle-Mariotte).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Critique Modal -->
+    <div id="critiqueModal" class="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col hidden transform scale-95 transition-transform duration-300">
+      <div class="px-6 py-4 border-b border-rose-900/50 flex justify-between items-center bg-rose-950/20 rounded-t-2xl">
+        <h3 class="text-lg font-bold text-rose-300 flex items-center gap-2">
+          <span>⚠️</span> Grenzen des Modells (Fachliche Modellkritik)
+        </h3>
+        <button class="close-modal text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors">✕</button>
+      </div>
+      
+      <div class="p-6 overflow-y-auto space-y-6 text-sm text-slate-300">
+        <p class="text-rose-200">Kein Computermodell ist perfekt. Diese Simulation abstrahiert die Realität didaktisch:</p>
+        
+        <div class="space-y-4">
+          <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800">
+            <h4 class="font-bold text-slate-200 mb-2">1. Absoluter Nullpunkt (0 K) & Quantenmechanik</h4>
+            <p class="text-slate-400">Im Modell frieren bei 0 K alle Teilchen zu 100% ein (klassischer Stillstand, $E_{kin} = 0$). In der echten Quantenphysik verbietet die Heisenbergsche Unschärferelation einen absoluten Stillstand. Es verbleibt immer eine sogenannte <em>Nullpunktsenergie</em> (leichtes Zittern).</p>
+          </div>
+          <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800">
+            <h4 class="font-bold text-slate-200 mb-2">2. Dimensionalität (2D statt 3D)</h4>
+            <p class="text-slate-400">Echte Kristallgitter sind dreidimensional. In einem echten NaCl-Kristall hat jedes Na⁺-Ion oktaedrisch 6 Cl⁻-Nachbarn (Koordinationszahl 6). In unserer 2D-Simulation hat es nur 4 direkte Nachbarn. Auch die Dichteanomalie von Wasser (Eis braucht mehr Platz) lässt sich in 2D kaum korrekt darstellen.</p>
+          </div>
+          <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800">
+            <h4 class="font-bold text-slate-200 mb-2">3. Phasenübergänge (Latente Wärme)</h4>
+            <p class="text-slate-400">In der Realität stagniert die Temperatur während des Schmelzens oder Siedens, bis der gesamte Stoff die Phase gewechselt hat (Schmelz- und Verdampfungsenthalpie). Das Modell berücksichtigt dieses "Temperaturplateau" nicht.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Definition der simulierten Stoffe mit realen Daten
+    const SUBSTANCES = {
+      nacl: {
+        name: 'NaCl',
+        type: 'ionic',
+        melt: 1074, // 801 °C
+        boil: 1738, // 1465 °C
+        descLiquid: 'Ionen-Schmelze: Ionen sind beweglich, Ladungsausgleich.',
+        descGas: 'Gasförmig: Ionen lösen sich fast völlig aus dem Verband.',
+        particles: [
+          { type: 'Na', color: '#60a5fa', radius: 10, mass: 1, charge: 1, label: 'Na⁺' },
+          { type: 'Cl', color: '#a7f3d0', radius: 14, mass: 1.5, charge: -1, label: 'Cl⁻' }
+        ]
+      },
+      cscl: {
+        name: 'CsCl',
+        type: 'ionic',
+        melt: 918,  // 645 °C
+        boil: 1563, // 1290 °C
+        descLiquid: 'Ionen-Schmelze: Niedrigerer Schmelzpunkt als NaCl durch größeres Cs⁺-Kation.',
+        descGas: 'Gasförmig: Freie Ionen.',
+        particles: [
+          { type: 'Cs', color: '#c084fc', radius: 17, mass: 2, charge: 1, label: 'Cs⁺' },
+          { type: 'Cl', color: '#a7f3d0', radius: 14, mass: 1.5, charge: -1, label: 'Cl⁻' }
+        ]
+      },
+      h2o: {
+        name: 'H₂O',
+        type: 'dipole',
+        melt: 273, // 0 °C
+        boil: 373, // 100 °C
+        descLiquid: 'Flüssig: Wasserstoffbrücken brechen und bilden sich dynamisch neu.',
+        descGas: 'Wasserdampf: Alle H-Brücken abgerissen, Moleküle fliegen völlig frei.',
+        particles: [
+          { type: 'H2O', color: '#3b82f6', radius: 12, mass: 1, label: 'H₂O' }
+        ]
+      },
+      n2: {
+        name: 'N₂',
+        type: 'vdw',
+        melt: 63, // -210 °C
+        boil: 77, // -196 °C
+        descLiquid: 'Flüssiger Stickstoff: Nur extrem schwache Kräfte halten Moleküle zusammen.',
+        descGas: 'Gasförmig: Moleküle fliegen unbeeinflusst und frei umher.',
+        particles: [
+          { type: 'N2', color: '#94a3b8', radius: 11, mass: 1, label: 'N₂' }
+        ]
+      }
+    };
+
+    // Globale Parameter (Reduzierte Geschwindigkeit für bessere Darstellung)
+    const SIM_SPEED = 0.5; 
+    const MAX_VELOCITY = 12.0;
+
+    let currentSubstance = 'nacl';
+    let temperature = 293; // Kelvin
+    let isPaused = false;
+    let particles = [];
+    let draggedParticle = null;
+    let animationFrameId = null;
+    
+    let isGravity = false;
+    let volumePercent = 100;
+    let pistonY = 0;
+
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // UI Elements
+    const tempSlider = document.getElementById('tempSlider');
+    const tempDisplayMain = document.getElementById('tempDisplayMain');
+    const tempDisplayCelsius = document.getElementById('tempDisplayCelsius');
+    const btnPause = document.getElementById('btnPause');
+    const chkShowBonds = document.getElementById('chkShowBonds');
+    const chkShowVectors = document.getElementById('chkShowVectors');
+    const chkGravity = document.getElementById('chkGravity');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const volumeDisplay = document.getElementById('volumeDisplay');
+
+    const hudKineticEnergy = document.getElementById('hudKineticEnergy');
+    const hudOrderBar = document.getElementById('hudOrderBar');
+    const hudOrderPercent = document.getElementById('hudOrderPercent');
+
+    const presetContainer = document.getElementById('presetContainer');
+    const phaseText = document.getElementById('phaseText');
+    const phaseIcon = document.getElementById('phaseIcon');
+    const phaseExplanationText = document.getElementById('phaseExplanationText');
+
+    
+    function resizeCanvas() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    }
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      if(temperature === 0) initParticles(); // Recenter at 0K
+    });
+
+    const kToC = (k) => k - 273;
+    const formatCelsius = (k) => {
+      const c = kToC(k);
+      return (c > 0 ? '+' : '') + c + ' °C';
+    };
+
+    function updatePresets() {
+      const conf = SUBSTANCES[currentSubstance];
+      presetContainer.innerHTML = '';
+      
+      const presets = [
+        { label: 'Abs. Nullpunkt', t: 0 },
+        { label: 'Raumtemp.', t: 293 },
+        { label: 'Schmelzpunkt', t: conf.melt },
+        { label: 'Siedepunkt', t: conf.boil }
+      ];
+
+      presets.forEach(p => {
+        const btn = document.createElement('button');
+        btn.className = 'py-1.5 px-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-[10px] text-slate-300 transition-colors flex flex-col items-center leading-tight';
+        btn.innerHTML = `<span class="font-bold text-amber-400">${p.t} K</span><span class="text-slate-500">${formatCelsius(p.t)}</span><span class="mt-0.5 text-[9px] text-slate-400 text-center">${p.label}</span>`;
+        btn.addEventListener('click', () => {
+          tempSlider.value = p.t;
+          updateTemperature(p.t);
+        });
+        presetContainer.appendChild(btn);
+      });
+    }
+
+    function updateTemperature(val) {
+      temperature = parseInt(val, 10);
+      tempDisplayMain.textContent = `${temperature} K`;
+      tempDisplayCelsius.textContent = formatCelsius(temperature);
+      updatePhaseUI();
+      
+      if (temperature > 0) {
+        particles.forEach(p => {
+          if (p.vx === 0 && p.vy === 0) {
+            p.vx = (Math.random() - 0.5) * 0.5;
+            p.vy = (Math.random() - 0.5) * 0.5;
+          }
+        });
+      }
+    }
+
+    function updatePhaseUI() {
+      const conf = SUBSTANCES[currentSubstance];
+      let state = 'solid';
+      let icon = '🧊';
+      let txt = 'Festkörper';
+      let desc = 'Starres Gitter, Teilchen schwingen um Ruhelage.';
+      
+      if (temperature >= conf.boil) {
+        state = 'gas'; icon = '💨'; txt = 'Gasförmig'; desc = conf.descGas;
+      } else if (temperature >= conf.melt) {
+        state = 'liquid'; icon = '💧'; txt = 'Flüssig'; desc = conf.descLiquid;
+      }
+      if (temperature === 0) {
+        icon = '❄️'; txt = 'Absoluter Nullpunkt'; desc = 'Klassischer Stillstand. Keine Teilchenbewegung.';
+      }
+
+      phaseIcon.textContent = icon;
+      phaseText.textContent = txt;
+      phaseExplanationText.textContent = desc;
+
+      const ind = document.getElementById('sliderPhaseIndicator');
+      ind.className = `p-2.5 rounded-lg border flex items-center gap-3 transition-colors ${
+        state === 'solid' ? 'bg-indigo-900/40 border-indigo-800' :
+        state === 'liquid' ? 'bg-sky-900/40 border-sky-800' :
+        'bg-rose-900/40 border-rose-800'
+      }`;
+    }
+
+    function initParticles() {
+      particles = [];
+      const conf = SUBSTANCES[currentSubstance];
+      const cx = canvas.width / 2;
+      const cy = (canvas.height + pistonY) / 2;
+      
+      let rows = 7, cols = 7;
+      let spacing = 28;
+
+      if (currentSubstance === 'h2o' || currentSubstance === 'n2') {
+        rows = 6; cols = 6; spacing = 32;
+      }
+      if (currentSubstance === 'cscl') {
+        spacing = 34; // Mehr Platz für großes Cäsium
+      }
+
+      const startX = cx - ((cols - 1) * spacing) / 2;
+      const startY = cy - ((rows - 1) * spacing) / 2;
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          let pType;
+          if (conf.type === 'ionic') {
+            pType = (r + c) % 2 === 0 ? conf.particles[0] : conf.particles[1];
+          } else {
+            pType = conf.particles[0];
+          }
+
+          const x = startX + c * spacing;
+          const y = startY + r * spacing;
+
+          particles.push({
+            ...pType,
+            x: x, y: y,
+            originX: x, originY: y,
+            vx: 0, vy: 0,
+            angle: Math.random() * Math.PI * 2,
+            angularVel: 0
+          });
+        }
+      }
+    }
+
+    function adjustLatticeOrigins(height, currentPistonY) {
+      if (particles.length === 0) return;
+      
+      let minOY = Math.min(...particles.map(p => p.originY));
+      let maxOY = Math.max(...particles.map(p => p.originY));
+      const margin = 20;
+
+      // Kolben drückt von oben
+      if (minOY < currentPistonY + margin) {
+        const shiftDown = (currentPistonY + margin) - minOY;
+        particles.forEach(p => p.originY += shiftDown);
+      }
+
+      // Schwerkraft zieht nach unten
+      if (isGravity && maxOY < height - margin) {
+        particles.forEach(p => p.originY += 1.5 * SIM_SPEED);
+      }
+
+      // Bodenkollision des Gitters
+      maxOY = Math.max(...particles.map(p => p.originY));
+      if (maxOY > height - margin) {
+        const shiftUp = height - margin - maxOY;
+        particles.forEach(p => p.originY += shiftUp);
+      }
+    }
+
+    function updatePhysics(dt) {
+      const width = canvas.width;
+      const height = canvas.height;
+      const conf = SUBSTANCES[currentSubstance];
+      
+      pistonY = height * (1 - volumePercent / 100);
+
+      // --- ABSOLUTER NULLPUNKT (0 K) ---
+      if (temperature === 0) {
+        particles.forEach(p => {
+          p.vx = 0; p.vy = 0; p.angularVel = 0;
+          if (draggedParticle !== p) {
+            p.x = p.originX; p.y = p.originY;
+          }
+        });
+        if (isGravity || volumePercent < 100) adjustLatticeOrigins(height, pistonY);
+        hudKineticEnergy.textContent = '0,00 · 10⁻²¹ J (Stillstand)';
+        hudOrderBar.style.width = '100%';
+        hudOrderPercent.textContent = '100%';
+        hudOrderBar.className = 'h-full bg-indigo-500';
+        return; 
+      }
+
+      const isSolid = temperature < conf.melt;
+      const isGas = temperature >= conf.boil;
+      const isLiquid = !isSolid && !isGas;
+
+      let totalKineticEnergy = 0;
+      let totalDisplacement = 0;
+
+      if (isSolid) adjustLatticeOrigins(height, pistonY);
+
+      // Reduzierter Jitter für weichere Bewegungen
+      const thermalFactor = temperature * 0.0015;
+      const randomForce = Math.sqrt(temperature) * 0.02 * SIM_SPEED; 
+
+      for (let i = 0; i < particles.length; i++) {
+        const p1 = particles[i];
+        
+        const dxOrig = p1.x - p1.originX;
+        const dyOrig = p1.y - p1.originY;
+        totalDisplacement += Math.sqrt(dxOrig * dxOrig + dyOrig * dyOrig);
+
+        // Brownsche Bewegung (Thermischer Stoß)
+        p1.vx += (Math.random() - 0.5) * randomForce / p1.mass;
+        p1.vy += (Math.random() - 0.5) * randomForce / p1.mass;
+        
+        if (p1.label !== 'Na⁺' && p1.label !== 'Cl⁻' && p1.label !== 'Cs⁺') {
+          p1.angularVel += (Math.random() - 0.5) * randomForce * 0.05;
+        }
+
+        // Schwerkraft
+        if (isGravity && temperature > 0) {
+          p1.vy += 0.3 * SIM_SPEED;
+        }
+
+        // Rückstellkraft im Festkörper
+        if (isSolid) {
+          p1.vx -= dxOrig * 0.04 * SIM_SPEED;
+          p1.vy -= dyOrig * 0.04 * SIM_SPEED;
+          p1.originX += (p1.x - p1.originX) * thermalFactor * 0.01;
+          p1.originY += (p1.y - p1.originY) * thermalFactor * 0.01;
+        }
+
+        // Im Gaszustand breiten sich die Teilchen aus (Drift zur Mitte hin abgemildert)
+        if (isGas && !isGravity) {
+          const cx = width / 2;
+          const cy = height / 2 + pistonY / 2;
+          p1.vx += (cx - p1.x) * 0.0005 * SIM_SPEED;
+          p1.vy += (cy - p1.y) * 0.0005 * SIM_SPEED;
+        }
+
+        // Teilchen-Teilchen Interaktionen
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dx = p2.x - p1.x;
+          const dy = p2.y - p1.y;
+          const distSq = dx * dx + dy * dy;
+          const dist = Math.sqrt(distSq);
+          const minD = p1.radius + p2.radius;
+
+          if (dist === 0) continue;
+
+          let force = 0;
+
+          // Harter Kern (Kollision)
+          if (dist < minD) {
+            force = -1.5 * (minD - dist); // Etwas weichere Kollision
+          } 
+          // Anziehungskraft NUR WENN NICHT GAS! (Siedepunkt = Lösen aus Verband)
+          else if (!isGas && dist < minD * 3.5) {
+            if (conf.type === 'ionic') {
+              if (p1.charge !== p2.charge) force = 0.4 * SIM_SPEED; 
+              else force = -0.4 * SIM_SPEED;
+            } else if (conf.type === 'dipole') {
+              force = 0.25 * SIM_SPEED; // H-Brücken
+            } else if (conf.type === 'vdw') {
+              force = 0.04 * SIM_SPEED; // Schwache VdW
+            }
+            if (isLiquid) force *= (1 - (temperature - conf.melt) / (conf.boil - conf.melt));
+          }
+
+          if (force !== 0) {
+            const fx = (dx / dist) * force;
+            const fy = (dy / dist) * force;
+            p1.vx += fx / p1.mass;
+            p1.vy += fy / p1.mass;
+            p2.vx -= fx / p2.mass;
+            p2.vy -= fy / p2.mass;
+          }
+        }
+
+        // Speed-Limit (verhindert Ausrasten bei hohen Temperaturen)
+        const speed = Math.sqrt(p1.vx*p1.vx + p1.vy*p1.vy);
+        if (speed > MAX_VELOCITY) {
+          p1.vx = (p1.vx / speed) * MAX_VELOCITY;
+          p1.vy = (p1.vy / speed) * MAX_VELOCITY;
+        }
+
+        // Position updaten
+        if (draggedParticle !== p1) {
+          p1.x += p1.vx * SIM_SPEED;
+          p1.y += p1.vy * SIM_SPEED;
+          p1.angle += p1.angularVel * SIM_SPEED;
+        }
+
+        // Dämpfung
+        const damping = isSolid ? 0.92 : (isLiquid ? 0.98 : 0.995);
+        p1.vx *= damping;
+        p1.vy *= damping;
+        p1.angularVel *= damping;
+
+        totalKineticEnergy += 0.5 * p1.mass * (p1.vx * p1.vx + p1.vy * p1.vy);
+
+        // Wandkollisionen (Box + Kolben)
+        const margin = p1.radius + 4;
+        if (p1.x < margin) { p1.x = margin; p1.vx = Math.abs(p1.vx) * 0.8; }
+        else if (p1.x > width - margin) { p1.x = width - margin; p1.vx = -Math.abs(p1.vx) * 0.8; }
+        
+        if (p1.y < pistonY + margin) { p1.y = pistonY + margin; p1.vy = Math.abs(p1.vy) * 0.8; }
+        else if (p1.y > height - margin) { p1.y = height - margin; p1.vy = -Math.abs(p1.vy) * 0.8; }
+      }
+
+      // Update HUDs
+      const ekDisplay = (totalKineticEnergy * 0.05).toFixed(2);
+      hudKineticEnergy.textContent = `${ekDisplay} · 10⁻²¹ J`;
+      
+      const avgDisplacement = totalDisplacement / particles.length;
+      let order = 100;
+      if (isGas) order = Math.max(0, Math.round(10 - avgDisplacement * 0.05));
+      else if (isLiquid) order = Math.max(10, Math.min(60, Math.round(80 - avgDisplacement * 0.5)));
+      else order = Math.max(70, Math.min(100, Math.round(100 - avgDisplacement * 1.5)));
+
+      hudOrderPercent.textContent = `${order}%`;
+      hudOrderBar.style.width = `${order}%`;
+      hudOrderBar.className = order > 70 ? 'h-full bg-emerald-400' : (order > 25 ? 'h-full bg-amber-400' : 'h-full bg-rose-400');
+    }
+
+    function renderBonds() {
+      // Im Gaszustand (oder wenn Checkbox aus) KEINE Bindungen zeichnen
+      if (!chkShowBonds.checked || temperature >= SUBSTANCES[currentSubstance].boil) return;
+
+      const conf = SUBSTANCES[currentSubstance];
+      ctx.lineWidth = 2;
+      
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const p1 = particles[i];
+          const p2 = particles[j];
+          const dx = p2.x - p1.x;
+          const dy = p2.y - p1.y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          const maxDist = (p1.radius + p2.radius) * 2.5;
+
+          if (dist < maxDist) {
+            let opacity = 1 - (dist / maxDist);
+            if (opacity < 0) opacity = 0;
+            
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+
+            if (conf.type === 'ionic' && p1.charge !== p2.charge) {
+              ctx.strokeStyle = `rgba(129, 140, 248, ${opacity * 0.6})`;
+              ctx.setLineDash([]);
+            } else if (conf.type === 'dipole') {
+              ctx.strokeStyle = `rgba(34, 211, 238, ${opacity})`;
+              ctx.setLineDash([4, 4]); // H-Brücken (gestrichelt)
+            } else if (conf.type === 'vdw') {
+              ctx.strokeStyle = `rgba(148, 163, 184, ${opacity * 0.4})`;
+              ctx.setLineDash([2, 4]);
+            } else {
+              continue;
+            }
+            ctx.stroke();
+          }
+        }
+      }
+      ctx.setLineDash([]);
+    }
+
+    function renderPiston() {
+      if (pistonY > 0) {
+        const w = canvas.width;
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+        ctx.fillRect(0, 0, w, pistonY);
+        
+        ctx.fillStyle = '#475569';
+        ctx.fillRect(0, pistonY - 8, w, 8);
+        
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([10, 10]);
+        ctx.beginPath();
+        ctx.moveTo(0, pistonY - 4);
+        ctx.lineTo(w, pistonY - 4);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = 'bold 12px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`Druckkolben (Volumen: ${volumePercent}%)`, w / 2, Math.max(10, pistonY - 20));
+      }
+    }
+
+    function renderParticles() {
+      const showVectors = chkShowVectors.checked && temperature > 0;
+
+      particles.forEach(p => {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle);
+
+        // Basis-Teilchen
+        ctx.beginPath();
+        ctx.arc(0, 0, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+        
+        // 3D-Lichteffekt (Gradient)
+        const grad = ctx.createRadialGradient(-p.radius*0.3, -p.radius*0.3, p.radius*0.1, 0, 0, p.radius);
+        grad.addColorStop(0, 'rgba(255,255,255,0.4)');
+        grad.addColorStop(1, 'rgba(0,0,0,0.3)');
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // Molekül-spezifisches Rendering
+        if (p.label === 'H₂O') {
+          // Sauerstoff (Rot) in der Mitte
+          ctx.fillStyle = '#ef4444';
+          ctx.beginPath(); ctx.arc(0, 0, p.radius*0.5, 0, Math.PI*2); ctx.fill();
+          // Wasserstoff (Weiß) als "Micky-Maus-Ohren"
+          ctx.fillStyle = '#f8fafc';
+          ctx.beginPath(); ctx.arc(-p.radius*0.6, -p.radius*0.4, p.radius*0.4, 0, Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.arc(p.radius*0.6, -p.radius*0.4, p.radius*0.4, 0, Math.PI*2); ctx.fill();
+        } else if (p.label === 'N₂') {
+          // Stickstoff Hantelform
+          ctx.fillStyle = '#3b82f6';
+          ctx.beginPath(); ctx.arc(-p.radius*0.4, 0, p.radius*0.6, 0, Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.arc(p.radius*0.4, 0, p.radius*0.6, 0, Math.PI*2); ctx.fill();
+          // Dreifachbindung visualisieren
+          ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.moveTo(-3, -2); ctx.lineTo(3, -2); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(-3, 0); ctx.lineTo(3, 0); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(-3, 2); ctx.lineTo(3, 2); ctx.stroke();
+        } else {
+          // Ionen Label (immer gerade aufrecht)
+          ctx.rotate(-p.angle);
+          ctx.fillStyle = 'rgba(255,255,255,0.9)';
+          ctx.font = `bold ${p.radius * 0.9}px sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(p.label, 0, 1);
+        }
+
+        ctx.restore();
+
+        // Geschwindigkeitsvektoren (Pfeile)
+        if (showVectors) {
+          const vScale = 5; // Kürzere Vektorpfeile
+          ctx.strokeStyle = '#34d399';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p.x + p.vx * vScale, p.y + p.vy * vScale);
+          ctx.stroke();
+          ctx.fillStyle = '#34d399';
+          ctx.beginPath();
+          ctx.arc(p.x + p.vx * vScale, p.y + p.vy * vScale, 2, 0, Math.PI*2);
+          ctx.fill();
+        }
+      });
+    }
+
+    let lastTime = performance.now();
+    function animate(now) {
+      const dt = Math.min((now - lastTime) / 1000, 0.1);
+      lastTime = now;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      renderPiston();
+
+      if (!isPaused) updatePhysics(dt);
+
+      renderBonds();
+      renderParticles();
+
+      animationFrameId = requestAnimationFrame(animate);
+    }
+
+    // UI Events
+    document.querySelectorAll('.substance-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.substance-btn').forEach(b => {
+          b.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-500');
+          b.classList.add('bg-slate-800', 'text-slate-300', 'border-slate-700');
+        });
+        const target = e.currentTarget;
+        target.classList.remove('bg-slate-800', 'text-slate-300', 'border-slate-700');
+        target.classList.add('bg-indigo-600', 'text-white', 'border-indigo-500');
+        
+        currentSubstance = target.dataset.substance;
+        updatePresets();
+        updatePhaseUI();
+        initParticles();
+      });
+    });
+
+    tempSlider.addEventListener('input', (e) => updateTemperature(e.target.value));
+    
+    btnPause.addEventListener('click', () => {
+      isPaused = !isPaused;
+      btnPause.innerHTML = isPaused ? '<span>▶️</span> Simulation fortsetzen' : '<span>⏸️</span> Simulation pausieren';
+      btnPause.className = isPaused ? 'w-full py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-colors flex justify-center items-center gap-2 shadow-lg shadow-indigo-500/20' 
+                                    : 'w-full py-2.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-semibold text-sm transition-colors flex justify-center items-center gap-2 shadow-lg';
+    });
+
+    chkGravity.addEventListener('change', (e) => {
+      isGravity = e.target.checked;
+      if (isGravity && temperature === 0) initParticles();
+    });
+    
+    volumeSlider.addEventListener('input', (e) => {
+      volumePercent = parseInt(e.target.value, 10);
+      volumeDisplay.textContent = `${volumePercent}%`;
+    });
+
+    // Mouse/Touch Interaction
+    function getMousePos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    canvas.addEventListener('mousedown', startDrag);
+    canvas.addEventListener('touchstart', startDrag, {passive: false});
+    window.addEventListener('mousemove', drag);
+    window.addEventListener('touchmove', drag, {passive: false});
+    window.addEventListener('mouseup', endDrag);
+    window.addEventListener('touchend', endDrag);
+
+    function startDrag(e) {
+      const pos = getMousePos(e);
+      for (let p of particles) {
+        const dx = p.x - pos.x;
+        const dy = p.y - pos.y;
+        if (Math.sqrt(dx*dx + dy*dy) < p.radius + 5) {
+          draggedParticle = p;
+          p.vx = 0; p.vy = 0;
+          if(e.type === 'touchstart') e.preventDefault();
+          break;
+        }
+      }
+    }
+    function drag(e) {
+      if (draggedParticle) {
+        const pos = getMousePos(e);
+        draggedParticle.x = pos.x;
+        draggedParticle.y = Math.max(pistonY + draggedParticle.radius, pos.y);
+        if(e.type === 'touchmove') e.preventDefault();
+      }
+    }
+    function endDrag() { draggedParticle = null; }
+
+    // Modals
+    const toggleModal = (modalId, show) => {
+      const overlay = document.getElementById('modalOverlay');
+      const modal = document.getElementById(modalId);
+      if (show) {
+        overlay.classList.remove('hidden');
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+          overlay.classList.remove('opacity-0');
+          modal.classList.remove('scale-95');
+        }, 10);
+      } else {
+        overlay.classList.add('opacity-0');
+        modal.classList.add('scale-95');
+        setTimeout(() => {
+          overlay.classList.add('hidden');
+          modal.classList.add('hidden');
+        }, 300);
+      }
+    };
+
+    document.getElementById('btnTheory').addEventListener('click', () => toggleModal('theoryModal', true));
+    document.getElementById('btnCritique').addEventListener('click', () => toggleModal('critiqueModal', true));
+    
+    document.querySelectorAll('.close-modal').forEach(btn => {
+      btn.addEventListener('click', () => {
+        toggleModal('theoryModal', false);
+        toggleModal('critiqueModal', false);
+      });
+    });
+
+    document.getElementById('modalOverlay').addEventListener('click', (e) => {
+      if (e.target.id === 'modalOverlay') {
+        toggleModal('theoryModal', false);
+        toggleModal('critiqueModal', false);
+      }
+    });
+
+    // Boot
+    resizeCanvas();
+    updatePresets();
+    updateTemperature(293);
+    initParticles();
+    animationFrameId = requestAnimationFrame(animate);
+  </script>
+</body>
+</html>
