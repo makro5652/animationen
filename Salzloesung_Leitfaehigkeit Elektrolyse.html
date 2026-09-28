@@ -89,6 +89,7 @@ details li{margin-bottom:.45em}
       <div class="checks">
         <label><input type="checkbox" id="chkHi"> Hydrathüllen hervorheben</label>
         <label><input type="checkbox" id="chkLab" checked> Beschriftungen</label>
+        <label id="lblRx"><input type="checkbox" id="chkRx" checked> Elektrodenreaktionen anzeigen</label>
       </div>
     </section>
 
@@ -100,7 +101,7 @@ details li{margin-bottom:.45em}
         <tr><td>davon frei (nicht in Hydrathüllen)</td><td id="dWf">–</td></tr>
         <tr><td>Ionen im Ionengitter</td><td id="dLat">24</td></tr>
         <tr><td>hydratisierte Na<sup>+</sup> | Cl<sup>−</sup> | OH<sup>−</sup></td><td id="dIons">0 | 0 | 0</td></tr>
-        <tr id="rowProd" hidden><td>entstanden: H<sub>2</sub> | Cl<sub>2</sub> | O<sub>2</sub></td><td id="dProd">0 | 0 | 0</td></tr>
+        <tr id="rowProd"><td>entstanden: H<sub>2</sub> | Cl<sub>2</sub> | O<sub>2</sub></td><td id="dProd">0 | 0 | 0</td></tr>
       </table>
     </section>
 
@@ -111,7 +112,8 @@ details li{margin-bottom:.45em}
         <li><b>Wasser hinzufügen:</b> Wassermoleküle lagern sich an Ionen an der Kristalloberfläche an. Die Ionen werden aus dem Gitter herausgelöst und von einer Hydrathülle umgeben.</li>
         <li><b>Spannung einschalten:</b> Die hydratisierten Ionen bewegen sich gerichtet: Kationen zum Minuspol, Anionen zum Pluspol. Im Kabel bewegen sich Elektronen. Die Lampe leuchtet.</li>
       </ol>
-      <p class="note">Modellvereinfachung: In dieser Ansicht sind die Vorgänge an den Elektroden ausgeblendet. Ionen, die eine Elektrode erreichen, werden auf der Gegenseite wieder eingesetzt, damit die Ionenkonzentration gleich bleibt. Was an den Elektroden tatsächlich geschieht, zeigt die Ansicht Elektrolyse.</p>
+      <p class="note" id="noteRxOff" hidden>Elektrodenreaktionen ausgeblendet (Modellvereinfachung): Ionen, die eine Elektrode erreichen, werden ausgeblendet und auf der Gegenseite wieder eingesetzt, damit die Ionenkonzentration gleich bleibt. So lässt sich die Ionenwanderung beliebig lange zeigen. In Wirklichkeit reagieren die Ionen an den Elektroden; schalte dazu die Elektrodenreaktionen ein.</p>
+      <p class="note" id="noteRxOn">An den Elektroden verschwinden keine Teilchen: Bei Gleichspannung ist die Stromleitung durch die Lösung immer mit Reaktionen an den Elektroden verbunden. Chlorid-Ionen werden an der Anode zu Chlor oxidiert, an der Kathode entstehen aus Wassermolekülen Wasserstoff und Hydroxid-Ionen. Die Natrium-Ionen reichern sich vor der Kathode an, reagieren aber nicht. Die Einzelheiten zeigt die Ansicht Elektrolyse.</p>
     </section>
 
     <section class="card explain" id="ex2" hidden aria-label="Erklärung Elektrolyse">
@@ -191,6 +193,8 @@ const PATH_B = [[488, 60], [170, 60], [170, 590]];           // Minuspol der Que
 let waters, ions, atoms, groups, bubbles, hops, eQueue, latt;
 let tick, pour, surfY, current, ePhase, dissCool, prod;
 let clPresentCache = true;
+let showReactions = true;
+const reactionsOn = () => mode === 2 || showReactions;
 let mode = 1, voltage = false, paused = false, speed = 1, highlight = false, labels = true;
 
 const cv = document.getElementById('sim');
@@ -328,7 +332,7 @@ function oxidize(ion) {
 }
 
 function cathodeStep() {
-  if (mode !== 2 || !voltage) return;
+  if (!voltage) return;
   const ready = eQueue.filter(t => t <= tick).length;
   if (ready < 2) return;
   const cand = waters.filter(w => w.state === 'free' && w.x > CATH.x1 && w.x < CATH.x1 + 120 && w.y > surfY + 12 && w.y < CATH.y1 - 6)
@@ -486,7 +490,7 @@ function step() {
       let f = E * PHYS.drift * MOB[ion.type];
       // Elektrolyse: Ionen, die an ihrer Elektrode nicht reagieren (Na+, OH- solange Cl- vorhanden),
       // bilden eine diffuse Anreicherungszone statt einer dichten Wand (Konzentrationspolarisation, Modell)
-      if (mode === 2 && (ion.type === 'Na' || (ion.type === 'OH' && clPresentCache))) {
+      if (reactionsOn() && (ion.type === 'Na' || (ion.type === 'OH' && clPresentCache))) {
         const dist = Q[ion.type] > 0 ? ion.x - CATH.x1 : AN.x0 - ion.x;
         f *= clamp((dist - 190) / 150, -1, 1);
       }
@@ -533,12 +537,15 @@ function step() {
     for (const ion of ions) {
       if (ion.state !== 'free' || ion.fade) continue;
       const r = RH[ion.type];
-      const atAnode = ion.x + r >= AN.x0 - 2, atCathode = ion.x - r <= CATH.x1 + 2;
       const nearAnode = ion.x + r >= AN.x0 - 60;
-      if (mode === 2) {
+      if (reactionsOn()) {
+        // Bei Gleichspannung ist Stromleitung durch die Lösung immer mit Elektrodenreaktionen verbunden
         if (ion.type === 'Cl' && nearAnode) oxidize(ion);
         else if (ion.type === 'OH' && !hasCl && nearAnode) oxidize(ion);
       } else {
+        // Modellvereinfachung (nur Ansicht Leitfähigkeit, Schalter aus): Ion wird an seiner Elektrode
+        // ausgeblendet und auf der Gegenseite wieder eingesetzt, damit die Konzentration gleich bleibt
+        const atAnode = ion.x + r >= AN.x0 - 2, atCathode = ion.x - r <= CATH.x1 + 2;
         if ((Q[ion.type] > 0 && atCathode) || (Q[ion.type] < 0 && atAnode)) ion.fade = -1;
       }
     }
@@ -836,7 +843,7 @@ function updatePanel() {
   $('meter').style.width = `${Math.round(current * 100)}%`;
   $('btnWater').disabled = total + pour >= MAXW;
   $('btnWater').textContent = total + pour >= MAXW ? 'Becherglas ist voll' : `Wasser hinzufügen (${total + pour}/${MAXW})`;
-  $('o2note').hidden = !(mode === 2 && !chloridePresent());
+  $('o2note').hidden = !(mode === 2 && voltage && !chloridePresent() && prod.O2 > 0);
 
   let msg;
   const dissolvedSalt = nNa + nCl;
@@ -847,7 +854,7 @@ function updatePanel() {
       : 'Festes Natriumchlorid im trockenen Becherglas. Schalte die Spannung ein und prüfe die Leitfähigkeit. Füge danach Wasser hinzu.';
   } else if (dissolvedSalt === 0 && lat) {
     msg = 'Wassermoleküle umgeben den Kristall. Ionen an Ecken und Kanten werden zuerst herausgelöst.';
-  } else if (mode === 2 && voltage && !chloridePresent()) {
+  } else if (voltage && reactionsOn() && !chloridePresent() && total) {
     msg = 'Alle Chlorid-Ionen sind oxidiert. An der Anode werden nun Hydroxid-Ionen oxidiert, es entsteht Sauerstoff. In der Lösung verbleiben Natrium-Ionen und Hydroxid-Ionen.';
   } else if (mode === 2 && voltage) {
     msg = 'Elektrolyse: An der Anode werden Chlorid-Ionen zu Chlor oxidiert. An der Kathode werden Wassermoleküle zu Wasserstoff und Hydroxid-Ionen reduziert. Die Natrium-Ionen bleiben unverändert.';
@@ -855,8 +862,10 @@ function updatePanel() {
     msg = 'Schalte die Spannung ein, um die Elektrolyse zu starten.';
   } else if (lat && dissolvedSalt >= limit) {
     msg = `Die Lösung ist gesättigt: ${lat} Ionen bleiben als Bodenkörper im Ionengitter. Füge mehr Wasser hinzu.`;
+  } else if (voltage && reactionsOn()) {
+    msg = 'Die hydratisierten Ionen bewegen sich gerichtet: Na⁺ zum Minuspol, Cl⁻ zum Pluspol. Im Kabel bewegen sich Elektronen, die Lampe leuchtet. An den Elektroden entstehen dabei Chlor und Wasserstoff (siehe Ansicht Elektrolyse).';
   } else if (voltage) {
-    msg = 'Die hydratisierten Ionen bewegen sich gerichtet: Na⁺ zum Minuspol, Cl⁻ zum Pluspol. Im Kabel bewegen sich Elektronen. Die Lampe leuchtet.';
+    msg = 'Die hydratisierten Ionen bewegen sich gerichtet: Na⁺ zum Minuspol, Cl⁻ zum Pluspol. Im Kabel bewegen sich Elektronen, die Lampe leuchtet. Elektrodenreaktionen sind ausgeblendet: Ionen, die eine Elektrode erreichen, werden auf der Gegenseite wieder eingesetzt.';
   } else {
     msg = 'Ohne Spannung bewegen sich die hydratisierten Ionen ungeordnet zwischen den vielen freien Wassermolekülen. Schalte die Spannung ein.';
   }
@@ -866,8 +875,9 @@ function updatePanel() {
 function setMode(m) {
   mode = m;
   $('tab1').setAttribute('aria-selected', m === 1); $('tab2').setAttribute('aria-selected', m === 2);
-  $('ex1').hidden = m !== 1; $('ex2').hidden = m !== 2; $('rowProd').hidden = m !== 2;
-  if (m === 1) for (const i of ions) if (i.fade) { i.alpha = 1; i.fade = 0; }
+  $('ex1').hidden = m !== 1; $('ex2').hidden = m !== 2;
+  updateRxUI();
+  clearFades();
 }
 function setVoltage(v) {
   voltage = v;
@@ -880,10 +890,20 @@ $('tab2').onclick = () => setMode(2);
 $('btnWater').onclick = () => { pour += Math.min(ADDW, MAXW - (waters.length + pour)); };
 $('btnVolt').onclick = () => setVoltage(!voltage);
 $('btnPause').onclick = () => { paused = !paused; $('btnPause').textContent = paused ? 'Weiter' : 'Pause'; };
-$('btnReset').onclick = () => { init(); setVoltage(false); };
+$('btnReset').onclick = () => { init(); setVoltage(false); updateRxUI(); };
 $('speed').oninput = e => { speed = +e.target.value; $('speedVal').textContent = `${speed}×`; };
 $('chkHi').onchange = e => { highlight = e.target.checked; };
 $('chkLab').onchange = e => { labels = e.target.checked; };
+function updateRxUI() {
+  const cb = $('chkRx');
+  cb.disabled = mode === 2; cb.checked = reactionsOn();
+  $('lblRx').title = mode === 2 ? 'In der Ansicht Elektrolyse sind die Elektrodenreaktionen immer eingeschaltet.' : '';
+  $('lblRx').style.opacity = mode === 2 ? 0.55 : 1;
+  $('noteRxOn').hidden = !showReactions; $('noteRxOff').hidden = showReactions;
+  $('rowProd').hidden = !reactionsOn() && prod.H2 + prod.Cl2 + prod.O2 === 0;
+}
+$('chkRx').onchange = e => { showReactions = e.target.checked; clearFades(); updateRxUI(); };
+function clearFades() { for (const i of ions) if (i.fade) { i.alpha = 1; i.fade = 0; } }
 
 // ---------- Legende und Detailansicht (SVG) ----------
 function svgWater(x, y, a, sc, marks) {
@@ -927,6 +947,7 @@ $('legend').innerHTML = [
 
 // ---------- Start ----------
 init();
+updateRxUI();
 if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
   speed = 0.5; $('speed').value = 0.5; $('speedVal').textContent = '0.5×';
 }
