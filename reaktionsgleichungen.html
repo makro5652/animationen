@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Reaktionsgleichungen ausgleichen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#EEF2F5; --surface:#FFFFFF; --ink:#15233A; --muted:#556279; --line:#D3DAE3; --soft:#F6F8FA;
+  --coef:#1F5FD6; --coef-bg:#E2EBFD; --idx:#0A7A5C; --idx-bg:#DBF2EA; --chg:#A3246F; --chg-bg:#F8E0ED; --ox:#6A4C93;
+  --ok:#1C7A38; --ok-bg:#E2F3E6; --bad:#B42318; --bad-bg:#FBE6E3; --warn:#8A5A00; --warn-bg:#FBF0D9;
+  --serif:"Fraunces", Georgia, "Times New Roman", serif;
+  --sans:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F151E; --surface:#172131; --ink:#E5ECF5; --muted:#9AA8BC; --line:#2A3749; --soft:#1B2638;
+    --coef:#86ADFF; --coef-bg:#1C2B4A; --idx:#52D3A9; --idx-bg:#11342A; --chg:#F284C4; --chg-bg:#3B1A31; --ox:#C3A6F0;
+    --ok:#62CF82; --ok-bg:#12311C; --bad:#FF8577; --bad-bg:#3B1814; --warn:#F2C25B; --warn-bg:#35290F;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F151E; --surface:#172131; --ink:#E5ECF5; --muted:#9AA8BC; --line:#2A3749; --soft:#1B2638;
+  --coef:#86ADFF; --coef-bg:#1C2B4A; --idx:#52D3A9; --idx-bg:#11342A; --chg:#F284C4; --chg-bg:#3B1A31; --ox:#C3A6F0;
+  --ok:#62CF82; --ok-bg:#12311C; --bad:#FF8577; --bad-bg:#3B1814; --warn:#F2C25B; --warn-bg:#35290F;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 70px)}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--sans);-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:var(--serif);font-weight:700;line-height:1.15;margin:0 0 .6em}
+h2{font-size:clamp(1.6rem,4vw,2.1rem)}
+h3{font-size:1.2rem;margin-top:1.6em}
+p,li{max-width:70ch}
+a{color:var(--coef)}
+:focus-visible{outline:3px solid var(--coef);outline-offset:2px;border-radius:4px}
+sub,sup{font-size:.68em;line-height:0;position:relative}
+sub{vertical-align:baseline;top:.32em}
+sup{vertical-align:baseline;top:-.55em}
+
+nav.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+nav.top ul{list-style:none;margin:0 auto;padding:0 12px;display:flex;gap:4px;overflow-x:auto;max-width:980px;scrollbar-width:none}
+nav.top a{display:block;padding:14px 12px;white-space:nowrap;text-decoration:none;color:var(--muted);font-weight:700;font-size:.95rem}
+nav.top a:hover{color:var(--ink)}
+main{max-width:920px;margin:0 auto;padding:0 20px 96px}
+section{padding-top:64px}
+
+/* Hero */
+.hero{padding:56px 0 24px}
+.hero h1{font-size:clamp(2.1rem,6.4vw,3.5rem);max-width:16ch}
+.hero .lead{font-size:1.15rem;color:var(--muted)}
+.anatomy{margin:36px 0 12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px 24px 20px;
+  background-image:linear-gradient(var(--soft) 1px,transparent 1px),linear-gradient(90deg,var(--soft) 1px,transparent 1px);background-size:22px 22px}
+.big{font-family:var(--serif);font-size:clamp(3.6rem,15vw,7.2rem);line-height:1.1;text-align:center;letter-spacing:.01em;padding:.15em 0 .35em}
+.big .k{background:none;padding:0;margin-right:.18em}
+.legend{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.legend button{all:unset;cursor:pointer;display:block;padding:12px 14px;border-radius:10px;border:2px solid transparent;background:var(--soft)}
+.legend button:focus-visible{outline:3px solid var(--coef)}
+.legend b{display:block;font-size:1.05rem}
+.legend span{font-size:.92rem;color:var(--muted)}
+.legend .lk{border-color:var(--coef)} .legend .lk b{color:var(--coef)}
+.legend .li{border-color:var(--idx)} .legend .li b{color:var(--idx)}
+.legend .lc{border-color:var(--chg)} .legend .lc b{color:var(--chg)}
+.big .part{transition:opacity .25s}
+.big.focus .part{opacity:.18} .big.focus .part.on{opacity:1}
+@media (max-width:640px){.legend{grid-template-columns:1fr}}
+
+/* Farbcodierung */
+.cc .k{color:var(--coef);font-weight:700}
+.cc .i{color:var(--idx);font-weight:700;text-decoration:underline dotted 2px;text-underline-offset:3px}
+.cc .c{color:var(--chg);font-weight:700}
+.k{color:var(--coef);font-weight:700;background:var(--coef-bg);border-radius:4px;padding:0 .14em;margin-right:.14em}
+.tag{display:inline-block;font-size:.8rem;font-weight:700;padding:1px 8px;border-radius:99px;background:var(--soft);border:1px solid var(--line);color:var(--muted);vertical-align:middle}
+
+.box{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:20px 0}
+.box.merk{border-left:6px solid var(--coef)}
+.box.warn{border-left:6px solid var(--bad)}
+.box.sek2{border-left:6px solid var(--ox)}
+.box h3{margin-top:0}
+.eqline{font-size:1.35rem;margin:.4em 0}
+.muted{color:var(--muted)}
+.small{font-size:.92rem}
+
+/* Tabellen */
+.tw{overflow-x:auto;margin:18px 0;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:.95rem}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:none}
+thead th{background:var(--soft);font-family:var(--sans)}
+th.hk{color:var(--coef)} th.hi{color:var(--idx)} th.hc{color:var(--chg)} th.ho{color:var(--ox)}
+ruby rt{font-size:.62em;color:var(--ox);font-weight:700}
+
+/* Buttons */
+.btn{font:inherit;font-weight:700;font-size:.95rem;cursor:pointer;border-radius:8px;padding:9px 16px;border:2px solid var(--ink);background:var(--ink);color:var(--surface)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{border-color:var(--ink)}
+.btn[aria-pressed="true"]{background:var(--coef);border-color:var(--coef);color:#fff}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+/* Teilchen-Demo */
+.stage{position:relative;height:250px;border:1px dashed var(--line);border-radius:12px;background:var(--surface);margin:14px 0;overflow:hidden}
+.stage::after{content:"→";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:2.2rem;color:var(--muted)}
+.atom{position:absolute;width:32px;height:32px;border-radius:50%;transform:translate(-50%,-50%);display:grid;place-items:center;font-weight:700;font-size:.8rem;
+  transition:left .9s ease-in-out,top .9s ease-in-out,opacity .4s,box-shadow .3s;z-index:2}
+.atom.gone{opacity:0}
+.atom.rest{box-shadow:0 0 0 4px var(--bad)}
+.side-label{position:absolute;bottom:8px;font-size:.85rem;color:var(--muted);font-weight:700}
+@media (prefers-reduced-motion:reduce){.atom{transition:none}}
+
+/* Atome (Teilchenansicht) */
+.at{width:var(--a,20px);height:var(--a,20px);border-radius:50%;display:grid;place-items:center;font-size:9px;font-weight:700;line-height:1}
+.mol{display:inline-grid;gap:1px;position:relative;vertical-align:middle;padding:2px}
+.mol .q{position:absolute;top:-8px;right:-10px;font-size:10px;font-weight:700;color:var(--chg);background:var(--chg-bg);border-radius:6px;padding:0 3px}
+
+/* Übung */
+.levels{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.levels button{font:inherit;font-size:.92rem;font-weight:700;cursor:pointer;padding:8px 12px;border-radius:8px;border:2px solid var(--line);background:var(--surface);color:var(--ink);text-align:left}
+.levels button small{display:block;font-weight:400;color:var(--muted);font-size:.8rem}
+.levels button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 -4px 0 var(--coef)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px}
+.dots{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}
+.dots button{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);background:var(--surface);color:var(--muted);font:700 .85rem var(--sans);cursor:pointer}
+.dots button.done{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+.dots button.cur{border-color:var(--ink);color:var(--ink)}
+.word{color:var(--muted);margin:0 0 14px;font-size:1rem}
+.eq{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;font-size:1.55rem;margin:8px 0 18px}
+.term{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.op{color:var(--muted)}
+.coef-in{width:2.4em;height:1.8em;font:700 1.25rem var(--sans);text-align:center;color:var(--coef);background:var(--coef-bg);border:2px solid var(--coef);border-radius:7px;padding:0}
+.coef-in::placeholder{color:var(--coef);opacity:.4}
+.coef-in:disabled{opacity:.9}
+@media (max-width:560px){.eq{font-size:1.2rem}.coef-in{font-size:1.05rem;width:2.2em}}
+.fb{margin:14px 0 0;padding:12px 14px;border-radius:8px;display:none}
+.fb.show{display:block}
+.fb.ok{background:var(--ok-bg);color:var(--ok)}
+.fb.bad{background:var(--bad-bg);color:var(--bad)}
+.fb.info{background:var(--warn-bg);color:var(--warn)}
+.fb b{display:block}
+.bil{margin-top:16px}
+.bil table{min-width:0}
+.bil td.okc{color:var(--ok);font-weight:700}
+.bil td.badc{color:var(--bad);font-weight:700}
+.opts{display:flex;flex-wrap:wrap;gap:18px;margin-top:16px;font-size:.95rem}
+.opts label{display:flex;gap:8px;align-items:center;cursor:pointer}
+.opts input{width:18px;height:18px;accent-color:var(--coef)}
+.pv{display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:14px;margin-top:14px;border:1px dashed var(--line);border-radius:10px;background:var(--soft)}
+.pv-sp{display:flex;flex-direction:column;align-items:center;gap:6px}
+.pv-mols{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:260px}
+.pv-lab{font-size:.85rem;color:var(--muted)}
+.pv .arr{font-size:1.6rem;color:var(--muted)}
+.progress{font-size:.92rem;color:var(--muted);margin-bottom:10px}
+
+/* Drills */
+.drill{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;margin:18px 0}
+.drill .big2{font-family:var(--serif);font-size:clamp(2.2rem,9vw,3.4rem);text-align:center;margin:10px 0 18px}
+mark.hl{background:none;color:inherit;outline:3px solid var(--ink);outline-offset:3px;border-radius:3px}
+.score{float:right;font-size:.9rem;color:var(--muted);font-weight:700}
+.num-in{width:5em;font:700 1.15rem var(--sans);padding:6px 8px;border:2px solid var(--line);border-radius:7px;background:var(--surface);color:var(--ink)}
+
+ol.steps{padding-left:1.3em} ol.steps li{margin:.5em 0}
+.worked{display:grid;gap:10px}
+.worked div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.worked .eqline{margin:.2em 0}
+.phrase{background:var(--soft);border-radius:8px;padding:10px 14px;margin:6px 0;font-style:italic}
+footer{max-width:920px;margin:0 auto;padding:24px 20px 48px;color:var(--muted);font-size:.88rem;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<nav class="top" aria-label="Abschnitte">
+  <ul>
+    <li><a href="#warum">Warum ausgleichen?</a></li>
+    <li><a href="#zahlen">Drei Zahlen</a></li>
+    <li><a href="#vorgehen">So gehst du vor</a></li>
+    <li><a href="#training">Zahlen-Training</a></li>
+    <li><a href="#uebungen">Übungen</a></li>
+    <li><a href="#woerter">Wörter</a></li>
+  </ul>
+</nav>
+<main>
+
+<header class="hero">
+  <h1>Reaktionsgleichungen ausgleichen</h1>
+  <p class="lead">In einer chemischen Formel stehen oft mehrere Zahlen. Jede Zahl hat eine eigene Bedeutung. Beim Ausgleichen darfst du nur eine davon verändern.</p>
+  <div class="anatomy">
+    <div class="big" id="bigF" aria-label="3 S O 4 2 minus: drei Sulfat-Ionen">
+      <span class="part k pk">3</span><span class="part">SO</span><sub class="part pi" style="color:var(--idx)">4</sub><sup class="part pc" style="color:var(--chg)">2−</sup>
+    </div>
+    <div class="legend">
+      <button class="lk" data-p="pk"><b>Koeffizient 3</b><span>steht vor der Formel: drei Sulfat-Ionen</span></button>
+      <button class="li" data-p="pi"><b>Indexzahl 4</b><span>steht unten rechts: vier O-Atome in einem Sulfat-Ion</span></button>
+      <button class="lc" data-p="pc"><b>Ladungszahl 2−</b><span>steht oben rechts: jedes Sulfat-Ion ist zweifach negativ geladen</span></button>
+    </div>
+  </div>
+  <p class="small muted">Tippe auf eine Erklärung, um die zugehörige Zahl hervorzuheben.</p>
+</header>
+
+<section id="warum">
+  <h2>Warum muss man ausgleichen?</h2>
+  <p>Bei einer chemischen Reaktion werden chemische Bindungen gespalten und neu geknüpft. Die Atome werden dabei <b>umgruppiert</b>. Es entstehen keine neuen Atome, und es gehen keine Atome verloren.</p>
+  <p>Daraus folgt: Links und rechts vom Reaktionspfeil muss die <b>Anzahl der Atome jedes Elements gleich</b> sein. Das ist die Teilchen-Erklärung für das <b>Gesetz von der Erhaltung der Masse</b> (Antoine Lavoisier, 18. Jahrhundert): Die Gesamtmasse der Stoffe ändert sich bei einer chemischen Reaktion nicht.</p>
+  <div class="box merk">
+    <h3>Merksatz</h3>
+    <p>Eine Reaktionsgleichung ist ausgeglichen, wenn für jedes Element gilt: <b>Anzahl der Atome links = Anzahl der Atome rechts.</b> Bei Ionen muss zusätzlich die <b>Summe der Ladungen</b> links und rechts gleich sein.</p>
+  </div>
+  <p>Ein Beispiel: Wasserstoff reagiert mit Sauerstoff zu Wasser. Beide Elemente liegen als zweiatomige Moleküle vor (H<sub>2</sub>, O<sub>2</sub>).</p>
+  <p class="eqline">H<sub>2</sub> + O<sub>2</sub> → H<sub>2</sub>O <span class="tag">nicht ausgeglichen</span></p>
+  <p>Links stehen 2 O-Atome, rechts nur 1 O-Atom. Ein O-Atom würde fehlen. Mit Koeffizienten wird die Gleichung korrekt:</p>
+  <p class="eqline"><span class="k">2</span> H<sub>2</sub> + O<sub>2</sub> → <span class="k">2</span> H<sub>2</sub>O <span class="tag">ausgeglichen</span></p>
+
+  <div class="row" style="margin-top:14px">
+    <button class="btn ghost" id="demoToggle" aria-expanded="false" aria-controls="demo">Teilchenansicht einblenden</button>
+  </div>
+  <div id="demo" hidden>
+    <div class="row" style="margin-top:14px" role="group" aria-label="Gleichung wählen">
+      <button class="btn ghost" id="mUn" aria-pressed="true">H₂ + O₂ → H₂O</button>
+      <button class="btn ghost" id="mBal" aria-pressed="false">2 H₂ + O₂ → 2 H₂O</button>
+    </div>
+    <div class="stage" id="stage" aria-hidden="true">
+      <span class="side-label" style="left:12px">Edukte</span>
+      <span class="side-label" style="right:12px">Produkte</span>
+    </div>
+    <div class="row">
+      <button class="btn" id="play">Reaktion abspielen</button>
+      <button class="btn ghost" id="back">Zurücksetzen</button>
+    </div>
+    <p id="demoText" class="small" aria-live="polite" style="margin-top:12px"></p>
+    <p class="small muted">Schematische Darstellung: Kreise stehen für Atome. Bindungslängen, Bindungswinkel und Größenverhältnisse sind nicht maßstabsgetreu.</p>
+  </div>
+
+  <div class="box sek2">
+    <h3>Vertiefung Sekundarstufe II: Koeffizienten als Stoffmengenverhältnis</h3>
+    <p>Die Koeffizienten geben das <b>Anzahlverhältnis der Teilchen</b> an und damit auch das <b>Stoffmengenverhältnis</b>. Für 2 H<sub>2</sub> + O<sub>2</sub> → 2 H<sub>2</sub>O gilt: n(H<sub>2</sub>) : n(O<sub>2</sub>) : n(H<sub>2</sub>O) = 2 : 1 : 2.</p>
+    <p>Das Massenverhältnis entspricht <b>nicht</b> dem Koeffizientenverhältnis. Es folgt erst über m = n · M: 4 g Wasserstoff reagieren mit 32 g Sauerstoff zu 36 g Wasser.</p>
+    <p class="small muted">In der Thermochemie werden manchmal gebrochene Koeffizienten verwendet (z. B. H<sub>2</sub> + ½ O<sub>2</sub> → H<sub>2</sub>O), damit sich die Reaktionsenthalpie auf 1 mol Produkt bezieht. In allen Übungen hier gilt die übliche Konvention: kleinste ganze Zahlen.</p>
+  </div>
+</section>
+
+<section id="zahlen">
+  <h2>Drei Zahlen, drei Bedeutungen</h2>
+  <p>Viele Fehler entstehen, weil die Zahlen in einer Formel verwechselt werden. Die Position der Zahl verrät ihre Bedeutung.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th></th><th class="hk">Koeffizient</th><th class="hi">Indexzahl</th><th class="hc">Ladungszahl</th><th class="ho">Oxidationszahl (Sek II)</th></tr></thead>
+      <tbody>
+        <tr><th>Position</th><td>vor der Formel, normal groß</td><td>unten rechts am Elementsymbol oder an der Klammer</td><td>oben rechts am Ion</td><td>über dem Elementsymbol</td></tr>
+        <tr><th>Beispiel</th><td class="cc"><span class="k">3</span> H<sub class="i">2</sub>O</td><td class="cc">H<sub class="i">2</sub>O, Ca(OH)<sub class="i">2</sub></td><td class="cc">Al<sup class="c">3+</sup>, SO<sub class="i">4</sub><sup class="c">2−</sup></td><td><ruby>Fe<rt>+III</rt></ruby><sub>2</sub><ruby>O<rt>−II</rt></ruby><sub>3</sub></td></tr>
+        <tr><th>Schreibweise</th><td>arabische Zahl; die 1 wird nicht geschrieben</td><td>arabische Zahl; die 1 wird nicht geschrieben</td><td>erst die Zahl, dann das Vorzeichen: 2+, 3−; bei einfacher Ladung nur + oder −</td><td>erst das Vorzeichen, dann eine römische Zahl: +III, −II</td></tr>
+        <tr><th>Bedeutung</th><td>Anzahl der Teilchen (Atome, Moleküle, Ionen oder Formeleinheiten)</td><td>Anzahl der Atome eines Elements in einem Molekül bzw. Anzahlverhältnis der Ionen in einer Formeleinheit</td><td>tatsächliche elektrische Ladung eines Ions (in Elementarladungen)</td><td>formale, gedachte Ladung eines Atoms in einem Teilchen</td></tr>
+        <tr><th>Bezug</th><td>gilt für die <b>ganze</b> Formel dahinter</td><td>gilt nur für das Symbol oder die Klammer <b>direkt davor</b></td><td>gilt für das ganze Ion</td><td>gilt für ein einzelnes Atom</td></tr>
+        <tr><th>Beim Ausgleichen ändern?</th><td><b>ja</b>, als einzige Zahl</td><td><b>nein</b>, sonst entsteht ein anderer Stoff</td><td><b>nein</b>, sie ist eine Eigenschaft des Ions</td><td><b>nein</b>, sie folgt aus der Formel</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box warn">
+    <h3>Warum darf man die Indexzahl nicht verändern?</h3>
+    <p>Die Indexzahlen legen fest, um welchen Stoff es sich handelt. H<sub>2</sub>O ist Wasser, H<sub>2</sub>O<sub>2</sub> ist Wasserstoffperoxid, ein ätzender und oxidierend wirkender Stoff. CO ist das giftige Kohlenstoffmonooxid, CO<sub>2</sub> ist Kohlenstoffdioxid. Wer eine Indexzahl verändert, beschreibt eine andere Reaktion.</p>
+  </div>
+
+  <h3>So rechnest du mit Koeffizient und Indexzahl</h3>
+  <p>Anzahl der Atome eines Elements = <b>Koeffizient · Indexzahl</b> (bei Klammern zusätzlich · Indexzahl hinter der Klammer).</p>
+  <div class="worked">
+    <div class="cc"><p class="eqline"><span class="k">3</span> H<sub class="i">2</sub>O</p><p class="small">H: 3 · 2 = 6 Atome. O: 3 · 1 = 3 Atome.</p></div>
+    <div class="cc"><p class="eqline"><span class="k">2</span> Ca(OH)<sub class="i">2</sub></p><p class="small">Ca: 2 · 1 = 2. O: 2 · 1 · 2 = 4. H: 2 · 1 · 2 = 4. Die Indexzahl hinter der Klammer gilt für O und H.</p></div>
+    <div class="cc"><p class="eqline"><span class="k">3</span> Al<sub class="i">2</sub>(SO<sub class="i">4</sub>)<sub class="i">3</sub></p><p class="small">Al: 3 · 2 = 6. S: 3 · 3 = 9. O: 3 · 3 · 4 = 36.</p></div>
+    <div class="cc"><p class="eqline"><span class="k">3</span> SO<sub class="i">4</sub><sup class="c">2−</sup></p><p class="small">S: 3. O: 3 · 4 = 12. Ladung insgesamt: 3 · (2−) = 6−. Der Koeffizient wirkt auch auf die Ladung.</p></div>
+  </div>
+
+  <div class="box merk">
+    <h3>Indexzahlen in Verhältnisformeln</h3>
+    <p>Salze bestehen nicht aus Molekülen, sondern aus einem Ionengitter. Die Formel Al<sub>2</sub>O<sub>3</sub> ist eine <b>Verhältnisformel</b>: Sie beschreibt das Anzahlverhältnis der Ionen, Al<sup>3+</sup> : O<sup>2−</sup> = 2 : 3. Die kleinste Einheit mit diesem Verhältnis heißt <b>Formeleinheit</b>.</p>
+    <p>Die Indexzahlen folgen aus der <b>Elektroneutralität</b>: 2 · (+3) + 3 · (−2) = 0. In der Verhältnisformel werden die Ladungszahlen nicht mitgeschrieben.</p>
+    <p class="small muted">Die sogenannte Kreuzregel (Ladungszahl des einen Ions wird zur Indexzahl des anderen) ist nur eine Merkhilfe. Sie führt nicht immer zur kleinsten Formel: Bei Ca<sup>2+</sup> und O<sup>2−</sup> ergäbe sie Ca<sub>2</sub>O<sub>2</sub>, richtig ist CaO.</p>
+  </div>
+</section>
+
+<section id="vorgehen">
+  <h2>So gehst du vor</h2>
+  <ol class="steps">
+    <li><b>Wortgleichung aufschreiben.</b> Edukte links, Produkte rechts.</li>
+    <li><b>Richtige Formeln einsetzen.</b> Die Elemente Wasserstoff, Sauerstoff, Stickstoff, Fluor, Chlor, Brom und Iod liegen als zweiatomige Moleküle vor: H<sub>2</sub>, O<sub>2</sub>, N<sub>2</sub>, F<sub>2</sub>, Cl<sub>2</sub>, Br<sub>2</sub>, I<sub>2</sub>. Formeln von Salzen leitest du aus den Ionenladungen ab.</li>
+    <li><b>Atome zählen.</b> Notiere für jedes Element die Anzahl links und rechts.</li>
+    <li><b>Koeffizienten setzen.</b> Beginne mit einem Element, das links und rechts nur in je einem Stoff vorkommt. Gleiche H und O meistens zuletzt aus. Verändere nie die Indexzahlen.</li>
+    <li><b>Kontrollieren.</b> Stimmt jedes Element? Stimmt bei Ionen die Ladungssumme? Sind die Koeffizienten die kleinsten ganzen Zahlen?</li>
+  </ol>
+
+  <h3>Beispiel: Aluminium verbrennt zu Aluminiumoxid</h3>
+  <div class="worked">
+    <div><p class="eqline">Al + O<sub>2</sub> → Al<sub>2</sub>O<sub>3</sub></p><p class="small">Al: links 1, rechts 2. O: links 2, rechts 3. Beides stimmt nicht.</p></div>
+    <div><p class="eqline">Al + <span class="k">3</span> O<sub>2</sub> → <span class="k">2</span> Al<sub>2</sub>O<sub>3</sub></p><p class="small">O zuerst: Das kleinste gemeinsame Vielfache von 2 und 3 ist 6. Also 3 O<sub>2</sub> (6 O) und 2 Al<sub>2</sub>O<sub>3</sub> (6 O). Jetzt stehen rechts 4 Al-Atome.</p></div>
+    <div><p class="eqline"><span class="k">4</span> Al + <span class="k">3</span> O<sub>2</sub> → <span class="k">2</span> Al<sub>2</sub>O<sub>3</sub></p><p class="small">Al: 4 = 4. O: 6 = 6. Die Gleichung ist ausgeglichen.</p></div>
+  </div>
+
+  <div class="box sek2">
+    <h3>Vertiefung Sekundarstufe II</h3>
+    <p><b>Verbrennung organischer Stoffe:</b> Zuerst C, dann H, zuletzt O ausgleichen. Ergibt sich für O<sub>2</sub> ein Bruch, werden alle Koeffizienten verdoppelt. Beispiel Ethan: C<sub>2</sub>H<sub>6</sub> + 3,5 O<sub>2</sub> → 2 CO<sub>2</sub> + 3 H<sub>2</sub>O, also 2 C<sub>2</sub>H<sub>6</sub> + 7 O<sub>2</sub> → 4 CO<sub>2</sub> + 6 H<sub>2</sub>O.</p>
+    <p><b>Algebraische Methode:</b> Jeder Koeffizient wird eine Unbekannte (a, b, c, …). Jedes Element liefert eine lineare Gleichung, bei Ionengleichungen zusätzlich die Ladungsbilanz. Man setzt einen Koeffizienten gleich 1 und löst das Gleichungssystem.</p>
+    <p><b>Redoxgleichungen:</b> Oxidationszahlen bestimmen, Teilgleichungen für Oxidation und Reduktion aufstellen, die Elektronenzahl über das kgV angleichen, dann die Ladung mit H<sub>3</sub>O<sup>+</sup> (sauer) oder OH<sup>−</sup> (alkalisch) ausgleichen und zuletzt die O- und H-Bilanz mit H<sub>2</sub>O.</p>
+  </div>
+</section>
+
+<section id="training">
+  <h2>Zahlen-Training</h2>
+  <p>Hier übst du, die Zahlen in Formeln sicher zu unterscheiden, bevor du Gleichungen ausgleichst.</p>
+
+  <div class="drill" id="d1">
+    <span class="score" id="d1s">0 von 0</span>
+    <h3 style="margin-top:0">1. Welche Zahl ist markiert?</h3>
+    <div class="big2" id="d1f"></div>
+    <div class="row" id="d1b">
+      <button class="btn ghost" data-a="k">Koeffizient</button>
+      <button class="btn ghost" data-a="i">Indexzahl</button>
+      <button class="btn ghost" data-a="c">Ladungszahl</button>
+    </div>
+    <div class="fb" id="d1fb" aria-live="polite"></div>
+    <div class="row" style="margin-top:12px"><button class="btn" id="d1n">Nächste Formel</button></div>
+  </div>
+
+  <div class="drill" id="d2">
+    <span class="score" id="d2s">0 von 0</span>
+    <h3 style="margin-top:0">2. Atome zählen</h3>
+    <p id="d2q"></p>
+    <div class="big2" id="d2f"></div>
+    <div class="row">
+      <label for="d2in">Anzahl:</label>
+      <input id="d2in" class="num-in" inputmode="numeric" autocomplete="off">
+      <button class="btn" id="d2c">Prüfen</button>
+      <button class="btn ghost" id="d2n">Nächste Formel</button>
+    </div>
+    <div class="fb" id="d2fb" aria-live="polite"></div>
+  </div>
+
+  <div class="drill" id="d3">
+    <span class="score" id="d3s">0 von 0</span>
+    <h3 style="margin-top:0">3. Richtig oder falsch?</h3>
+    <p class="muted" id="d3ctx"></p>
+    <div class="eqline" id="d3f" style="text-align:center;font-size:1.5rem;margin:12px 0 16px"></div>
+    <div class="row" id="d3b">
+      <button class="btn ghost" data-a="1">Richtig</button>
+      <button class="btn ghost" data-a="0">Falsch</button>
+    </div>
+    <div class="fb" id="d3fb" aria-live="polite"></div>
+    <div class="row" style="margin-top:12px"><button class="btn" id="d3n">Nächste Gleichung</button></div>
+  </div>
+</section>
+
+<section id="uebungen">
+  <h2>Übungen: Gleichungen ausgleichen</h2>
+  <p>Trage die Koeffizienten in die blauen Felder ein. Ein leeres Feld zählt als 1. Die Formeln selbst sind fest vorgegeben.</p>
+  <div class="levels" id="levels" role="group" aria-label="Schwierigkeitsstufe"></div>
+  <div class="panel">
+    <div class="progress" id="prog"></div>
+    <div class="dots" id="dots" aria-label="Aufgaben dieser Stufe"></div>
+    <div id="exBox"></div>
+  </div>
+  <div class="row" style="margin-top:14px">
+    <button class="btn ghost" id="resetAll">Fortschritt löschen</button>
+    <span class="small muted">Der Fortschritt wird nur in diesem Browser gespeichert.</span>
+  </div>
+</section>
+
+<section id="woerter">
+  <h2>Wichtige Wörter</h2>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Wort</th><th>Plural</th><th>Englisch</th><th>Beispielsatz</th></tr></thead>
+      <tbody>
+        <tr><td>der Koeffizient</td><td>die Koeffizienten</td><td>coefficient</td><td>Vor H<sub>2</sub>O steht der Koeffizient 2.</td></tr>
+        <tr><td>die Indexzahl (der Index)</td><td>die Indexzahlen</td><td>subscript</td><td>Die Indexzahl 2 gehört zum Wasserstoff.</td></tr>
+        <tr><td>die Ladungszahl</td><td>die Ladungszahlen</td><td>charge number</td><td>Das Aluminium-Ion hat die Ladungszahl 3+.</td></tr>
+        <tr><td>die Oxidationszahl</td><td>die Oxidationszahlen</td><td>oxidation number</td><td>Eisen hat in Fe<sub>2</sub>O<sub>3</sub> die Oxidationszahl +III.</td></tr>
+        <tr><td>die Reaktionsgleichung</td><td>die Reaktionsgleichungen</td><td>chemical equation</td><td>Die Reaktionsgleichung ist ausgeglichen.</td></tr>
+        <tr><td>die Wortgleichung</td><td>die Wortgleichungen</td><td>word equation</td><td>Zuerst schreibe ich die Wortgleichung auf.</td></tr>
+        <tr><td>das Edukt (der Ausgangsstoff)</td><td>die Edukte</td><td>reactant</td><td>Die Edukte stehen links vom Reaktionspfeil.</td></tr>
+        <tr><td>das Produkt</td><td>die Produkte</td><td>product</td><td>Die Produkte stehen rechts vom Reaktionspfeil.</td></tr>
+        <tr><td>der Reaktionspfeil</td><td>die Reaktionspfeile</td><td>reaction arrow</td><td>Der Reaktionspfeil zeigt von den Edukten zu den Produkten.</td></tr>
+        <tr><td>ausgleichen</td><td>(glich aus, hat ausgeglichen)</td><td>to balance</td><td>Ich gleiche die Gleichung aus.</td></tr>
+        <tr><td>die Atombilanz</td><td>die Atombilanzen</td><td>atom balance</td><td>Die Atombilanz für Sauerstoff stimmt nicht.</td></tr>
+        <tr><td>das Molekül</td><td>die Moleküle</td><td>molecule</td><td>Ein Wassermolekül besteht aus drei Atomen.</td></tr>
+        <tr><td>das Ion</td><td>die Ionen</td><td>ion</td><td>Ein Ion ist ein elektrisch geladenes Teilchen.</td></tr>
+        <tr><td>die Verhältnisformel</td><td>die Verhältnisformeln</td><td>empirical formula</td><td>Al<sub>2</sub>O<sub>3</sub> ist eine Verhältnisformel.</td></tr>
+        <tr><td>die Formeleinheit</td><td>die Formeleinheiten</td><td>formula unit</td><td>Eine Formeleinheit NaCl enthält ein Na<sup>+</sup> und ein Cl<sup>−</sup>.</td></tr>
+        <tr><td>das kleinste gemeinsame Vielfache (kgV)</td><td>–</td><td>least common multiple</td><td>Das kgV von 2 und 3 ist 6.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>Satzbausteine zum Erklären</h3>
+  <p class="phrase">Links stehen … Atome …, rechts stehen … Atome ….</p>
+  <p class="phrase">Die Anzahl der …-Atome stimmt (nicht) überein.</p>
+  <p class="phrase">Ich setze den Koeffizienten … vor die Formel ….</p>
+  <p class="phrase">Ich darf die Indexzahl nicht verändern, weil sonst ein anderer Stoff entsteht.</p>
+  <p class="phrase">Die Summe der Ladungen ist links … und rechts ….</p>
+</section>
+</main>
+<footer>Übungsseite für die Sekundarstufe I und II. Alle Lösungen wurden rechnerisch auf Atom- und Ladungsbilanz geprüft. Die Prüfung akzeptiert jede korrekt ausgeglichene Lösung mit kleinsten ganzen Koeffizienten.</footer>
+
+<script>
+const EX = [
+{lv:1,r:["H2","O2"],p:["H2O"],s:[2,1,2],w:"Wasserstoff + Sauerstoff → Wasser",tip:"Rechts steht nur ein O-Atom. Verändere den Koeffizienten vor H₂O, nicht die Formel."},
+{lv:1,r:["Mg","O2"],p:["MgO"],s:[2,1,2],w:"Magnesium + Sauerstoff → Magnesiumoxid"},
+{lv:1,r:["Na","Cl2"],p:["NaCl"],s:[2,1,2],w:"Natrium + Chlor → Natriumchlorid"},
+{lv:1,r:["H2","Cl2"],p:["HCl"],s:[1,1,2],w:"Wasserstoff + Chlor → Chlorwasserstoff"},
+{lv:1,r:["Cu","O2"],p:["CuO"],s:[2,1,2],w:"Kupfer + Sauerstoff → Kupfer(II)-oxid"},
+{lv:1,r:["C","O2"],p:["CO"],s:[2,1,2],w:"Kohlenstoff + Sauerstoff → Kohlenstoffmonooxid"},
+{lv:1,r:["Ca","O2"],p:["CaO"],s:[2,1,2],w:"Calcium + Sauerstoff → Calciumoxid"},
+{lv:1,r:["K","Br2"],p:["KBr"],s:[2,1,2],w:"Kalium + Brom → Kaliumbromid"},
+{lv:1,r:["N2","H2"],p:["NH3"],s:[1,3,2],w:"Stickstoff + Wasserstoff → Ammoniak",tip:"Gleiche zuerst die N-Atome aus, danach die H-Atome."},
+{lv:1,r:["H2O2"],p:["H2O","O2"],s:[2,2,1],w:"Wasserstoffperoxid → Wasser + Sauerstoff"},
+{lv:1,r:["HgO"],p:["Hg","O2"],s:[2,2,1],w:"Quecksilber(II)-oxid → Quecksilber + Sauerstoff"},
+{lv:1,r:["Zn","HCl"],p:["ZnCl2","H2"],s:[1,2,1,1],w:"Zink + Chlorwasserstoff → Zinkchlorid + Wasserstoff"},
+
+{lv:2,r:["Al","O2"],p:["Al2O3"],s:[4,3,2],w:"Aluminium + Sauerstoff → Aluminiumoxid",tip:"Links 2 O-Atome, rechts 3 O-Atome. Das kleinste gemeinsame Vielfache ist 6."},
+{lv:2,r:["Fe","O2"],p:["Fe2O3"],s:[4,3,2],w:"Eisen + Sauerstoff → Eisen(III)-oxid"},
+{lv:2,r:["Fe","Cl2"],p:["FeCl3"],s:[2,3,2],w:"Eisen + Chlor → Eisen(III)-chlorid",tip:"Links 2 Cl-Atome, rechts 3 Cl-Atome: kgV ist 6."},
+{lv:2,r:["Na","H2O"],p:["NaOH","H2"],s:[2,2,2,1],w:"Natrium + Wasser → Natriumhydroxid + Wasserstoff"},
+{lv:2,r:["CH4","O2"],p:["CO2","H2O"],s:[1,2,1,2],w:"Methan + Sauerstoff → Kohlenstoffdioxid + Wasser",tip:"Reihenfolge: zuerst C, dann H, zuletzt O."},
+{lv:2,r:["CuO","C"],p:["Cu","CO2"],s:[2,1,2,1],w:"Kupfer(II)-oxid + Kohlenstoff → Kupfer + Kohlenstoffdioxid"},
+{lv:2,r:["Fe2O3","C"],p:["Fe","CO2"],s:[2,3,4,3],w:"Eisen(III)-oxid + Kohlenstoff → Eisen + Kohlenstoffdioxid",tip:"Betrachte die O-Atome: links 3 pro Formeleinheit, rechts 2 pro Molekül. kgV ist 6."},
+{lv:2,r:["Fe2O3","Al"],p:["Al2O3","Fe"],s:[1,2,1,2],w:"Eisen(III)-oxid + Aluminium → Aluminiumoxid + Eisen (Thermitreaktion)"},
+{lv:2,r:["Al","HCl"],p:["AlCl3","H2"],s:[2,6,2,3],w:"Aluminium + Chlorwasserstoff → Aluminiumchlorid + Wasserstoff",tip:"Die H-Atome kommen links einzeln, rechts paarweise vor. Die Cl-Atome rechts in Dreiergruppen."},
+{lv:2,r:["KClO3"],p:["KCl","O2"],s:[2,2,3],w:"Kaliumchlorat → Kaliumchlorid + Sauerstoff"},
+{lv:2,r:["NaHCO3"],p:["Na2CO3","H2O","CO2"],s:[2,1,1,1],w:"Natriumhydrogencarbonat → Natriumcarbonat + Wasser + Kohlenstoffdioxid"},
+{lv:2,r:["P4","O2"],p:["P4O10"],s:[1,5,1],w:"Phosphor (weiß) + Sauerstoff → Tetraphosphordecaoxid"},
+{lv:2,r:["Li","N2"],p:["Li3N"],s:[6,1,2],w:"Lithium + Stickstoff → Lithiumnitrid"},
+{lv:2,r:["Mg","N2"],p:["Mg3N2"],s:[3,1,1],w:"Magnesium + Stickstoff → Magnesiumnitrid"},
+
+{lv:3,r:["HCl","NaOH"],p:["NaCl","H2O"],s:[1,1,1,1],w:"Chlorwasserstoff + Natriumhydroxid → Natriumchlorid + Wasser"},
+{lv:3,r:["H2SO4","NaOH"],p:["Na2SO4","H2O"],s:[1,2,1,2],w:"Schwefelsäure + Natriumhydroxid → Natriumsulfat + Wasser",tip:"Behandle die Sulfatgruppe SO₄ als eine Einheit. Gleiche Wasser zuletzt aus."},
+{lv:3,r:["Ca(OH)2","HCl"],p:["CaCl2","H2O"],s:[1,2,1,2],w:"Calciumhydroxid + Chlorwasserstoff → Calciumchlorid + Wasser",tip:"Die Indexzahl 2 hinter der Klammer gilt für O und H."},
+{lv:3,r:["H3PO4","KOH"],p:["K3PO4","H2O"],s:[1,3,1,3],w:"Phosphorsäure + Kaliumhydroxid → Kaliumphosphat + Wasser"},
+{lv:3,r:["Al(OH)3","H2SO4"],p:["Al2(SO4)3","H2O"],s:[2,3,1,6],w:"Aluminiumhydroxid + Schwefelsäure → Aluminiumsulfat + Wasser",tip:"In Al₂(SO₄)₃ stecken 2 Al und 3 Sulfatgruppen. Beginne mit Al und SO₄, gleiche H₂O zuletzt aus."},
+{lv:3,r:["CaCO3","HCl"],p:["CaCl2","H2O","CO2"],s:[1,2,1,1,1],w:"Calciumcarbonat + Chlorwasserstoff → Calciumchlorid + Wasser + Kohlenstoffdioxid"},
+{lv:3,r:["BaCl2","Na2SO4"],p:["BaSO4","NaCl"],s:[1,1,1,2],w:"Bariumchlorid + Natriumsulfat → Bariumsulfat + Natriumchlorid"},
+{lv:3,r:["Pb(NO3)2","KI"],p:["PbI2","KNO3"],s:[1,2,1,2],w:"Blei(II)-nitrat + Kaliumiodid → Blei(II)-iodid + Kaliumnitrat",tip:"Behandle die Nitratgruppe NO₃ als eine Einheit."},
+{lv:3,r:["AgNO3","CaCl2"],p:["AgCl","Ca(NO3)2"],s:[2,1,2,1],w:"Silbernitrat + Calciumchlorid → Silberchlorid + Calciumnitrat"},
+{lv:3,r:["Mg","H3PO4"],p:["Mg3(PO4)2","H2"],s:[3,2,1,3],w:"Magnesium + Phosphorsäure → Magnesiumphosphat + Wasserstoff"},
+{lv:3,r:["NH3","H2SO4"],p:["(NH4)2SO4"],s:[2,1,1],w:"Ammoniak + Schwefelsäure → Ammoniumsulfat"},
+{lv:3,r:["Fe2(SO4)3","NaOH"],p:["Fe(OH)3","Na2SO4"],s:[1,6,2,3],w:"Eisen(III)-sulfat + Natriumhydroxid → Eisen(III)-hydroxid + Natriumsulfat"},
+
+{lv:4,r:["Al^3+","O^2-"],p:["Al2O3"],s:[2,3,1],w:"Aluminium-Ionen + Oxid-Ionen → Aluminiumoxid",tip:"Eine Ionenverbindung ist elektrisch neutral: Die Ladungen der Ionen ergeben zusammen null."},
+{lv:4,r:["Ca^2+","PO4^3-"],p:["Ca3(PO4)2"],s:[3,2,1],w:"Calcium-Ionen + Phosphat-Ionen → Calciumphosphat"},
+{lv:4,r:["Fe^3+","OH^-"],p:["Fe(OH)3"],s:[1,3,1],w:"Eisen(III)-Ionen + Hydroxid-Ionen → Eisen(III)-hydroxid"},
+{lv:4,r:["Pb^2+","I^-"],p:["PbI2"],s:[1,2,1],w:"Blei(II)-Ionen + Iodid-Ionen → Blei(II)-iodid"},
+{lv:4,r:["H3O^+","OH^-"],p:["H2O"],s:[1,1,2],w:"Oxonium-Ionen + Hydroxid-Ionen → Wasser (Neutralisation)"},
+{lv:4,r:["Ag^+","Cu"],p:["Ag","Cu^2+"],s:[2,1,2,1],w:"Silber-Ionen + Kupfer → Silber + Kupfer(II)-Ionen",tip:"Die Atombilanz stimmt schon mit lauter Einsen. Die Ladungsbilanz aber nicht."},
+{lv:4,r:["Fe^3+","Zn"],p:["Fe","Zn^2+"],s:[2,3,2,3],w:"Eisen(III)-Ionen + Zink → Eisen + Zink-Ionen"},
+{lv:4,r:["Al","Cu^2+"],p:["Al^3+","Cu"],s:[2,3,2,3],w:"Aluminium + Kupfer(II)-Ionen → Aluminium-Ionen + Kupfer"},
+{lv:4,r:["Mg","H3O^+"],p:["Mg^2+","H2","H2O"],s:[1,2,1,1,2],w:"Magnesium + Oxonium-Ionen → Magnesium-Ionen + Wasserstoff + Wasser"},
+{lv:4,r:["Fe^2+","Cl2"],p:["Fe^3+","Cl^-"],s:[2,1,2,2],w:"Eisen(II)-Ionen + Chlor → Eisen(III)-Ionen + Chlorid-Ionen"},
+
+{lv:5,r:["C2H6","O2"],p:["CO2","H2O"],s:[2,7,4,6],w:"Ethan + Sauerstoff → Kohlenstoffdioxid + Wasser",tip:"Rechts ergeben sich 7 O-Atome, also 3,5 O₂. Verdopple dann alle Koeffizienten."},
+{lv:5,r:["C3H8","O2"],p:["CO2","H2O"],s:[1,5,3,4],w:"Propan + Sauerstoff → Kohlenstoffdioxid + Wasser"},
+{lv:5,r:["C8H18","O2"],p:["CO2","H2O"],s:[2,25,16,18],w:"Octan + Sauerstoff → Kohlenstoffdioxid + Wasser"},
+{lv:5,r:["C6H6","O2"],p:["CO2","H2O"],s:[2,15,12,6],w:"Benzol + Sauerstoff → Kohlenstoffdioxid + Wasser"},
+{lv:5,r:["C2H5OH","O2"],p:["CO2","H2O"],s:[1,3,2,3],w:"Ethanol + Sauerstoff → Kohlenstoffdioxid + Wasser",tip:"Ethanol enthält selbst ein O-Atom. Berücksichtige es bei der O-Bilanz."},
+{lv:5,r:["C6H12O6","O2"],p:["CO2","H2O"],s:[1,6,6,6],w:"Glucose + Sauerstoff → Kohlenstoffdioxid + Wasser (Zellatmung, Bruttogleichung)"},
+{lv:5,r:["CO2","H2O"],p:["C6H12O6","O2"],s:[6,6,1,6],w:"Kohlenstoffdioxid + Wasser → Glucose + Sauerstoff (Fotosynthese, Bruttogleichung)"},
+{lv:5,r:["C12H22O11","O2"],p:["CO2","H2O"],s:[1,12,12,11],w:"Saccharose + Sauerstoff → Kohlenstoffdioxid + Wasser"},
+{lv:5,r:["NH3","O2"],p:["NO","H2O"],s:[4,5,4,6],w:"Ammoniak + Sauerstoff → Stickstoffmonooxid + Wasser (Ostwald-Verfahren)"},
+{lv:5,r:["FeS2","O2"],p:["Fe2O3","SO2"],s:[4,11,2,8],w:"Pyrit + Sauerstoff → Eisen(III)-oxid + Schwefeldioxid (Rösten)",tip:"Beginne mit Fe und S. Für O ergibt sich zunächst ein Bruch; verdopple dann."},
+{lv:5,r:["Fe3O4","CO"],p:["Fe","CO2"],s:[1,4,3,4],w:"Magnetit + Kohlenstoffmonooxid → Eisen + Kohlenstoffdioxid"},
+{lv:5,r:["Al4C3","H2O"],p:["Al(OH)3","CH4"],s:[1,12,4,3],w:"Aluminiumcarbid + Wasser → Aluminiumhydroxid + Methan"},
+{lv:5,r:["Pb","PbO2","H2SO4"],p:["PbSO4","H2O"],s:[1,1,2,2,2],w:"Blei + Blei(IV)-oxid + Schwefelsäure → Blei(II)-sulfat + Wasser (Bleiakkumulator, Entladung)"},
+{lv:5,r:["Cu","HNO3"],p:["Cu(NO3)2","NO","H2O"],s:[3,8,3,2,4],w:"Kupfer + Salpetersäure → Kupfer(II)-nitrat + Stickstoffmonooxid + Wasser",tip:"Redoxreaktion: Cu gibt 2 Elektronen ab (0 → +II), N nimmt 3 Elektronen auf (+V → +II). Elektronenbilanz: 3 Cu auf 2 NO."},
+{lv:5,r:["Cu","NO3^-","H3O^+"],p:["Cu^2+","NO","H2O"],s:[3,2,8,3,2,12],w:"Kupfer + Nitrat-Ionen + Oxonium-Ionen → Kupfer(II)-Ionen + Stickstoffmonooxid + Wasser",tip:"Elektronenbilanz: 3 Cu auf 2 NO₃⁻. Dann Ladungsausgleich mit H₃O⁺, zuletzt H₂O."},
+{lv:5,r:["MnO4^-","H3O^+","Fe^2+"],p:["Mn^2+","Fe^3+","H2O"],s:[1,8,5,1,5,12],w:"Permanganat-Ionen + Oxonium-Ionen + Eisen(II)-Ionen → Mangan(II)-Ionen + Eisen(III)-Ionen + Wasser",tip:"Mn: +VII → +II (5 Elektronen aufgenommen). Fe: +II → +III (1 Elektron abgegeben). Also 5 Fe²⁺ pro MnO₄⁻."},
+{lv:5,r:["MnO4^-","H3O^+","Cl^-"],p:["Mn^2+","Cl2","H2O"],s:[2,16,10,2,5,24],w:"Permanganat-Ionen + Oxonium-Ionen + Chlorid-Ionen → Mangan(II)-Ionen + Chlor + Wasser"},
+{lv:5,r:["Cr2O7^2-","H3O^+","Fe^2+"],p:["Cr^3+","Fe^3+","H2O"],s:[1,14,6,2,6,21],w:"Dichromat-Ionen + Oxonium-Ionen + Eisen(II)-Ionen → Chrom(III)-Ionen + Eisen(III)-Ionen + Wasser",tip:"Pro Dichromat-Ion werden 2 Cr-Atome von +VI auf +III reduziert: 6 Elektronen."}
+];
+
+
+const LEVELS=[
+ {n:1,t:"Stufe 1: Einstieg",s:"Sek I",hint:"Zähle für jedes Element die Atome links und rechts. Beginne mit einem Element, dessen Anzahl nicht übereinstimmt. Verändere nur die Koeffizienten."},
+ {n:2,t:"Stufe 2: Oxide und Metalle",s:"Sek I",hint:"Kommt ein Element links und rechts mit verschiedenen Indexzahlen vor (z. B. O₂ und O₃), bilde das kleinste gemeinsame Vielfache. Gleiche danach die übrigen Elemente aus."},
+ {n:3,t:"Stufe 3: Säuren, Laugen, Salze",s:"Sek I",hint:"Mehratomige Ionen wie SO₄, PO₄ oder NO₃, die unverändert bleiben, kannst du als eine Einheit zählen. Gleiche Wasser (H und O) zuletzt aus."},
+ {n:4,t:"Stufe 4: Ionengleichungen",s:"Sek I / II",hint:"Neben der Atombilanz muss die Ladungsbilanz stimmen: Summe der Ladungen links = Summe der Ladungen rechts. Der Koeffizient wirkt auch auf die Ladung."},
+ {n:5,t:"Stufe 5: Verbrennung und Redox",s:"Sek II",hint:"Verbrennung: C, dann H, zuletzt O; bei einem Bruch alles verdoppeln. Redox: Elektronenbilanz über Oxidationszahlen, dann Ladungsausgleich mit H₃O⁺, zuletzt H₂O."}
+];
+const COL={H:["#FFFFFF","#15233A","#8A94A3"],O:["#E03131","#fff"],C:["#343A40","#fff"],N:["#3B5BDB","#fff"],Cl:["#2F9E44","#fff"],Na:["#8E44AD","#fff"],K:["#6F2DBD","#fff"],S:["#F2C200","#15233A"],Fe:["#C0662B","#fff"],Al:["#98A4B3","#15233A"],Cu:["#B87333","#fff"],Mg:["#6E8B1E","#fff"],Ca:["#4F7384","#fff"],P:["#F08C00","#15233A"],Zn:["#7D8FA3","#fff"],Ag:["#C9CED6","#15233A"],Hg:["#A9A9C8","#15233A"],Li:["#C77DFF","#15233A"],Ba:["#0B9B9B","#fff"],Pb:["#5A5E66","#fff"],I:["#8F1A8F","#fff"],Br:["#A62929","#fff"],Cr:["#7F8FC4","#fff"],Mn:["#9C7AC7","#fff"]};
+function atomStyle(e){const c=COL[e]||["#888","#fff"];return `background:${c[0]};color:${c[1]};${c[2]?`box-shadow:inset 0 0 0 1.5px ${c[2]};`:""}`}
+
+function parseFormula(f){let i=0;function num(){const m=f.slice(i).match(/^\d+/);if(m){i+=m[0].length;return +m[0]}return 1}
+ function group(){const c={};while(i<f.length){const ch=f[i];if(ch==='('){i++;const g=group();i++;const n=num();for(const k in g)c[k]=(c[k]||0)+g[k]*n}else if(ch===')'){return c}else{const m=f.slice(i).match(/^[A-Z][a-z]?/);i+=m[0].length;const n=num();c[m[0]]=(c[m[0]]||0)+n}}return c}return group()}
+function parseSpecies(s){const[f,ch]=s.split('^');let q=0;if(ch){const m=ch.match(/^(\d*)([+-])$/);const n=m[1]?+m[1]:1;q=m[2]==='+'?n:-n}return{f,q,counts:parseFormula(f)}}
+function tokens(s){const[f,ch]=s.split('^');const out=[];let i=0;while(i<f.length){const c=f[i];
+ if(/\d/.test(c)){const m=f.slice(i).match(/^\d+/);out.push({t:'i',v:m[0]});i+=m[0].length}
+ else if(c==='('||c===')'){out.push({t:'p',v:c});i++}
+ else{const m=f.slice(i).match(/^[A-Z][a-z]?/);out.push({t:'e',v:m[0]});i+=m[0].length}}
+ if(ch)out.push({t:'c',v:ch.replace('-','−')});return out}
+function tokHTML(t){return t.t==='i'?`<sub class="i">${t.v}</sub>`:t.t==='c'?`<sup class="c">${t.v}</sup>`:t.v}
+function fHTML(s){return tokens(s).map(tokHTML).join('')}
+const SUB="₀₁₂₃₄₅₆₇₈₉",SUP={"0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹","+":"⁺","-":"⁻"};
+function uni(s){const[f,ch]=s.split('^');let o=f.replace(/\d/g,d=>SUB[d]);if(ch)o+=[...ch].map(c=>SUP[c]).join('');return o}
+function fmtQ(q){return q>0?'+'+q:q<0?'−'+(-q):'0'}
+function gcd(a,b){return b?gcd(b,a%b):a}
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function rnd(a){return a[Math.floor(Math.random()*a.length)]}
+
+/* ---------- Hero-Legende ---------- */
+(function(){const big=document.getElementById('bigF');
+ document.querySelectorAll('.legend button').forEach(b=>{b.addEventListener('click',()=>{
+   const p=b.dataset.p;const on=big.classList.contains('focus')&&big.dataset.p===p;
+   big.querySelectorAll('.part').forEach(x=>x.classList.remove('on'));
+   if(on){big.classList.remove('focus');big.dataset.p=''}else{big.classList.add('focus');big.dataset.p=p;big.querySelectorAll('.'+p).forEach(x=>x.classList.add('on'))}
+ })})})();
+
+/* ---------- Teilchen-Demo ---------- */
+(function(){
+ const tgl=document.getElementById('demoToggle'),demo=document.getElementById('demo'),stage=document.getElementById('stage'),txt=document.getElementById('demoText');
+ const IDS={a:'H',b:'H',c:'H',d:'H',e:'O',f:'O'};const el={};
+ for(const id in IDS){const d=document.createElement('div');d.className='atom';d.textContent=IDS[id];d.setAttribute('style',atomStyle(IDS[id]));stage.appendChild(d);el[id]=d}
+ const L={
+  un:{react:{a:[15,48,-14,0],b:[15,48,14,0],e:[35,48,-15,0],f:[35,48,15,0]},
+      prod:{e:[72,48,0,-8],a:[72,48,-22,10],b:[72,48,22,10],f:[88,48,0,0]},hide:['c','d'],rest:'f',
+      eq:'H₂ + O₂ → H₂O',pre:'Links: 2 H-Atome und 2 O-Atome. Rechts: 2 H-Atome und 1 O-Atom.',
+      post:'Ein O-Atom ist rot markiert: Es ist in keinem Produktteilchen enthalten. Atome können nicht verschwinden. Diese Gleichung ist also falsch. Man muss Koeffizienten ergänzen.'},
+  bal:{react:{a:[15,26,-14,0],b:[15,26,14,0],c:[15,72,-14,0],d:[15,72,14,0],e:[35,48,-15,0],f:[35,48,15,0]},
+      prod:{e:[74,28,0,-8],a:[74,28,-22,10],b:[74,28,22,10],f:[74,70,0,-8],c:[74,70,-22,10],d:[74,70,22,10]},hide:[],rest:null,
+      eq:'2 H₂ + O₂ → 2 H₂O',pre:'Links: 4 H-Atome und 2 O-Atome. Rechts: 4 H-Atome und 2 O-Atome.',
+      post:'Alle Atome sind in den Produkten wieder gebunden. Die Anzahl der H-Atome (4) und der O-Atome (2) ist links und rechts gleich.'}
+ };
+ let mode='un',timers=[];
+ const reduce=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+ function put(id,p,k=1){el[id].style.left=`calc(${p[0]}% + ${p[2]*k}px)`;el[id].style.top=`calc(${p[1]}% + ${p[3]*k}px)`}
+ function reset(){timers.forEach(clearTimeout);timers=[];const m=L[mode];
+  for(const id in el){el[id].classList.remove('rest');if(m.hide.includes(id)){el[id].classList.add('gone');put(id,[15,48,0,0])}else{el[id].classList.remove('gone');put(id,m.react[id])}}
+  txt.textContent=m.pre;document.getElementById('play').disabled=false}
+ function play(){const m=L[mode];document.getElementById('play').disabled=true;
+  if(reduce){for(const id in m.prod)put(id,m.prod[id]);fin();return}
+  for(const id in m.react){const p=m.react[id];put(id,[p[0],p[1],p[2],p[3]+(p[2]<0?-1:1)*0],2.6)}
+  txt.textContent='Die Bindungen in den Eduktteilchen werden gespalten.';
+  timers.push(setTimeout(()=>{for(const id in m.prod)put(id,m.prod[id]);txt.textContent='Die Atome werden umgruppiert und neu gebunden.'},1000));
+  timers.push(setTimeout(fin,2100));
+  function fin(){if(m.rest)el[m.rest].classList.add('rest');txt.textContent=m.post}}
+ function setMode(m){mode=m;document.getElementById('mUn').setAttribute('aria-pressed',m==='un');document.getElementById('mBal').setAttribute('aria-pressed',m==='bal');reset()}
+ tgl.addEventListener('click',()=>{const open=demo.hidden;demo.hidden=!open;tgl.setAttribute('aria-expanded',open);tgl.textContent=open?'Teilchenansicht ausblenden':'Teilchenansicht einblenden';if(open)reset()});
+ document.getElementById('mUn').onclick=()=>setMode('un');document.getElementById('mBal').onclick=()=>setMode('bal');
+ document.getElementById('play').onclick=play;document.getElementById('back').onclick=reset;
+})();
+
+/* ---------- Teilchencluster ---------- */
+function molHTML(s,size){const sp=parseSpecies(s);const atoms=[];for(const e in sp.counts)for(let j=0;j<sp.counts[e];j++)atoms.push(e);
+ const n=atoms.length;const cols=n<=3?n:Math.ceil(Math.sqrt(n));
+ return `<span class="mol" style="grid-template-columns:repeat(${cols},${size}px);--a:${size}px">${atoms.map(e=>`<span class="at" style="${atomStyle(e)}">${e}</span>`).join('')}${sp.q?`<span class="q">${fmtQ(sp.q).replace(/^([+−])(\d+)$/,(m,a,b)=>b==='1'?a:b+a)}</span>`:''}</span>`}
+
+/* ---------- Übungen ---------- */
+const KEY='rg-solved-v1';
+function load(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify([...solved]))}catch(e){}}
+EX.forEach((e,i)=>e.id=i);
+let solved=new Set(load()),lv=1,pos=0,hintStep=0,showBil=true,showPv=false,showWord=true;
+const levelsEl=document.getElementById('levels');
+function list(){return EX.filter(e=>e.lv===lv)}
+function renderLevels(){levelsEl.innerHTML=LEVELS.map(L=>{const tot=EX.filter(e=>e.lv===L.n).length,d=EX.filter(e=>e.lv===L.n&&solved.has(e.id)).length;
+ return `<button data-l="${L.n}" aria-pressed="${L.n===lv}">${L.t}<small>${L.s}, ${d} von ${tot} gelöst</small></button>`}).join('');
+ levelsEl.querySelectorAll('button').forEach(b=>b.onclick=()=>{lv=+b.dataset.l;pos=0;renderLevels();renderEx()})}
+function renderDots(){const L=list();document.getElementById('dots').innerHTML=L.map((e,i)=>`<button class="${solved.has(e.id)?'done':''} ${i===pos?'cur':''}" data-i="${i}" aria-label="Aufgabe ${i+1}${solved.has(e.id)?', gelöst':''}">${i+1}</button>`).join('');
+ document.querySelectorAll('#dots button').forEach(b=>b.onclick=()=>{pos=+b.dataset.i;renderEx()});
+ const d=L.filter(e=>solved.has(e.id)).length;document.getElementById('prog').textContent=`${LEVELS[lv-1].t}: Aufgabe ${pos+1} von ${L.length}, ${d} gelöst`}
+function renderEx(){hintStep=0;const ex=list()[pos];const all=[...ex.r,...ex.p];
+ const term=(s,j)=>`<span class="term"><input class="coef-in" data-j="${j}" inputmode="numeric" maxlength="2" placeholder="1" autocomplete="off" aria-label="Koeffizient vor ${uni(s)}"><span class="cc">${fHTML(s)}</span></span>`;
+ const lhs=ex.r.map((s,j)=>term(s,j)).join('<span class="op">+</span>');
+ const rhs=ex.p.map((s,j)=>term(s,j+ex.r.length)).join('<span class="op">+</span>');
+ document.getElementById('exBox').innerHTML=`
+  <p class="word" id="wordLine" ${showWord?'':'hidden'}>${esc(ex.w)}</p>
+  <div class="eq">${lhs}<span class="op">→</span>${rhs}</div>
+  <div class="row">
+   <button class="btn" id="chk">Prüfen</button>
+   <button class="btn ghost" id="hint">Tipp</button>
+   <button class="btn ghost" id="sol">Lösung zeigen</button>
+   <button class="btn ghost" id="clr">Leeren</button>
+   <span style="flex:1"></span>
+   <button class="btn ghost" id="prev" ${pos===0?'disabled':''}>Zurück</button>
+   <button class="btn ghost" id="next" ${pos===list().length-1?'disabled':''}>Weiter</button>
+  </div>
+  <div class="fb" id="fb" aria-live="polite"></div>
+  <div class="opts">
+   <label><input type="checkbox" id="oB" ${showBil?'checked':''}> Atombilanz anzeigen</label>
+   <label><input type="checkbox" id="oP" ${showPv?'checked':''}> Teilchenansicht</label>
+   <label><input type="checkbox" id="oW" ${showWord?'checked':''}> Wortgleichung</label>
+  </div>
+  <div class="bil" id="bil"></div>
+  <div id="pv"></div>`;
+ const ins=[...document.querySelectorAll('.coef-in')];
+ ins.forEach(inp=>{inp.addEventListener('input',()=>{inp.value=inp.value.replace(/\D/g,'');hideFb();update()});
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')check()})});
+ document.getElementById('chk').onclick=check;
+ document.getElementById('hint').onclick=hint;
+ document.getElementById('sol').onclick=()=>{ins.forEach((inp,j)=>inp.value=ex.s[j]===1?'':ex.s[j]);update();fb('info','Lösung eingeblendet',`Kleinste ganze Koeffizienten: ${all.map((s,j)=>(ex.s[j]>1?ex.s[j]+' ':'')+uni(s)).slice(0,ex.r.length).join(' + ')} → ${all.map((s,j)=>(ex.s[j]>1?ex.s[j]+' ':'')+uni(s)).slice(ex.r.length).join(' + ')}. Die Aufgabe zählt nicht als selbst gelöst. Versuche sie später noch einmal.`)};
+ document.getElementById('clr').onclick=()=>{ins.forEach(i=>i.value='');hideFb();update()};
+ document.getElementById('prev').onclick=()=>{pos--;renderEx()};
+ document.getElementById('next').onclick=()=>{pos++;renderEx()};
+ document.getElementById('oB').onchange=e=>{showBil=e.target.checked;update()};
+ document.getElementById('oP').onchange=e=>{showPv=e.target.checked;update()};
+ document.getElementById('oW').onchange=e=>{showWord=e.target.checked;document.getElementById('wordLine').hidden=!showWord};
+ renderDots();update()}
+function coefs(){return[...document.querySelectorAll('.coef-in')].map(i=>i.value===''?1:parseInt(i.value,10))}
+function bilanz(ex,k){const sp=[...ex.r,...ex.p].map(parseSpecies),nr=ex.r.length,Lc={},Rc={},els=[];let qL=0,qR=0;
+ sp.forEach((s,j)=>{const T=j<nr?Lc:Rc;for(const e in s.counts){if(!els.includes(e))els.push(e);T[e]=(T[e]||0)+k[j]*s.counts[e]}if(j<nr)qL+=k[j]*s.q;else qR+=k[j]*s.q});
+ return{els,L:Lc,R:Rc,qL,qR,hasQ:sp.some(s=>s.q!==0)}}
+function update(){const ex=list()[pos],k=coefs(),b=bilanz(ex,k),valid=k.every(x=>Number.isInteger(x)&&x>=1);
+ const bil=document.getElementById('bil');
+ if(showBil&&valid){bil.innerHTML=`<div class="tw" style="margin:0"><table><thead><tr><th>Element</th><th>links</th><th>rechts</th><th></th></tr></thead><tbody>${
+  b.els.map(e=>{const l=b.L[e]||0,r=b.R[e]||0,ok=l===r;return `<tr><td><span class="at" style="${atomStyle(e)};display:inline-grid;--a:22px;vertical-align:middle">${e}</span></td><td>${l}</td><td>${r}</td><td class="${ok?'okc':'badc'}">${ok?'stimmt':'stimmt nicht'}</td></tr>`}).join('')}${
+  b.hasQ?`<tr><td><b>Ladung</b></td><td>${fmtQ(b.qL)}</td><td>${fmtQ(b.qR)}</td><td class="${b.qL===b.qR?'okc':'badc'}">${b.qL===b.qR?'stimmt':'stimmt nicht'}</td></tr>`:''}</tbody></table></div>`}
+ else bil.innerHTML='';
+ const pv=document.getElementById('pv');
+ if(showPv&&valid){const all=[...ex.r,...ex.p];let tot=0;all.forEach((s,j)=>{const c=parseSpecies(s).counts;tot+=k[j]*Object.values(c).reduce((a,b)=>a+b,0)});
+  if(tot>180){pv.innerHTML=`<div class="pv"><span class="small muted">Bei ${tot} Atomen wird die Teilchenansicht zu unübersichtlich. Nutze die Atombilanz.</span></div>`;return}
+  const size=tot>90?14:tot>45?17:20;
+  const part=(s,j)=>`<div class="pv-sp"><div class="pv-mols">${Array.from({length:k[j]},()=>molHTML(s,size)).join('')}</div><div class="pv-lab">${k[j]} × ${uni(s)}</div></div>`;
+  pv.innerHTML=`<div class="pv" aria-hidden="true">${ex.r.map((s,j)=>part(s,j)).join('<span class="arr">+</span>')}<span class="arr">→</span>${ex.p.map((s,j)=>part(s,j+ex.r.length)).join('<span class="arr">+</span>')}</div><p class="small muted">Schematisch: Die Anordnung der Kreise zeigt nicht die räumliche Struktur der Teilchen.</p>`}
+ else pv.innerHTML=''}
+function fb(type,title,text){const f=document.getElementById('fb');f.className='fb show '+type;f.innerHTML=`<b>${title}</b>${text}`}
+function hideFb(){const f=document.getElementById('fb');if(f)f.className='fb'}
+function check(){const ex=list()[pos],k=coefs();
+ if(!k.every(x=>Number.isInteger(x)&&x>=1&&x<100)){fb('bad','Ungültige Eingabe','Koeffizienten sind ganze Zahlen ab 1. Die 0 ist nicht erlaubt: Ein Stoff mit dem Koeffizienten 0 würde gar nicht an der Reaktion teilnehmen.');return}
+ const b=bilanz(ex,k),wrong=b.els.filter(e=>(b.L[e]||0)!==(b.R[e]||0));
+ if(wrong.length||(b.hasQ&&b.qL!==b.qR)){const parts=wrong.map(e=>`${e}: links ${b.L[e]||0}, rechts ${b.R[e]||0}`);if(b.hasQ&&b.qL!==b.qR)parts.push(`Ladung: links ${fmtQ(b.qL)}, rechts ${fmtQ(b.qR)}`);
+  fb('bad','Falsch.',`Diese Bilanz stimmt nicht: ${parts.join('; ')}.`);return}
+ const g=k.reduce(gcd);
+ if(g>1){fb('bad','Falsch: nicht die kleinsten ganzen Zahlen.',`Die Atombilanz stimmt, aber alle Koeffizienten lassen sich durch ${g} teilen. Kürze auf die kleinsten ganzen Zahlen.`);return}
+ solved.add(ex.id);save();renderLevels();renderDots();
+ fb('ok','Richtig.',`Die Gleichung ist ausgeglichen${b.hasQ?', Atombilanz und Ladungsbilanz stimmen':''}.${pos<list().length-1?' Weiter mit der nächsten Aufgabe.':' Das war die letzte Aufgabe dieser Stufe.'}`)}
+function hint(){const ex=list()[pos],all=[...ex.r,...ex.p];hintStep++;
+ if(hintStep===1){fb('info','Tipp',(ex.tip?ex.tip+' ':'')+LEVELS[lv-1].hint);return}
+ const k=coefs();const cand=all.map((s,j)=>j).filter(j=>k[j]!==ex.s[j]);
+ if(!cand.length){fb('info','Tipp','Deine Koeffizienten entsprechen bereits der Lösung. Drücke auf „Prüfen“.');return}
+ const j=cand.reduce((a,b)=>ex.s[b]>ex.s[a]?b:a);
+ fb('info','Tipp',`Vor ${uni(all[j])} gehört der Koeffizient ${ex.s[j]}${ex.s[j]===1?' (die 1 wird nicht geschrieben)':''}.`)}
+document.getElementById('resetAll').onclick=()=>{if(confirm('Soll der gesamte Übungsfortschritt gelöscht werden?')){solved=new Set();save();renderLevels();renderEx()}};
+renderLevels();renderEx();
+
+/* ---------- Drill 1: Welche Zahl? ---------- */
+const POOL=[...new Set(EX.flatMap(e=>[...e.r,...e.p]).concat(["Al2(SO4)3","Ca3(PO4)2","NH4^+","CO3^2-","Fe(OH)2","Mg(NO3)2","S^2-","N^3-","HPO4^2-","(NH4)3PO4","K2Cr2O7","Na2SO3","SO3^2-","Ba(OH)2"]))];
+const d1={n:0,r:0,cur:null};
+function d1new(){const type=rnd(['k','i','c']);let s,coef;
+ if(type==='c'){s=rnd(POOL.filter(x=>/\^\d/.test(x)))}else if(type==='i'){s=rnd(POOL.filter(x=>/\d/.test(x.split('^')[0])))}else{s=rnd(POOL)}
+ coef=type==='k'?2+Math.floor(Math.random()*5):rnd([1,1,2,3,4]);
+ const toks=tokens(s);const list=[];if(coef>1)list.push({t:'k',v:String(coef)});toks.forEach(t=>list.push(t));
+ let idxs=list.map((t,i)=>i).filter(i=>list[i].t===type&&(type!=='c'||/\d/.test(list[i].v)));
+ const hi=rnd(idxs);d1.cur={type,s,coef,t:list[hi],prev:list[hi-1]};
+ document.getElementById('d1f').innerHTML=`<span class="cc">${list.map((t,i)=>{const h=t.t==='k'?`<span class="k" style="background:none">${t.v}</span>`:tokHTML(t);return i===hi?`<mark class="hl">${h}</mark>`:h}).join('')}</span>`;
+ document.getElementById('d1fb').className='fb';document.querySelectorAll('#d1b button').forEach(b=>b.disabled=false)}
+document.querySelectorAll('#d1b button').forEach(b=>b.onclick=()=>{const c=d1.cur,ok=b.dataset.a===c.type;d1.n++;if(ok)d1.r++;
+ document.getElementById('d1s').textContent=`${d1.r} von ${d1.n}`;document.querySelectorAll('#d1b button').forEach(x=>x.disabled=true);
+ let ex;if(c.type==='k')ex=`Die ${c.t.v} steht vor der Formel. Sie ist ein Koeffizient und gibt an: ${c.t.v} Teilchen ${uni(c.s)}. Sie gilt für die ganze Formel.`;
+ else if(c.type==='i'){ex=c.prev&&c.prev.v===')'?`Die ${c.t.v} steht unten rechts hinter einer Klammer. Sie ist eine Indexzahl und gilt für die gesamte Atomgruppe in der Klammer.`:`Die ${c.t.v} steht unten rechts am Symbol ${c.prev.v}. Sie ist eine Indexzahl und gibt die Anzahl der ${c.prev.v}-Atome in einem Teilchen bzw. einer Formeleinheit an.`}
+ else ex=`Die ${c.t.v} steht oben rechts. Sie ist eine Ladungszahl: Das Ion ${uni(c.s)} trägt ${c.t.v.replace(/\D/g,'')} ${c.t.v.includes('+')?'positive':'negative'} Elementarladungen.`;
+ const f=document.getElementById('d1fb');f.className='fb show '+(ok?'ok':'bad');f.innerHTML=`<b>${ok?'Richtig.':'Falsch.'}</b>${ex}`});
+document.getElementById('d1n').onclick=d1new;d1new();
+
+/* ---------- Drill 2: Atome zählen ---------- */
+const d2={n:0,r:0,cur:null};
+function d2new(){const cand=POOL.filter(s=>{const c=parseSpecies(s).counts;return Object.values(c).reduce((a,b)=>a+b,0)>=2});
+ const s=rnd(cand),sp=parseSpecies(s),els=Object.keys(sp.counts);
+ const e=els.length>1?rnd(els.filter(x=>sp.counts[x]>1).concat(els)):els[0];const coef=2+Math.floor(Math.random()*4);
+ d2.cur={s,e,coef,per:sp.counts[e],ans:coef*sp.counts[e]};
+ document.getElementById('d2q').innerHTML=`Wie viele <b>${e}-Atome</b> sind insgesamt angegeben?`;
+ document.getElementById('d2f').innerHTML=`<span class="cc"><span class="k" style="background:none">${coef}</span>${fHTML(s)}</span>`;
+ const i=document.getElementById('d2in');i.value='';i.disabled=false;document.getElementById('d2c').disabled=false;document.getElementById('d2fb').className='fb'}
+function d2check(){const c=d2.cur,v=parseInt(document.getElementById('d2in').value,10);if(isNaN(v))return;const ok=v===c.ans;d2.n++;if(ok)d2.r++;
+ document.getElementById('d2s').textContent=`${d2.r} von ${d2.n}`;document.getElementById('d2in').disabled=true;document.getElementById('d2c').disabled=true;
+ const f=document.getElementById('d2fb');f.className='fb show '+(ok?'ok':'bad');
+ f.innerHTML=`<b>${ok?'Richtig.':'Falsch.'}</b>In einem Teilchen ${uni(c.s)} sind ${c.per} ${c.e}-Atom${c.per>1?'e':''} enthalten${/\(/.test(c.s)?' (Indexzahl hinter der Klammer mitgerechnet)':''}. Mit dem Koeffizienten ${c.coef}: ${c.coef} · ${c.per} = ${c.ans}.`}
+document.getElementById('d2c').onclick=d2check;document.getElementById('d2in').addEventListener('keydown',e=>{if(e.key==='Enter')d2check()});
+document.getElementById('d2n').onclick=d2new;d2new();
+
+/* ---------- Drill 3: Richtig oder falsch? ---------- */
+const D3=[
+ {e:"H2 + O2 -> H2O2",c:"Wasserstoff reagiert mit Sauerstoff zu Wasser.",ok:0,w:"Die Atome sind zwar gleich verteilt, aber die Indexzahl im Produkt wurde verändert. H₂O₂ ist Wasserstoffperoxid, nicht Wasser. Richtig: 2 H₂ + O₂ → 2 H₂O."},
+ {e:"2 Mg + O2 -> 2 MgO",c:"Magnesium verbrennt zu Magnesiumoxid.",ok:1,w:"Links 2 Mg und 2 O, rechts 2 Mg und 2 O."},
+ {e:"Na + Cl -> NaCl",c:"Natrium reagiert mit Chlor zu Natriumchlorid.",ok:0,w:"Chlor liegt elementar als zweiatomiges Molekül Cl₂ vor. Richtig: 2 Na + Cl₂ → 2 NaCl."},
+ {e:"4 Al + 3 O2 -> 2 Al2O3",c:"Aluminium verbrennt zu Aluminiumoxid.",ok:1,w:"Al: 4 = 4. O: 6 = 6. Die Koeffizienten sind die kleinsten ganzen Zahlen."},
+ {e:"2 Al + 3 O2 -> Al2O6",c:"Aluminium verbrennt zu Aluminiumoxid.",ok:0,w:"Die Formel des Produkts wurde verändert. Aluminiumoxid hat die Verhältnisformel Al₂O₃ (aus Al³⁺ und O²⁻). Richtig: 4 Al + 3 O₂ → 2 Al₂O₃."},
+ {e:"4 H2 + 2 O2 -> 4 H2O",c:"Wasserstoff reagiert mit Sauerstoff zu Wasser.",ok:0,w:"Die Atombilanz stimmt, aber die Koeffizienten sind nicht die kleinsten ganzen Zahlen. Alle lassen sich durch 2 teilen: 2 H₂ + O₂ → 2 H₂O."},
+ {e:"CH4 + 2 O2 -> CO2 + 2 H2O",c:"Methan verbrennt vollständig.",ok:1,w:"C: 1 = 1. H: 4 = 4. O: 4 = 4."},
+ {e:"Ca(OH)2 + HCl -> CaCl2 + 2 H2O",c:"Calciumhydroxid reagiert mit Chlorwasserstoff.",ok:0,w:"Cl: links 1, rechts 2. H: links 3, rechts 4. Richtig: Ca(OH)₂ + 2 HCl → CaCl₂ + 2 H₂O."},
+ {e:"Cu + Ag^+ -> Cu^2+ + Ag",c:"Kupfer reagiert mit Silber-Ionen.",ok:0,w:"Die Atombilanz stimmt, die Ladungsbilanz nicht: links +1, rechts +2. Richtig: Cu + 2 Ag⁺ → Cu²⁺ + 2 Ag."},
+ {e:"2 H2O -> 2 H2 + O2",c:"Wasser wird durch Elektrolyse zerlegt.",ok:1,w:"H: 4 = 4. O: 2 = 2."},
+ {e:"Fe + 3 Cl -> FeCl3",c:"Eisen reagiert mit Chlor zu Eisen(III)-chlorid.",ok:0,w:"Chlor liegt als Cl₂ vor. Richtig: 2 Fe + 3 Cl₂ → 2 FeCl₃."},
+ {e:"C3H8 + 5 O2 -> 3 CO2 + 4 H2O",c:"Propan verbrennt vollständig.",ok:1,w:"C: 3 = 3. H: 8 = 8. O: 10 = 10."},
+ {e:"N2 + H2 -> 2 NH3",c:"Ammoniaksynthese.",ok:0,w:"H: links 2, rechts 6. Richtig: N₂ + 3 H₂ → 2 NH₃."},
+ {e:"Mg + 2 HCl -> MgCl2 + H2",c:"Magnesium reagiert mit Chlorwasserstoff.",ok:1,w:"Mg: 1 = 1. H: 2 = 2. Cl: 2 = 2."},
+ {e:"Fe2O3 + 3 CO -> 2 Fe + 3 CO2",c:"Reduktion von Eisenoxid im Hochofen.",ok:1,w:"Fe: 2 = 2. C: 3 = 3. O: 6 = 6."},
+ {e:"2 KClO3 -> 2 KCl + O2",c:"Kaliumchlorat wird thermisch zersetzt.",ok:0,w:"O: links 6, rechts 2. Richtig: 2 KClO₃ → 2 KCl + 3 O₂."}
+];
+const d3={n:0,r:0,cur:null,order:[],p:0};
+function eqHTML(str){const[l,r]=str.split(' -> ');const side=x=>x.split(' + ').map(t=>{const m=t.match(/^(\d+) (.+)$/);return m?`<span class="k">${m[1]}</span>${fHTML(m[2])}`:fHTML(t)}).join(' + ');return side(l)+' → '+side(r)}
+function d3new(){if(d3.p>=d3.order.length){d3.order=D3.map((x,i)=>i).sort(()=>Math.random()-.5);d3.p=0}d3.cur=D3[d3.order[d3.p++]];
+ document.getElementById('d3ctx').textContent=d3.cur.c;document.getElementById('d3f').innerHTML=eqHTML(d3.cur.e);
+ document.getElementById('d3fb').className='fb';document.querySelectorAll('#d3b button').forEach(b=>b.disabled=false)}
+document.querySelectorAll('#d3b button').forEach(b=>b.onclick=()=>{const c=d3.cur,ok=+b.dataset.a===c.ok;d3.n++;if(ok)d3.r++;
+ document.getElementById('d3s').textContent=`${d3.r} von ${d3.n}`;document.querySelectorAll('#d3b button').forEach(x=>x.disabled=true);
+ const f=document.getElementById('d3fb');f.className='fb show '+(ok?'ok':'bad');
+ f.innerHTML=`<b>${ok?'Deine Einschätzung ist richtig.':'Deine Einschätzung ist falsch.'} Die Gleichung ist ${c.ok?'richtig':'falsch'}.</b>${c.w}`});
+document.getElementById('d3n').onclick=d3new;d3new();
+
+
+</script>
+</body>
+</html>
