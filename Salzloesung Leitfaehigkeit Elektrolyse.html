@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Salzlösung im elektrischen Feld: Leitfähigkeit und Elektrolyse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E9EFF3; --card:#FFFFFF; --ink:#15232D; --muted:#4E5F6B; --line:#C8D4DC;
+  --accent:#1D5C84; --accent-soft:#DCEAF3;
+  --na:#6F4BB2; --cl:#2E9656; --o:#D5402F; --el:#F0B000; --metal:#4B5661;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,"Segoe UI",Arial,sans-serif;font-size:16px;line-height:1.45}
+.app{display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:18px;padding:18px;max-width:1560px;margin:0 auto}
+.stage{background:#F8FAFC;border:1px solid var(--line);border-radius:12px;padding:14px 14px 10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.stage h1{font-size:1.55rem;line-height:1.2;margin:0}
+.stage .sub{margin:0;color:var(--muted);font-size:.98rem}
+canvas{width:100%;aspect-ratio:1000/660;display:block;border-radius:8px;background:#FBFCFD;touch-action:manipulation}
+.status{min-height:3em;margin:0;padding:10px 12px;border-radius:8px;background:var(--accent-soft);color:#10334A;font-size:1rem}
+aside{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.card h2{font-size:1.05rem;margin:0 0 8px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:#D9E3EA;padding:5px;border-radius:10px}
+.tabs button{border:0;background:transparent;border-radius:7px;padding:9px 8px;font:inherit;font-weight:700;color:var(--muted);cursor:pointer}
+.tabs button[aria-selected="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(20,40,60,.18)}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{font:inherit;font-weight:700;border-radius:8px;padding:10px 10px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);text-align:center}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.on{background:#8A2E1F;border-color:#8A2E1F;color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.wide{grid-column:1/-1}
+button:focus-visible,input:focus-visible{outline:3px solid #F0B000;outline-offset:2px}
+.row{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:.95rem}
+.row input[type=range]{flex:1}
+.checks{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:8px;font-size:.95rem}
+.checks label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.meter{height:14px;border-radius:7px;background:#E2E8ED;overflow:hidden;margin:4px 0 10px}
+.meter span{display:block;height:100%;width:0;background:linear-gradient(90deg,#F0B000,#E07B00);transition:width .25s}
+table.data{width:100%;border-collapse:collapse;font-size:.93rem}
+table.data td{padding:3px 0;border-bottom:1px solid #EDF1F4}
+table.data td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+.explain p,.explain li{font-size:.95rem}
+.explain ol{padding-left:1.2em;margin:.4em 0}
+.explain li{margin-bottom:.35em}
+.eq{display:flex;flex-direction:column;gap:2px;font-size:.95rem;margin:.5em 0 .8em}
+.eq b{margin-top:6px}
+.eq .r{display:block;padding:4px 10px;background:#F1F5F8;border-radius:6px;font-size:1.02rem;white-space:nowrap;overflow-x:auto}
+.note{font-size:.88rem;color:var(--muted);border-left:3px solid var(--line);padding-left:10px;margin:.6em 0 0}
+.legend{display:grid;grid-template-columns:26px 1fr;gap:6px 8px;align-items:center;font-size:.92rem}
+.inset{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.inset figure{margin:0;text-align:center}
+.inset svg{width:100%;height:auto}
+.inset figcaption{font-size:.84rem;color:var(--muted);line-height:1.3}
+details{font-size:.9rem}
+details summary{cursor:pointer;font-weight:700;font-size:1rem}
+details li{margin-bottom:.45em}
+[hidden]{display:none!important}
+@media (max-width:1050px){.app{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <main class="stage">
+    <h1>Salzlösung im elektrischen Feld</h1>
+    <p class="sub">Teilchenmodell von Natriumchlorid in Wasser. Füge Wasser hinzu und schalte die Spannung ein.</p>
+    <canvas id="sim" aria-label="Animation: Natriumchlorid und Wasser zwischen zwei Elektroden"></canvas>
+    <p class="status" id="status" aria-live="polite"></p>
+  </main>
+
+  <aside>
+    <div class="tabs" role="tablist" aria-label="Ansicht">
+      <button role="tab" id="tab1" aria-selected="true">Leitfähigkeit</button>
+      <button role="tab" id="tab2" aria-selected="false">Elektrolyse</button>
+    </div>
+
+    <section class="card" aria-label="Steuerung">
+      <div class="controls">
+        <button class="btn primary wide" id="btnWater">Wasser hinzufügen</button>
+        <button class="btn" id="btnVolt">Spannung einschalten</button>
+        <button class="btn" id="btnPause">Pause</button>
+        <button class="btn wide" id="btnReset">Zurücksetzen</button>
+      </div>
+      <div class="row"><label for="speed">Tempo</label><input type="range" id="speed" min="0.25" max="2" step="0.25" value="1"><span id="speedVal">1×</span></div>
+      <div class="checks">
+        <label><input type="checkbox" id="chkHi"> Hydrathüllen hervorheben</label>
+        <label><input type="checkbox" id="chkLab" checked> Beschriftungen</label>
+      </div>
+    </section>
+
+    <section class="card" aria-label="Messwerte">
+      <h2>Stromstärke (Modell)</h2>
+      <div class="meter" aria-hidden="true"><span id="meter"></span></div>
+      <table class="data">
+        <tr><td>Wassermoleküle insgesamt</td><td id="dW">0</td></tr>
+        <tr><td>davon frei (nicht in Hydrathüllen)</td><td id="dWf">–</td></tr>
+        <tr><td>Ionen im Ionengitter</td><td id="dLat">24</td></tr>
+        <tr><td>hydratisierte Na<sup>+</sup> | Cl<sup>−</sup> | OH<sup>−</sup></td><td id="dIons">0 | 0 | 0</td></tr>
+        <tr id="rowProd" hidden><td>entstanden: H<sub>2</sub> | Cl<sub>2</sub> | O<sub>2</sub></td><td id="dProd">0 | 0 | 0</td></tr>
+      </table>
+    </section>
+
+    <section class="card explain" id="ex1" aria-label="Erklärung Leitfähigkeit">
+      <h2>So entsteht die Leitfähigkeit</h2>
+      <ol>
+        <li><b>Festes Natriumchlorid:</b> Natrium-Ionen und Chlorid-Ionen sind im Ionengitter an feste Plätze gebunden. Schalte die Spannung ein: Es gibt keine frei beweglichen Ladungsträger, die Lampe bleibt aus.</li>
+        <li><b>Wasser hinzufügen:</b> Wassermoleküle lagern sich an Ionen an der Kristalloberfläche an. Die Ionen werden aus dem Gitter herausgelöst und von einer Hydrathülle umgeben.</li>
+        <li><b>Spannung einschalten:</b> Die hydratisierten Ionen bewegen sich gerichtet: Kationen zum Minuspol, Anionen zum Pluspol. Im Kabel bewegen sich Elektronen. Die Lampe leuchtet.</li>
+      </ol>
+      <p class="note">Modellvereinfachung: In dieser Ansicht sind die Vorgänge an den Elektroden ausgeblendet. Ionen, die eine Elektrode erreichen, werden auf der Gegenseite wieder eingesetzt, damit die Ionenkonzentration gleich bleibt. Was an den Elektroden tatsächlich geschieht, zeigt die Ansicht Elektrolyse.</p>
+    </section>
+
+    <section class="card explain" id="ex2" hidden aria-label="Erklärung Elektrolyse">
+      <h2>Elektrolyse einer Natriumchlorid-Lösung</h2>
+      <div class="eq">
+        <b>Minuspol (Kathode): Reduktion</b>
+        <span class="r">2 H<sub>2</sub>O + 2 e<sup>−</sup> → H<sub>2</sub> + 2 OH<sup>−</sup></span>
+        <b>Pluspol (Anode): Oxidation</b>
+        <span class="r">2 Cl<sup>−</sup> → Cl<sub>2</sub> + 2 e<sup>−</sup></span>
+        <b>Gesamt</b>
+        <span class="r">2 H<sub>2</sub>O + 2 Cl<sup>−</sup> → H<sub>2</sub> + Cl<sub>2</sub> + 2 OH<sup>−</sup></span>
+      </div>
+      <ol>
+        <li>Chlorid-Ionen erreichen die Anode. Ihre Hydrathülle löst sich, ein Elektron geht auf die Elektrode über. Zwei Chlor-Atome bilden ein Chlor-Molekül.</li>
+        <li>Die Elektronen bewegen sich durch das Kabel und die Spannungsquelle zur Kathode.</li>
+        <li>An der Kathode nehmen Wassermoleküle Elektronen auf. Es entstehen Wasserstoff-Moleküle und Hydroxid-Ionen.</li>
+        <li>Die Natrium-Ionen bewegen sich zur Kathode, werden dort aber nicht reduziert. Zurück bleibt eine Lösung aus Na<sup>+</sup> und OH<sup>−</sup>: Natronlauge.</li>
+      </ol>
+      <p class="note" id="o2note" hidden>Alle Chlorid-Ionen sind oxidiert. Nun werden an der Anode Hydroxid-Ionen oxidiert: 4 OH<sup>−</sup> → O<sub>2</sub> + 2 H<sub>2</sub>O + 4 e<sup>−</sup>. Zusammen mit der Kathodenreaktion wird damit Wasser zersetzt (2 H<sub>2</sub>O → 2 H<sub>2</sub> + O<sub>2</sub>); die Zahl der Wassermoleküle nimmt ab.</p>
+    </section>
+
+    <section class="card" aria-label="Legende">
+      <h2>Legende</h2>
+      <div class="legend" id="legend"></div>
+    </section>
+
+    <section class="card" aria-label="Hydrathülle im Detail">
+      <h2>Hydrathülle im Detail</h2>
+      <div class="inset">
+        <figure><div id="insetNa"></div><figcaption>Am Kation zeigen die Sauerstoff-Atome (δ−) zum Ion.</figcaption></figure>
+        <figure><div id="insetCl"></div><figcaption>Am Anion zeigt je ein Wasserstoff-Atom (δ+) zum Ion.</figcaption></figure>
+      </div>
+    </section>
+
+    <section class="card">
+      <details>
+        <summary>Fachliche Hinweise zum Modell</summary>
+        <ul>
+          <li>Zweidimensionale Projektion. Dargestellt ist nur die erste Hydrathülle (Na<sup>+</sup>: 6, Cl<sup>−</sup>: 7 Wassermoleküle). Die Koordinationszahlen in Lösung liegen je nach Messmethode und Simulation bei etwa 5–6 (Na<sup>+</sup>) bzw. 6–8 (Cl<sup>−</sup>). Die Hüllmoleküle werden laufend gegen freie Wassermoleküle ausgetauscht.</li>
+          <li>Größen näherungsweise maßstäblich: Ionenradien nach Shannon (Na<sup>+</sup> 102 pm, Cl<sup>−</sup> 181 pm), Wassermolekül ca. 280 pm, O–H 96 pm, H–O–H 104,5°, Abstand Na–O ca. 240 pm, Cl–O ca. 320 pm. Das Chlor-Atom im Cl<sub>2</sub>-Molekül ist kleiner gezeichnet als das Chlorid-Ion.</li>
+          <li>Ionenbeweglichkeit: Cl<sup>−</sup> ist beweglicher als Na<sup>+</sup> (Grenzleitfähigkeiten ca. 76 bzw. 50 S·cm²/mol); das Modell verwendet dieses Verhältnis. OH<sup>−</sup> ist real deutlich beweglicher (ca. 198 S·cm²/mol, Grotthuss-Mechanismus); das ist hier nicht abgebildet.</li>
+          <li>Geschwindigkeiten und Teilchenzahlen sind nicht maßstäblich. Die Driftgeschwindigkeit von Elektronen im Kabel liegt real im Bereich von Millimetern pro Sekunde oder darunter. Die technische Stromrichtung verläuft entgegengesetzt zur Bewegungsrichtung der Elektronen.</li>
+          <li>Kathode: E°(Na<sup>+</sup>/Na) = −2,71 V liegt weit unter dem Potenzial der Wasserreduktion, daher entsteht an üblichen Kathoden Wasserstoff und kein Natrium (anders beim früheren Amalgamverfahren mit Quecksilberkathode).</li>
+          <li>Anode: Thermodynamisch wäre die Sauerstoffbildung begünstigt (E°(O<sub>2</sub>/H<sub>2</sub>O) = +1,23 V gegenüber E°(Cl<sub>2</sub>/Cl<sup>−</sup>) = +1,36 V). Wegen der hohen Überspannung der Sauerstoffbildung entsteht in konzentrierter Lösung überwiegend Chlor; in verdünnter Lösung steigt der Sauerstoffanteil. Das Modell zeigt Sauerstoff vereinfachend erst, wenn keine Chlorid-Ionen mehr vorhanden sind.</li>
+          <li>Na<sup>+</sup>-Ionen (und OH<sup>−</sup>, solange Cl<sup>−</sup> vorhanden ist) reichern sich im Modell in einer breiten Zone vor ihrer Elektrode an, ohne sie dicht zu belegen. Das ersetzt vereinfacht die reale Konzentrationsverteilung (Diffusionsschicht, Elektroneutralität). Chlorid-Ionen werden oxidiert, sobald sie in unmittelbare Nähe der Anode gelangen.</li>
+          <li>Ohne Trennung der Elektrodenräume reagiert Chlor mit Hydroxid-Ionen weiter (Hypochlorit-Bildung). Das ist nicht dargestellt.</li>
+          <li>Stromleitung durch einen Elektrolyten bei Gleichspannung ist immer mit Elektrodenreaktionen verbunden. Leitfähigkeitsmessgeräte arbeiten deshalb mit Wechselspannung.</li>
+          <li>Löslichkeit: Das Modell löst höchstens ein Ion pro 13 Wassermoleküle. Mit wenig Wasser entsteht so eine gesättigte Lösung mit Bodenkörper. Das reale Verhältnis bei 20 °C beträgt ca. 9 Wassermoleküle pro Formeleinheit NaCl.</li>
+        </ul>
+      </details>
+    </section>
+  </aside>
+</div>
+
+<script>
+(() => {
+'use strict';
+// ---------- Geometrie und Konstanten (Modelleinheiten = px bei 1000 × 660) ----------
+const W = 1000, H = 660;
+const BX0 = 120, BX1 = 880, BY0 = 165, BY1 = 630;          // Innenraum Becherglas
+const CATH = { x0: 163, x1: 177, y0: 95, y1: 592 };         // Kathode (links, Minuspol)
+const AN   = { x0: 823, x1: 837, y0: 95, y1: 592 };         // Anode (rechts, Pluspol)
+const R    = { Na: 7, Cl: 12, OH: 8.5 };                    // unhydratisierte Radien
+const RH   = { Na: 26, Cl: 31, OH: 27 };                    // Radius inkl. Hydrathülle (Kollision)
+const SHELL = { Na: { n: 6, r: 17, kind: 'cat' }, Cl: { n: 7, r: 23, kind: 'an' }, OH: { n: 3, r: 19, kind: 'an' } };
+const MOB  = { Na: 0.66, Cl: 1.0, OH: 1.0 };                // relative Beweglichkeit
+const Q    = { Na: 1, Cl: -1, OH: -1 };
+const RW = 9, RO = 8.5, RHv = 5, OHL = 6.5, HALF = 104.5 / 2 * Math.PI / 180;
+const MAXW = 550, ADDW = 110, WATER_PER_ION = 13;
+const PHYS = { wNoise: 1.8, g: 0, damp: 0.82, ionNoise: 0.6, drift: 0.3, ionIm: 0.3, iters: 2, pack: 0.5, kp: 1.2 };
+const COLORS = { na: '#6F4BB2', naD: '#4C2F85', cl: '#2E9656', clD: '#1D6B3B', o: '#D5402F', oD: '#9C2B1F', h: '#FFFFFF', hD: '#8C99A3', el: '#F0B000', elD: '#7A5A00', metal: '#4B5661', wire: '#26313B', ink: '#15232D' };
+const FONT = '"Atkinson Hyperlegible", system-ui, "Segoe UI", Arial, sans-serif';
+const PATH_A = [[830, 590], [830, 60], [512, 60]];           // Anode -> Pluspol der Quelle
+const PATH_B = [[488, 60], [170, 60], [170, 590]];           // Minuspol der Quelle -> Kathode
+
+// ---------- Zustand ----------
+let waters, ions, atoms, groups, bubbles, hops, eQueue, latt;
+let tick, pour, surfY, current, ePhase, dissCool, prod;
+let clPresentCache = true;
+let mode = 1, voltage = false, paused = false, speed = 1, highlight = false, labels = true;
+
+const cv = document.getElementById('sim');
+const ctx = cv.getContext('2d');
+
+function init() {
+  waters = []; ions = []; atoms = []; groups = []; bubbles = []; hops = []; eQueue = [];
+  tick = 0; pour = 0; surfY = BY1; current = 0; ePhase = 0; dissCool = 0;
+  prod = { H2: 0, Cl2: 0, O2: 0 };
+  const COLS = 8, ROWS = 3, d = 19;
+  latt = [];
+  for (let j = 0; j < ROWS; j++) {
+    latt[j] = [];
+    for (let i = 0; i < COLS; i++) {
+      const type = (i + j) % 2 === 0 ? 'Na' : 'Cl';
+      const ion = { type, x: 500 + (i - (COLS - 1) / 2) * d, y: BY1 - 12 - j * d, vx: 0, vy: 0,
+        rot: Math.random() * 6.28, vr: 0, state: 'lattice', li: i, lj: j, alpha: 1, fade: 0,
+        shell: [], seed: Math.random() * 100 };
+      latt[j][i] = ion; ions.push(ion);
+    }
+  }
+}
+
+// ---------- Hilfsfunktionen ----------
+const rnd = () => Math.random() - 0.5;
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+function angDiff(a, b) { let d = b - a; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; return d; }
+
+function slotPose(ion, k, wob) {
+  const s = SHELL[ion.type];
+  const phi = ion.type === 'OH' ? ion.rot + Math.PI / 2 * (k + 1) : ion.rot + 2 * Math.PI * k / s.n;
+  const x = ion.x + s.r * Math.cos(phi), y = ion.y + s.r * Math.sin(phi);
+  let a;
+  if (s.kind === 'cat') a = phi;                                   // Dipolachse nach außen: O zum Kation
+  else { const sg = k % 2 ? 1 : -1; a = phi + Math.PI - sg * HALF; } // ein O–H zeigt zum Anion
+  if (wob) {
+    const t = tick * 0.05 + k * 1.7 + (ion.seed || 0);
+    return { x: x + Math.sin(t) * 0.7, y: y + Math.cos(t * 1.3) * 0.7, a: a + Math.sin(t * 0.8) * 0.12 };
+  }
+  return { x, y, a };
+}
+
+function spawnWater() {
+  waters.push({ x: BX0 + 12 + Math.random() * (BX1 - BX0 - 24), y: 115 + Math.random() * 30, vx: rnd(), vy: 2.5, px: 0, py: 0,
+    a: Math.random() * 6.28, va: 0, state: 'free', host: null, slot: -1, inL: false });
+}
+
+function recruit(ion) {
+  const s = SHELL[ion.type];
+  ion.shell = new Array(s.n).fill(null);
+  for (let k = 0; k < s.n; k++) {
+    const p = slotPose(ion, k, false);
+    let best = null, bd = 160 * 160;
+    for (const w of waters) {
+      if (w.state !== 'free') continue;
+      const d2 = (w.x - p.x) ** 2 + (w.y - p.y) ** 2;
+      if (d2 < bd) { bd = d2; best = w; }
+    }
+    if (best) { best.state = 'moving'; best.host = ion; best.slot = k; ion.shell[k] = best; }
+  }
+}
+
+function releaseShell(ion, pushX) {
+  for (const w of ion.shell) {
+    if (!w) continue;
+    w.state = 'free'; w.host = null; w.slot = -1; w.inL = true;
+    const ang = Math.atan2(w.y - ion.y, w.x - ion.x);
+    w.vx = Math.cos(ang) * 1.0 + pushX; w.vy = Math.sin(ang) * 1.0;
+  }
+  ion.shell = [];
+}
+
+function chloridePresent() {
+  return ions.some(i => i.type === 'Cl' && (i.state === 'lattice' || i.state === 'dissolving' || i.state === 'free'));
+}
+
+function inSolution(i) { return i.state === 'free'; }
+
+// ---------- Lösevorgang ----------
+function latticeNeighbors(ion) {
+  const { li: i, lj: j } = ion; let n = 0;
+  for (const [a, b] of [[i - 1, j], [i + 1, j], [i, j - 1], [i, j + 1]]) if (latt[b] && latt[b][a]) n++;
+  return n;
+}
+function freeDir(ion) {
+  const { li: i, lj: j } = ion;
+  const up = !(latt[j + 1] && latt[j + 1][i]);
+  if (up) return [0, -1];
+  const left = !latt[j][i - 1], right = !latt[j][i + 1];
+  if (left && right) return Math.random() < 0.5 ? [-1, 0] : [1, 0];
+  if (left) return [-1, 0];
+  if (right) return [1, 0];
+  return null;
+}
+
+function dissolveStep() {
+  if (--dissCool > 0) return;
+  dissCool = 6;
+  const total = waters.filter(w => w.state !== 'gone').length;
+  if (total < 10) return;
+  const dissolved = ions.filter(i => i.type !== 'OH' && (i.state === 'free' || i.state === 'dissolving')).length;
+  if (dissolved >= Math.floor(total / WATER_PER_ION)) return;
+  let freeCount = 0; for (const w of waters) if (w.state === 'free') freeCount++;
+  if (freeCount < 16) return;
+  const latNa = ions.filter(i => i.state === 'lattice' && i.type === 'Na').length;
+  const latCl = ions.filter(i => i.state === 'lattice' && i.type === 'Cl').length;
+  const prefer = latNa > latCl ? 'Na' : latCl > latNa ? 'Cl' : null;
+  const cands = [];
+  for (const ion of ions) {
+    if (ion.state !== 'lattice') continue;
+    const dir = freeDir(ion); if (!dir) continue;
+    let wet = 0;
+    for (const w of waters) if (w.state === 'free' && (w.x - ion.x) ** 2 + (w.y - ion.y) ** 2 < 36 * 36) { wet++; if (wet >= 2) break; }
+    if (wet < 1) continue;
+    const score = latticeNeighbors(ion) * 10 + (prefer && ion.type !== prefer ? 25 : 0) + Math.random() * 3;
+    cands.push({ ion, dir, score });
+  }
+  if (!cands.length) return;
+  cands.sort((a, b) => a.score - b.score);
+  const { ion, dir } = cands[0];
+  latt[ion.lj][ion.li] = null;
+  ion.state = 'dissolving'; ion.t = 0;
+  ion.sx = ion.x; ion.sy = ion.y; ion.tx = ion.x + dir[0] * 24; ion.ty = ion.y + dir[1] * 24; ion.dir = dir;
+  recruit(ion);
+}
+
+// ---------- Elektrodenvorgänge ----------
+function oxidize(ion) {
+  releaseShell(ion, -0.8);
+  const kind = ion.type === 'Cl' ? 'Cl' : 'OH';
+  hops.push({ x0: ion.x, y0: ion.y, x1: AN.x0 + 4, y1: ion.y, t: 0, dur: 32 });
+  atoms.push({ type: kind, x: ion.x, y: ion.y, tx: AN.x0 - (kind === 'Cl' ? 8 : 9), side: 'an', rot: Math.PI, grouped: false });
+  ion.state = 'gone';
+  eQueue.push(tick + 110);
+}
+
+function cathodeStep() {
+  if (mode !== 2 || !voltage) return;
+  const ready = eQueue.filter(t => t <= tick).length;
+  if (ready < 2) return;
+  const cand = waters.filter(w => w.state === 'free' && w.x > CATH.x1 && w.x < CATH.x1 + 120 && w.y > surfY + 12 && w.y < CATH.y1 - 6)
+    .sort((a, b) => a.x - b.x);
+  if (cand.length < 2) return;
+  eQueue.sort((a, b) => a - b); eQueue.splice(0, 2);
+  for (let k = 0; k < 2; k++) {
+    const w = cand[k]; w.state = 'reacting';
+    hops.push({ x0: CATH.x1 - 3, y0: w.y, x1: w.x, y1: w.y, t: 0, dur: 32, done: () => reduceWater(w) });
+  }
+}
+
+function reduceWater(w) {
+  const a1 = w.a + HALF, a2 = w.a - HALF;
+  const h1 = { x: w.x + OHL * Math.cos(a1), y: w.y + OHL * Math.sin(a1) };
+  const h2 = { x: w.x + OHL * Math.cos(a2), y: w.y + OHL * Math.sin(a2) };
+  const [hr, keep] = h1.x < h2.x ? [h1, a2] : [h2, a1];
+  atoms.push({ type: 'H', x: hr.x, y: hr.y, tx: CATH.x1 + 5, side: 'cat', grouped: false });
+  const oh = { type: 'OH', x: w.x, y: w.y, vx: 0.4, vy: 0, rot: keep, vr: 0, state: 'free', alpha: 1, fade: 0, shell: [], seed: Math.random() * 100 };
+  w.state = 'gone';
+  ions.push(oh);
+  recruit(oh);
+}
+
+function atomsStep() {
+  for (const a of atoms) a.x += (a.tx - a.x) * 0.12;
+  const specs = [['Cl', 2, 'Cl2', 'an'], ['H', 2, 'H2', 'cat'], ['OH', 4, 'O2', 'an']];
+  for (const [type, need, product, side] of specs) {
+    const free = atoms.filter(a => a.type === type && !a.grouped && Math.abs(a.x - a.tx) < 1.5);
+    while (free.length >= need) {
+      const g = free.splice(0, need);
+      const ty = g.reduce((s, a) => s + a.y, 0) / need;
+      g.forEach(a => { a.grouped = true; });
+      groups.push({ atoms: g, product, side, ty });
+    }
+  }
+  for (let gi = groups.length - 1; gi >= 0; gi--) {
+    const g = groups[gi];
+    let done = true;
+    g.atoms.forEach((a, idx) => {
+      const target = g.ty + (idx - (g.atoms.length - 1) / 2) * (a.type === 'H' ? 5 : 13);
+      const dy = target - a.y;
+      if (Math.abs(dy) > 1) { a.y += Math.sign(dy) * Math.min(1.6, Math.abs(dy)); done = false; }
+    });
+    if (done) {
+      const x = g.side === 'an' ? AN.x0 - 13 : CATH.x1 + 10;
+      bubbles.push({ type: g.product, x, y: g.ty, vx: 0, vy: -0.2, alpha: 1, rot: Math.PI / 2 + rnd() * 0.4, vr: 0 });
+      prod[g.product]++;
+      if (g.product === 'O2') {
+        for (let k = 0; k < 2; k++) waters.push({ x: AN.x0 - 22, y: g.ty + (k ? 12 : -12), vx: -1, vy: 0, px: 0, py: 0, a: Math.random() * 6.28, va: 0, state: 'free', host: null, slot: -1, inL: true });
+      }
+      atoms = atoms.filter(a => !g.atoms.includes(a));
+      groups.splice(gi, 1);
+    }
+  }
+}
+
+// ---------- Kollisionen (positionsbasiert mit Raster) ----------
+const CELL = 64, GX = Math.ceil(W / CELL) + 1, GY = Math.ceil(H / CELL) + 1;
+const grid = Array.from({ length: GX * GY }, () => []);
+
+function collide() {
+  const bodies = [];
+  for (const w of waters) if (w.state === 'free') { w._r = RW; w._im = 1; bodies.push(w); }
+  for (const i of ions) {
+    if (i.state === 'free') { i._r = RH[i.type]; i._im = PHYS.ionIm; bodies.push(i); }
+    else if (i.state === 'lattice' || i.state === 'dissolving') { i._r = R[i.type]; i._im = 0; bodies.push(i); }
+  }
+  for (let it = 0; it < PHYS.iters; it++) {
+    for (const c of grid) c.length = 0;
+    bodies.forEach((b, idx) => {
+      b._i = idx;
+      const cx = clamp(Math.floor(b.x / CELL), 0, GX - 1), cy = clamp(Math.floor(b.y / CELL), 0, GY - 1);
+      b._cx = cx; b._cy = cy; grid[cy * GX + cx].push(b);
+    });
+    if (it === 0) pressure(bodies);
+    for (const b of bodies) {
+      for (let oy = -1; oy <= 1; oy++) for (let ox = -1; ox <= 1; ox++) {
+        const cx = b._cx + ox, cy = b._cy + oy;
+        if (cx < 0 || cy < 0 || cx >= GX || cy >= GY) continue;
+        for (const o of grid[cy * GX + cx]) {
+          if (o._i <= b._i) continue;
+          const tot = b._im + o._im; if (tot === 0) continue;
+          const dx = o.x - b.x, dy = o.y - b.y, d2 = dx * dx + dy * dy;
+          const min = b._r + o._r - ((b._im === PHYS.ionIm) !== (o._im === PHYS.ionIm) ? 4 : 0);
+          if (d2 >= min * min || d2 < 1e-6) continue;
+          const d = Math.sqrt(d2), ov = (min - d) / d;
+          b.x -= dx * ov * b._im / tot; b.y -= dy * ov * b._im / tot;
+          o.x += dx * ov * o._im / tot; o.y += dy * ov * o._im / tot;
+        }
+      }
+    }
+    for (const b of bodies) if (b._im > 0) constrain(b, b._r);
+  }
+}
+
+// Horizontaler Druckausgleich: Wassermoleküle strömen aus dicht besetzten in weniger dicht besetzte Bereiche
+const occ = new Float32Array(GX * GY);
+function pressure(bodies) {
+  occ.fill(0);
+  // Konzentration freier Wassermoleküle je Zelle (Ionen zählen nicht mit, damit Wasser zwischen ihnen hindurchströmen kann)
+  for (const b of bodies) if (b._im === 1) occ[b._cy * GX + b._cx] += Math.PI * b._r * b._r / (CELL * CELL);
+  for (const b of bodies) {
+    if (b._im !== 1) continue;
+    const c = b._cy * GX + b._cx, o = occ[c];
+    const inside = (b._cy + 0.5) * CELL > surfY + 12;
+    const l = b._cx > 0 && (inside || occ[c - 1] > 0.02) ? occ[c - 1] : o;
+    const r = b._cx < GX - 1 && (inside || occ[c + 1] > 0.02) ? occ[c + 1] : o;
+    b.x -= (r - l) * PHYS.kp;
+  }
+}
+function rectPush(b, r, E) {
+  const cx = clamp(b.x, E.x0, E.x1), cy = clamp(b.y, E.y0, E.y1);
+  const dx = b.x - cx, dy = b.y - cy, d2 = dx * dx + dy * dy;
+  if (d2 >= r * r) return;
+  if (d2 < 1e-6) { b.x = b.x < (E.x0 + E.x1) / 2 ? E.x0 - r : E.x1 + r; return; }
+  const d = Math.sqrt(d2), p = (r - d) / d; b.x += dx * p; b.y += dy * p;
+}
+function constrain(b, r) {
+  if (b.x < BX0 + r) b.x = BX0 + r;
+  if (b.x > BX1 - r) b.x = BX1 - r;
+  if (b.y > BY1 - r) b.y = BY1 - r;
+  if (b.inL && b.y < surfY + r * 0.9) b.y = surfY + r * 0.9;
+  else if (b.type && b.state === 'free' && b.y < surfY + r * 0.9) b.y = Math.min(BY1 - r, surfY + r * 0.9);
+  if (b.type) { if (b.x < CATH.x1 + r) b.x = CATH.x1 + r; if (b.x > AN.x0 - r) b.x = AN.x0 - r; }
+  rectPush(b, r, CATH); rectPush(b, r, AN);
+}
+
+// ---------- Simulationsschritt ----------
+function computeSurface() {
+  // Füllhöhe aus dem Platzbedarf aller Teilchen in der Flüssigkeit (flache Oberfläche)
+  let A = 0;
+  for (const w of waters) if ((w.state === 'free' && w.inL) || w.state === 'reacting') A += Math.PI * RW * RW;
+  for (const i of ions) {
+    if (i.state === 'free') A += Math.PI * RH[i.type] ** 2;
+    else if (i.state === 'lattice' || i.state === 'dissolving') A += 19 * 19;
+  }
+  const level = A > 0 ? Math.max(BY0 + 8, BY1 - A / PHYS.pack / (BX1 - BX0 - 28)) : BY1;
+  surfY += (level - surfY) * 0.08;
+}
+
+function step() {
+  tick++;
+  for (let k = 0; k < 3 && pour > 0; k++, pour--) spawnWater();
+  computeSurface();
+  dissolveStep();
+  const E = voltage ? 1 : 0;
+  clPresentCache = chloridePresent();
+
+  // Ionen
+  for (const ion of ions) {
+    if (ion.state === 'free') {
+      ion.px = ion.x; ion.py = ion.y;
+      // Feld zeigt vom Pluspol (rechts) zum Minuspol (links): Kationen -> Minuspol, Anionen -> Pluspol
+      let f = E * PHYS.drift * MOB[ion.type];
+      // Elektrolyse: Ionen, die an ihrer Elektrode nicht reagieren (Na+, OH- solange Cl- vorhanden),
+      // bilden eine diffuse Anreicherungszone statt einer dichten Wand (Konzentrationspolarisation, Modell)
+      if (mode === 2 && (ion.type === 'Na' || (ion.type === 'OH' && clPresentCache))) {
+        const dist = Q[ion.type] > 0 ? ion.x - CATH.x1 : AN.x0 - ion.x;
+        f *= clamp((dist - 190) / 150, -1, 1);
+      }
+      ion.vx += rnd() * PHYS.ionNoise - Q[ion.type] * f;
+      ion.vy += rnd() * PHYS.ionNoise;
+      if (ion.y < surfY + RH[ion.type]) ion.vy += 0.3;
+      ion.vx *= 0.9; ion.vy *= 0.9;
+      ion.x += ion.vx; ion.y += ion.vy;
+      ion.vr += rnd() * 0.004; ion.vr *= 0.95; ion.rot += ion.vr;
+      if (ion.fade) {
+        ion.alpha += ion.fade * 0.045;
+        if (ion.alpha <= 0) teleport(ion);
+        if (ion.alpha >= 1) { ion.alpha = 1; ion.fade = 0; }
+      }
+    } else if (ion.state === 'dissolving') {
+      ion.t += 1 / 60;
+      const e = ion.t < 1 ? ion.t * ion.t * (3 - 2 * ion.t) : 1;
+      ion.x = ion.sx + (ion.tx - ion.sx) * e; ion.y = ion.sy + (ion.ty - ion.sy) * e;
+      ion.rot += 0.004;
+      if (ion.t >= 1) { ion.state = 'free'; ion.vx = ion.dir[0] * 0.6; ion.vy = ion.dir[1] * 0.6; ion.vr = 0; }
+    }
+  }
+
+  // freie Wassermoleküle
+  for (const w of waters) {
+    if (w.state !== 'free') continue;
+    w.px = w.x; w.py = w.y;
+    if (!w.inL && w.y >= surfY - 4) w.inL = true;
+    w.vx += rnd() * PHYS.wNoise; w.vy += rnd() * PHYS.wNoise + (w.inL ? PHYS.g : 0.35);
+    w.vx *= PHYS.damp; w.vy *= PHYS.damp;
+    w.x += w.vx; w.y += w.vy;
+    w.va += rnd() * 0.08; w.va *= 0.9; w.a += w.va;
+  }
+
+  collide();
+
+  // Geschwindigkeit aus tatsächlicher Verschiebung (verhindert Stau in Hindernissen)
+  for (const w of waters) if (w.state === 'free') { w.vx = (w.x - w.px) * 0.9; w.vy = (w.y - w.py) * 0.9; }
+  for (const i of ions) if (i.state === 'free' && i.px !== undefined) { i.vx = i.x - i.px; i.vy = i.y - i.py; }
+
+  // Elektrodenkontakt
+  if (voltage) {
+    const hasCl = chloridePresent();
+    for (const ion of ions) {
+      if (ion.state !== 'free' || ion.fade) continue;
+      const r = RH[ion.type];
+      const atAnode = ion.x + r >= AN.x0 - 2, atCathode = ion.x - r <= CATH.x1 + 2;
+      const nearAnode = ion.x + r >= AN.x0 - 60;
+      if (mode === 2) {
+        if (ion.type === 'Cl' && nearAnode) oxidize(ion);
+        else if (ion.type === 'OH' && !hasCl && nearAnode) oxidize(ion);
+      } else {
+        if ((Q[ion.type] > 0 && atCathode) || (Q[ion.type] < 0 && atAnode)) ion.fade = -1;
+      }
+    }
+  }
+  cathodeStep();
+
+  // Hydrathüllen an Ionen ausrichten
+  for (const w of waters) {
+    if (w.state === 'shell' || w.state === 'moving') {
+      const host = w.host;
+      if (!host || host.state === 'gone') { w.state = 'free'; w.host = null; w.inL = true; continue; }
+      const p = slotPose(host, w.slot, true);
+      if (w.state === 'shell') { w.x = p.x; w.y = p.y; w.a = p.a; }
+      else {
+        w.x += (p.x - w.x) * 0.2; w.y += (p.y - w.y) * 0.2; w.a += angDiff(w.a, p.a) * 0.2;
+        if ((p.x - w.x) ** 2 + (p.y - w.y) ** 2 < 16) w.state = 'shell';
+      }
+    }
+  }
+
+  exchangeStep();
+  atomsStep();
+
+  // Elektronen-Sprünge
+  for (let k = hops.length - 1; k >= 0; k--) {
+    const h = hops[k]; h.t += 1 / h.dur;
+    if (h.t >= 1) { if (h.done) h.done(); hops.splice(k, 1); }
+  }
+  // Gasmoleküle
+  for (let k = bubbles.length - 1; k >= 0; k--) {
+    const b = bubbles[k];
+    b.vy = Math.max(-1.4, b.vy - 0.025); b.y += b.vy; b.x += Math.sin(tick * 0.07 + k) * 0.25;
+    b.rot += Math.sin(tick * 0.03 + k) * 0.01;
+    if (b.y < surfY - 8) b.alpha -= 0.02;
+    if (b.alpha <= 0 || b.y < 20) bubbles.splice(k, 1);
+  }
+  waters = waters.filter(w => w.state !== 'gone');
+  if (tick % 120 === 0) ions = ions.filter(i => i.state !== 'gone');
+
+  // Stromstärke
+  let mob = 0; for (const i of ions) if (inSolution(i)) mob += MOB[i.type];
+  const target = voltage ? Math.min(1, mob / 19.9) : 0;
+  current += (target - current) * 0.05;
+  if (current < 0.002) current = 0;
+  ePhase += current * 1.8;
+}
+
+function teleport(ion) {
+  const r = RH[ion.type];
+  ion.x = Q[ion.type] > 0 ? AN.x0 - r - 6 : CATH.x1 + r + 6;
+  const lo = Math.min(BY1 - r - 2, surfY + r + 6);
+  ion.y = lo + Math.random() * Math.max(0, BY1 - r - 2 - lo);
+  ion.vx = 0; ion.vy = 0; ion.px = ion.x; ion.py = ion.y;
+  ion.alpha = 0; ion.fade = 1;
+  ion.shell.forEach((w, k) => { if (w) { const p = slotPose(ion, k, false); w.x = p.x; w.y = p.y; w.a = p.a; w.state = 'shell'; } });
+}
+
+function exchangeStep() {
+  if (tick % 36 !== 0) return;
+  const hyd = ions.filter(i => i.state === 'free' && !i.fade);
+  if (!hyd.length) return;
+  const ion = hyd[Math.floor(Math.random() * hyd.length)];
+  const n = SHELL[ion.type].n;
+  if (ion.shell.length !== n) { const old = ion.shell; ion.shell = new Array(n).fill(null); old.forEach((w, k) => { ion.shell[k] = w; }); }
+  const k = Math.floor(Math.random() * n);
+  const old = ion.shell[k];
+  if (old && old.state !== 'shell') return;
+  const p = slotPose(ion, k, false);
+  let best = null, bd = 58 * 58;
+  for (const f of waters) {
+    if (f.state !== 'free') continue;
+    const d2 = (f.x - p.x) ** 2 + (f.y - p.y) ** 2;
+    if (d2 < bd) { bd = d2; best = f; }
+  }
+  if (!best) return;
+  if (old) {
+    old.state = 'free'; old.host = null; old.slot = -1; old.inL = true;
+    const ang = Math.atan2(old.y - ion.y, old.x - ion.x);
+    old.vx = Math.cos(ang) * 1.3; old.vy = Math.sin(ang) * 1.3;
+  }
+  best.state = 'moving'; best.host = ion; best.slot = k; ion.shell[k] = best;
+}
+
+// ---------- Zeichnen ----------
+function resize() {
+  const r = cv.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = Math.round(r.width * dpr);
+  cv.height = Math.round(r.width * H / W * dpr);
+  ctx.setTransform(cv.width / W, 0, 0, cv.height / H, 0, 0);
+}
+
+function circle(x, y, r, fill, stroke, lw) {
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke) { ctx.lineWidth = lw || 1; ctx.strokeStyle = stroke; ctx.stroke(); }
+}
+
+function drawWaters(list, alpha) {
+  if (!list.length) return;
+  ctx.globalAlpha = alpha;
+  ctx.beginPath();
+  for (const w of list) {
+    for (const s of [1, -1]) {
+      const hx = w.x + OHL * Math.cos(w.a + s * HALF), hy = w.y + OHL * Math.sin(w.a + s * HALF);
+      ctx.moveTo(hx + RHv, hy); ctx.arc(hx, hy, RHv, 0, Math.PI * 2);
+    }
+  }
+  ctx.fillStyle = COLORS.h; ctx.fill(); ctx.lineWidth = 0.9; ctx.strokeStyle = COLORS.hD; ctx.stroke();
+  ctx.beginPath();
+  for (const w of list) { ctx.moveTo(w.x + RO, w.y); ctx.arc(w.x, w.y, RO, 0, Math.PI * 2); }
+  ctx.fillStyle = COLORS.o; ctx.fill(); ctx.lineWidth = 0.9; ctx.strokeStyle = COLORS.oD; ctx.stroke();
+  ctx.globalAlpha = 1;
+}
+
+function chargeLabel(x, y, txt, size, color) {
+  ctx.fillStyle = color; ctx.font = `700 ${size}px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(txt, x, y + 0.5);
+}
+
+function drawIon(ion) {
+  let x = ion.x, y = ion.y;
+  if (ion.state === 'lattice') { x += Math.sin(tick * 0.21 + ion.seed) * 0.7; y += Math.cos(tick * 0.17 + ion.seed * 2) * 0.7; }
+  ctx.globalAlpha = ion.alpha;
+  if (ion.type === 'Na') { circle(x, y, R.Na, COLORS.na, COLORS.naD, 1.2); chargeLabel(x, y, '+', 11, '#fff'); }
+  else if (ion.type === 'Cl') { circle(x, y, R.Cl, COLORS.cl, COLORS.clD, 1.2); chargeLabel(x, y, '−', 14, '#fff'); }
+  else {
+    const hx = x + OHL * Math.cos(ion.rot), hy = y + OHL * Math.sin(ion.rot);
+    circle(hx, hy, RHv, COLORS.h, COLORS.hD, 0.9);
+    circle(x, y, RO, COLORS.o, '#5E160D', 1.6);
+    chargeLabel(x, y, '−', 12, '#fff');
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawAtom(a) {
+  if (a.type === 'Cl') circle(a.x, a.y, 8, COLORS.cl, COLORS.clD, 1.2);
+  else if (a.type === 'H') circle(a.x, a.y, RHv, COLORS.h, COLORS.hD, 1);
+  else { circle(a.x - OHL, a.y, RHv, COLORS.h, COLORS.hD, 0.9); circle(a.x, a.y, RO, COLORS.o, COLORS.oD, 1); }
+}
+
+function drawBubble(b) {
+  ctx.globalAlpha = Math.max(0, b.alpha);
+  const c = Math.cos(b.rot), s = Math.sin(b.rot);
+  let r, d, fill, stroke, label;
+  if (b.type === 'H2') { r = RHv; d = 5; fill = COLORS.h; stroke = COLORS.hD; label = 'H₂'; }
+  else if (b.type === 'Cl2') { r = 8; d = 13; fill = COLORS.cl; stroke = COLORS.clD; label = 'Cl₂'; }
+  else { r = RO; d = 8; fill = COLORS.o; stroke = COLORS.oD; label = 'O₂'; }
+  circle(b.x - c * d / 2, b.y - s * d / 2, r, fill, stroke, 1);
+  circle(b.x + c * d / 2, b.y + s * d / 2, r, fill, stroke, 1);
+  if (labels) {
+    ctx.fillStyle = COLORS.ink; ctx.font = `700 13px ${FONT}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText(label, b.x + (b.x < 500 ? 16 : -40), b.y);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function pathPoint(path, s) {
+  for (let k = 0; k < path.length - 1; k++) {
+    const [x0, y0] = path[k], [x1, y1] = path[k + 1];
+    const L = Math.hypot(x1 - x0, y1 - y0);
+    if (s <= L) return [x0 + (x1 - x0) * s / L, y0 + (y1 - y0) * s / L];
+    s -= L;
+  }
+  return path[path.length - 1];
+}
+function pathLen(path) { let L = 0; for (let k = 0; k < path.length - 1; k++) L += Math.hypot(path[k + 1][0] - path[k][0], path[k + 1][1] - path[k][1]); return L; }
+
+function drawCircuit() {
+  // Leitungen
+  ctx.strokeStyle = COLORS.wire; ctx.lineWidth = 3; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(830, 95); ctx.lineTo(830, 60); ctx.lineTo(510, 60); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(490, 60); ctx.lineTo(352, 60); ctx.moveTo(320, 60); ctx.lineTo(170, 60); ctx.lineTo(170, 95); ctx.stroke();
+  // Schalter
+  ctx.beginPath(); ctx.moveTo(320, 60);
+  if (voltage) ctx.lineTo(352, 60); else ctx.lineTo(348, 42);
+  ctx.stroke(); circle(320, 60, 3, COLORS.wire); circle(352, 60, 3, COLORS.wire);
+  // Spannungsquelle: kurze dicke Platte = Minuspol, lange dünne = Pluspol
+  ctx.fillStyle = '#FBFCFD'; ctx.fillRect(492, 34, 16, 52);
+  ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(491, 49); ctx.lineTo(491, 71); ctx.stroke();
+  ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(510, 38); ctx.lineTo(510, 82); ctx.stroke();
+  ctx.fillStyle = COLORS.ink; ctx.font = `700 18px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('−', 480, 30); ctx.fillText('+', 522, 28);
+  // Lampe
+  const lx = 665, ly = 60, lr = 13;
+  if (current > 0.01) {
+    const g = ctx.createRadialGradient(lx, ly, 2, lx, ly, 48);
+    g.addColorStop(0, `rgba(255,205,60,${0.85 * current})`); g.addColorStop(1, 'rgba(255,205,60,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(lx, ly, 48, 0, Math.PI * 2); ctx.fill();
+  }
+  circle(lx, ly, lr, current > 0.01 ? `rgba(255,236,160,${0.4 + 0.6 * current})` : '#FFFFFF', COLORS.wire, 2.5);
+  const k = lr * 0.707; ctx.lineWidth = 2; ctx.strokeStyle = COLORS.wire;
+  ctx.beginPath(); ctx.moveTo(lx - k, ly - k); ctx.lineTo(lx + k, ly + k); ctx.moveTo(lx - k, ly + k); ctx.lineTo(lx + k, ly - k); ctx.stroke();
+  // Elektroden
+  for (const E of [CATH, AN]) {
+    ctx.fillStyle = COLORS.metal; ctx.fillRect(E.x0, E.y0, E.x1 - E.x0, E.y1 - E.y0);
+    ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.fillRect(E.x0 + 2, E.y0, 3, E.y1 - E.y0);
+  }
+  // Elektronen
+  const sp = 21;
+  for (const P of [PATH_A, PATH_B]) {
+    const L = pathLen(P);
+    for (let s = (ePhase % sp); s < L; s += sp) {
+      const [x, y] = pathPoint(P, s);
+      if (!voltage && P === PATH_B && x > 322 && x < 350) continue;
+      circle(x, y, 3.3, COLORS.el, COLORS.elD, 0.9);
+    }
+  }
+  // Richtungspfeile der Elektronenbewegung
+  if (current > 0.04 && labels) {
+    ctx.fillStyle = COLORS.elD;
+    const arrows = [[830, 300, -Math.PI / 2], [740, 60, Math.PI], [250, 60, Math.PI], [170, 300, Math.PI / 2]];
+    for (const [x, y, a] of arrows) {
+      ctx.save(); ctx.translate(x + Math.cos(a + Math.PI / 2) * 14, y + Math.sin(a + Math.PI / 2) * 14); ctx.rotate(a);
+      ctx.beginPath(); ctx.moveTo(7, 0); ctx.lineTo(-5, -5); ctx.lineTo(-5, 5); ctx.closePath(); ctx.fill(); ctx.restore();
+    }
+  }
+}
+
+function drawLabels() {
+  ctx.textBaseline = 'middle';
+  ctx.font = `700 15px ${FONT}`; ctx.fillStyle = COLORS.ink;
+  ctx.textAlign = 'left'; ctx.fillText('Minuspol (Kathode)', 186, 108);
+  ctx.textAlign = 'right'; ctx.fillText('Pluspol (Anode)', 814, 108);
+  ctx.textAlign = 'center'; ctx.font = `400 13px ${FONT}`; ctx.fillStyle = '#4E5F6B';
+  ctx.fillText('Spannungsquelle', 500, 101);
+  ctx.fillText('Lampe', 665, 92);
+  ctx.fillText(voltage ? 'Schalter geschlossen' : 'Schalter offen', 336, 92);
+  if (current > 0.04) { ctx.fillStyle = COLORS.elD; ctx.font = `700 13px ${FONT}`; ctx.fillText('Bewegungsrichtung der Elektronen', 250, 30); }
+  const latN = ions.filter(i => i.state === 'lattice').length;
+  if (latN) {
+    let minY = 1e9; for (const i of ions) if (i.state === 'lattice') minY = Math.min(minY, i.y);
+    const txt = waters.length ? 'Ionengitter (Bodenkörper)' : 'Ionengitter (fester Salzkristall)';
+    ctx.font = `700 13px ${FONT}`; const tw = ctx.measureText(txt).width;
+    ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.fillRect(500 - tw / 2 - 6, minY - 36, tw + 12, 20);
+    ctx.fillStyle = COLORS.ink; ctx.fillText(txt, 500, minY - 26);
+  }
+  if (!waters.length && !pour) {
+    ctx.font = `400 16px ${FONT}`; ctx.fillStyle = '#4E5F6B';
+    ctx.fillText('Das Becherglas enthält noch kein Wasser.', 500, 380);
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  // Wasserphase leicht getönt
+  if (waters.length > 20 && surfY < BY1 - 5) {
+    ctx.fillStyle = 'rgba(120,170,210,0.10)'; ctx.fillRect(BX0, surfY - 6, BX1 - BX0, BY1 - surfY + 6);
+  }
+  const free = [], other = [];
+  for (const w of waters) (w.state === 'shell' || w.state === 'moving') ? other.push(w) : free.push(w);
+  drawWaters(free, highlight ? 0.22 : 1);
+  for (const ion of ions) {
+    if (ion.state === 'gone') continue;
+    if (ion.shell.length) {
+      const sh = ion.shell.filter(w => w && (w.state === 'shell' || w.state === 'moving'));
+      if (ion.state === 'free' || ion.state === 'dissolving') {
+        const col = ion.type === 'Na' ? '111,75,178' : ion.type === 'Cl' ? '46,150,86' : '213,64,47';
+        const k = ion.state === 'dissolving' ? Math.min(1, ion.t) : 1;
+        ctx.globalAlpha = ion.alpha * k;
+        circle(ion.x, ion.y, RH[ion.type] + 1, `rgba(${col},${highlight ? 0.22 : 0.13})`, `rgba(${col},${highlight ? 0.8 : 0.45})`, highlight ? 2 : 1.2);
+        ctx.globalAlpha = 1;
+      }
+      drawWaters(sh, ion.alpha);
+    }
+    drawIon(ion);
+  }
+  for (const a of atoms) drawAtom(a);
+  for (const b of bubbles) drawBubble(b);
+  drawCircuit();
+  for (const h of hops) {
+    const x = h.x0 + (h.x1 - h.x0) * h.t, y = h.y0 + (h.y1 - h.y0) * h.t;
+    circle(x, y, 4.2, COLORS.el, COLORS.elD, 1.2);
+    if (labels) { ctx.fillStyle = COLORS.elD; ctx.font = `700 12px ${FONT}`; ctx.textAlign = 'center'; ctx.fillText('e⁻', x, y - 11); }
+  }
+  // Becherglas
+  ctx.strokeStyle = '#7FA2BD'; ctx.lineWidth = 5; ctx.lineJoin = 'round';
+  ctx.beginPath(); ctx.moveTo(BX0 - 3, BY0 - 20); ctx.lineTo(BX0 - 3, BY1 + 3); ctx.lineTo(BX1 + 3, BY1 + 3); ctx.lineTo(BX1 + 3, BY0 - 20); ctx.stroke();
+  if (labels) drawLabels();
+}
+
+// ---------- Bedienfeld ----------
+const $ = id => document.getElementById(id);
+function updatePanel() {
+  const total = waters.length;
+  const freeW = waters.filter(w => w.state === 'free' || w.state === 'reacting').length;
+  const lat = ions.filter(i => i.state === 'lattice').length;
+  const cnt = t => ions.filter(i => i.type === t && (i.state === 'free' || i.state === 'dissolving')).length;
+  const nNa = cnt('Na'), nCl = cnt('Cl'), nOH = cnt('OH');
+  $('dW').textContent = total;
+  $('dWf').textContent = total ? `${freeW} (${Math.round(100 * freeW / total)} %)` : '–';
+  $('dLat').textContent = lat;
+  $('dIons').textContent = `${nNa} | ${nCl} | ${nOH}`;
+  $('dProd').textContent = `${prod.H2} | ${prod.Cl2} | ${prod.O2}`;
+  $('meter').style.width = `${Math.round(current * 100)}%`;
+  $('btnWater').disabled = total + pour >= MAXW;
+  $('btnWater').textContent = total + pour >= MAXW ? 'Becherglas ist voll' : `Wasser hinzufügen (${total + pour}/${MAXW})`;
+  $('o2note').hidden = !(mode === 2 && !chloridePresent());
+
+  let msg;
+  const dissolvedSalt = nNa + nCl;
+  const limit = Math.floor(total / WATER_PER_ION);
+  if (!total && !pour) {
+    msg = voltage
+      ? 'Festes Natriumchlorid: Die Ionen sind im Ionengitter an feste Plätze gebunden. Es gibt keine frei beweglichen Ladungsträger, deshalb leuchtet die Lampe nicht.'
+      : 'Festes Natriumchlorid im trockenen Becherglas. Schalte die Spannung ein und prüfe die Leitfähigkeit. Füge danach Wasser hinzu.';
+  } else if (dissolvedSalt === 0 && lat) {
+    msg = 'Wassermoleküle umgeben den Kristall. Ionen an Ecken und Kanten werden zuerst herausgelöst.';
+  } else if (mode === 2 && voltage && !chloridePresent()) {
+    msg = 'Alle Chlorid-Ionen sind oxidiert. An der Anode werden nun Hydroxid-Ionen oxidiert, es entsteht Sauerstoff. In der Lösung verbleiben Natrium-Ionen und Hydroxid-Ionen.';
+  } else if (mode === 2 && voltage) {
+    msg = 'Elektrolyse: An der Anode werden Chlorid-Ionen zu Chlor oxidiert. An der Kathode werden Wassermoleküle zu Wasserstoff und Hydroxid-Ionen reduziert. Die Natrium-Ionen bleiben unverändert.';
+  } else if (mode === 2) {
+    msg = 'Schalte die Spannung ein, um die Elektrolyse zu starten.';
+  } else if (lat && dissolvedSalt >= limit) {
+    msg = `Die Lösung ist gesättigt: ${lat} Ionen bleiben als Bodenkörper im Ionengitter. Füge mehr Wasser hinzu.`;
+  } else if (voltage) {
+    msg = 'Die hydratisierten Ionen bewegen sich gerichtet: Na⁺ zum Minuspol, Cl⁻ zum Pluspol. Im Kabel bewegen sich Elektronen. Die Lampe leuchtet.';
+  } else {
+    msg = 'Ohne Spannung bewegen sich die hydratisierten Ionen ungeordnet zwischen den vielen freien Wassermolekülen. Schalte die Spannung ein.';
+  }
+  if ($('status').textContent !== msg) $('status').textContent = msg;
+}
+
+function setMode(m) {
+  mode = m;
+  $('tab1').setAttribute('aria-selected', m === 1); $('tab2').setAttribute('aria-selected', m === 2);
+  $('ex1').hidden = m !== 1; $('ex2').hidden = m !== 2; $('rowProd').hidden = m !== 2;
+  if (m === 1) for (const i of ions) if (i.fade) { i.alpha = 1; i.fade = 0; }
+}
+function setVoltage(v) {
+  voltage = v;
+  $('btnVolt').textContent = v ? 'Spannung ausschalten' : 'Spannung einschalten';
+  $('btnVolt').classList.toggle('on', v);
+  if (!v) for (const i of ions) if (i.fade) { if (i.alpha <= 0.05) teleport(i); }
+}
+$('tab1').onclick = () => setMode(1);
+$('tab2').onclick = () => setMode(2);
+$('btnWater').onclick = () => { pour += Math.min(ADDW, MAXW - (waters.length + pour)); };
+$('btnVolt').onclick = () => setVoltage(!voltage);
+$('btnPause').onclick = () => { paused = !paused; $('btnPause').textContent = paused ? 'Weiter' : 'Pause'; };
+$('btnReset').onclick = () => { init(); setVoltage(false); };
+$('speed').oninput = e => { speed = +e.target.value; $('speedVal').textContent = `${speed}×`; };
+$('chkHi').onchange = e => { highlight = e.target.checked; };
+$('chkLab').onchange = e => { labels = e.target.checked; };
+
+// ---------- Legende und Detailansicht (SVG) ----------
+function svgWater(x, y, a, sc, marks) {
+  let s = '';
+  const L = OHL * sc * (marks ? 1.3 : 1);
+  const hs = [1, -1].map(sg => [x + L * Math.cos(a + sg * HALF), y + L * Math.sin(a + sg * HALF)]);
+  const hCircles = () => hs.map(([hx, hy]) => `<circle cx="${hx.toFixed(1)}" cy="${hy.toFixed(1)}" r="${(RHv * sc * (marks ? 0.85 : 1)).toFixed(1)}" fill="#fff" stroke="#8C99A3" stroke-width="1"/>` +
+    (marks ? `<text x="${hx.toFixed(1)}" y="${(hy + 3).toFixed(1)}" font-size="8" text-anchor="middle" fill="#15232D" font-family="Arial">δ+</text>` : '')).join('');
+  const oCircle = `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(RO * sc).toFixed(1)}" fill="${COLORS.o}" stroke="${COLORS.oD}" stroke-width="1"/>` +
+    (marks ? `<text x="${x.toFixed(1)}" y="${(y + 4).toFixed(1)}" font-size="10" text-anchor="middle" fill="#fff" font-weight="700" font-family="Arial">δ−</text>` : '');
+  // Detailansicht: H-Atome über dem O-Atom zeichnen, damit die Partialladungen lesbar sind
+  s += marks ? oCircle + hCircles() : hCircles() + oCircle;
+  return s;
+}
+function insetSVG(type) {
+  const sc = 2.1, size = 170, c = size / 2;
+  const ion = { type, x: 0, y: 0, rot: -Math.PI / 2, seed: 0 };
+  const r = R[type] * sc;
+  let s = `<svg viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hydrathülle um ${type === 'Na' ? 'ein Natrium-Ion' : 'ein Chlorid-Ion'}">`;
+  s += `<circle cx="${c}" cy="${c}" r="${r}" fill="${type === 'Na' ? COLORS.na : COLORS.cl}" stroke="${type === 'Na' ? COLORS.naD : COLORS.clD}" stroke-width="1.5"/>`;
+  s += `<text x="${c}" y="${c + 5}" font-size="${type === 'Na' ? 12 : 15}" text-anchor="middle" fill="#fff" font-weight="700" font-family="Arial">${type === 'Na' ? 'Na⁺' : 'Cl⁻'}</text>`;
+  const rs = type === 'Na' ? 1.25 : 1.2; // Hülle in der Detailansicht etwas aufgeweitet
+  for (let k = 0; k < SHELL[type].n; k++) {
+    const p = slotPose(ion, k, false);
+    s += svgWater(c + p.x * sc * rs, c + p.y * sc * rs, p.a, sc, true);
+  }
+  return s + '</svg>';
+}
+function legendIcon(inner) { return `<svg viewBox="0 0 26 26" width="26" height="26" aria-hidden="true">${inner}</svg>`; }
+tick = 0;
+$('insetNa').innerHTML = insetSVG('Na');
+$('insetCl').innerHTML = insetSVG('Cl');
+$('legend').innerHTML = [
+  [legendIcon(`<circle cx="13" cy="13" r="7" fill="${COLORS.na}" stroke="${COLORS.naD}"/><text x="13" y="17" font-size="11" text-anchor="middle" fill="#fff" font-weight="700">+</text>`), 'Natrium-Ion Na<sup>+</sup> (Kation)'],
+  [legendIcon(`<circle cx="13" cy="13" r="11" fill="${COLORS.cl}" stroke="${COLORS.clD}"/><text x="13" y="18" font-size="14" text-anchor="middle" fill="#fff" font-weight="700">−</text>`), 'Chlorid-Ion Cl<sup>−</sup> (Anion)'],
+  [legendIcon(svgWater(13, 14, -Math.PI / 2, 1.2, false)), 'Wassermolekül H<sub>2</sub>O (Sauerstoff rot, Wasserstoff weiß)'],
+  [legendIcon(`<circle cx="18" cy="9" r="5" fill="#fff" stroke="#8C99A3"/><circle cx="13" cy="14" r="8.5" fill="${COLORS.o}" stroke="#5E160D" stroke-width="1.6"/><text x="13" y="18" font-size="12" text-anchor="middle" fill="#fff" font-weight="700">−</text>`), 'Hydroxid-Ion OH<sup>−</sup> (entsteht bei der Elektrolyse)'],
+  [legendIcon(`<circle cx="13" cy="13" r="4" fill="${COLORS.el}" stroke="${COLORS.elD}"/>`), 'Elektron e<sup>−</sup> im Kabel und in den Elektroden'],
+  [legendIcon(`<rect x="9" y="1" width="8" height="24" fill="${COLORS.metal}"/>`), 'Elektrode (z. B. Graphit)'],
+].map(([i, t]) => `${i}<span>${t}</span>`).join('');
+
+// ---------- Start ----------
+init();
+if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  speed = 0.5; $('speed').value = 0.5; $('speedVal').textContent = '0.5×';
+}
+resize();
+window.addEventListener('resize', resize);
+let acc = 0, frameN = 0;
+function frame() {
+  if (!paused) { acc += speed; while (acc >= 1) { step(); acc -= 1; } }
+  draw();
+  if (++frameN % 8 === 0) updatePanel();
+  requestAnimationFrame(frame);
+}
+updatePanel();
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
