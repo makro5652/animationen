@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dipol-Labor: polare Bindungen und Dipolmoleküle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Catppuccin Latte */
+  --bg:#eff1f5;      /* Base */
+  --panel:#e6e9ef;   /* Mantle */
+  --crust:#dce0e8;   /* Crust */
+  --line:#ccd0da;    /* Surface0 */
+  --line-hi:#acb0be; /* Surface2 */
+  --text:#4c4f69;    /* Text */
+  --sub:#5c5f77;     /* Subtext1 */
+  --muted:#6c6f85;   /* Subtext0 */
+  --accent:#8839ef;  /* Mauve */
+  --gold:#fe640b;    /* Peach */
+  --pos:#1e66f5;     /* Blue */
+  --neg:#d20f39;     /* Red */
+  --display:'Chakra Petch','Segoe UI',system-ui,sans-serif;
+  --body:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#eff1f5; --panel:#e6e9ef; --text:#4c4f69; } }
+:root[data-theme="dark"]{ --bg:#eff1f5; --panel:#e6e9ef; --text:#4c4f69; }
+:root{ box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); background:#eff1f5; }
+html{ scroll-padding-top:env(safe-area-inset-top,0px); height:100%; }
+*,*::before,*::after{ box-sizing:inherit; }
+body{ margin:0; height:100%; background:var(--bg); color:var(--text); font-family:var(--body); font-size:15px; line-height:1.45; }
+
+.app{ display:flex; height:100%; min-height:0; }
+.stage{ position:relative; flex:1; min-width:0; min-height:0; }
+#sim{ display:block; width:100%; height:100%; touch-action:none; cursor:grab; outline:none; }
+#sim.dragging{ cursor:grabbing; }
+#sim:focus-visible{ box-shadow:inset 0 0 0 2px var(--accent); }
+
+.overlay{ position:absolute; pointer-events:none; }
+.title{ top:18px; left:22px; }
+.title h1{ margin:0; font-family:var(--display); font-weight:700; font-size:28px; letter-spacing:.04em; line-height:1.1; color:var(--text); }
+.title p{ margin:4px 0 0; font-family:var(--display); font-size:15px; color:var(--accent); letter-spacing:.03em; }
+.legend{ left:22px; bottom:16px; display:flex; flex-wrap:wrap; gap:6px 16px; font-size:12.5px; color:var(--muted); max-width:calc(100% - 44px); }
+.legend span{ display:inline-flex; align-items:center; gap:6px; }
+.legend b{ font-weight:600; }
+.hint{ right:18px; top:20px; max-width:300px; text-align:right; font-size:12.5px; color:var(--muted); }
+
+.panel{ width:370px; flex:none; overflow-y:auto; border-left:1px solid var(--line); background:var(--panel); padding:16px 18px 32px; }
+.panel section{ padding:14px 0 16px; border-bottom:1px solid var(--line); }
+.panel section:last-child{ border-bottom:0; }
+.panel h2{ margin:0 0 10px; font-family:var(--display); font-weight:600; font-size:16px; letter-spacing:.04em; color:var(--text); display:flex; align-items:center; gap:8px; }
+.panel h2::before{ content:""; width:10px; height:3px; border-radius:2px; background:var(--accent); }
+
+.seg{ display:grid; grid-template-columns:repeat(3,1fr); border:1px solid var(--line-hi); border-radius:6px; overflow:hidden; }
+.seg button{ font:inherit; font-family:var(--display); font-weight:600; font-size:14px; color:var(--muted); background:transparent; border:0; border-right:1px solid var(--line-hi); padding:9px 4px; cursor:pointer; }
+.seg button:last-child{ border-right:0; }
+.seg button[aria-pressed="true"]{ color:#eff1f5; background:var(--accent); }
+.seg button:focus-visible, .btn:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+label.field{ display:block; font-size:13px; color:var(--muted); margin:12px 0 5px; }
+select{ width:100%; font:inherit; color:var(--text); background:var(--bg); border:1px solid var(--line-hi); border-radius:6px; padding:8px 10px; }
+select option{ background:var(--bg); color:var(--text); }
+
+.atom-card{ margin-top:10px; padding:10px 12px 12px; border:1px solid var(--line-hi); border-left:3px solid var(--c,#fff); border-radius:6px; background:var(--bg); }
+.atom-card[hidden]{ display:none; }
+.ac-head{ display:flex; align-items:baseline; gap:8px; margin-bottom:8px; }
+.ac-head strong{ font-family:var(--display); font-size:16px; color:var(--text); }
+.ac-head .role{ font-size:12px; color:var(--muted); }
+.ac-head output{ margin-left:auto; font-family:var(--display); font-weight:600; font-size:15px; color:var(--text); }
+.en-row{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:8px; margin-top:9px; font-size:12px; color:var(--muted); }
+input[type=range]{ width:100%; accent-color:var(--accent); height:22px; }
+
+.btn-row{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.btn{ font:inherit; font-size:13px; font-family:var(--display); font-weight:600; color:var(--accent); background:transparent; border:1px solid var(--line-hi); border-radius:5px; padding:6px 10px; cursor:pointer; }
+.btn:hover{ border-color:var(--accent); background:rgba(136,57,239,.08); }
+.btn.wide{ width:100%; padding:9px; }
+.angle-out{ font-family:var(--display); font-size:15px; color:var(--text); }
+.angle-out div{ margin:2px 0; }
+
+.checks{ display:grid; grid-template-columns:1fr; gap:7px; }
+.check{ display:flex; align-items:center; gap:10px; font-size:14px; cursor:pointer; }
+.check input{ width:18px; height:18px; accent-color:var(--accent); margin:0; }
+.check .sw{ width:26px; height:0; border-top:3px solid var(--k,#fff); position:relative; }
+.check .dot{ width:12px; height:12px; border-radius:50%; background:var(--k); box-shadow:0 0 8px var(--k); }
+
+.switch{ position:relative; display:flex; align-items:center; gap:12px; cursor:pointer; font-size:14px; }
+.switch input{ position:absolute; opacity:0; width:1px; height:1px; }
+.switch .track{ width:46px; height:24px; border-radius:12px; border:1px solid var(--line-hi); background:var(--line); position:relative; transition:background .15s; flex:none; }
+.switch .track::after{ content:""; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:#fff; box-shadow:0 1px 2px rgba(76,79,105,.4); transition:transform .15s, background .15s; }
+.switch input:checked + .track{ background:var(--accent); border-color:var(--accent); }
+.switch input:checked + .track::after{ transform:translateX(22px); background:#fff; }
+.switch input:focus-visible + .track{ outline:2px solid var(--accent); outline-offset:2px; }
+
+.meas .row{ display:grid; grid-template-columns:62px 1fr auto; gap:8px; align-items:center; padding:5px 0; border-bottom:1px dashed var(--line); font-size:14px; }
+.meas .row b{ font-family:var(--display); font-weight:600; }
+.tag{ font-size:12px; padding:2px 7px; border-radius:10px; border:1px solid currentColor; white-space:nowrap; }
+.tag.u{ color:#7c7f93; } .tag.nu{ color:#5c5f77; } .tag.p{ color:var(--accent); } .tag.i{ color:var(--gold); }
+.total{ margin-top:10px; font-size:14px; }
+.total b{ font-family:var(--display); color:var(--gold); font-size:17px; }
+.verdict{ margin:10px 0 0; padding:9px 11px; border-radius:6px; font-size:14px; background:var(--bg); border:1px solid var(--line-hi); }
+.verdict.yes{ border-color:var(--gold); }
+.note{ font-size:12.5px; color:var(--muted); margin:8px 0 0; }
+
+details{ border:1px solid var(--line-hi); border-radius:6px; padding:0 12px; margin-top:8px; }
+details[open]{ padding-bottom:10px; }
+summary{ cursor:pointer; font-family:var(--display); font-weight:600; font-size:15px; padding:9px 0; color:var(--text); }
+details ol, details ul{ margin:4px 0 0; padding-left:20px; font-size:14px; }
+details li{ margin:6px 0; }
+dl{ margin:4px 0 0; font-size:14px; }
+dt{ font-weight:600; color:var(--text); margin-top:8px; }
+dd{ margin:2px 0 0; color:var(--sub); }
+
+@media (min-width: 901px){ html, body{ overflow:hidden; } }
+@media (max-width: 900px){
+  html, body{ height:auto; }
+  .app{ flex-direction:column; height:auto; }
+  .stage{ height:64vh; min-height:380px; flex:none; }
+  .panel{ width:100%; border-left:0; border-top:1px solid var(--line); }
+  .hint{ display:none; }
+  .title h1{ font-size:22px; }
+}
+@media (prefers-reduced-motion: reduce){ .switch .track, .switch .track::after{ transition:none; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="stage" id="stage">
+    <canvas id="sim" tabindex="0" aria-label="Molekülansicht. Mit den Pfeiltasten links und rechts wird das Molekül gedreht."></canvas>
+    <div class="overlay title">
+      <h1>Dipol-Labor</h1>
+      <p id="molName">eigenes Molekül</p>
+    </div>
+    <div class="overlay hint" id="hint"></div>
+    <div class="overlay legend" aria-hidden="true">
+      <span><svg width="34" height="12"><line x1="3" y1="6" x2="24" y2="6" stroke="#4c4f69" stroke-width="3"/><line x1="8" y1="1" x2="8" y2="11" stroke="#4c4f69" stroke-width="3"/><polygon points="33,6 22,0 22,12" fill="#4c4f69"/></svg><b>Bindungsdipol</b></span>
+      <span><svg width="34" height="12"><line x1="3" y1="6" x2="24" y2="6" stroke="#fe640b" stroke-width="3"/><line x1="8" y1="1" x2="8" y2="11" stroke="#fe640b" stroke-width="3"/><polygon points="33,6 22,0 22,12" fill="#fe640b"/></svg><b>Gesamtdipol</b></span>
+      <span>Pfeil vom δ+-Ende (Kreuz) zum δ−-Ende</span>
+      <span><b style="color:#1e66f5">δ+ positiv</b></span>
+      <span><b style="color:#d20f39">δ− negativ</b></span>
+    </div>
+  </div>
+
+  <aside class="panel" aria-label="Einstellungen">
+    <section>
+      <h2>Molekül</h2>
+      <div class="seg" role="group" aria-label="Anzahl der Atome">
+        <button type="button" data-mode="2" aria-pressed="true">Zwei Atome</button>
+        <button type="button" data-mode="3" aria-pressed="false">Drei Atome</button>
+        <button type="button" data-mode="4" aria-pressed="false">Vier Atome</button>
+      </div>
+      <label class="field" for="preset">Beispielmolekül laden</label>
+      <select id="preset"></select>
+      <div id="cards"></div>
+    </section>
+
+    <section id="angleSec" hidden>
+      <h2>Bindungswinkel</h2>
+      <div class="angle-out" id="angleOut"></div>
+      <div class="btn-row" id="anglePresets"></div>
+      <p class="note">Ein Außenatom ziehen: Der Bindungswinkel ändert sich.</p>
+    </section>
+
+    <section>
+      <h2>Ansicht</h2>
+      <div class="checks">
+        <label class="check"><input type="checkbox" id="vBond" checked><span class="sw" style="--k:#4c4f69"></span>Bindungsdipole</label>
+        <label class="check"><input type="checkbox" id="vTotal" checked><span class="sw" style="--k:#fe640b"></span>Gesamtdipol</label>
+        <label class="check"><input type="checkbox" id="vCharge" checked><span class="dot" style="--k:#d20f39"></span>Teilladungen (δ+ / δ−)</label>
+        <label class="check"><input type="checkbox" id="vDensity" checked><span class="dot" style="--k:#40a02b"></span>Elektronenwolke</label>
+        <label class="check"><input type="checkbox" id="vPair"><span class="dot" style="--k:#8839ef"></span>Lage des bindenden Elektronenpaars</label>
+        <label class="check"><input type="checkbox" id="vVec" checked><span class="sw" style="--k:#fe640b"></span>Vektoraddition (ab drei Atomen)</label>
+        <label class="check"><input type="checkbox" id="vDen" checked><span class="sw" style="--k:#8839ef"></span>ΔEN-Werte an den Bindungen</label>
+      </div>
+      <p class="note">Elektronenwolke: <b style="color:#d20f39">rot</b> = Elektronendichte erhöht (δ−), <b style="color:#1e66f5">blau</b> = Elektronendichte verringert (δ+), <b style="color:#40a02b">grün</b> = ausgeglichen.</p>
+    </section>
+
+    <section>
+      <h2>Elektrisches Feld</h2>
+      <label class="switch"><input type="checkbox" id="fieldOn"><span class="track"></span>Feld anlegen</label>
+      <label class="field" for="fieldStr">Feldstärke</label>
+      <input type="range" id="fieldStr" min="0.1" max="1" step="0.01" value="0.6">
+      <div class="btn-row"><button type="button" class="btn" id="flip">Polung umkehren</button></div>
+      <label class="field" for="thermal">Wärmebewegung (Temperatur): <span id="thermalOut">aus</span></label>
+      <input type="range" id="thermal" min="0" max="1" step="0.01" value="0">
+    </section>
+
+    <section>
+      <h2>Messwerte</h2>
+      <div class="meas" id="meas"></div>
+    </section>
+
+    <section>
+      <h2>Einstellungen</h2>
+      <label class="field" for="table">Elektronegativitätswerte (Pauling-Skala)</label>
+      <select id="table">
+        <option value="rev">revidierte Werte (z. B. O 3,44; Cl 3,16)</option>
+        <option value="cls">gerundete Schulbuchwerte (z. B. O 3,5; Cl 3,0)</option>
+      </select>
+      <div class="btn-row" style="margin-top:12px"><button type="button" class="btn wide" id="reset">Alles zurücksetzen</button></div>
+    </section>
+
+    <section>
+      <h2>Arbeiten mit der Simulation</h2>
+      <details>
+        <summary>Aufträge</summary>
+        <ol>
+          <li>Wähle „Zwei Atome“. Stelle bei Atom A und Atom B den gleichen EN-Wert ein. Beschreibe die Bindung.</li>
+          <li>Lade H₂ und danach HCl. Achte auf die Elektronenwolke zwischen den Atomen. Beschreibe ihre Form. Erkläre damit den Begriff „gemeinsames Elektronenpaar“.</li>
+          <li>Erhöhe den EN-Wert von Atom B Schritt für Schritt. Beobachte die Teilladungen und den Bindungsdipol. Beschreibe den Zusammenhang zwischen ΔEN und Bindungsdipol.</li>
+          <li>Lade H₂O und danach CO₂. Vergleiche die Bindungsdipole und den Gesamtdipol. Erkläre den Unterschied mit dem Bau der Moleküle.</li>
+          <li>Ziehe bei CO₂ ein Sauerstoff-Atom. Beschreibe, wie sich der Gesamtdipol mit dem Bindungswinkel ändert.</li>
+          <li>Lege das elektrische Feld an. Beschreibe das Verhalten von H₂O und CO₂ im Feld. Begründe deine Beobachtung.</li>
+          <li>Wähle „Drei Atome“ und einen Winkel von etwa 150°. Stelle für A und C unterschiedliche EN-Werte ein. Lege das Feld an. Erkläre die Ausrichtung des Moleküls mit der Vektoraddition.</li>
+          <li>Stelle eine Wärmebewegung ein. Vergleiche die Ausrichtung bei kleiner und bei großer Feldstärke.</li>
+          <li>Lade BF₃ und danach Formaldehyd (CH₂O). Erkläre, warum nur eines der beiden Moleküle ein Dipolmolekül ist.</li>
+        </ol>
+      </details>
+      <details>
+        <summary>Begriffe</summary>
+        <dl>
+          <dt>die Elektronegativität (EN)</dt>
+          <dd>Maß für die Anziehung eines Atoms auf die Elektronen einer Bindung.</dd>
+          <dt>die Elektronegativitätsdifferenz (ΔEN)</dt>
+          <dd>ΔEN = größerer EN-Wert − kleinerer EN-Wert.</dd>
+          <dt>die polare Elektronenpaarbindung</dt>
+          <dd>Das bindende Elektronenpaar ist näher am Atom mit der höheren EN.</dd>
+          <dt>die Elektronenwolke</dt>
+          <dd>Der Bereich, in dem die Aufenthaltswahrscheinlichkeit der Elektronen hoch ist. Bei einer Elektronenpaarbindung umfasst die Wolke beide Atome: Das Elektronenpaar gehört zu beiden Atomen.</dd>
+          <dt>die Teilladung (δ+, δ−)</dt>
+          <dd>Eine Ladung, die kleiner ist als eine ganze Ladung. δ ist der griechische Buchstabe „delta“.</dd>
+          <dt>der Bindungsdipol</dt>
+          <dd>Eine polare Bindung mit einem positiven und einem negativen Ende.</dd>
+          <dt>der Gesamtdipol</dt>
+          <dd>Die Summe aller Bindungsdipole (Vektoraddition). Er hängt vom Bau des Moleküls ab.</dd>
+          <dt>das Dipolmolekül</dt>
+          <dd>Ein Molekül, bei dem der Schwerpunkt der positiven und der Schwerpunkt der negativen Teilladungen nicht zusammenfallen.</dd>
+          <dt>das elektrische Feld</dt>
+          <dd>Der Raum zwischen zwei entgegengesetzt geladenen Platten. Dipolmoleküle werden darin ausgerichtet.</dd>
+        </dl>
+      </details>
+      <details>
+        <summary>Grenzen des Modells</summary>
+        <ul>
+          <li>Die Darstellung ist zweidimensional. Räumliche Moleküle (z. B. NH₃, CH₄) lassen sich hier nicht korrekt darstellen.</li>
+          <li>Der Gesamtdipol wird als Vektorsumme der ΔEN-Werte berechnet. Nichtbindende Elektronenpaare, Bindungslängen und Bindungsordnungen gehen nicht ein.</li>
+          <li>Größe der Teilladungen und Länge der Pfeile sind relative Modellwerte, keine Messwerte in Debye.</li>
+          <li>Die Elektronenwolke ist schematisch. Sie ist nicht quantenmechanisch berechnet.</li>
+          <li>Die Grenzen 0,4 und 1,7 für ΔEN sind Faustregeln. Der Übergang zwischen den Bindungsarten ist fließend.</li>
+        </ul>
+      </details>
+    </section>
+  </aside>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+/* ---------- Daten ---------- */
+// [Symbol, Name, Farbe, EN revidiert (Pauling/Allred), EN gerundet (Pauling, Schulbuch)]
+const ELEMENTS = [
+  ['H','Wasserstoff','#fbfbfd',2.20,2.1],
+  ['Li','Lithium','#ea76cb',0.98,1.0],
+  ['B','Bor','#dc8a78',2.04,2.0],
+  ['C','Kohlenstoff','#7c7f93',2.55,2.5],
+  ['N','Stickstoff','#1e66f5',3.04,3.0],
+  ['O','Sauerstoff','#d20f39',3.44,3.5],
+  ['F','Fluor','#179299',3.98,4.0],
+  ['Na','Natrium','#7287fd',0.93,0.9],
+  ['Mg','Magnesium','#04a5e5',1.31,1.2],
+  ['Al','Aluminium','#acb0be',1.61,1.5],
+  ['Si','Silicium','#dd7878',1.90,1.8],
+  ['P','Phosphor','#fe640b',2.19,2.1],
+  ['S','Schwefel','#df8e1d',2.58,2.5],
+  ['Cl','Chlor','#40a02b',3.16,3.0],
+  ['K','Kalium','#209fb5',0.82,0.8],
+  ['Br','Brom','#e64553',2.96,2.8],
+  ['I','Iod','#8839ef',2.66,2.5]
+];
+const EL = {}; ELEMENTS.forEach(e => EL[e[0]] = {sym:e[0], name:e[1], color:e[2], rev:e[3], cls:e[4]});
+const SLOT_COLOR = {A:'#df8e1d', B:'#40a02b', C:'#ea76cb', D:'#209fb5'};
+const D2R = Math.PI/180;
+
+const PRESETS = {
+  2: [
+    {name:'H₂ (Wasserstoff)', at:{A:'H',B:'H'}, ord:{A:1}},
+    {name:'N₂ (Stickstoff)', at:{A:'N',B:'N'}, ord:{A:3}},
+    {name:'Cl₂ (Chlor)', at:{A:'Cl',B:'Cl'}, ord:{A:1}},
+    {name:'HF (Fluorwasserstoff)', at:{A:'H',B:'F'}, ord:{A:1}},
+    {name:'HCl (Chlorwasserstoff)', at:{A:'H',B:'Cl'}, ord:{A:1}},
+    {name:'HBr (Bromwasserstoff)', at:{A:'H',B:'Br'}, ord:{A:1}},
+    {name:'HI (Iodwasserstoff)', at:{A:'H',B:'I'}, ord:{A:1}},
+    {name:'NaCl (Ionenpaar, Gasphase)', at:{A:'Na',B:'Cl'}, ord:{A:1}}
+  ],
+  3: [
+    {name:'H₂O (Wasser)', at:{A:'H',B:'O',C:'H'}, angle:104.5, ord:{A:1,C:1}},
+    {name:'H₂S (Schwefelwasserstoff)', at:{A:'H',B:'S',C:'H'}, angle:92, ord:{A:1,C:1}},
+    {name:'OF₂ (Sauerstoffdifluorid)', at:{A:'F',B:'O',C:'F'}, angle:103, ord:{A:1,C:1}},
+    {name:'CO₂ (Kohlenstoffdioxid)', at:{A:'O',B:'C',C:'O'}, angle:180, ord:{A:2,C:2}},
+    {name:'CS₂ (Kohlenstoffdisulfid)', at:{A:'S',B:'C',C:'S'}, angle:180, ord:{A:2,C:2}},
+    {name:'SO₂ (Schwefeldioxid)', at:{A:'O',B:'S',C:'O'}, angle:119, ord:{A:2,C:2}},
+    {name:'HCN (Blausäure)', at:{A:'H',B:'C',C:'N'}, angle:180, ord:{A:1,C:3}}
+  ],
+  4: [
+    {name:'BF₃ (Bortrifluorid)', at:{A:'F',B:'B',C:'F',D:'F'}, rel:{A:210,C:330,D:90}, ord:{A:1,C:1,D:1}},
+    {name:'SO₃ (Schwefeltrioxid)', at:{A:'O',B:'S',C:'O',D:'O'}, rel:{A:210,C:330,D:90}, ord:{A:2,C:2,D:2}},
+    {name:'CH₂O (Formaldehyd)', at:{A:'H',B:'C',C:'H',D:'O'}, rel:{A:211.75,C:328.25,D:90}, ord:{A:1,C:1,D:2}},
+    {name:'COCl₂ (Phosgen)', at:{A:'Cl',B:'C',C:'Cl',D:'O'}, rel:{A:214.1,C:325.9,D:90}, ord:{A:1,C:1,D:2}}
+  ]
+};
+
+/* ---------- Zustand ---------- */
+const S = {
+  mode:2, table:'rev',
+  slots:{A:{el:null,en:2.0}, B:{el:null,en:3.0}, C:{el:null,en:2.0}, D:{el:null,en:2.0}},
+  phi:0, omega:0,
+  rel:{A:210*D2R, C:330*D2R, D:90*D2R},
+  ord:{A:1, C:1, D:1},
+  view:{bond:true,total:true,charge:true,density:true,pair:false,den:true,vec:true},
+  field:{on:false, str:0.6, dir:1, thermal:0},
+  preset:''
+};
+
+const outerKeys = () => S.mode===2 ? [] : S.mode===3 ? ['A','C'] : ['A','C','D'];
+const activeKeys = () => S.mode===2 ? ['A','B'] : S.mode===3 ? ['A','B','C'] : ['A','B','C','D'];
+const bondList = () => S.mode===2 ? [['A','B']] : outerKeys().map(k => [k,'B']);
+const enOf = k => S.slots[k].en;
+const colorOf = k => S.slots[k].el ? EL[S.slots[k].el].color : SLOT_COLOR[k];
+const labelOf = k => S.slots[k].el ? S.slots[k].el : k;
+const fmt = (v,d=2) => v.toFixed(d).replace('.',',');
+const fmtEN = k => (S.slots[k].el && S.table==='cls') ? fmt(enOf(k),1) : fmt(enOf(k),2);
+const wrap = a => { while(a>Math.PI) a-=2*Math.PI; while(a<=-Math.PI) a+=2*Math.PI; return a; };
+const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
+
+/* ---------- Canvas ---------- */
+const stage = document.getElementById('stage');
+const cv = document.getElementById('sim');
+const ctx = cv.getContext('2d');
+let W=0, H=0, DPR=1;
+function resize(){
+  const r = stage.getBoundingClientRect();
+  DPR = Math.min(window.devicePixelRatio||1, 2.5);
+  W = r.width; H = r.height;
+  cv.width = Math.round(W*DPR); cv.height = Math.round(H*DPR);
+}
+new ResizeObserver(resize).observe(stage);
+resize();
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function geom(){
+  const L = clamp(Math.min(W,H)*0.22, 72, 165);
+  const R = L*0.32;
+  const pos = {};
+  if(S.mode===2){
+    const h = L*1.45/2;
+    pos.B = {x:Math.cos(S.phi)*h, y:Math.sin(S.phi)*h};
+    pos.A = {x:-pos.B.x, y:-pos.B.y};
+  } else {
+    pos.B = {x:0,y:0};
+    outerKeys().forEach(k => { pos[k] = {x:Math.cos(S.phi+S.rel[k])*L, y:Math.sin(S.phi+S.rel[k])*L}; });
+  }
+  return {L,R,pos};
+}
+const CX = () => W/2, CY = () => H/2 + (W < 520 ? 10 : 0);
+const toS = p => ({x:CX()+p.x, y:CY()-p.y});
+
+function analyze(pos){
+  const q = {}; activeKeys().forEach(k => q[k]=0);
+  const M = {x:0,y:0}; const bonds = [];
+  for(const [i,j] of bondList()){
+    const d = enOf(j) - enOf(i);
+    const dx = pos[j].x-pos[i].x, dy = pos[j].y-pos[i].y, len = Math.hypot(dx,dy)||1;
+    const u = {x:dx/len, y:dy/len};
+    M.x += d*u.x; M.y += d*u.y;
+    q[i] += d*0.5; q[j] -= d*0.5;
+    bonds.push({i,j,d,u});
+  }
+  return {q,M,bonds};
+}
+
+/* ---------- Farbhilfen ---------- */
+function hexRgb(h){ h=h.replace('#',''); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; }
+function mix(a,b,t){ const A=hexRgb(a),B=hexRgb(b); return `rgb(${A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join(',')})`; }
+function lum(h){ const [r,g,b]=hexRgb(h); return (0.299*r+0.587*g+0.114*b)/255; }
+
+/* ---------- Zeichnen ---------- */
+function drawGrid(){
+  ctx.strokeStyle = 'rgba(114,135,253,0.11)'; ctx.lineWidth = 1;
+  const s = 44, ox = CX()%s, oy = CY()%s;
+  ctx.beginPath();
+  for(let x=ox; x<W; x+=s){ ctx.moveTo(x+.5,0); ctx.lineTo(x+.5,H); }
+  for(let y=oy; y<H; y+=s){ ctx.moveTo(0,y+.5); ctx.lineTo(W,y+.5); }
+  ctx.stroke();
+  // Eckwinkel
+  ctx.strokeStyle = 'rgba(136,57,239,0.55)'; ctx.lineWidth = 2;
+  const c=18, m=8;
+  ctx.beginPath();
+  ctx.moveTo(m,m+c); ctx.lineTo(m,m); ctx.lineTo(m+c,m);
+  ctx.moveTo(W-m-c,m); ctx.lineTo(W-m,m); ctx.lineTo(W-m,m+c);
+  ctx.moveTo(m,H-m-c); ctx.lineTo(m,H-m); ctx.lineTo(m+c,H-m);
+  ctx.moveTo(W-m-c,H-m); ctx.lineTo(W-m,H-m); ctx.lineTo(W-m,H-m-c);
+  ctx.stroke();
+}
+
+function drawField(t){
+  const top = Math.max(70, H*0.12), bot = H - Math.max(56, H*0.1);
+  const pw = 9, pad = 16;
+  const leftPos = S.field.dir > 0;
+  const plates = [
+    {x:pad, sign: leftPos ? '+' : '−', col: leftPos ? '#1e66f5' : '#d20f39', inner:pad+pw},
+    {x:W-pad-pw, sign: leftPos ? '−' : '+', col: leftPos ? '#d20f39' : '#1e66f5', inner:W-pad-pw}
+  ];
+  const a = 0.18 + 0.32*S.field.str;
+  ctx.save();
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = `rgba(136,57,239,${a})`;
+  ctx.setLineDash([10,12]);
+  ctx.lineDashOffset = reduceMotion ? 0 : -t*38*S.field.dir*(0.4+S.field.str);
+  const x0 = pad+pw+30, x1 = W-pad-pw-30;
+  const lines = [];
+  for(let y=top+22; y<bot-10; y+=54) lines.push(y);
+  ctx.beginPath();
+  lines.forEach(y => { ctx.moveTo(x0,y); ctx.lineTo(x1,y); });
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = `rgba(136,57,239,${a+0.1})`;
+  lines.forEach(y => {
+    [0.2,0.8].forEach(f => {
+      const x = x0+(x1-x0)*f, d = S.field.dir*7;
+      ctx.beginPath(); ctx.moveTo(x+d,y); ctx.lineTo(x-d,y-5); ctx.lineTo(x-d,y+5); ctx.closePath(); ctx.fill();
+    });
+  });
+  plates.forEach(p => {
+    ctx.shadowColor = p.col; ctx.shadowBlur = 8;
+    ctx.fillStyle = p.col; ctx.fillRect(p.x, top, pw, bot-top);
+    ctx.shadowBlur = 0;
+    ctx.font = `700 18px ${getComputedStyle(document.documentElement).getPropertyValue('--display')}`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const tx = p.x < W/2 ? p.inner+13 : p.inner-13;
+    for(let y=top+18; y<bot-8; y+=36) ctx.fillText(p.sign, tx, y);
+  });
+  ctx.restore();
+}
+
+// Elektronenwolke: Summe aus Atom- und Bindungsbeiträgen (schematisch, nicht quantenmechanisch berechnet).
+// Der Bindungsbeitrag liegt zwischen den Atomen und ist zum Atom mit höherer EN verschoben.
+const cloudCv = document.createElement('canvas'), cctx = cloudCv.getContext('2d');
+const C_NEU = [64,160,43], C_POS = [30,102,245], C_NEG = [210,15,57];
+function drawCloud(P,A,R){
+  const keys = activeKeys();
+  const atoms = keys.map(k => {
+    const q = A.q[k], sig = R*1.12*clamp(1-0.22*q,0.6,1.25);
+    return {x:P[k].x, y:P[k].y, amp:clamp(1-0.4*q,0.35,1.4), inv:1/(2*sig*sig), q};
+  });
+  const bonds = A.bonds.map(b => {
+    const pi = P[b.i], pj = P[b.j], dx = pj.x-pi.x, dy = pj.y-pi.y, len = Math.hypot(dx,dy)||1;
+    const f = 0.5 + 0.36*clamp(b.d/2.5,-1,1);
+    const sa = len*0.32, sp = R*0.8;
+    return {x:pi.x+dx*f, y:pi.y+dy*f, ux:dx/len, uy:dy/len, amp:1.0, ia:1/(2*sa*sa), ip:1/(2*sp*sp), q:(1-f)*A.q[b.i]+f*A.q[b.j]};
+  });
+  const pad = R*4.2;
+  let x0=Infinity, y0=Infinity, x1=-Infinity, y1=-Infinity;
+  atoms.forEach(a => { x0=Math.min(x0,a.x); y0=Math.min(y0,a.y); x1=Math.max(x1,a.x); y1=Math.max(y1,a.y); });
+  x0 = Math.max(0,Math.floor(x0-pad)); y0 = Math.max(0,Math.floor(y0-pad));
+  x1 = Math.min(W,Math.ceil(x1+pad)); y1 = Math.min(H,Math.ceil(y1+pad));
+  const s = 3, w = Math.max(1,Math.ceil((x1-x0)/s)), h = Math.max(1,Math.ceil((y1-y0)/s));
+  if(cloudCv.width !== w || cloudCv.height !== h){ cloudCv.width = w; cloudCv.height = h; }
+  const img = cctx.createImageData(w,h), dat = img.data;
+  const T = 0.2;
+  for(let iy=0; iy<h; iy++){
+    const py = y0 + (iy+0.5)*s;
+    for(let ix=0; ix<w; ix++){
+      const px = x0 + (ix+0.5)*s;
+      let d = 0, wq = 0;
+      for(const a of atoms){ const dx=px-a.x, dy=py-a.y; const g = a.amp*Math.exp(-(dx*dx+dy*dy)*a.inv); d += g; wq += g*a.q; }
+      for(const b of bonds){ const dx=px-b.x, dy=py-b.y; const al = dx*b.ux+dy*b.uy, pe = -dx*b.uy+dy*b.ux; const g = b.amp*Math.exp(-(al*al*b.ia + pe*pe*b.ip)); d += g; wq += g*b.q; }
+      if(d < T-0.08) continue;
+      const t = clamp((wq/d)/0.55,-1,1), m = Math.abs(t), tg = t < 0 ? C_NEG : C_POS;
+      const e = clamp((d-(T-0.08))/0.1,0,1), edge = e*e*(3-2*e);
+      const body = 0.26 + 0.32*clamp((d-T)/1.2,0,1);
+      const rim = Math.max(0,1-Math.abs(d-T)/0.035)*0.4;
+      const i = (iy*w+ix)*4;
+      dat[i]   = C_NEU[0]+(tg[0]-C_NEU[0])*m;
+      dat[i+1] = C_NEU[1]+(tg[1]-C_NEU[1])*m;
+      dat[i+2] = C_NEU[2]+(tg[2]-C_NEU[2])*m;
+      dat[i+3] = Math.min(255,(edge*body+rim)*255);
+    }
+  }
+  cctx.putImageData(img,0,0);
+  ctx.save(); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(cloudCv, x0, y0, w*s, h*s);
+  ctx.restore();
+}
+
+function drawBond(p1,p2,order){
+  const dx=p2.x-p1.x, dy=p2.y-p1.y, len=Math.hypot(dx,dy)||1, nx=-dy/len, ny=dx/len;
+  const offs = order===1 ? [0] : order===2 ? [-6,6] : [-9,0,9];
+  ctx.save();
+  ctx.lineCap='round';
+  ctx.strokeStyle='#8c8fa1'; ctx.lineWidth = order===1 ? 10 : 5.5;
+  offs.forEach(o => { ctx.beginPath(); ctx.moveTo(p1.x+nx*o,p1.y+ny*o); ctx.lineTo(p2.x+nx*o,p2.y+ny*o); ctx.stroke(); });
+  ctx.restore();
+}
+
+function drawAtom(k,p,R,highlight){
+  const col = colorOf(k), free = !S.slots[k].el;
+  ctx.save();
+  ctx.shadowColor = highlight ? 'rgba(136,57,239,0.55)' : 'rgba(76,79,105,0.32)'; ctx.shadowBlur = highlight ? 22 : 12; ctx.shadowOffsetY = 3;
+  const g = ctx.createRadialGradient(p.x-R*0.35,p.y-R*0.42,R*0.08,p.x,p.y,R);
+  g.addColorStop(0, mix(col,'#ffffff',0.8));
+  g.addColorStop(0.45, col);
+  g.addColorStop(1, mix(col,'#4c4f69',0.5));
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(p.x,p.y,R,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+  ctx.lineWidth = highlight ? 2.5 : 1.5;
+  ctx.strokeStyle = highlight ? '#8839ef' : mix(col,'#4c4f69',0.45);
+  ctx.beginPath(); ctx.arc(p.x,p.y,R,0,Math.PI*2); ctx.stroke();
+  if(free){
+    ctx.save(); ctx.setLineDash([4,6]); ctx.strokeStyle = col; ctx.globalAlpha = 0.7; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(p.x,p.y,R+6,0,Math.PI*2); ctx.stroke(); ctx.restore();
+  }
+  drawLabel(k,p,R,false);
+}
+function drawLabel(k,p,R,halo){
+  const col = colorOf(k), dark = lum(col) > 0.5;
+  ctx.save();
+  ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.lineJoin='round';
+  const lab = labelOf(k);
+  const items = [[`700 ${Math.round(R*(lab.length>1?0.6:0.7))}px 'Chakra Petch', sans-serif`, lab, p.y - R*0.1],
+                 [`600 ${Math.max(10,Math.round(R*0.25))}px 'IBM Plex Sans', sans-serif`, 'EN ' + fmtEN(k), p.y + R*0.52]];
+  items.forEach(([f,txt,y]) => {
+    ctx.font = f;
+    if(halo){ ctx.lineWidth = 5; ctx.strokeStyle = col; ctx.strokeText(txt,p.x,y); }
+    ctx.fillStyle = dark ? '#4c4f69' : '#ffffff';
+    ctx.fillText(txt,p.x,y);
+  });
+  ctx.restore();
+}
+
+function dipoleArrow(x1,y1,x2,y2,color,w){
+  const dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy);
+  if(len < 6) return;
+  const ux=dx/len, uy=dy/len, nx=-uy, ny=ux;
+  const head = Math.min(len*0.42, w*3+8), hw = head*0.55;
+  const cp = Math.min(len*0.2, 16), ch = w*1.6+5;
+  const bx = x2-ux*head*0.85, by = y2-uy*head*0.85;
+  ctx.save(); ctx.lineCap='butt'; ctx.lineJoin='round';
+  for(const pass of [0,1]){
+    const c = pass ? color : 'rgba(239,241,245,0.95)', ex = pass ? 0 : 5;
+    ctx.strokeStyle = c; ctx.fillStyle = c;
+    ctx.lineWidth = w+ex;
+    ctx.beginPath(); ctx.moveTo(x1-ux*ex/2,y1-uy*ex/2); ctx.lineTo(bx,by); ctx.stroke();
+    const cx = x1+ux*cp, cy = y1+uy*cp;
+    ctx.beginPath(); ctx.moveTo(cx+nx*(ch+ex/2),cy+ny*(ch+ex/2)); ctx.lineTo(cx-nx*(ch+ex/2),cy-ny*(ch+ex/2)); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x2+ux*ex*0.6,y2+uy*ex*0.6);
+    ctx.lineTo(x2-ux*head+nx*(hw+ex*0.6), y2-uy*head+ny*(hw+ex*0.6));
+    ctx.lineTo(x2-ux*head-nx*(hw+ex*0.6), y2-uy*head-ny*(hw+ex*0.6));
+    ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+}
+
+function rrect(x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+}
+// Einschub: Bindungsdipole Spitze an Ende aneinandergesetzt, Summe als Gesamtdipol
+function drawVecInset(A){
+  const size = W < 560 ? 132 : 184, pad = 16, head = 22;
+  const bx = W - size - 18, by = H - size - (W < 760 ? 92 : 62);
+  ctx.save();
+  rrect(bx,by,size,size,10);
+  ctx.fillStyle = 'rgba(230,233,239,0.95)'; ctx.fill();
+  ctx.strokeStyle = '#bcc0cc'; ctx.lineWidth = 1; ctx.stroke();
+  ctx.fillStyle = '#5c5f77'; ctx.font = `600 12.5px 'IBM Plex Sans', sans-serif`;
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  ctx.fillText('Vektoraddition', bx+10, by+14);
+  const vs = A.bonds.filter(b => Math.abs(b.d) >= 0.02).map(b => ({x:b.d*b.u.x, y:-b.d*b.u.y}));
+  if(!vs.length){
+    ctx.textAlign='center'; ctx.fillStyle='#7c7f93';
+    ctx.fillText('keine Bindungsdipole', bx+size/2, by+size/2+8);
+    ctx.restore(); return;
+  }
+  // Maßstab über den (drehungsunabhängigen) Durchmesser der Vektorkette
+  const raw = [{x:0,y:0}];
+  vs.forEach(v => { const l = raw[raw.length-1]; raw.push({x:l.x+v.x, y:l.y+v.y}); });
+  let diam = 0;
+  raw.forEach(a => raw.forEach(b => { diam = Math.max(diam, Math.hypot(a.x-b.x,a.y-b.y)); }));
+  const sc = (size - 2*pad - head) / Math.max(diam, 0.6);
+  const pts = raw.map(q => ({x:q.x*sc, y:q.y*sc}));
+  let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+  pts.forEach(q => { x0=Math.min(x0,q.x); x1=Math.max(x1,q.x); y0=Math.min(y0,q.y); y1=Math.max(y1,q.y); });
+  const ox = bx + size/2 - (x0+x1)/2, oy = by + head/2 + size/2 - (y0+y1)/2;
+  if(S.field.on){
+    ctx.setLineDash([4,4]); ctx.strokeStyle = 'rgba(136,57,239,0.55)'; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(bx+6, oy); ctx.lineTo(bx+size-6, oy); ctx.stroke(); ctx.setLineDash([]);
+  }
+  for(let i=0;i<vs.length;i++) dipoleArrow(ox+pts[i].x, oy+pts[i].y, ox+pts[i+1].x, oy+pts[i+1].y, '#4c4f69', 2.4);
+  const e = pts[pts.length-1];
+  if(Math.hypot(e.x,e.y) > 3) dipoleArrow(ox, oy, ox+e.x, oy+e.y, '#fe640b', 3.4);
+  else { ctx.textAlign='center'; ctx.fillStyle='#fe640b'; ctx.fillText('Summe = 0', bx+size/2, by+size-14); }
+  ctx.restore();
+}
+function classify(d){
+  d = Math.abs(d);
+  if(d < 0.05) return {t:'unpolar', c:'u', col:'#7c7f93'};
+  if(d < 0.4) return {t:'nahezu unpolar', c:'nu', col:'#5c5f77'};
+  if(d < 1.7) return {t:'polar', c:'p', col:'#8839ef'};
+  return {t:'überwiegend ionisch', c:'i', col:'#fe640b'};
+}
+
+function pill(x,y,text,col){
+  ctx.font = `600 13px 'IBM Plex Sans', sans-serif`;
+  const w = ctx.measureText(text).width + 14, h = 22;
+  ctx.fillStyle = 'rgba(239,241,245,0.95)';
+  ctx.strokeStyle = col; ctx.lineWidth = 1;
+  const r = 11;
+  ctx.beginPath();
+  ctx.moveTo(x-w/2+r,y-h/2); ctx.arcTo(x+w/2,y-h/2,x+w/2,y+h/2,r); ctx.arcTo(x+w/2,y+h/2,x-w/2,y+h/2,r);
+  ctx.arcTo(x-w/2,y+h/2,x-w/2,y-h/2,r); ctx.arcTo(x-w/2,y-h/2,x+w/2,y-h/2,r); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = col; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(text,x,y+0.5);
+}
+
+let hoverKey = null;
+
+function draw(t){
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.fillStyle = '#eff1f5'; ctx.fillRect(0,0,W,H);
+  drawGrid();
+  if(S.field.on) drawField(t);
+
+  const {L,R,pos} = geom();
+  const A = analyze(pos);
+  const keys = activeKeys();
+  const P = {}; keys.forEach(k => P[k] = toS(pos[k]));
+  const cen = {x:0,y:0}; keys.forEach(k => { cen.x += P[k].x/keys.length; cen.y += P[k].y/keys.length; });
+
+  if(S.view.density) drawCloud(P,A,R);
+
+  A.bonds.forEach(b => drawBond(P[b.i],P[b.j], S.ord[b.i === 'B' ? b.j : b.i] || 1));
+  const order = S.mode===2 ? ['A','B'] : [...outerKeys(),'B'];
+  order.forEach(k => drawAtom(k,P[k],R, hoverKey===k || (drag && drag.key===k)));
+
+  if(S.view.pair){
+    A.bonds.forEach(b => {
+      const f = 0.5 + 0.42*clamp(b.d/2.5,-1,1);
+      const x = P[b.i].x + (P[b.j].x-P[b.i].x)*f, y = P[b.i].y + (P[b.j].y-P[b.i].y)*f;
+      const len = Math.hypot(P[b.j].x-P[b.i].x, P[b.j].y-P[b.i].y)||1;
+      const nx = -(P[b.j].y-P[b.i].y)/len, ny = (P[b.j].x-P[b.i].x)/len;
+      ctx.save();
+      ctx.fillStyle='#eff1f5'; ctx.strokeStyle='#8839ef'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(x,y,9.5,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle='#8839ef';
+      [-4.5,4.5].forEach(o => { ctx.beginPath(); ctx.arc(x+nx*o,y+ny*o,3.4,0,Math.PI*2); ctx.fill(); });
+      ctx.restore();
+    });
+  }
+
+  // Normalen der Bindungen (nach außen gerichtet)
+  const bondGeo = A.bonds.map(b => {
+    const a = P[b.i], c = P[b.j];
+    const mx=(a.x+c.x)/2, my=(a.y+c.y)/2;
+    const dx=c.x-a.x, dy=c.y-a.y, len=Math.hypot(dx,dy)||1;
+    let nx=-dy/len, ny=dx/len;
+    const vx = mx-cen.x, vy = my-cen.y;
+    const dot = nx*vx+ny*vy;
+    if(Math.abs(dot) < 1){ if(ny > 0){ nx=-nx; ny=-ny; } }
+    else if(dot < 0){ nx=-nx; ny=-ny; }
+    return {b,mx,my,nx,ny,ux:dx/len,uy:dy/len};
+  });
+
+  if(S.view.bond){
+    bondGeo.forEach(g => {
+      const ad = Math.abs(g.b.d); if(ad < 0.02) return;
+      const len = Math.min(ad*L*0.5, L*1.35);
+      const off = R*1.3;
+      const cx = g.mx + g.nx*off, cy = g.my + g.ny*off;
+      const s = Math.sign(g.b.d);
+      dipoleArrow(cx - g.ux*s*len/2, cy - g.uy*s*len/2, cx + g.ux*s*len/2, cy + g.uy*s*len/2, '#4c4f69', 4);
+    });
+  }
+
+  if(S.view.den){
+    bondGeo.forEach(g => {
+      const cl = classify(g.b.d);
+      const off = S.mode===2 ? (S.view.pair ? -R*0.85 : 0) : (S.view.bond && Math.abs(g.b.d) >= 0.02 ? R*1.3 + 27 : R*1.15);
+      pill(g.mx + g.nx*off, g.my + g.ny*off, 'ΔEN ' + fmt(Math.abs(g.b.d)), cl.col);
+    });
+  }
+
+  if(S.view.charge){
+    keys.forEach(k => {
+      const q = A.q[k]; if(Math.abs(q) < 0.02) return;
+      let dx, dy;
+      if(S.mode===2 || k!=='B'){
+        const ref = S.mode===2 ? {x:CX(),y:CY()} : P.B;
+        dx = P[k].x-ref.x; dy = P[k].y-ref.y;
+      } else {
+        const angs = outerKeys().map(o => Math.atan2(P[o].y-P.B.y, P[o].x-P.B.x)).sort((a,b)=>a-b);
+        let best = -1, bis = 0;
+        angs.forEach((a,i) => { const nxt = i===angs.length-1 ? angs[0]+2*Math.PI : angs[i+1]; const gap = nxt-a; if(gap > best+1e-6){ best = gap; bis = a+gap/2; } });
+        dx = Math.cos(bis); dy = Math.sin(bis);
+      }
+      const l = Math.hypot(dx,dy)||1;
+      const size = Math.round(17 + Math.min(Math.abs(q),1.6)*9);
+      const rr = R + 8 + size*(0.75 + 0.45*Math.abs(dx/l));
+      const x = P[k].x + dx/l*rr, y = P[k].y + dy/l*rr;
+      const col = q>0 ? '#1e66f5' : '#d20f39';
+      ctx.save();
+      ctx.font = `700 ${size}px 'IBM Plex Sans', sans-serif`;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.lineWidth = 5; ctx.lineJoin = 'round'; ctx.strokeStyle = '#eff1f5'; ctx.strokeText(q>0?'δ+':'δ−',x,y);
+      ctx.fillStyle = col; ctx.fillText(q>0?'δ+':'δ−',x,y);
+      ctx.restore();
+    });
+  }
+
+  if(S.view.total){
+    const m = Math.hypot(A.M.x,A.M.y);
+    if(m > 0.03){
+      const len = Math.min(m*L*0.6, L*1.9);
+      const ux = A.M.x/m, uy = -A.M.y/m;
+      let ax = cen.x, ay = cen.y;
+      if(S.mode===2){ const g = bondGeo[0]; ax -= g.nx*R*1.5; ay -= g.ny*R*1.5; }
+      ctx.save();
+      dipoleArrow(ax-ux*len/2, ay-uy*len/2, ax+ux*len/2, ay+uy*len/2, '#fe640b', 5);
+      ctx.restore();
+    } else if(A.bonds.some(b => Math.abs(b.d) >= 0.02)){
+      pill(cen.x, cen.y + (S.mode===2 ? R*1.6 : R*1.75), 'Gesamtdipol = 0', '#fe640b');
+    }
+  }
+  if(S.view.vec && S.mode > 2) drawVecInset(A);
+}
+
+/* ---------- Dynamik ---------- */
+const FIELD_K = 14, GAMMA = 4, NOISE = 7;
+function gauss(){ let u=0,v=0; while(!u) u=Math.random(); while(!v) v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+function step(dt){
+  if(drag){ S.omega = 0; return; }
+  let tau = 0;
+  if(S.field.on){
+    const {pos} = geom(); const {M} = analyze(pos);
+    tau = FIELD_K*S.field.str*S.field.dir*M.y;
+  }
+  S.omega += (tau - GAMMA*S.omega)*dt;
+  if(S.field.thermal > 0) S.omega += gauss()*NOISE*S.field.thermal*Math.sqrt(dt);
+  S.phi = wrap(S.phi + S.omega*dt);
+}
+
+let last = performance.now();
+function loop(now){
+  const dt = Math.min(0.033,(now-last)/1000); last = now;
+  step(dt);
+  draw(now/1000);
+  requestAnimationFrame(loop);
+}
+
+/* ---------- Ziehen ---------- */
+let drag = null;
+function evWorld(e){ const r = cv.getBoundingClientRect(); const sx=e.clientX-r.left, sy=e.clientY-r.top; return {sx,sy,x:sx-CX(), y:CY()-sy}; }
+function hit(w){
+  const {L,R,pos} = geom();
+  const order = S.mode===2 ? ['A','B'] : [...outerKeys(),'B'];
+  for(const k of order){ if(Math.hypot(w.x-pos[k].x,w.y-pos[k].y) <= R+6) return {k,L,R}; }
+  const reach = S.mode===2 ? L*0.65+R : L+R;
+  if(Math.hypot(w.x,w.y) <= reach) return {k:null,L,R};
+  return null;
+}
+cv.addEventListener('pointerdown', e => {
+  const w = evWorld(e); const h = hit(w);
+  if(!h) return;
+  cv.setPointerCapture(e.pointerId);
+  cv.classList.add('dragging');
+  if(h.k && S.mode>2 && h.k!=='B') drag = {type:'outer', key:h.k};
+  else drag = {type:'rot', key:h.k, off: Math.atan2(w.y,w.x) - S.phi};
+  S.omega = 0;
+  e.preventDefault();
+});
+cv.addEventListener('pointermove', e => {
+  const w = evWorld(e);
+  if(!drag){ const h = hit(w); hoverKey = h ? h.k : null; cv.style.cursor = h ? 'grab' : 'default'; return; }
+  if(drag.type==='rot'){ S.phi = wrap(Math.atan2(w.y,w.x) - drag.off); }
+  else {
+    const k = drag.key;
+    let a = wrap(Math.atan2(w.y,w.x) - S.phi);
+    const minSep = 46*D2R;
+    for(let pass=0; pass<2; pass++){
+      outerKeys().forEach(o => {
+        if(o===k) return;
+        const d = wrap(a - S.rel[o]);
+        if(Math.abs(d) < minSep) a = wrap(S.rel[o] + (d>=0?1:-1)*minSep);
+      });
+    }
+    S.rel[k] = a;
+    clearPreset(false);
+    updateReadout();
+  }
+});
+function endDrag(e){ if(drag){ drag=null; cv.classList.remove('dragging'); try{cv.releasePointerCapture(e.pointerId);}catch(_){} } }
+cv.addEventListener('pointerup', endDrag);
+cv.addEventListener('pointercancel', endDrag);
+cv.addEventListener('pointerleave', () => { if(!drag) hoverKey=null; });
+cv.addEventListener('keydown', e => {
+  if(e.key==='ArrowLeft'){ S.phi = wrap(S.phi + 5*D2R); S.omega=0; e.preventDefault(); }
+  if(e.key==='ArrowRight'){ S.phi = wrap(S.phi - 5*D2R); S.omega=0; e.preventDefault(); }
+});
+
+/* ---------- Bedienfeld ---------- */
+const cardsEl = document.getElementById('cards');
+const cards = {};
+['A','B','C','D'].forEach(k => {
+  const d = document.createElement('div');
+  d.className = 'atom-card';
+  d.innerHTML = `
+    <div class="ac-head"><strong>Atom ${k}</strong><span class="role"></span><output aria-live="polite"></output></div>
+    <label class="field" style="margin-top:0" for="sel${k}">Element</label>
+    <select id="sel${k}"></select>
+    <div class="en-row"><span>weniger</span><input type="range" id="rng${k}" min="0.7" max="4" step="0.01" aria-label="Elektronegativität von Atom ${k}"><span>mehr</span></div>`;
+  cardsEl.appendChild(d);
+  const sel = d.querySelector('select'), rng = d.querySelector('input'), out = d.querySelector('output'), role = d.querySelector('.role');
+  sel.innerHTML = `<option value="">frei einstellbar (${k})</option>` + ELEMENTS.map(e => `<option value="${e[0]}">${e[0]}: ${e[1]}</option>`).join('');
+  sel.addEventListener('change', () => {
+    const s = S.slots[k];
+    s.el = sel.value || null;
+    if(s.el) s.en = EL[s.el][S.table];
+    clearPreset(true); syncUI();
+  });
+  rng.addEventListener('input', () => {
+    const s = S.slots[k]; s.el = null; s.en = parseFloat(rng.value);
+    clearPreset(true); syncUI();
+  });
+  cards[k] = {d,sel,rng,out,role};
+});
+
+const presetSel = document.getElementById('preset');
+function fillPresets(){
+  presetSel.innerHTML = `<option value="">eigenes Molekül</option>` + PRESETS[S.mode].map((p,i) => `<option value="${i}">${p.name}</option>`).join('');
+  presetSel.value = '';
+}
+presetSel.addEventListener('change', () => { if(presetSel.value!=='') loadPreset(PRESETS[S.mode][+presetSel.value]); });
+
+function setAngle3(deg){ const h = deg*D2R/2; S.rel.A = wrap(1.5*Math.PI - h); S.rel.C = wrap(1.5*Math.PI + h); }
+function defaultGeometry(){
+  if(S.mode===3) setAngle3(120);
+  if(S.mode===4){ S.rel.A=210*D2R; S.rel.C=330*D2R; S.rel.D=90*D2R; }
+  S.ord = {A:1,C:1,D:1};
+}
+function loadPreset(p){
+  Object.entries(p.at).forEach(([k,sym]) => { S.slots[k].el = sym; S.slots[k].en = EL[sym][S.table]; });
+  S.ord = Object.assign({A:1,C:1,D:1}, p.ord);
+  if(S.mode===3) setAngle3(p.angle);
+  if(S.mode===4) Object.entries(p.rel).forEach(([k,v]) => S.rel[k] = v*D2R);
+  S.phi = 0; S.omega = 0;
+  S.preset = p.name;
+  syncUI();
+}
+function clearPreset(resetOrders){
+  if(!S.preset) return;
+  S.preset = ''; presetSel.value = '';
+  if(resetOrders) S.ord = {A:1,C:1,D:1};
+  document.getElementById('molName').textContent = 'eigenes Molekül';
+}
+
+document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
+  S.mode = +b.dataset.mode; S.phi = 0; S.omega = 0; S.preset = '';
+  defaultGeometry(); fillPresets(); syncUI();
+}));
+
+const anglePresets = document.getElementById('anglePresets');
+function fillAnglePresets(){
+  anglePresets.innerHTML = '';
+  const list = S.mode===3 ? [['linear (180°)',180],['120°',120],['104,5°',104.5],['90°',90]] : S.mode===4 ? [['trigonal-planar (3 × 120°)',null]] : [];
+  list.forEach(([t,v]) => {
+    const b = document.createElement('button'); b.type='button'; b.className='btn'; b.textContent=t;
+    b.addEventListener('click', () => {
+      if(S.mode===3) setAngle3(v); else { S.rel.A=210*D2R; S.rel.C=330*D2R; S.rel.D=90*D2R; }
+      clearPreset(false); updateReadout();
+    });
+    anglePresets.appendChild(b);
+  });
+}
+
+const bind = (id, key) => { const el = document.getElementById(id); el.checked = S.view[key]; el.addEventListener('change', () => S.view[key] = el.checked); };
+bind('vBond','bond'); bind('vTotal','total'); bind('vCharge','charge'); bind('vDensity','density'); bind('vPair','pair'); bind('vDen','den'); bind('vVec','vec');
+
+const fieldOn = document.getElementById('fieldOn');
+fieldOn.addEventListener('change', () => S.field.on = fieldOn.checked);
+const fieldStr = document.getElementById('fieldStr');
+fieldStr.addEventListener('input', () => S.field.str = parseFloat(fieldStr.value));
+document.getElementById('flip').addEventListener('click', () => S.field.dir *= -1);
+const thermal = document.getElementById('thermal'), thermalOut = document.getElementById('thermalOut');
+thermal.addEventListener('input', () => {
+  S.field.thermal = parseFloat(thermal.value);
+  thermalOut.textContent = S.field.thermal < 0.01 ? 'aus' : S.field.thermal < 0.35 ? 'gering' : S.field.thermal < 0.7 ? 'mittel' : 'hoch';
+});
+
+const tableSel = document.getElementById('table');
+tableSel.addEventListener('change', () => {
+  S.table = tableSel.value;
+  Object.values(S.slots).forEach(s => { if(s.el) s.en = EL[s.el][S.table]; });
+  syncUI();
+});
+
+document.getElementById('reset').addEventListener('click', () => {
+  S.slots = {A:{el:null,en:2.0}, B:{el:null,en:3.0}, C:{el:null,en:2.0}, D:{el:null,en:2.0}};
+  S.mode = 2; S.phi = 0; S.omega = 0; S.preset = '';
+  S.field = {on:false,str:0.6,dir:1,thermal:0};
+  fieldOn.checked = false; fieldStr.value = 0.6; thermal.value = 0; thermalOut.textContent = 'aus';
+  defaultGeometry(); fillPresets(); syncUI();
+});
+
+function syncUI(){
+  document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.mode===S.mode)));
+  const act = activeKeys();
+  ['A','B','C','D'].forEach(k => {
+    const c = cards[k], s = S.slots[k];
+    c.d.hidden = !act.includes(k);
+    c.d.style.setProperty('--c', lum(colorOf(k)) > 0.85 ? '#9ca0b0' : colorOf(k));
+    c.sel.value = s.el || '';
+    c.rng.value = s.en;
+    c.out.textContent = 'EN ' + fmtEN(k);
+    c.role.textContent = (S.mode>2 && k==='B') ? 'Zentralatom' : '';
+  });
+  document.getElementById('angleSec').hidden = S.mode===2;
+  fillAnglePresets();
+  document.getElementById('molName').textContent = S.preset || 'eigenes Molekül';
+  document.getElementById('hint').textContent = S.mode===2
+    ? 'Ein Atom ziehen: Das Molekül dreht sich.'
+    : 'Zentralatom oder Bindung ziehen: Das Molekül dreht sich. Außenatom ziehen: Der Bindungswinkel ändert sich.';
+  updateReadout();
+}
+
+function updateReadout(){
+  const {pos} = geom(); const A = analyze(pos);
+  let html = '';
+  A.bonds.forEach(b => {
+    const cl = classify(b.d);
+    html += `<div class="row"><b>${labelOf(b.i)}–${labelOf(b.j)}</b><span>ΔEN = ${fmt(Math.abs(b.d))}</span><span class="tag ${cl.c}">${cl.t}</span></div>`;
+  });
+  const m = Math.hypot(A.M.x,A.M.y);
+  const maxD = Math.max(...A.bonds.map(b => Math.abs(b.d)));
+  html += `<div class="total">Gesamtdipol (Modellwert): <b>${fmt(m)}</b></div>`;
+  let v, yes = false;
+  if(maxD < 0.05) v = 'Unpolares Molekül: Die Bindungen sind unpolar. Es gibt keine Teilladungen.';
+  else if(m < 0.03) v = 'Kein Dipolmolekül: Die Bindungen sind polar, aber die Bindungsdipole heben sich wegen des symmetrischen Baus auf.';
+  else if(maxD < 0.4) { v = 'Schwacher Dipol: Die Bindungen sind nur schwach polar.'; yes = true; }
+  else { v = S.mode===2 ? 'Dipolmolekül: Der Bindungsdipol ist zugleich der Gesamtdipol.' : 'Dipolmolekül: Die Bindungsdipole heben sich nicht auf.'; yes = true; }
+  if(maxD >= 1.7) v += ' Hinweis: Bei ΔEN ≥ 1,7 überwiegt der ionische Charakter. Das Modell der Elektronenpaarbindung gerät hier an seine Grenzen.';
+  html += `<p class="verdict ${yes?'yes':''}">${v}</p>`;
+  document.getElementById('meas').innerHTML = html;
+
+  const ao = document.getElementById('angleOut');
+  if(S.mode===3){
+    const a = Math.abs(wrap(S.rel.A - S.rel.C))/D2R;
+    ao.innerHTML = `<div>∠ ${labelOf('A')}–${labelOf('B')}–${labelOf('C')} = ${fmt(a,1)}°</div>`;
+  } else if(S.mode===4){
+    const pairs = [['A','C'],['C','D'],['D','A']];
+    ao.innerHTML = pairs.map(([x,y]) => `<div>∠ ${labelOf(x)}–${labelOf('B')}–${labelOf(y)} = ${fmt(Math.abs(wrap(S.rel[x]-S.rel[y]))/D2R,1)}°</div>`).join('');
+  }
+}
+
+fillPresets();
+defaultGeometry();
+syncUI();
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
