@@ -1,0 +1,1621 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Schaltlogik – vom Stromkreis zum Schaltwerk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F1F4F2; --grid:#DDE6E1; --panel:#FFFFFF; --ink:#1D3557; --ink2:#4B5E74; --rule:#C8D4CE;
+  --high:#E39B0B; --glow:rgba(240,170,20,.38); --low:#A3AFBA; --ok:#2F7A4E; --bad:#B42318; --sel:#2B6CB0;
+  --on-text:#1D2733;
+  --f:"Barlow","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --fc:"Barlow Condensed","Arial Narrow","Roboto Condensed","Segoe UI",sans-serif;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#10171E; --grid:#1A2530; --panel:#16212B; --ink:#D6E2EE; --ink2:#98AABD; --rule:#2B3A48;
+    --high:#F5B83D; --glow:rgba(245,184,61,.30); --low:#56687A; --ok:#5DBB86; --bad:#F07167; --sel:#7FB2F0;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#10171E; --grid:#1A2530; --panel:#16212B; --ink:#D6E2EE; --ink2:#98AABD; --rule:#2B3A48;
+  --high:#F5B83D; --glow:rgba(245,184,61,.30); --low:#56687A; --ok:#5DBB86; --bad:#F07167; --sel:#7FB2F0;
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0; font-family:var(--f); font-size:17px; line-height:1.5; color:var(--ink);
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;
+}
+.wrap{max-width:1280px;margin:0 auto;padding:0 20px 56px}
+:focus-visible{outline:3px solid var(--sel);outline-offset:2px}
+
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:18px;padding:30px 0 16px;border-bottom:2px solid var(--ink)}
+h1{font-family:var(--fc);font-weight:700;font-size:clamp(2.2rem,5vw,3.4rem);line-height:.95;margin:0}
+.sub{margin:.45rem 0 0;color:var(--ink2);max-width:60ch}
+.controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end}
+.ctl-l{display:block;font-size:.8rem;color:var(--ink2);margin-bottom:3px}
+.seg{display:inline-flex;border:1.5px solid var(--ink);border-radius:6px;overflow:hidden;background:var(--panel);vertical-align:middle}
+.seg button{border:0;background:transparent;color:var(--ink);font:500 .92rem var(--f);padding:6px 11px;cursor:pointer}
+.seg button+button{border-left:1.5px solid var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
+.seg button:disabled{opacity:.35;cursor:not-allowed}
+.seg.sm button{padding:3px 10px;font-size:.88rem}
+.plain{border:1.5px solid var(--ink);background:var(--panel);color:var(--ink);font:500 .92rem var(--f);padding:6px 11px;border-radius:6px;cursor:pointer}
+.primary{border:1.5px solid var(--ink);background:var(--ink);color:var(--panel);font:600 1rem var(--fc);padding:6px 16px;border-radius:6px;cursor:pointer}
+
+nav.tabs{display:flex;flex-wrap:wrap;gap:4px;margin:18px 0 24px}
+.tab{font:600 1.2rem var(--fc);border:0;background:none;color:var(--ink2);padding:8px 14px 6px;border-bottom:3px solid transparent;cursor:pointer}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--high)}
+.tab .n{display:inline-block;width:1.45em;height:1.45em;line-height:1.35em;text-align:center;border:1.5px solid currentColor;border-radius:50%;font-size:.8em;margin-right:7px}
+
+h2{font:700 1.9rem/1.1 var(--fc);margin:0 0 .5rem}
+h3{font:600 1.25rem/1.2 var(--fc);margin:0 0 .55rem}
+.intro{max-width:82ch;margin:0 0 20px}
+.intro p{margin:.3rem 0}
+.card{background:var(--panel);border:1.5px solid var(--rule);border-radius:8px;padding:16px 18px}
+.note{font-size:.95rem;color:var(--ink2);margin:.7rem 0 0}
+.op{font:600 1rem var(--fc);color:var(--ink2);margin-left:.35em}
+.small{font-size:.88rem;color:var(--ink2)}
+.warn{color:var(--bad);font-size:.93rem;margin:.3rem 0}
+.fb{margin:.6rem 0 0;font-weight:600}
+.fb.ok{color:var(--ok)} .fb.no{color:var(--bad)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+
+/* 1 */
+.circuits{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,540px),1fr));gap:18px}
+.circ{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:640px){.circ{grid-template-columns:1fr}}
+.csvg{width:100%;height:auto;display:block}
+.swbtns{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.swb{text-align:left;border:1.5px solid var(--ink);background:var(--panel);color:var(--ink);border-radius:6px;padding:6px 10px;font:500 .95rem var(--f);cursor:pointer}
+.swb[aria-pressed="true"]{background:var(--high);border-color:var(--high);color:var(--on-text)}
+.swb span{opacity:.8}
+.legend{display:flex;flex-wrap:wrap;gap:18px;font-size:.92rem;color:var(--ink2);margin:14px 0 0}
+.legend svg{vertical-align:middle;margin-right:6px}
+
+/* Tabellen */
+table.tt{border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:.98rem}
+table.tt th,table.tt td{padding:3px 11px;text-align:center;border-bottom:1px solid var(--rule)}
+table.tt th{font:600 1rem var(--fc)}
+table.tt .o{border-left:2px solid var(--ink)}
+table.tt tr.cur td{background:var(--glow)}
+table.tt tr.bad td{color:var(--bad);font-weight:600}
+table.tt tr.bad td:last-child::after{content:" ×"}
+table.tt td.v1{font-weight:600}
+table.tt td.yc{cursor:pointer;min-width:3em;border:1.5px solid var(--ink);border-radius:4px}
+table.tt td.yc.v1{background:var(--high);color:var(--on-text)}
+.ttscroll{max-height:440px;overflow:auto}
+
+/* 2 */
+.gatepick{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;align-items:center}
+.gatepick>button{border:1.5px solid var(--ink);background:var(--panel);color:var(--ink);border-radius:6px;padding:7px 14px;font:600 1.05rem var(--fc);cursor:pointer;min-width:74px}
+.gatepick>button[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
+.gatepick .lnw{margin-left:12px;display:flex;gap:8px;align-items:center}
+.labgrid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:820px){.labgrid{grid-template-columns:1fr}}
+#labsvg{width:100%;height:auto;display:block}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:14px 0 0}
+.kv dt{color:var(--ink2);font-size:.92rem}
+.kv dd{margin:0}
+.term{font-size:1.15rem}
+figure{margin:0}
+figcaption{font-size:.9rem;color:var(--ink2);margin-top:6px}
+
+/* 3 */
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.toolbar .grp{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.toolbar .sep{width:1.5px;height:28px;background:var(--rule);margin:0 4px}
+.pal{border:1.5px solid var(--ink);background:var(--panel);color:var(--ink);border-radius:6px;padding:5px 10px;font:600 1rem var(--fc);cursor:pointer}
+.pal small{font:500 .78rem var(--f);color:var(--ink2);margin-left:4px}
+.pal:disabled{opacity:.3;cursor:not-allowed}
+select{font:500 .95rem var(--f);color:var(--ink);background:var(--panel);border:1.5px solid var(--ink);border-radius:6px;padding:5px 8px;max-width:100%}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;min-height:44px;padding:6px 10px;border:1.5px dashed var(--rule);border-radius:8px;margin-bottom:10px;font-size:.93rem;background:var(--panel)}
+.bar strong{font:600 1.05rem var(--fc)}
+.bgrid{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:16px;align-items:start}
+@media (max-width:1080px){.bgrid{grid-template-columns:1fr}}
+.canvaswrap{overflow:auto;max-height:78vh;border:1.5px solid var(--rule);border-radius:8px;background:var(--panel)}
+#bsvg{display:block;width:100%;min-width:760px;height:auto;touch-action:none;user-select:none;-webkit-user-select:none}
+.side{display:flex;flex-direction:column;gap:14px}
+.side .card{overflow-x:auto}
+#bstatus{min-height:1.5em;margin:.5rem 0 0;font-size:.95rem;color:var(--ink2)}
+.exprs p{margin:.35rem 0}
+.help{font-size:.93rem;color:var(--ink2);max-width:92ch}
+.tdcard{margin-top:16px}
+.tdwrap{overflow-x:auto}
+#tdsvg{display:block;width:100%;min-width:700px;height:auto}
+#tInfo{font-variant-numeric:tabular-nums}
+
+/* 4 */
+.syngrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,500px),1fr));gap:18px;align-items:start}
+.termin{width:100%;font:500 1.15rem var(--f);padding:8px 10px;border:1.5px solid var(--ink);border-radius:6px;background:var(--panel);color:var(--ink)}
+.keys{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0}
+.keys button{min-width:40px;border:1.5px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:6px;padding:4px 8px;font:500 1rem var(--f);cursor:pointer}
+.forms p{margin:.45rem 0}
+.forms .lbl{display:block;font-size:.85rem;color:var(--ink2)}
+label.chk{display:inline-flex;gap:6px;align-items:center;font-size:.93rem}
+
+var{font-style:italic;font-family:"Cambria Math","STIX Two Text",Georgia,serif}
+.ol{text-decoration:overline;text-decoration-thickness:1.5px}
+
+/* SVG */
+.cond{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.plate{stroke:var(--ink);stroke-width:2.5}
+.plate.thick{stroke-width:6}
+.pol{font:600 17px var(--f);fill:var(--ink)}
+.ct{fill:var(--panel);stroke:var(--ink);stroke-width:2}
+.blade{stroke:var(--ink);stroke-width:3.2;stroke-linecap:round}
+.swg{cursor:pointer}
+.hit{fill:transparent}
+.swl{font:700 16px var(--fc);fill:var(--ink)}
+.node{fill:var(--ink)}
+.cap{font:500 12.5px var(--f);fill:var(--ink2)}
+.flow{fill:none;stroke:var(--high);stroke-width:3.2;stroke-linecap:round;stroke-dasharray:7 13;animation:flow .9s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-20}}
+.lamp .halo{fill:var(--glow);opacity:0;transition:opacity .2s}
+.lamp.on .halo{opacity:1}
+.lamp .bulb{fill:var(--panel);stroke:var(--ink);stroke-width:2.2;transition:fill .2s}
+.lamp.on .bulb{fill:var(--high)}
+.lamp .xc{stroke:var(--ink);stroke-width:2;fill:none}
+.lamp.on .xc{stroke:var(--on-text)}
+.gbody,.blk{fill:var(--panel);stroke:var(--ink);stroke-width:2}
+.gline{fill:none;stroke:var(--ink);stroke-width:2}
+.glabel{font:700 17px var(--fc);fill:var(--ink)}
+.glabel.long{font-size:14px}
+.btitle{font:700 14px var(--fc);fill:var(--ink)}
+.pin{font:500 11px var(--f);fill:var(--ink2)}
+.bname{font:600 12px var(--fc);fill:var(--ink2)}
+.w{fill:none;stroke-width:3;stroke-linecap:round}
+.s0{stroke:var(--low)}
+.s1{stroke:var(--high)}
+.wsel{stroke-width:5.5}
+.whit{fill:none;stroke:transparent;stroke-width:14;cursor:pointer}
+.el{cursor:grab}
+.ghit{fill:transparent}
+.esel .gbody,.esel .inbox,.esel .bulb,.esel .blk{stroke:var(--sel);stroke-width:3.2}
+.inbox{fill:var(--panel);stroke:var(--ink);stroke-width:2}
+.inbox.on{fill:var(--high)}
+.inlbl{font:700 15px var(--fc);fill:var(--ink)}
+.inval{font:600 13px var(--f);fill:var(--ink)}
+.dk{fill:var(--on-text)}
+.dks{stroke:var(--on-text)}
+.olbl{font:600 14px var(--fc);fill:var(--ink)}
+.port{fill:var(--panel);stroke:var(--ink);stroke-width:2;pointer-events:none}
+.port.open{stroke:var(--bad)}
+.port.target{fill:var(--sel);stroke:var(--sel)}
+.port.src{fill:var(--sel);stroke:var(--sel)}
+.phit{fill:transparent;cursor:crosshair}
+.tempw{fill:none;stroke:var(--sel);stroke-width:2.5;stroke-dasharray:6 5;pointer-events:none}
+.gpp{fill:none;stroke:var(--grid);stroke-width:1}
+.bgfill{fill:var(--panel)}
+.tog{cursor:pointer}
+.tdlbl{font:600 14px var(--fc);fill:var(--ink)}
+.tdnum{font:500 11px var(--f);fill:var(--ink2)}
+.tdgrid{stroke:var(--rule);stroke-width:1}
+.tdbase{stroke:var(--rule);stroke-width:1;stroke-dasharray:3 4}
+.tdwave{fill:none;stroke:var(--high);stroke-width:2.4;stroke-linejoin:round}
+.tdfill{fill:var(--glow)}
+
+@media (prefers-reduced-motion: reduce){
+  .flow{animation:none;stroke-dasharray:none;opacity:.85}
+  .lamp .halo,.lamp .bulb{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div>
+    <h1>Schaltlogik</h1>
+    <p class="sub">Vom geschlossenen Stromkreis über Logikgatter und Schaltnetze bis zu Schaltwerken mit Speicherverhalten.</p>
+  </div>
+  <div class="controls">
+    <div>
+      <span class="ctl-l">Schaltzeichen</span>
+      <div class="seg" role="group" aria-label="Schaltzeichen">
+        <button data-setting="style" data-value="iec" aria-pressed="true">DIN EN 60617</button>
+        <button data-setting="style" data-value="ansi" aria-pressed="false">ANSI/IEEE</button>
+      </div>
+    </div>
+    <div>
+      <span class="ctl-l">Schreibweise</span>
+      <div class="seg" role="group" aria-label="Schreibweise der Terme">
+        <button data-setting="nota" data-value="logic" aria-pressed="true">∧ ∨ ¬</button>
+        <button data-setting="nota" data-value="alg" aria-pressed="false">· + Überstrich</button>
+      </div>
+    </div>
+    <button class="plain" id="themeBtn" type="button">Hell/Dunkel</button>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Bereiche">
+  <button class="tab" role="tab" data-view="v-kreis" aria-selected="true"><span class="n">1</span>Stromkreise</button>
+  <button class="tab" role="tab" data-view="v-lab" aria-selected="false"><span class="n">2</span>Gatter-Labor</button>
+  <button class="tab" role="tab" data-view="v-bau" aria-selected="false"><span class="n">3</span>Schaltungsbaukasten</button>
+  <button class="tab" role="tab" data-view="v-syn" aria-selected="false"><span class="n">4</span>Synthese</button>
+</nav>
+
+<!-- ============ 1 ============ -->
+<section class="view" id="v-kreis">
+  <div class="intro">
+    <h2>Vom Stromkreis zur Logik</h2>
+    <p>Ein Schalter besitzt zwei diskrete Zustände. Ordnet man ihnen die Werte 0 und 1 zu und deutet das Leuchten der Lampe als Ausgangsgröße <var>Y</var>, so realisiert jede Anordnung der Schalter eine logische Verknüpfung. Schalter im Schaltbild oder über die Schaltflächen betätigen und die Wahrheitstabelle vergleichen.</p>
+  </div>
+  <div class="circuits" id="circuits"></div>
+  <div class="legend">
+    <span><svg width="46" height="10" aria-hidden="true"><path class="flow" d="M2,5 H44" style="animation:none"/></svg>Stromfluss in technischer Stromrichtung (vom Pluspol zum Minuspol)</span>
+    <span>Idealisierte Darstellung: Innenwiderstand der Quelle und Leitungswiderstände werden vernachlässigt.</span>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="view" id="v-lab" hidden>
+  <div class="intro">
+    <h2>Gatter-Labor</h2>
+    <p>In der Digitaltechnik ersetzen elektronische Bauelemente (Transistoren) die mechanischen Schalter. Der Wert 1 entspricht einem High-Pegel (bei TTL-Logik bezogen auf eine Versorgungsspannung von 5 V), der Wert 0 einem Low-Pegel nahe 0 V. Gatter und Anzahl der Eingänge wählen, Eingänge umschalten und die Zeile der Wahrheitstabelle verfolgen.</p>
+  </div>
+  <div class="gatepick" role="group" aria-label="Gatter wählen" id="gatepick"></div>
+  <div class="labgrid">
+    <figure class="card">
+      <svg id="labsvg" viewBox="0 0 390 200" aria-label="Schaltsymbol des gewählten Gatters mit Eingängen und Ausgang"></svg>
+      <figcaption>Eingänge antippen (oder mit Tabulator auswählen und Leertaste drücken), um zwischen 0 und 1 zu wechseln.</figcaption>
+    </figure>
+    <div class="card" id="labinfo"></div>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="view" id="v-bau" hidden>
+  <div class="intro">
+    <h2>Schaltungsbaukasten</h2>
+    <p class="help">Bausteine über die Leiste hinzufügen und verschieben. Verbindungen entstehen durch Ziehen vom Ausgang (rechter Anschluss) zu einem Eingang (linker Anschluss) oder durch nacheinander Antippen beider Anschlüsse. Schalter und Taktgeber werden durch Antippen umgeschaltet. Ein markiertes Element lässt sich in der Eigenschaftsleiste anpassen (z. B. Anzahl der Gattereingänge) und mit der Entf-Taste löschen.</p>
+    <p class="help">Im Pausenzustand kommt die Schaltung nach jeder Änderung sofort zur Ruhe. Mit „Start“ läuft die Simulation schrittweise: Jedes Gatter benötigt einen Zeitschritt (Gatterlaufzeit). So werden Speicherverhalten, Taktflanken, Schwingungen und Laufzeiteffekte im Impulsdiagramm sichtbar.</p>
+  </div>
+  <div class="toolbar">
+    <div class="grp" id="palette">
+      <button class="pal" data-add="IN">Schalter</button>
+      <button class="pal" data-add="CLK">Taktgeber</button>
+      <button class="pal" data-add="OUT">Lampe</button>
+      <span class="sep" aria-hidden="true"></span>
+      <button class="pal" data-add="AND">UND<small>&amp;</small></button>
+      <button class="pal" data-add="OR">ODER<small>≥1</small></button>
+      <button class="pal" data-add="NOT">NICHT<small>1</small></button>
+      <button class="pal" data-add="NAND">NAND</button>
+      <button class="pal" data-add="NOR">NOR</button>
+      <button class="pal" data-add="XOR">XOR<small>=1</small></button>
+      <button class="pal" data-add="XNOR">XNOR</button>
+      <span class="sep" aria-hidden="true"></span>
+      <button class="pal" data-add="MUX2">MUX 2:1</button>
+      <button class="pal" data-add="MUX4">MUX 4:1</button>
+      <button class="pal" data-add="DEC">DEC 2→4</button>
+      <button class="pal" data-add="DFF">D-Flipflop</button>
+    </div>
+  </div>
+  <div class="toolbar">
+    <div class="grp">
+      <label class="small" for="presetSel">Beispiel</label>
+      <select id="presetSel">
+        <option value="">laden …</option>
+        <optgroup label="Schaltnetze">
+          <option value="ha">Halbaddierer</option>
+          <option value="fa">Volladdierer</option>
+          <option value="alarm">Alarmanlage</option>
+          <option value="major">Mehrheitsentscheid mit 3-fach-ODER</option>
+          <option value="dm">De-Morgan-Vergleich</option>
+          <option value="mux">4:1-Multiplexer</option>
+          <option value="dec">2→4-Dekodierer</option>
+        </optgroup>
+        <optgroup label="Schaltwerke und Laufzeit">
+          <option value="rsnor">RS-Flipflop aus NOR</option>
+          <option value="rsnand">RS-Flipflop aus NAND (aktiv 0)</option>
+          <option value="dlatch">D-Latch (taktzustandsgesteuert)</option>
+          <option value="dff">D-Flipflop (taktflankengesteuert)</option>
+          <option value="counter">Asynchroner 3-Bit-Zähler</option>
+          <option value="ring">Ringoszillator (3 × NICHT)</option>
+          <option value="hazard">Laufzeiteffekt: A ∧ ¬A</option>
+        </optgroup>
+      </select>
+      <button class="plain" id="clearBtn" type="button">Alles leeren</button>
+    </div>
+    <span class="sep" aria-hidden="true"></span>
+    <div class="grp" id="simbar">
+      <button class="primary" id="runBtn" type="button">Start</button>
+      <button class="plain" id="stepBtn" type="button">Einzelschritt</button>
+      <label class="small" for="speedSel">Tempo</label>
+      <select id="speedSel"><option value="2">2 Schritte/s</option><option value="4" selected>4 Schritte/s</option><option value="8">8 Schritte/s</option><option value="16">16 Schritte/s</option></select>
+      <span class="small" id="tInfo">t = 0</span>
+    </div>
+  </div>
+  <div class="bar" id="propbar" aria-live="polite"></div>
+  <div class="bgrid">
+    <div class="canvaswrap">
+      <svg id="bsvg" viewBox="0 0 1000 560" aria-label="Arbeitsfläche des Schaltungsbaukastens">
+        <defs><pattern id="gpat" width="20" height="20" patternUnits="userSpaceOnUse"><path class="gpp" d="M20 0H0V20"/></pattern></defs>
+        <rect class="bgfill bgr" x="0" y="0" width="1000" height="560"/>
+        <rect class="bgr" x="0" y="0" width="1000" height="560" fill="url(#gpat)"/>
+        <g id="blayer"></g>
+        <path id="btemp" class="tempw" d=""/>
+      </svg>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>Aufgabe</h3>
+        <select id="taskSel" aria-label="Aufgabe wählen"></select>
+        <div id="taskBox"></div>
+      </div>
+      <div class="card">
+        <h3>Wahrheitstabelle</h3>
+        <div id="bWarn"></div>
+        <div id="bTable" class="ttscroll"></div>
+      </div>
+      <div class="card exprs">
+        <h3>Schaltterme</h3>
+        <div id="bExpr"></div>
+      </div>
+    </aside>
+  </div>
+  <p id="bstatus" role="status" aria-live="polite"></p>
+  <div class="card tdcard">
+    <h3>Impulsdiagramm</h3>
+    <p class="small">Aufgezeichnet werden Schalter, Taktgeber, Lampen und alle Elemente, bei denen „im Impulsdiagramm“ aktiviert ist. Im laufenden Betrieb entsteht ein Messpunkt je Zeitschritt, im Pausenzustand einer je Änderung.</p>
+    <div class="tdwrap"><svg id="tdsvg" viewBox="0 0 1000 80" aria-label="Impulsdiagramm"></svg></div>
+    <div class="row"><button class="plain" id="tdClear" type="button">Diagramm leeren</button></div>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="view" id="v-syn" hidden>
+  <div class="intro">
+    <h2>Synthese: vom Term oder von der Tabelle zur Schaltung</h2>
+    <p>Hier verläuft die Arbeitsrichtung umgekehrt. Aus einem Schaltterm oder einer vorgegebenen Wahrheitstabelle wird eine Schaltung erzeugt und in den Baukasten übertragen. Umgekehrt lässt sich prüfen, ob eine selbst gebaute Schaltung zum Term oder zur Tabelle äquivalent ist.</p>
+  </div>
+  <div class="syngrid">
+    <div class="card">
+      <h3>Aus einem Term</h3>
+      <input class="termin" id="termIn" type="text" spellcheck="false" autocomplete="off" aria-label="Schaltterm" value="(A ∨ B) ∧ ¬C">
+      <div class="keys" id="termKeys">
+        <button data-ins="∧">∧</button><button data-ins="∨">∨</button><button data-ins="¬">¬</button><button data-ins="⊕">⊕</button>
+        <button data-ins="(">(</button><button data-ins=")">)</button>
+        <button data-ins="A">A</button><button data-ins="B">B</button><button data-ins="C">C</button><button data-ins="D">D</button>
+        <button data-ins="⌫">⌫</button>
+      </div>
+      <p class="small">Variablen A bis D sowie 0 und 1. UND: ∧ &amp; * · „und“; ODER: ∨ | + „oder“; NICHT: ¬ ! ~ „nicht“; XOR: ⊕ ^ „xor“. Nebeneinanderstehende Variablen (AB) werden als UND gelesen. Bindungsstärke: ¬ vor ∧ vor ⊕ vor ∨.</p>
+      <div id="termOut"></div>
+      <div class="row">
+        <label class="small" for="termGates">Gatterarten</label>
+        <select id="termGates">
+          <option value="term">wie im Term</option>
+          <option value="basic">nur UND, ODER, NICHT</option>
+          <option value="nand">nur NAND</option>
+          <option value="nor">nur NOR</option>
+        </select>
+        <label class="chk"><input type="checkbox" id="termMin"> vorher minimieren</label>
+      </div>
+      <div class="row">
+        <button class="primary" id="termGen" type="button">Schaltung erzeugen</button>
+        <button class="plain" id="termCmp" type="button">Mit Baukasten vergleichen</button>
+      </div>
+      <p class="fb" id="termFb"></p>
+    </div>
+    <div class="card">
+      <h3>Aus einer Wahrheitstabelle</h3>
+      <div class="row" style="margin-top:0">
+        <span class="small">Anzahl Variablen</span>
+        <span class="seg sm" id="tabN"><button data-n="2" aria-pressed="false">2</button><button data-n="3" aria-pressed="true">3</button><button data-n="4" aria-pressed="false">4</button></span>
+        <button class="plain" id="tabZero" type="button">Alle 0</button>
+      </div>
+      <p class="small">Ausgangswerte <var>Y</var> durch Antippen festlegen.</p>
+      <div id="tabTable" class="ttscroll"></div>
+      <div class="forms" id="tabForms"></div>
+      <div class="row">
+        <label class="small" for="tabForm">Grundlage</label>
+        <select id="tabForm">
+          <option value="min">minimierte DNF</option>
+          <option value="dnf">kanonische DNF</option>
+          <option value="knf">kanonische KNF</option>
+        </select>
+        <label class="small" for="tabGates">Gatterarten</label>
+        <select id="tabGates">
+          <option value="basic">UND, ODER, NICHT</option>
+          <option value="nand">nur NAND</option>
+          <option value="nor">nur NOR</option>
+        </select>
+      </div>
+      <div class="row">
+        <button class="primary" id="tabGen" type="button">Schaltung erzeugen</button>
+        <button class="plain" id="tabCmp" type="button">Mit Baukasten vergleichen</button>
+      </div>
+      <p class="fb" id="tabFb"></p>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script>
+'use strict';
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const settings={style:'iec',nota:'logic'};
+
+/* ---------- Grundgerüst ---------- */
+(function(){
+  let saved=null; try{saved=localStorage.getItem('schaltlogik-theme');}catch(e){}
+  if(saved) document.documentElement.dataset.theme=saved;
+  $('#themeBtn').addEventListener('click',()=>{
+    const cur=document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+    const next=cur==='dark'?'light':'dark';
+    document.documentElement.dataset.theme=next;
+    try{localStorage.setItem('schaltlogik-theme',next);}catch(e){}
+  });
+})();
+function showTab(id){
+  $$('.tab').forEach(x=>x.setAttribute('aria-selected',String(x.dataset.view===id)));
+  $$('.view').forEach(v=>{v.hidden=v.id!==id;});
+}
+$$('.tab').forEach(t=>t.addEventListener('click',()=>showTab(t.dataset.view)));
+$$('[data-setting]').forEach(b=>b.addEventListener('click',()=>{
+  settings[b.dataset.setting]=b.dataset.value;
+  $$(`[data-setting="${b.dataset.setting}"]`).forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+  renderLab(); renderBuilder(); renderSyn();
+}));
+
+/* ---------- Gatter ---------- */
+const par=x=>x.reduce((a,b)=>a^b,0);
+const GATES={
+  AND:{name:'UND',alt:'Konjunktion',f:x=>x.every(v=>v)?1:0,iec:'&amp;',neg:false,base:'AND',
+       rule:'<var>Y</var> = 1 genau dann, wenn alle Eingänge 1 sind.',analog:'Reihenschaltung von Schließern'},
+  OR:{name:'ODER',alt:'Disjunktion',f:x=>x.some(v=>v)?1:0,iec:'≥1',neg:false,base:'OR',
+       rule:'<var>Y</var> = 1, wenn mindestens ein Eingang 1 ist (inklusives ODER). Das Symbol „≥1“ drückt genau diese Bedingung aus.',analog:'Parallelschaltung von Schließern'},
+  NOT:{name:'NICHT',alt:'Negation',f:x=>1-x[0],iec:'1',neg:true,base:'NOT',
+       rule:'Der Ausgang nimmt stets den komplementären Wert des Eingangs an.',analog:'Öffner (Ruhekontakt), z. B. als Relaiskontakt'},
+  NAND:{name:'NAND',alt:'negierte Konjunktion',f:x=>x.every(v=>v)?0:1,iec:'&amp;',neg:true,base:'AND',
+       rule:'<var>Y</var> = 0 nur dann, wenn alle Eingänge 1 sind.',analog:'Parallelschaltung von Öffnern',
+       extra:'NAND ist ein universelles Gatter: Jede Schaltfunktion lässt sich ausschließlich aus NAND-Gattern aufbauen (siehe Bereich Synthese). In der CMOS-Technik ist ein NAND mit zwei Eingängen mit nur vier Transistoren realisierbar.'},
+  NOR:{name:'NOR',alt:'negierte Disjunktion',f:x=>x.some(v=>v)?0:1,iec:'≥1',neg:true,base:'OR',
+       rule:'<var>Y</var> = 1 nur dann, wenn alle Eingänge 0 sind.',analog:'Reihenschaltung von Öffnern',
+       extra:'Auch NOR ist ein universelles Gatter.'},
+  XOR:{name:'XOR',alt:'Antivalenz, exklusives ODER',f:par,iec:'=1',neg:false,base:'XOR',
+       rule:'Bei zwei Eingängen: <var>Y</var> = 1, wenn die Eingänge verschieden sind. Bei mehr Eingängen wird hier – wie bei hintereinandergeschalteten XOR-Gattern – die Parität ausgewertet: <var>Y</var> = 1 bei ungerader Anzahl von Einsen (Symbol „2k+1“).',analog:'Wechselschaltung (bei entsprechender Zuordnung der Schalterstellungen)',
+       extra:'Das Symbol „=1“ bedeutet streng genommen „genau ein Eingang ist 1“. Nur bei zwei Eingängen stimmt dies mit der Paritätsfunktion überein. XOR bildet die Summenstelle der binären Addition.'},
+  XNOR:{name:'XNOR',alt:'Äquivalenz',f:x=>1-par(x),iec:'=1',neg:true,base:'XOR',
+       rule:'Bei zwei Eingängen: <var>Y</var> = 1, wenn die Eingänge gleich sind. Allgemein: <var>Y</var> = 1 bei gerader Anzahl von Einsen.',analog:'Wechselschaltung („Treppenhausschaltung“)',
+       extra:'Nach DIN EN 60617 wird die Äquivalenz (zwei Eingänge) auch mit dem Qualifizierungssymbol „=“ ohne Negationskreis dargestellt.'}
+};
+const GATE_ORDER=['AND','OR','NOT','NAND','NOR','XOR','XNOR'];
+const GW=56;
+const gh=n=>n<=3?48:62;
+const inYs=n=>({1:[24],2:[14,34],3:[10,24,38],4:[10,24,38,52]})[n];
+const sc=v=>v?'s1':'s0';
+const iecLbl=(type,n)=>GATES[type].base==='XOR'&&n>2?'2k+1':GATES[type].iec;
+function orBackX(y,H){const t=y/H;return 2*t*(1-t)*(GW*0.35);}
+function gateBody(type,style,n){
+  const g=GATES[type],H=gh(n); let s='';
+  if(style==='iec'){
+    const l=iecLbl(type,n);
+    s+=`<rect class="gbody" x="0" y="0" width="${GW}" height="${H}" rx="2"/>`;
+    s+=`<text class="glabel${l.length>3?' long':''}" x="${GW/2}" y="${H/2+6}" text-anchor="middle">${l}</text>`;
+  }else if(g.base==='AND'){
+    const r=H/2; s+=`<path class="gbody" d="M0,0 H${GW-r} A${r},${r} 0 0 1 ${GW-r},${H} H0 Z"/>`;
+  }else if(g.base==='OR'||g.base==='XOR'){
+    s+=`<path class="gbody" d="M0,0 Q${GW*0.35},${H/2} 0,${H} Q${GW*0.62},${H} ${GW},${H/2} Q${GW*0.62},0 0,0 Z"/>`;
+    if(g.base==='XOR') s+=`<path class="gline" d="M-7,0 Q${GW*0.35-7},${H/2} -7,${H}"/>`;
+  }else{
+    s+=`<path class="gbody" d="M0,2 L${GW},${H/2} L0,${H-2} Z"/>`;
+  }
+  if(g.neg) s+=`<circle class="gbody" cx="${GW+5}" cy="${H/2}" r="5"/>`;
+  return s;
+}
+function gateSVG(type,style,n,ins,out){
+  const g=GATES[type],H=gh(n); let s='';
+  inYs(n).forEach((y,i)=>{
+    let end=0;
+    if(style==='ansi'&&(g.base==='OR'||g.base==='XOR')) end=orBackX(y,H)-(g.base==='XOR'?7:0);
+    s+=`<path class="w ${sc(ins[i])}" d="M-14,${y} H${end.toFixed(1)}"/>`;
+  });
+  s+=gateBody(type,style,n);
+  s+=`<path class="w ${sc(out)}" d="M${g.neg?GW+10:GW},${H/2} H${GW+18}"/>`;
+  return s;
+}
+function lampSVG(cx,cy,r,on){
+  const k=r*0.707;
+  return `<g class="lamp ${on?'on':''}"><circle class="halo" cx="${cx}" cy="${cy}" r="${r+11}"/><circle class="bulb" cx="${cx}" cy="${cy}" r="${r}"/><path class="xc" d="M${cx-k},${cy-k} L${cx+k},${cy+k} M${cx+k},${cy-k} L${cx-k},${cy+k}"/></g>`;
+}
+
+/* ---------- Terme ---------- */
+const OPS={logic:{AND:'∧',OR:'∨',XOR:'⊕'},alg:{AND:'·',OR:'+',XOR:'⊕'}};
+const V=l=>({s:`<var>${esc(l)}</var>`,a:true});
+const wrap=x=>x.a?x.s:`(${x.s})`;
+function negE(x){return settings.nota==='logic'?{s:'¬'+wrap(x),a:true}:{s:`<span class="ol">${x.s}</span>`,a:true};}
+function naryE(op,xs){return xs.length===1?xs[0]:{s:xs.map(wrap).join(` ${OPS[settings.nota][op]} `),a:false};}
+function applyGate(type,xs){
+  const g=GATES[type];
+  if(type==='NOT') return negE(xs[0]);
+  const core=naryE(g.base,xs);
+  return g.neg?negE(core):core;
+}
+
+function ttHTML(inH,outH,rows,cur,bad,clickable){
+  let h='<table class="tt"><thead><tr>';
+  inH.forEach(x=>h+=`<th><var>${esc(x)}</var></th>`);
+  outH.forEach((x,i)=>h+=`<th class="${i===0?'o':''}"><var>${esc(x)}</var></th>`);
+  h+='</tr></thead><tbody>';
+  rows.forEach((r,ri)=>{
+    const cls=[ri===cur?'cur':'',bad&&bad.has(ri)?'bad':''].join(' ').trim();
+    h+=`<tr class="${cls}">`;
+    r.i.forEach(v=>h+=`<td>${v}</td>`);
+    r.o.forEach((v,i)=>{
+      const c=(i===0?'o ':'')+(v?'v1 ':'')+(clickable?'yc':'');
+      h+=`<td class="${c}"${clickable?` data-row="${ri}" tabindex="0" role="button" aria-label="Zeile ${ri+1}: Ausgang umschalten"`:''}>${v===undefined?'–':v}</td>`;
+    });
+    h+='</tr>';
+  });
+  return h+'</tbody></table>';
+}
+function combos(n){const r=[];for(let k=0;k<(1<<n);k++){const b=[];for(let i=n-1;i>=0;i--)b.push((k>>i)&1);r.push(b);}return r;}
+
+/* =========================================================
+   1  Stromkreise
+   ========================================================= */
+function battery(x,yp,ym){
+  return `<line class="plate" x1="${x-16}" y1="${yp}" x2="${x+16}" y2="${yp}"/><line class="plate thick" x1="${x-8}" y1="${ym}" x2="${x+8}" y2="${ym}"/>`+
+         `<text class="pol" x="${x-30}" y="${yp+5}">+</text><text class="pol" x="${x-30}" y="${ym+9}">−</text>`;
+}
+function sw(x1,x2,y,closed,key){
+  const ex=closed?x2:x2-6, ey=closed?y:y-20;
+  return `<g class="swg" data-sw="${key}"><rect class="hit" x="${x1-8}" y="${y-34}" width="${x2-x1+16}" height="48"/>`+
+    `<line class="blade" x1="${x1}" y1="${y}" x2="${ex}" y2="${ey}"/>`+
+    `<circle class="ct" cx="${x1}" cy="${y}" r="3.5"/><circle class="ct" cx="${x2}" cy="${y}" r="3.5"/>`+
+    `<text class="swl" x="${(x1+x2)/2}" y="${y-26}" text-anchor="middle">${key}</text></g>`;
+}
+const LOOP_A='M40,105 V40 H320 V102 M320,138 V200 H40 V118';
+const CIRCS=[
+  {id:'reihe',title:'Reihenschaltung',op:'≙ UND',ins:['A','B'],y:s=>s.A&s.B,
+   st:v=>v?'geschlossen':'offen',
+   note:'Es existiert nur ein Strompfad. Der Stromkreis ist genau dann geschlossen, wenn jeder Schalter in diesem Pfad geschlossen ist.',
+   draw(s){const on=this.y(s);return `<path class="cond" d="M40,105 V40 H110 M150,40 H210 M250,40 H320 V102 M320,138 V200 H40 V118"/>`+
+     (on?`<path class="flow" d="${LOOP_A}"/>`:'')+battery(40,105,118)+sw(110,150,40,s.A,'A')+sw(210,250,40,s.B,'B')+lampSVG(320,120,18,on);}},
+  {id:'para',title:'Parallelschaltung',op:'≙ ODER',ins:['A','B'],y:s=>s.A|s.B,
+   st:v=>v?'geschlossen':'offen',
+   note:'Zwei voneinander unabhängige Zweige: Es genügt, dass einer der beiden Schalter geschlossen ist. Sind beide geschlossen, teilt sich der Strom auf beide Zweige auf.',
+   draw(s){const on=this.y(s);let f='';
+     if(on) f+=`<path class="flow" d="M40,105 V40 H120 M240,40 H320 V132 M320,168 V200 H40 V118"/>`;
+     if(s.A) f+=`<path class="flow" d="M120,40 H240"/>`;
+     if(s.B) f+=`<path class="flow" d="M120,40 V100 H240 V40"/>`;
+     return `<path class="cond" d="M40,105 V40 H160 M200,40 H320 V132 M320,168 V200 H40 V118 M120,40 V100 H160 M200,100 H240 V40"/>`+f+
+       `<circle class="node" cx="120" cy="40" r="4"/><circle class="node" cx="240" cy="40" r="4"/>`+
+       battery(40,105,118)+sw(160,200,40,s.A,'A')+sw(160,200,100,s.B,'B')+lampSVG(320,150,18,on);}},
+  {id:'oeff',title:'Öffner (Ruhekontakt)',op:'≙ NICHT',ins:['A'],y:s=>1-s.A,
+   st:v=>v?'betätigt, Kontakt offen':'unbetätigt, Kontakt geschlossen',
+   note:'Ein Öffner ist im unbetätigten Zustand geschlossen. Die Betätigung (A = 1) unterbricht den Stromkreis. Relais mit Ruhekontakt und Transistor-Inverter realisieren auf diese Weise die Negation.',
+   draw(s){const on=this.y(s);return `<path class="cond" d="M40,105 V40 H150 M190,40 H320 V102 M320,138 V200 H40 V118"/>`+
+     (on?`<path class="flow" d="${LOOP_A}"/>`:'')+battery(40,105,118)+sw(150,190,40,1-s.A,'A')+
+     `<text class="cap" x="170" y="68" text-anchor="middle">Öffner</text>`+lampSVG(320,120,18,on);}},
+  {id:'wech',title:'Wechselschaltung',op:'≙ XNOR (Äquivalenz)',ins:['A','B'],y:s=>1-(s.A^s.B),
+   st:v=>v?'Stellung 1 (unten)':'Stellung 0 (oben)',
+   note:'Jeder Wechselschalter verbindet seinen Mittelkontakt entweder mit der oberen oder der unteren Leitung. Die Lampe leuchtet, wenn beide Schalter dieselbe Leitung wählen. Mit der hier gewählten Zuordnung ergibt sich die Äquivalenz; kehrt man die Zuordnung eines Schalters um, erhält man XOR. Da jede Betätigung eines beliebigen Schalters den Zustand der Lampe umkehrt, wird die Schaltung im Treppenhaus eingesetzt.',
+   draw(s){const on=this.y(s);const ya=s.A?150:90,yb=s.B?150:90;
+     const f=on?`<path class="flow" d="M40,160 V120 H100 L140,${ya} H220 L260,120 H320 V142 M320,178 V220 H40 V173"/>`:'';
+     const ws=(k,px,cx,y,lx)=>`<g class="swg" data-sw="${k}"><rect class="hit" x="${Math.min(px,cx)-12}" y="66" width="64" height="104"/>`+
+       `<line class="blade" x1="${px}" y1="120" x2="${cx}" y2="${y}"/>`+
+       `<circle class="ct" cx="${px}" cy="120" r="3.5"/><circle class="ct" cx="${cx}" cy="90" r="3.5"/><circle class="ct" cx="${cx}" cy="150" r="3.5"/>`+
+       `<text class="swl" x="${lx}" y="112" text-anchor="middle">${k}</text></g>`;
+     return `<path class="cond" d="M40,160 V120 H100 M140,90 H220 M140,150 H220 M260,120 H320 V142 M320,178 V220 H40 V173"/>`+f+
+       battery(40,160,173)+ws('A',100,140,ya,86)+ws('B',260,220,yb,274)+
+       `<text class="cap" x="180" y="82" text-anchor="middle">Stellung 0</text><text class="cap" x="180" y="168" text-anchor="middle">Stellung 1</text>`+
+       lampSVG(320,160,18,on);}}
+];
+const CS={reihe:{A:0,B:0},para:{A:0,B:0},oeff:{A:0},wech:{A:0,B:0}};
+function buildCircuits(){
+  $('#circuits').innerHTML=CIRCS.map(c=>`<article class="card" id="c-${c.id}">
+    <h3>${c.title}<span class="op">${c.op}</span></h3>
+    <div class="circ"><svg class="csvg" viewBox="0 0 360 240" role="img" aria-label="Schaltbild ${c.title}"></svg>
+    <div><div class="swbtns"></div><div class="ttbox"></div></div></div>
+    <p class="note">${c.note}</p></article>`).join('');
+  CIRCS.forEach(c=>{
+    $('#c-'+c.id).addEventListener('click',e=>{
+      const t=e.target.closest('[data-sw],[data-k]'); if(!t) return;
+      const k=t.dataset.sw||t.dataset.k; CS[c.id][k]^=1; renderCirc(c,t.dataset.k);
+    });
+    renderCirc(c);
+  });
+}
+function renderCirc(c,refocus){
+  const s=CS[c.id], root=$('#c-'+c.id);
+  root.querySelector('svg').innerHTML=c.draw(s);
+  root.querySelector('.swbtns').innerHTML=c.ins.map(k=>`<button class="swb" data-k="${k}" aria-pressed="${!!s[k]}">${k} = ${s[k]} <span>(${c.st(s[k])})</span></button>`).join('');
+  if(refocus){const b=root.querySelector(`[data-k="${refocus}"]`); if(b) b.focus();}
+  const rows=combos(c.ins.length).map(b=>{const o={};c.ins.forEach((k,i)=>o[k]=b[i]);return {i:b,o:[c.y(o)]};});
+  root.querySelector('.ttbox').innerHTML=ttHTML(c.ins,['Y'],rows,c.ins.reduce((a,k)=>a*2+s[k],0));
+}
+
+/* =========================================================
+   2  Gatter-Labor
+   ========================================================= */
+const lab={type:'AND',n:2,v:[0,0,0,0]};
+const labN=()=>lab.type==='NOT'?1:lab.n;
+function buildLab(){
+  const gp=$('#gatepick');
+  gp.innerHTML=GATE_ORDER.map(k=>`<button data-gate="${k}" aria-pressed="${k===lab.type}">${GATES[k].name}</button>`).join('')+
+    `<span class="lnw"><span class="small">Eingänge</span><span class="seg sm" id="labN">${[2,3,4].map(n=>`<button data-ln="${n}" aria-pressed="${n===lab.n}">${n}</button>`).join('')}</span></span>`;
+  gp.addEventListener('click',e=>{
+    const b=e.target.closest('[data-gate]');
+    if(b){lab.type=b.dataset.gate;$$('#gatepick [data-gate]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));renderLab();return;}
+    const l=e.target.closest('[data-ln]');
+    if(l&&!l.disabled){lab.n=+l.dataset.ln;$$('#labN button').forEach(x=>x.setAttribute('aria-pressed',String(x===l)));renderLab();}
+  });
+  const svg=$('#labsvg');
+  svg.addEventListener('click',e=>{const t=e.target.closest('[data-in]');if(!t)return;lab.v[+t.dataset.in]^=1;renderLab(+t.dataset.in);});
+  svg.addEventListener('keydown',e=>{const t=e.target.closest('[data-in]');if(!t)return;
+    if(e.key===' '||e.key==='Enter'){e.preventDefault();lab.v[+t.dataset.in]^=1;renderLab(+t.dataset.in);}});
+}
+function renderLab(refocus){
+  const g=GATES[lab.type], n=labN();
+  $$('#labN button').forEach(b=>b.disabled=lab.type==='NOT');
+  const ins=lab.v.slice(0,n), y=g.f(ins);
+  const S=1.9, H=gh(n), gx=160, gy=100-H/2*S;
+  const tys=Array.from({length:n},(_,i)=>100+(i-(n-1)/2)*44);
+  let s='';
+  inYs(n).forEach((iy,i)=>{
+    const py=gy+iy*S, px=gx-14*S, ty=tys[i], v=ins[i], L='ABCD'[i];
+    const d=Math.abs(ty-py)<0.5?`M76,${ty} H${px}`:`M76,${ty} H112 V${py} H${px}`;
+    s+=`<path class="w ${sc(v)}" d="${d}"/>`;
+    s+=`<g class="tog" data-in="${i}" tabindex="0" role="button" aria-label="Eingang ${L} umschalten, aktueller Wert ${v}">`+
+       `<rect class="inbox ${v?'on':''}" x="12" y="${ty-17}" width="64" height="34" rx="6"/>`+
+       `<text class="inlbl ${v?'dk':''}" x="44" y="${ty+5}" text-anchor="middle">${L} = ${v}</text></g>`;
+  });
+  s+=`<g transform="translate(${gx},${gy}) scale(${S})">${gateSVG(lab.type,settings.style,n,ins,y)}</g>`;
+  const ox=gx+(GW+18)*S;
+  s+=`<path class="w ${sc(y)}" d="M${ox},100 H338"/>`+lampSVG(355,100,18,y)+
+     `<text class="olbl" x="355" y="144" text-anchor="middle">Y = ${y}</text>`;
+  $('#labsvg').innerHTML=s;
+  if(refocus!==undefined){const t=$(`#labsvg [data-in="${refocus}"]`); if(t) t.focus();}
+  const names='ABCD'.slice(0,n).split('');
+  const rows=combos(n).map(b=>({i:b,o:[g.f(b)]}));
+  const cur=ins.reduce((a,v)=>a*2+v,0);
+  $('#labinfo').innerHTML=`<h3>${g.name}<span class="op">${g.alt}</span></h3>
+    <p>${g.rule}</p><div class="ttscroll">${ttHTML(names,['Y'],rows,cur)}</div>
+    <dl class="kv">
+      <dt>Schaltterm</dt><dd class="term"><var>Y</var> = ${applyGate(lab.type,names.map(V)).s}</dd>
+      <dt>DIN-Symbol</dt><dd>Rechteck mit „${iecLbl(lab.type,n)}“${g.neg?' und Negationskreis am Ausgang':''}</dd>
+      <dt>Stromkreis-Analogon</dt><dd>${g.analog}</dd>
+    </dl>${g.extra?`<p class="note">${g.extra}</p>`:''}`;
+}
+
+/* =========================================================
+   3  Baukasten: Datenmodell und Geometrie
+   ========================================================= */
+const BLOCKS={
+  MUX2:{title:'MUX',ins:['I0','I1','S'],outs:['Y'],name:'2:1-Multiplexer'},
+  MUX4:{title:'MUX',ins:['I0','I1','I2','I3','S1','S0'],outs:['Y'],name:'4:1-Multiplexer'},
+  DEC:{title:'DEC',ins:['A1','A0'],outs:['Y0','Y1','Y2','Y3'],name:'2→4-Dekodierer'},
+  DFF:{title:'FF',ins:['1D','C1'],outs:['Q','Q̄'],name:'D-Flipflop (flankengesteuert)'}
+};
+const BW=72;
+const B={els:[],wires:[],nid:1,sel:null,pending:null,drag:null,task:null,check:null,hist:[],sn:0,t:0,unstable:false,w:1000,h:560};
+let timer=null;
+const bsvg=$('#bsvg'), layer=$('#blayer'), temp=$('#btemp');
+const byId=id=>B.els.find(e=>e.id===id);
+const inWire=(id,idx)=>B.wires.find(w=>w.to===id&&w.idx===idx);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const gateN=el=>el.type==='NOT'?1:el.n;
+function geom(el){
+  if(el.type==='IN'||el.type==='CLK') return {w:48,h:36,ins:[],outs:[{x:62,y:18}]};
+  if(el.type==='OUT') return {w:40,h:40,ins:[{x:-14,y:20}],outs:[]};
+  if(GATES[el.type]){const n=gateN(el),H=gh(n);return {w:GW+18,h:H,ins:inYs(n).map(y=>({x:-14,y})),outs:[{x:GW+18,y:H/2}]};}
+  const b=BLOCKS[el.type], rows=Math.max(b.ins.length,b.outs.length), H=rows*24+8;
+  const py=(i,n)=>Math.round(H*(i+0.5)/n);
+  return {w:BW+14,h:H,ins:b.ins.map((_,i)=>({x:-14,y:py(i,b.ins.length)})),outs:b.outs.map((_,i)=>({x:BW+14,y:py(i,b.outs.length)}))};
+}
+const nInOf=el=>geom(el).ins.length;
+const nOutOf=el=>geom(el).outs.length;
+function inPort(el,i){const p=geom(el).ins[i];return {x:el.x+p.x,y:el.y+p.y};}
+function outPort(el,k){const p=geom(el).outs[k];return {x:el.x+p.x,y:el.y+p.y};}
+function status(t){$('#bstatus').textContent=t||'';}
+function titleOf(el){
+  if(el.type==='IN') return 'Schalter '+el.label;
+  if(el.type==='OUT') return 'Lampe '+el.label;
+  if(el.type==='CLK') return 'Taktgeber '+el.label;
+  if(GATES[el.type]) return `${GATES[el.type].name}-Gatter ${el.name}`;
+  return `${BLOCKS[el.type].name} ${el.name}`;
+}
+function nextLabel(type){
+  const pool={IN:['A','B','C','D','E','F'],OUT:['Y','Z','Q','P','Y2','Z2'],CLK:['T','T2','T3']}[type];
+  const used=new Set(B.els.filter(e=>e.type===type).map(e=>e.label));
+  return pool.find(c=>!used.has(c))||null;
+}
+function nextName(type){
+  const pre=GATES[type]?'G':type==='DFF'?'FF':type==='DEC'?'DEC':'MUX';
+  let m=0; B.els.forEach(e=>{const r=e.name&&e.name.match(/^([A-Z]+)(\d+)$/);if(r&&r[1]===pre)m=Math.max(m,+r[2]);});
+  return pre+(m+1);
+}
+function addEl(type,x,y,o={}){
+  const el={id:B.nid++,type,x,y,value:o.value||0,label:o.label||null,cap:o.cap||'',n:o.n||2,half:o.half||4,q:0,prevC:0,name:''};
+  if(type==='IN'||type==='OUT'||type==='CLK'){if(!el.label){el.label=nextLabel(type);if(!el.label) return null;}}
+  else el.name=nextName(type);
+  el.probe=o.probe!==undefined?o.probe:(type==='IN'||type==='OUT'||type==='CLK');
+  el.out=(type==='IN'||type==='CLK')?[el.value]:new Array(Math.max(1,nOutOf(el))).fill(0);
+  if(o.init!==undefined) el.out[0]=o.init;
+  if(type==='DFF'){el.q=el.out[0];el.out=[el.q,1-el.q];}
+  B.els.push(el); return el;
+}
+function freeSpot(type){
+  const taken=(x,y)=>B.els.some(e=>Math.abs(e.x-x)<70&&Math.abs(e.y-y)<70);
+  if(type==='IN'||type==='CLK'){for(let y=40;y<=B.h-80;y+=90) if(!taken(40,y)) return [40,y];return [40,40];}
+  if(type==='OUT'){for(let y=40;y<=B.h-80;y+=100) if(!taken(860,y)) return [860,y];return [860,40];}
+  for(let y=40;y<=B.h-120;y+=110) for(let x=240;x<=700;x+=150) if(!taken(x,y)) return [x,y];
+  return [460,240];
+}
+function connect(from,fk,to,idx){
+  if(from===to&&!byId(from)) return;
+  B.wires=B.wires.filter(w=>!(w.to===to&&w.idx===idx));
+  B.wires.push({id:B.nid++,from,fk,to,idx});
+}
+function delSel(){
+  if(!B.sel) return;
+  if(B.sel.kind==='wire') B.wires=B.wires.filter(w=>w.id!==B.sel.id);
+  else{const id=B.sel.id;B.els=B.els.filter(e=>e.id!==id);B.wires=B.wires.filter(w=>w.from!==id&&w.to!==id);if(B.pending&&B.pending.id===id)B.pending=null;}
+  B.sel=null; changed();
+}
+function clearAll(){B.els=[];B.wires=[];B.sel=null;B.pending=null;B.check=null;B.hist=[];drawTemp(null);}
+
+/* ---------- Simulationskern ---------- */
+function stepEl(el,ins){
+  switch(el.type){
+    case 'IN': case 'CLK': return {outs:[el.value]};
+    case 'OUT': return {outs:[ins[0]]};
+    case 'MUX2': return {outs:[ins[2]?ins[1]:ins[0]]};
+    case 'MUX4': return {outs:[ins[(ins[4]<<1)|ins[5]]]};
+    case 'DEC': {const k=(ins[0]<<1)|ins[1];return {outs:[0,1,2,3].map(j=>j===k?1:0)};}
+    case 'DFF': {let q=el.q; if(el.prevC===0&&ins[1]===1) q=ins[0]; return {outs:[q,1-q],q,prevC:ins[1]};}
+    default: return {outs:[GATES[el.type].f(ins)]};
+  }
+}
+function insOf(el,get){const r=[];for(let i=0;i<nInOf(el);i++){const w=inWire(el.id,i);r.push(w?get(w.from,w.fk):0);}return r;}
+function apply(el,r){el.out=r.outs;if(el.type==='DFF'){el.q=r.q;el.prevC=r.prevC;}}
+function settle(){
+  const order=[...B.els].sort((a,b)=>a.x-b.x||a.y-b.y);
+  const get=(id,k)=>{const e=byId(id);return e?(e.out[k]||0):0;};
+  for(let it=0;it<300;it++){
+    let ch=false;
+    for(const el of order){
+      const r=stepEl(el,insOf(el,get));
+      if(r.outs.some((v,i)=>v!==el.out[i])) ch=true;
+      apply(el,r);
+    }
+    if(!ch){B.unstable=false;return;}
+  }
+  B.unstable=true;
+}
+function tick(){
+  B.t++;
+  B.els.forEach(el=>{if(el.type==='CLK'&&B.t%el.half===0) el.value^=1;});
+  const snap=new Map(B.els.map(e=>[e.id,e.out.slice()]));
+  const get=(id,k)=>{const o=snap.get(id);return o?(o[k]||0):0;};
+  const res=B.els.map(el=>[el,stepEl(el,insOf(el,get))]);
+  res.forEach(([el,r])=>apply(el,r));
+  sample(); renderBuilder();
+}
+function sample(){
+  const v={}; B.els.forEach(e=>v[e.id]=e.out.slice());
+  B.hist.push({n:B.sn++,v}); if(B.hist.length>300) B.hist.shift();
+}
+function changed(){
+  B.check=null;
+  if(!timer){settle();sample();}
+  renderBuilder();
+}
+function setRunning(on){
+  if(on&&!timer){timer=setInterval(tick,1000/(+$('#speedSel').value));}
+  else if(!on&&timer){clearInterval(timer);timer=null;}
+  $('#runBtn').textContent=timer?'Pause':'Start';
+  renderPanel();
+}
+function hasCycle(){
+  const st=new Map(); let cyc=false;
+  const visit=id=>{
+    if(cyc) return; const s=st.get(id); if(s===1){cyc=true;return;} if(s===2) return;
+    st.set(id,1); const el=byId(id);
+    for(let i=0;i<nInOf(el);i++){const w=inWire(id,i);if(w) visit(w.from);}
+    st.set(id,2);
+  };
+  B.els.forEach(e=>visit(e.id)); return cyc;
+}
+const isSequential=()=>B.els.some(e=>e.type==='DFF'||e.type==='CLK')||hasCycle();
+function evalPure(vals){
+  const memo=new Map();
+  const ev=id=>{
+    if(memo.has(id)) return memo.get(id);
+    const el=byId(id);
+    const ins=insOf(el,(fid,k)=>ev(fid)[k]||0);
+    const r=el.type==='IN'?[vals[id]]:stepEl(el,ins).outs;
+    memo.set(id,r); return r;
+  };
+  B.els.forEach(e=>ev(e.id)); return memo;
+}
+const sortLbl=(a,b)=>a.label.localeCompare(b.label,'de',{numeric:true});
+function truthTable(){
+  const ins=B.els.filter(e=>e.type==='IN').sort(sortLbl);
+  const outs=B.els.filter(e=>e.type==='OUT').sort(sortLbl);
+  const rows=[];
+  if(ins.length<=6) combos(ins.length).forEach(bits=>{
+    const vals={}; ins.forEach((e,i)=>vals[e.id]=bits[i]);
+    const m=evalPure(vals); rows.push({i:bits,o:outs.map(o=>m.get(o.id)[0])});
+  });
+  return {ins,outs,rows};
+}
+function exprOut(id,k,depth=0){
+  if(depth>30) return {s:'…',a:true};
+  const el=byId(id);
+  if(el.type==='IN') return V(el.label);
+  const sub=i=>{const w=inWire(id,i);return w?exprOut(w.from,w.fk,depth+1):{s:'0',a:true};};
+  if(el.type==='OUT') return sub(0);
+  if(GATES[el.type]){const xs=[];for(let i=0;i<nInOf(el);i++)xs.push(sub(i));return applyGate(el.type,xs);}
+  if(el.type==='MUX2'){const s=sub(2);return naryE('OR',[naryE('AND',[negE(s),sub(0)]),naryE('AND',[s,sub(1)])]);}
+  if(el.type==='MUX4'){const s1=sub(4),s0=sub(5);return naryE('OR',[0,1,2,3].map(j=>naryE('AND',[(j&2)?s1:negE(s1),(j&1)?s0:negE(s0),sub(j)])));}
+  if(el.type==='DEC'){const a1=sub(0),a0=sub(1);return naryE('AND',[(k&2)?a1:negE(a1),(k&1)?a0:negE(a0)]);}
+  return {s:'?',a:true};
+}
+function dnfHTML(tt,k){
+  const ones=tt.rows.filter(r=>r.o[k]===1);
+  if(!ones.length) return '0';
+  if(ones.length===tt.rows.length) return '1';
+  const logic=settings.nota==='logic';
+  return ones.map(r=>{
+    const lits=r.i.map((b,i)=>{const v=V(tt.ins[i].label);return b?v.s:negE(v).s;});
+    const inner=lits.join(logic?' ∧ ':'·');
+    return logic&&lits.length>1&&ones.length>1?`(${inner})`:inner;
+  }).join(logic?' ∨ ':' + ');
+}
+function countOpen(){return B.els.filter(e=>e.type!=='IN'&&e.type!=='CLK').reduce((n,e)=>{for(let i=0;i<nInOf(e);i++) if(!inWire(e.id,i)) n++;return n;},0);}
+
+/* ---------- Zeichnen ---------- */
+function portSVG(p,kind,id,idx,cls){
+  return `<circle class="phit" cx="${p.x}" cy="${p.y}" r="12" data-port="${kind}" data-id="${id}" data-idx="${idx}"/>`+
+         `<circle class="port ${cls}" cx="${p.x}" cy="${p.y}" r="5.5"/>`;
+}
+const srcVal=(id,i)=>{const w=inWire(id,i);if(!w) return undefined;const e=byId(w.from);return e?e.out[w.fk]:undefined;};
+function renderBuilder(){
+  let mx=0,my=0;
+  B.els.forEach(e=>{const g=geom(e);mx=Math.max(mx,e.x+g.w+70);my=Math.max(my,e.y+g.h+50);});
+  B.w=Math.max(1000,Math.ceil(mx/20)*20); B.h=Math.max(560,Math.ceil(my/20)*20);
+  bsvg.setAttribute('viewBox',`0 0 ${B.w} ${B.h}`); bsvg.style.minWidth=Math.round(B.w*0.76)+'px';
+  $$('.bgr',bsvg).forEach(r=>{r.setAttribute('width',B.w);r.setAttribute('height',B.h);});
+  const pend=B.pending;
+  let s='';
+  for(const w of B.wires){
+    const fe=byId(w.from), te=byId(w.to); if(!fe||!te) continue;
+    const a=outPort(fe,w.fk), b=inPort(te,w.idx), v=fe.out[w.fk];
+    const dx=Math.max(30,Math.abs(b.x-a.x)*0.5);
+    const d=`M${a.x},${a.y} C${a.x+dx},${a.y} ${b.x-dx},${b.y} ${b.x},${b.y}`;
+    const selc=B.sel&&B.sel.kind==='wire'&&B.sel.id===w.id?' wsel':'';
+    s+=`<g data-wire="${w.id}"><path class="whit" d="${d}"/><path class="w ${sc(v)}${selc}" d="${d}"/></g>`;
+  }
+  for(const el of B.els){
+    const selc=B.sel&&B.sel.kind==='el'&&B.sel.id===el.id?' esel':'';
+    const g=geom(el);
+    s+=`<g class="el${selc}" data-el="${el.id}" transform="translate(${el.x},${el.y})">`;
+    if(el.type==='IN'||el.type==='CLK'){
+      const v=el.value, dk=v?' dk':'';
+      s+=`<rect class="inbox ${v?'on':''}" x="0" y="0" width="48" height="36" rx="${el.type==='CLK'?2:6}"/>`;
+      if(el.type==='IN') s+=`<text class="inlbl${dk}" x="24" y="16" text-anchor="middle">${esc(el.label)}</text><text class="inval${dk}" x="24" y="30" text-anchor="middle">${v}</text>`;
+      else s+=`<text class="inlbl${dk}" x="24" y="15" text-anchor="middle">${esc(el.label)}</text><path class="gline${v?' dks':''}" d="M9,30 H16 V21 H24 V30 H32 V21 H39"/>`;
+      s+=`<path class="w ${sc(el.out[0])}" d="M48,18 H62"/>`;
+      if(el.cap) s+=`<text class="cap" x="24" y="52" text-anchor="middle">${esc(el.cap)}</text>`;
+    }else if(el.type==='OUT'){
+      const v=el.out[0];
+      s+=`<rect class="ghit" x="-2" y="-2" width="44" height="44"/><path class="w ${sc(srcVal(el.id,0))}" d="M-14,20 H2"/>`+lampSVG(20,20,18,v)+
+         `<text class="olbl" x="20" y="56" text-anchor="middle">${esc(el.label)} = ${v}</text>`+
+         (el.cap?`<text class="cap" x="20" y="72" text-anchor="middle">${esc(el.cap)}</text>`:'');
+    }else if(GATES[el.type]){
+      const n=gateN(el), ins=[]; for(let i=0;i<n;i++) ins.push(srcVal(el.id,i));
+      s+=`<rect class="ghit" x="-4" y="-4" width="${GW+14}" height="${g.h+8}"/>`+gateSVG(el.type,settings.style,n,ins,el.out[0])+
+         `<text class="bname" x="${GW/2}" y="-6" text-anchor="middle">${el.name}</text>`;
+    }else{
+      const b=BLOCKS[el.type];
+      s+=`<rect class="blk" x="0" y="0" width="${BW}" height="${g.h}" rx="3"/><text class="btitle" x="${BW/2}" y="${el.type==='DFF'?g.h/2+5:17}" text-anchor="middle">${b.title}</text>`+
+         `<text class="bname" x="${BW/2}" y="-6" text-anchor="middle">${el.name}</text>`;
+      g.ins.forEach((p,i)=>{
+        const isC=el.type==='DFF'&&i===1;
+        s+=`<path class="w ${sc(srcVal(el.id,i))}" d="M-14,${p.y} H0"/><text class="pin" x="${isC?11:5}" y="${p.y+4}">${b.ins[i]}</text>`;
+        if(isC) s+=`<path class="gline" d="M0,${p.y-5} L8,${p.y} L0,${p.y+5}"/>`;
+      });
+      g.outs.forEach((p,k)=>{s+=`<path class="w ${sc(el.out[k])}" d="M${BW},${p.y} H${BW+14}"/><text class="pin" x="${BW-5}" y="${p.y+4}" text-anchor="end">${b.outs[k]}</text>`;});
+    }
+    s+='</g>';
+    for(let i=0;i<g.ins.length;i++){
+      const tgt=pend&&pend.id!==el.id?' target':'';
+      s+=portSVG(inPort(el,i),'in',el.id,i,(inWire(el.id,i)?'':'open')+tgt);
+    }
+    for(let k=0;k<g.outs.length;k++) s+=portSVG(outPort(el,k),'out',el.id,k,pend&&pend.id===el.id&&pend.k===k?'src':'');
+  }
+  layer.innerHTML=s;
+  $('#tInfo').textContent=`t = ${B.t}`;
+  renderProps(); renderPanel(); renderTD();
+}
+function renderProps(){
+  const pb=$('#propbar');
+  if(!B.sel){pb.innerHTML='<span class="small">Kein Element markiert. Ein Element antippen, um seine Eigenschaften zu ändern.</span>';return;}
+  if(B.sel.kind==='wire'){pb.innerHTML='<strong>Leitung</strong><button class="plain" data-act="del" type="button">Löschen</button>';return;}
+  const el=byId(B.sel.id); if(!el){pb.innerHTML='';return;}
+  let h=`<strong>${esc(titleOf(el))}</strong>`;
+  if(GATES[el.type]&&el.type!=='NOT') h+=`<span class="small">Eingänge</span><span class="seg sm">${[2,3,4].map(n=>`<button type="button" data-act="n" data-v="${n}" aria-pressed="${el.n===n}">${n}</button>`).join('')}</span>`;
+  if(el.type==='CLK') h+=`<span class="small">Halbperiode in Zeitschritten</span><span class="seg sm">${[2,4,8,16].map(n=>`<button type="button" data-act="half" data-v="${n}" aria-pressed="${el.half===n}">${n}</button>`).join('')}</span>`;
+  if(el.type==='DFF') h+=`<span class="small">Speichert D bei steigender Flanke an C1.</span>`;
+  h+=`<label class="chk"><input type="checkbox" data-act="probe" ${el.probe?'checked':''}> im Impulsdiagramm</label>`;
+  h+=`<button class="plain" data-act="del" type="button">Löschen</button>`;
+  pb.innerHTML=h;
+}
+$('#propbar').addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]'); if(!b) return;
+  const el=B.sel&&B.sel.kind==='el'?byId(B.sel.id):null;
+  if(b.dataset.act==='del'){delSel();return;}
+  if(!el) return;
+  if(b.dataset.act==='n'){el.n=+b.dataset.v;B.wires=B.wires.filter(w=>!(w.to===el.id&&w.idx>=el.n));changed();}
+  if(b.dataset.act==='half'){el.half=+b.dataset.v;renderBuilder();}
+});
+$('#propbar').addEventListener('change',e=>{
+  if(e.target.dataset.act!=='probe') return;
+  const el=B.sel&&byId(B.sel.id); if(el){el.probe=e.target.checked;renderTD();}
+});
+
+function renderPanel(){
+  const seq=isSequential(), open=countOpen();
+  let warn='';
+  if(B.unstable&&!timer) warn+='<p class="warn">Die Schaltung erreicht keinen stabilen Zustand (sie schwingt). Mit „Start“ lässt sich der zeitliche Verlauf im Impulsdiagramm verfolgen.</p>';
+  if(seq) warn+='<p class="small">Schaltwerk: Die Schaltung enthält Rückkopplungen oder Speicherglieder. Ihre Ausgänge hängen vom inneren Zustand und damit von der Vorgeschichte ab; eine Wahrheitstabelle ist deshalb nicht eindeutig. Den zeitlichen Verlauf zeigt das Impulsdiagramm.</p>';
+  if(open) warn+=`<p class="warn">${open} nicht verbundene${open===1?'r':''} Eingang${open===1?'':'e'} (als 0 gewertet).</p>`;
+  $('#bWarn').innerHTML=warn;
+  if(seq){
+    $('#bTable').innerHTML='';
+    $('#bExpr').innerHTML='<p class="small">Für Schaltwerke werden keine Schaltterme berechnet.</p>';
+    renderTask();
+    return;
+  }
+  const tt=truthTable();
+  if(!tt.ins.length||!tt.outs.length) $('#bTable').innerHTML='<p class="small">Mindestens einen Schalter und eine Lampe hinzufügen.</p>';
+  else if(tt.ins.length>6) $('#bTable').innerHTML='<p class="small">Bei mehr als sechs Eingängen wird keine Tabelle erzeugt.</p>';
+  else{
+    const cur=tt.ins.reduce((a,e)=>a*2+e.value,0);
+    $('#bTable').innerHTML=ttHTML(tt.ins.map(e=>e.label),tt.outs.map(e=>e.label),tt.rows,cur)+'<p class="small">Hervorgehoben: aktuelle Schalterstellung.</p>';
+  }
+  if(!tt.outs.length) $('#bExpr').innerHTML='<p class="small">Noch keine Lampe vorhanden.</p>';
+  else{
+    let h='';
+    tt.outs.forEach((o,k)=>{
+      const e=exprOut(o.id,0);
+      h+=`<p><span class="small">aus der Schaltung:</span><br><var>${esc(o.label)}</var> = ${e.s.length>2500?'<span class="small">(zu umfangreich für die Anzeige)</span>':e.s}</p>`;
+      if(tt.ins.length&&tt.ins.length<=4) h+=`<p><span class="small">disjunktive Normalform (nicht minimiert):</span><br><var>${esc(o.label)}</var> = ${dnfHTML(tt,k)}</p>`;
+    });
+    $('#bExpr').innerHTML=h;
+  }
+  renderTask();
+}
+
+/* ---------- Impulsdiagramm ---------- */
+function probeRows(){
+  const rows=[];
+  const ordered=[...B.els].sort((a,b)=>{const r=t=>({CLK:0,IN:1,OUT:3})[t.type]??2;return r(a)-r(b)||(a.label||a.name).localeCompare(b.label||b.name,'de',{numeric:true});});
+  ordered.forEach(el=>{
+    if(!el.probe) return;
+    if(el.type==='DFF') rows.push({id:el.id,k:0,name:el.name+' Q'});
+    else if(el.type==='DEC') [0,1,2,3].forEach(k=>rows.push({id:el.id,k,name:`${el.name} Y${k}`}));
+    else rows.push({id:el.id,k:0,name:el.label||el.name});
+  });
+  return rows;
+}
+function renderTD(){
+  const svg=$('#tdsvg'), rows=probeRows(), N=64, hist=B.hist.slice(-N);
+  const lw=120, W=1000, rh=32, top=24, dx=(W-lw-10)/N;
+  const H=Math.max(70,top+rows.length*rh+8);
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  if(!rows.length){svg.innerHTML=`<text class="tdnum" x="10" y="40">Keine Signale ausgewählt.</text>`;return;}
+  let s='';
+  hist.forEach((h,i)=>{if(h.n%4===0){const x=lw+i*dx;s+=`<line class="tdgrid" x1="${x}" y1="${top-6}" x2="${x}" y2="${H-4}"/><text class="tdnum" x="${x+2}" y="${top-10}">${h.n}</text>`;}});
+  rows.forEach((r,ri)=>{
+    const y0=top+ri*rh, hi=y0+5, lo=y0+rh-7;
+    s+=`<text class="tdlbl" x="8" y="${y0+rh/2+5}">${esc(r.name)}</text><line class="tdbase" x1="${lw}" y1="${lo}" x2="${W-10}" y2="${lo}"/>`;
+    let d='',f='',pen=false;
+    hist.forEach((h,i)=>{
+      const o=h.v[r.id], v=o?o[r.k]:undefined, x=lw+i*dx;
+      if(v===undefined){pen=false;return;}
+      const y=v?hi:lo;
+      d+=pen?`V${y} `:`M${x},${y} `; pen=true; d+=`H${(x+dx).toFixed(1)} `;
+      if(v) f+=`M${x},${lo} V${hi} H${(x+dx).toFixed(1)} V${lo} Z `;
+    });
+    s+=`<path class="tdfill" d="${f}" opacity=".6"/><path class="tdwave" d="${d}"/>`;
+  });
+  svg.innerHTML=s;
+}
+
+/* ---------- Beispiele ---------- */
+const PRESETS={
+  ha:{msg:'Halbaddierer: Y = A ⊕ B ist die Summenstelle, Z = A ∧ B der Übertrag.',
+    els:[['A','IN',40,120,{label:'A'}],['B','IN',40,320,{label:'B'}],['x','XOR',420,110],['u','AND',420,310],
+         ['S','OUT',820,115,{label:'Y',cap:'Summe'}],['C','OUT',820,315,{label:'Z',cap:'Übertrag'}]],
+    wires:[['A','x',0],['B','x',1],['A','u',0],['B','u',1],['x','S',0],['u','C',0]]},
+  fa:{msg:'Volladdierer aus zwei Halbaddierern und einem ODER-Gatter: Er verarbeitet zusätzlich den Übertrag der vorherigen Stelle.',
+    els:[['A','IN',40,60,{label:'A'}],['B','IN',40,180,{label:'B'}],['C','IN',40,400,{label:'C',cap:'Übertrag ein'}],
+         ['x1','XOR',260,80],['x2','XOR',560,110],['a1','AND',260,220],['a2','AND',560,300],['o','OR',760,260],
+         ['S','OUT',900,125,{label:'Y',cap:'Summe'}],['Co','OUT',900,275,{label:'Z',cap:'Übertrag aus'}]],
+    wires:[['A','x1',0],['B','x1',1],['A','a1',0],['B','a1',1],['x1','x2',0],['C','x2',1],['x1','a2',0],['C','a2',1],
+           ['a1','o',0],['a2','o',1],['x2','S',0],['o','Co',0]]},
+  alarm:{msg:'Alarmanlage: Y = (A ∨ B) ∧ C.',
+    els:[['A','IN',40,80,{label:'A',cap:'Tür'}],['B','IN',40,200,{label:'B',cap:'Fenster'}],['C','IN',40,380,{label:'C',cap:'scharf'}],
+         ['g1','OR',300,120],['g2','AND',560,220],['Y','OUT',820,225,{label:'Y',cap:'Sirene'}]],
+    wires:[['A','g1',0],['B','g1',1],['g1','g2',0],['C','g2',1],['g2','Y',0]]},
+  major:{msg:'Mehrheitsentscheid: Drei UND-Gatter prüfen alle Paare, ein ODER-Gatter mit drei Eingängen fasst zusammen.',
+    els:[['A','IN',40,70,{label:'A'}],['B','IN',40,230,{label:'B'}],['C','IN',40,410,{label:'C'}],
+         ['a1','AND',300,60],['a2','AND',300,220],['a3','AND',300,390],['o','OR',600,220,{n:3}],['Y','OUT',860,224,{label:'Y',cap:'Mehrheit'}]],
+    wires:[['A','a1',0],['B','a1',1],['A','a2',0],['C','a2',1],['B','a3',0],['C','a3',1],['a1','o',0],['a2','o',1],['a3','o',2],['o','Y',0]]},
+  dm:{msg:'Erstes De-Morgan-Gesetz: Die Spalten Y und Z der Wahrheitstabelle stimmen in jeder Zeile überein.',
+    els:[['A','IN',40,110,{label:'A'}],['B','IN',40,370,{label:'B'}],['n','NAND',420,90],['i1','NOT',260,250],['i2','NOT',260,380],['o','OR',480,300],
+         ['Y','OUT',820,95,{label:'Y',cap:'NICHT (A UND B)'}],['Z','OUT',820,305,{label:'Z',cap:'NICHT A ODER NICHT B'}]],
+    wires:[['A','n',0],['B','n',1],['A','i1',0],['B','i2',0],['i1','o',0],['i2','o',1],['n','Y',0],['o','Z',0]]},
+  mux:{msg:'4:1-Multiplexer: Die Auswahleingänge A (S1) und B (S0) bilden eine Dualzahl, die festlegt, welcher Dateneingang D0 bis D3 an Y durchgeschaltet wird.',
+    els:[['I0','IN',40,40,{label:'D0'}],['I1','IN',40,120,{label:'D1'}],['I2','IN',40,200,{label:'D2'}],['I3','IN',40,280,{label:'D3'}],
+         ['S1','IN',40,380,{label:'A',cap:'Auswahl S1'}],['S0','IN',40,460,{label:'B',cap:'Auswahl S0'}],['m','MUX4',440,160],['Y','OUT',800,216,{label:'Y'}]],
+    wires:[['I0','m',0],['I1','m',1],['I2','m',2],['I3','m',3],['S1','m',4],['S0','m',5],['m','Y',0]]},
+  dec:{msg:'2→4-Dekodierer: Genau einer der vier Ausgänge ist aktiv; sein Index entspricht der Dualzahl aus A (höherwertig) und B.',
+    els:[['A1','IN',40,150,{label:'A',cap:'A1, höherwertig'}],['A0','IN',40,300,{label:'B',cap:'A0, niederwertig'}],['d','DEC',420,170],
+         ['Y0','OUT',800,60,{label:'Y0'}],['Y1','OUT',800,170,{label:'Y1'}],['Y2','OUT',800,280,{label:'Y2'}],['Y3','OUT',800,390,{label:'Y3'}]],
+    wires:[['A1','d',0],['A0','d',1],['d','Y0',0,0],['d','Y1',0,1],['d','Y2',0,2],['d','Y3',0,3]]},
+  rsnor:{msg:'RS-Flipflop: S = 1 setzt Q auf 1, R = 1 setzt Q auf 0. Bei S = R = 0 bleibt der Zustand gespeichert. S = R = 1 ist unzulässig (Q und Q̄ werden beide 0).',
+    els:[['R','IN',40,110,{label:'R',cap:'Rücksetzen'}],['S','IN',40,350,{label:'S',cap:'Setzen'}],
+         ['n1','NOR',380,110],['n2','NOR',380,330,{init:1}],['Q','OUT',780,114,{label:'Q'}],['Qn','OUT',780,334,{label:'Q̄'}]],
+    wires:[['R','n1',0],['n2','n1',1],['n1','n2',0],['S','n2',1],['n1','Q',0],['n2','Qn',0]]},
+  rsnand:{msg:'RS-Flipflop aus NAND mit aktiv-0-Eingängen: S̄ = 0 setzt, R̄ = 0 setzt zurück, S̄ = R̄ = 1 speichert. S̄ = R̄ = 0 ist unzulässig.',
+    els:[['S','IN',40,110,{label:'S̄',cap:'Setzen (aktiv 0)',value:1}],['R','IN',40,350,{label:'R̄',cap:'Rücksetzen (aktiv 0)',value:1}],
+         ['n1','NAND',380,110],['n2','NAND',380,330,{init:1}],['Q','OUT',780,114,{label:'Q'}],['Qn','OUT',780,334,{label:'Q̄'}]],
+    wires:[['S','n1',0],['n2','n1',1],['n1','n2',0],['R','n2',1],['n1','Q',0],['n2','Qn',0]]},
+  dlatch:{msg:'D-Latch: Solange C = 1 ist, folgt Q dem Eingang D („transparent“). Bei C = 0 wird der zuletzt anliegende Wert gehalten.',
+    els:[['D','IN',40,100,{label:'D'}],['C','IN',40,330,{label:'C',cap:'Freigabe'}],['inv','NOT',200,250],
+         ['n1','NAND',360,90],['n2','NAND',360,300],['n3','NAND',600,100],['n4','NAND',600,290,{init:1}],
+         ['Q','OUT',840,104,{label:'Q'}],['Qn','OUT',840,294,{label:'Q̄'}]],
+    wires:[['D','inv',0],['D','n1',0],['C','n1',1],['inv','n2',0],['C','n2',1],['n1','n3',0],['n4','n3',1],['n3','n4',0],['n2','n4',1],['n3','Q',0],['n4','Qn',0]]},
+  dff:{msg:'Taktflankengesteuertes D-Flipflop: Q übernimmt den Wert von D nur im Moment der steigenden Taktflanke. „Start“ drücken oder den Taktgeber von Hand umschalten.',
+    els:[['D','IN',40,100,{label:'D'}],['T','CLK',40,300,{label:'T',half:8}],['f','DFF',400,150],['Q','OUT',760,144,{label:'Q'}],['Qn','OUT',760,260,{label:'Q̄'}]],
+    wires:[['D','f',0],['T','f',1],['f','Q',0,0],['f','Qn',0,1]]},
+  counter:{msg:'Asynchroner Zähler: Jedes Flipflop kippt bei jeder steigenden Flanke an seinem Takteingang (D ist mit Q̄ verbunden). Q2 Q1 Q0 zählen dual aufwärts. Im Impulsdiagramm halbiert jede Stufe die Frequenz.',
+    els:[['T','CLK',40,200,{label:'T',half:4}],['f0','DFF',240,180],['f1','DFF',480,180],['f2','DFF',720,180],
+         ['Q0','OUT',350,340,{label:'Q0',cap:'2⁰'}],['Q1','OUT',590,340,{label:'Q1',cap:'2¹'}],['Q2','OUT',830,340,{label:'Q2',cap:'2²'}]],
+    wires:[['T','f0',1],['f0','f0',0,1],['f0','f1',1,1],['f1','f1',0,1],['f1','f2',1,1],['f2','f2',0,1],['f0','Q0',0,0],['f1','Q1',0,0],['f2','Q2',0,0]]},
+  ring:{msg:'Ringoszillator: Eine ungerade Anzahl rückgekoppelter Inverter hat keinen stabilen Zustand. Mit „Start“ wird die Schwingung sichtbar; ihre Periodendauer beträgt das Doppelte der Summe der Gatterlaufzeiten.',
+    els:[['n1','NOT',250,200,{probe:true}],['n2','NOT',450,200,{probe:true}],['n3','NOT',650,200,{probe:true}],['Y','OUT',860,204,{label:'Y'}]],
+    wires:[['n3','n1',0],['n1','n2',0],['n2','n3',0],['n3','Y',0]]},
+  hazard:{msg:'Laufzeiteffekt (Hazard): Logisch ist A ∧ ¬A stets 0. Weil das NICHT-Gatter eine Laufzeit besitzt, entsteht nach einer steigenden Flanke von A kurzzeitig ein Störimpuls. „Start“ drücken und A umschalten.',
+    els:[['A','IN',40,200,{label:'A'}],['inv','NOT',260,300,{probe:true}],['g','AND',500,190],['Y','OUT',800,194,{label:'Y'}]],
+    wires:[['A','inv',0],['A','g',0],['inv','g',1],['g','Y',0]]}
+};
+function loadCircuit(def){
+  clearAll();
+  const key={};
+  def.els.forEach(([k,type,x,y,o])=>{key[k]=addEl(type,x,y,o||{}).id;});
+  def.wires.forEach(([f,t,i,fk])=>B.wires.push({id:B.nid++,from:key[f],fk:fk||0,to:key[t],idx:i}));
+  settle(); sample();
+}
+
+/* ---------- Aufgaben ---------- */
+const TASKS=[
+  {id:'alarm',title:'Alarmanlage',ins:3,caps:{A:'Tür',B:'Fenster',C:'scharf',Y:'Sirene'},
+   text:'Die Sirene <var>Y</var> soll ertönen, wenn die Anlage scharf geschaltet ist (<var>C</var> = 1) und zugleich die Tür (<var>A</var>) oder das Fenster (<var>B</var>) geöffnet ist.',f:(a,b,c)=>[(a|b)&c]},
+  {id:'major',title:'Mehrheitsentscheid',ins:3,caps:{Y:'Mehrheit'},
+   text:'Drei Personen stimmen ab (1 = Zustimmung). <var>Y</var> = 1, wenn mindestens zwei Personen zustimmen. Mehrstellige Gatter sind erlaubt.',f:(a,b,c)=>[(a+b+c)>=2?1:0]},
+  {id:'par',title:'Paritätsbit (3 Bit)',ins:3,
+   text:'<var>Y</var> = 1, wenn eine ungerade Anzahl der Eingänge <var>A</var>, <var>B</var>, <var>C</var> den Wert 1 hat.',f:(a,b,c)=>[a^b^c]},
+  {id:'xor',title:'XOR aus Grundgattern',allowed:['AND','OR','NOT'],
+   text:'Realisiere die Antivalenz <var>Y</var> = <var>A</var> ⊕ <var>B</var> ausschließlich mit UND-, ODER- und NICHT-Gattern.',f:(a,b)=>[a^b]},
+  {id:'nandand',title:'UND nur aus NAND',allowed:['NAND'],
+   text:'Realisiere <var>Y</var> = <var>A</var> ∧ <var>B</var> ausschließlich mit NAND-Gattern.',f:(a,b)=>[a&b]},
+  {id:'nandor',title:'ODER nur aus NAND',allowed:['NAND'],
+   text:'Realisiere <var>Y</var> = <var>A</var> ∨ <var>B</var> ausschließlich mit NAND-Gattern. Hinweis: De-Morgan-Gesetze.',f:(a,b)=>[a|b]},
+  {id:'dm',title:'De Morgan',allowed:['NOT','OR'],
+   text:'Realisiere <var>Y</var> = ¬(<var>A</var> ∧ <var>B</var>) ausschließlich mit NICHT- und ODER-Gattern.',f:(a,b)=>[1-(a&b)]},
+  {id:'ha',title:'Halbaddierer',outL:['Y','Z'],caps:{Y:'Summe',Z:'Übertrag'},
+   text:'Addiere die einstelligen Dualzahlen <var>A</var> und <var>B</var>. <var>Y</var> ist die Summenstelle, <var>Z</var> der Übertrag.',f:(a,b)=>[a^b,a&b]},
+  {id:'mux',title:'Multiplexer aus Gattern',inL:['A','B','S'],caps:{A:'Eingang 0',B:'Eingang 1',S:'Auswahl'},allowed:['AND','OR','NOT'],
+   text:'Für <var>S</var> = 0 soll <var>Y</var> den Wert von <var>A</var> annehmen, für <var>S</var> = 1 den Wert von <var>B</var> (2:1-Multiplexer).',f:(a,b,s)=>[s?b:a]},
+  {id:'dec',title:'Dekodierer 2→4 aus Gattern',outL:['Y0','Y1','Y2','Y3'],caps:{A:'höherwertig',B:'niederwertig'},allowed:['AND','NOT','NOR'],
+   text:'Die Dualzahl <var>AB</var> (<var>A</var> höherwertig) soll genau eine der Lampen <var>Y0</var> bis <var>Y3</var> einschalten.',f:(a,b)=>{const k=a*2+b;return [0,1,2,3].map(j=>j===k?1:0);}},
+  {id:'norxnor',title:'Knobelaufgabe: XNOR nur aus NOR',allowed:['NOR'],
+   text:'Realisiere die Äquivalenz <var>Y</var> = ¬(<var>A</var> ⊕ <var>B</var>) ausschließlich mit NOR-Gattern. Vier Gatter genügen.',f:(a,b)=>[1-(a^b)]}
+];
+TASKS.forEach(t=>{t.inL=t.inL||'ABC'.slice(0,t.ins||2).split('');t.outL=t.outL||['Y'];t.caps=t.caps||{};});
+function setPalette(allowed){$$('#palette [data-add]').forEach(b=>{const k=b.dataset.add;b.disabled=!!(allowed&&!['IN','OUT'].includes(k)&&!allowed.includes(k));});}
+function startTask(t){
+  clearAll(); B.task=t;
+  t.inL.forEach((L,i)=>addEl('IN',40,60+i*150,{label:L,cap:t.caps[L]||''}));
+  const no=t.outL.length;
+  t.outL.forEach((L,i)=>addEl('OUT',860,no===1?240:Math.round(60+i*Math.min(240,400/(no-1))),{label:L,cap:t.caps[L]||''}));
+  setPalette(t.allowed);
+  status('Ein- und Ausgänge der Aufgabe wurden platziert.');
+  changed();
+}
+function targetRows(t){return combos(t.inL.length).map(b=>({i:b,o:t.f(...b)}));}
+function renderTask(){
+  const t=B.task, box=$('#taskBox');
+  if(!t){box.innerHTML='<p class="small">Freies Bauen. Eine Aufgabe auswählen, um eine Schaltung automatisch prüfen zu lassen.</p>';return;}
+  const bad=B.check&&B.check.bad?new Set(B.check.bad):null;
+  box.innerHTML=`<p>${t.text}</p>`+
+    (t.allowed?`<p class="small">Erlaubte Gatter: ${t.allowed.map(k=>GATES[k].name).join(', ')}</p>`:'<p class="small">Alle Gatter und Bausteine erlaubt, keine Speicherglieder.</p>')+
+    `<p class="small">Soll-Wahrheitstabelle:</p>`+ttHTML(t.inL,t.outL,targetRows(t),-1,bad)+
+    `<div class="row"><button class="primary" id="checkBtn" type="button">Schaltung prüfen</button></div>`+
+    (B.check?`<p class="fb ${B.check.ok?'ok':'no'}">${B.check.msg}</p>`:'');
+  $('#checkBtn').addEventListener('click',()=>checkTask(t));
+}
+function checkTask(t){
+  const needIn=[...t.inL].sort(), needOut=[...t.outL].sort();
+  const hi=B.els.filter(e=>e.type==='IN').map(e=>e.label).sort(), ho=B.els.filter(e=>e.type==='OUT').map(e=>e.label).sort();
+  const used=[...new Set(B.els.filter(e=>!['IN','OUT'].includes(e.type)).map(e=>e.type))];
+  const nGates=B.els.filter(e=>!['IN','OUT'].includes(e.type)).length;
+  const nameOf=k=>GATES[k]?GATES[k].name:k==='CLK'?'Taktgeber':BLOCKS[k].name;
+  let r;
+  if(hi.join()!==needIn.join()) r={ok:false,msg:`Falsch: Benötigt werden genau die Eingänge ${needIn.join(', ')} (vorhanden: ${hi.join(', ')||'keine'}).`};
+  else if(ho.join()!==needOut.join()) r={ok:false,msg:`Falsch: Benötigt werden genau die Ausgänge ${needOut.join(', ')} (vorhanden: ${ho.join(', ')||'keine'}).`};
+  else if(t.allowed&&used.some(k=>!t.allowed.includes(k))) r={ok:false,msg:`Falsch: Nicht zugelassene Bausteine verwendet (${used.filter(k=>!t.allowed.includes(k)).map(nameOf).join(', ')}).`};
+  else if(isSequential()) r={ok:false,msg:'Falsch: Die Schaltung enthält Rückkopplungen oder Speicherglieder; gefordert ist ein Schaltnetz.'};
+  else if(countOpen()) r={ok:false,msg:'Falsch: Mindestens ein Eingang eines Bausteins oder einer Lampe ist nicht verbunden.'};
+  else{
+    const tt=truthTable(), tr=targetRows(t), bad=[];
+    const ip=t.inL.map(L=>tt.ins.findIndex(e=>e.label===L)), op=t.outL.map(L=>tt.outs.findIndex(e=>e.label===L));
+    tr.forEach((row,ri)=>{
+      let idx=0; row.i.forEach((b,j)=>{idx|=b<<(tt.ins.length-1-ip[j]);});
+      if(row.o.some((v,k)=>tt.rows[idx].o[op[k]]!==v)) bad.push(ri);
+    });
+    r=bad.length?{ok:false,bad,msg:`Falsch: In ${bad.length} von ${tr.length} Zeilen weicht der Ausgang vom Sollwert ab (Zeilen markiert).`}
+                :{ok:true,msg:`Richtig. Die Schaltung erfüllt die Soll-Wahrheitstabelle mit ${nGates} Baustein${nGates===1?'':'en'}.`};
+  }
+  B.check=r; renderPanel();
+}
+
+/* ---------- Interaktion Baukasten ---------- */
+function svgPt(e){const p=bsvg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(bsvg.getScreenCTM().inverse());}
+function nearestIn(p){
+  let best=null,bd=22;
+  for(const el of B.els) for(let i=0;i<nInOf(el);i++){const q=inPort(el,i),d=Math.hypot(q.x-p.x,q.y-p.y);if(d<bd){bd=d;best={id:el.id,idx:i};}}
+  return best;
+}
+function drawTemp(p){
+  if(!B.pending||!p){temp.setAttribute('d','');return;}
+  const el=byId(B.pending.id); if(!el){temp.setAttribute('d','');return;}
+  const a=outPort(el,B.pending.k), dx=Math.max(30,Math.abs(p.x-a.x)*0.5);
+  temp.setAttribute('d',`M${a.x},${a.y} C${a.x+dx},${a.y} ${p.x-dx},${p.y} ${p.x},${p.y}`);
+}
+function doConnect(t){connect(B.pending.id,B.pending.k,t.id,t.idx);B.pending=null;drawTemp(null);changed();}
+bsvg.addEventListener('pointerdown',e=>{
+  if(e.button>0) return;
+  const p=svgPt(e);
+  const port=e.target.closest('[data-port]');
+  if(port){
+    const id=+port.dataset.id, idx=+port.dataset.idx;
+    if(port.dataset.port==='out'){
+      B.pending={id,k:idx}; B.sel=null; B.drag={mode:'wire',start:p,moved:false};
+      bsvg.setPointerCapture(e.pointerId); drawTemp(p); renderBuilder(); e.preventDefault(); return;
+    }
+    if(B.pending){doConnect({id,idx});return;}
+    const w=inWire(id,idx); B.sel=w?{kind:'wire',id:w.id}:null; renderBuilder(); return;
+  }
+  if(B.pending){const t=nearestIn(p); if(t) doConnect(t); else {B.pending=null;drawTemp(null);renderBuilder();} return;}
+  const wg=e.target.closest('[data-wire]');
+  if(wg){B.sel={kind:'wire',id:+wg.dataset.wire};renderBuilder();return;}
+  const eg=e.target.closest('[data-el]');
+  if(eg){
+    const el=byId(+eg.dataset.el);
+    B.sel={kind:'el',id:el.id};
+    B.drag={mode:'move',id:el.id,dx:p.x-el.x,dy:p.y-el.y,start:p,moved:false};
+    bsvg.setPointerCapture(e.pointerId); renderBuilder(); e.preventDefault(); return;
+  }
+  B.sel=null; renderBuilder();
+});
+bsvg.addEventListener('pointermove',e=>{
+  const p=svgPt(e), d=B.drag;
+  if(d){
+    if(Math.hypot(p.x-d.start.x,p.y-d.start.y)>5) d.moved=true;
+    if(d.mode==='move'&&d.moved){
+      const el=byId(d.id), g=geom(el);
+      el.x=clamp(Math.round((p.x-d.dx)/10)*10,20,B.w-g.w-80);
+      el.y=clamp(Math.round((p.y-d.dy)/10)*10,20,B.h-g.h-60);
+      renderBuilder();
+    }else if(d.mode==='wire') drawTemp(p);
+    return;
+  }
+  if(B.pending) drawTemp(p);
+});
+bsvg.addEventListener('pointerup',e=>{
+  const d=B.drag; if(!d) return; B.drag=null;
+  const p=svgPt(e);
+  if(d.mode==='move'){
+    const el=byId(d.id);
+    if(!d.moved&&el&&(el.type==='IN'||el.type==='CLK')){el.value^=1;changed();return;}
+    renderBuilder(); return;
+  }
+  if(d.moved){const t=nearestIn(p); if(t){doConnect(t);return;} B.pending=null; drawTemp(null);}
+  else status('Ausgang gewählt. Jetzt einen Eingang antippen (Esc bricht ab).');
+  renderBuilder();
+});
+bsvg.addEventListener('pointercancel',()=>{B.drag=null;B.pending=null;drawTemp(null);renderBuilder();});
+document.addEventListener('keydown',e=>{
+  if($('#v-bau').hidden) return;
+  const tag=(document.activeElement&&document.activeElement.tagName)||'';
+  if(/INPUT|SELECT|TEXTAREA/.test(tag)) return;
+  if((e.key==='Delete'||e.key==='Backspace')&&B.sel){e.preventDefault();delSel();}
+  if(e.key==='Escape'){B.pending=null;B.sel=null;drawTemp(null);status('');renderBuilder();}
+});
+$('#palette').addEventListener('click',e=>{
+  const b=e.target.closest('[data-add]'); if(!b||b.disabled) return;
+  const type=b.dataset.add, [x,y]=freeSpot(type);
+  const el=addEl(type,x,y);
+  if(!el){status({IN:'Höchstens sechs Schalter möglich.',OUT:'Höchstens sechs Lampen möglich.',CLK:'Höchstens drei Taktgeber möglich.'}[type]);return;}
+  B.sel={kind:'el',id:el.id};
+  status(`${titleOf(el)} hinzugefügt.`);
+  changed();
+});
+$('#clearBtn').addEventListener('click',()=>{if(B.task) startTask(B.task); else {clearAll();status('Arbeitsfläche geleert.');changed();}});
+$('#presetSel').addEventListener('change',e=>{
+  const k=e.target.value; if(!k) return;
+  $('#taskSel').value=''; B.task=null; setPalette(null);
+  loadCircuit(PRESETS[k]); status(PRESETS[k].msg); e.target.value=''; renderBuilder();
+});
+$('#taskSel').innerHTML='<option value="">Freies Bauen</option>'+TASKS.map(t=>`<option value="${t.id}">${t.title}</option>`).join('');
+$('#taskSel').addEventListener('change',e=>{
+  const t=TASKS.find(x=>x.id===e.target.value);
+  if(t) startTask(t); else {B.task=null;setPalette(null);status('');renderBuilder();}
+});
+$('#runBtn').addEventListener('click',()=>setRunning(!timer));
+$('#stepBtn').addEventListener('click',()=>{setRunning(false);tick();});
+$('#speedSel').addEventListener('change',()=>{if(timer){setRunning(false);setRunning(true);}});
+$('#tdClear').addEventListener('click',()=>{B.hist=[];renderTD();});
+
+/* =========================================================
+   4  Synthese
+   ========================================================= */
+const C0={t:'const',v:0}, C1={t:'const',v:1};
+function tokenize(s){
+  const map={'∧':'and','&':'and','*':'and','·':'and','⋅':'and','∨':'or','|':'or','+':'or','¬':'not','!':'not','~':'not','⊕':'xor','^':'xor','(':'(',')':')'};
+  const words={und:'and',and:'and',oder:'or',or:'or',nicht:'not',not:'not',xor:'xor'};
+  const toks=[]; let i=0;
+  while(i<s.length){
+    const c=s[i];
+    if(/\s/.test(c)){i++;continue;}
+    if(map[c]){toks.push({t:map[c]});i++;continue;}
+    if(c==='0'||c==='1'){toks.push({t:'const',v:+c});i++;continue;}
+    if(/[A-Za-zÄÖÜäöüß]/.test(c)){
+      let j=i; while(j<s.length&&/[A-Za-zÄÖÜäöüß]/.test(s[j])) j++;
+      const w=s.slice(i,j), lw=w.toLowerCase();
+      if(words[lw]) toks.push({t:words[lw]});
+      else for(const ch of w.toUpperCase()){
+        if(!'ABCD'.includes(ch)) throw new Error(`„${w}“ ist weder eine zulässige Variable (A bis D) noch ein bekannter Operator.`);
+        toks.push({t:'var',v:ch});
+      }
+      i=j; continue;
+    }
+    throw new Error(`Unzulässiges Zeichen „${c}“.`);
+  }
+  return toks;
+}
+function parse(s){
+  const toks=tokenize(s); let p=0;
+  if(!toks.length) throw new Error('Bitte einen Term eingeben.');
+  const eat=t=>{if(toks[p]&&toks[p].t===t){p++;return true;}return false;};
+  const starts=tk=>tk&&['var','const','(','not'].includes(tk.t);
+  const mk=(t,a)=>a.length>1?{t,args:a}:a[0];
+  function pOr(){const a=[pXor()];while(eat('or'))a.push(pXor());return mk('or',a);}
+  function pXor(){const a=[pAnd()];while(eat('xor'))a.push(pAnd());return mk('xor',a);}
+  function pAnd(){const a=[pUn()];for(;;){if(eat('and'))a.push(pUn());else if(starts(toks[p]))a.push(pUn());else break;}return mk('and',a);}
+  function pUn(){if(eat('not'))return {t:'not',a:pUn()};return pPrim();}
+  function pPrim(){
+    const tk=toks[p];
+    if(!tk) throw new Error('Der Term endet unerwartet (fehlt ein Operand?).');
+    if(tk.t==='var'){p++;return {t:'var',v:tk.v};}
+    if(tk.t==='const'){p++;return {t:'const',v:tk.v};}
+    if(eat('(')){const e=pOr();if(!eat(')')) throw new Error('Eine schließende Klammer fehlt.');return e;}
+    throw new Error('An einer Stelle steht ein Operator ohne Operand.');
+  }
+  const e=pOr();
+  if(p<toks.length) throw new Error('Der Term enthält überzählige Symbole (z. B. eine Klammer ohne Gegenstück).');
+  return e;
+}
+function evalAst(n,env){
+  switch(n.t){
+    case 'var':return env[n.v];
+    case 'const':return n.v;
+    case 'not':return 1-evalAst(n.a,env);
+    case 'and':return n.args.every(a=>evalAst(a,env))?1:0;
+    case 'or':return n.args.some(a=>evalAst(a,env))?1:0;
+    case 'xor':return n.args.reduce((s,a)=>s^evalAst(a,env),0);
+    case 'nand':return n.args.every(a=>evalAst(a,env))?0:1;
+    case 'nor':return n.args.some(a=>evalAst(a,env))?0:1;
+  }
+}
+function varsOf(n,set=new Set()){if(n.t==='var')set.add(n.v);else if(n.t==='not')varsOf(n.a,set);else if(n.args)n.args.forEach(a=>varsOf(a,set));return set;}
+const keyOf=n=>n.t==='var'?n.v:n.t==='const'?String(n.v):n.t==='not'?'¬'+keyOf(n.a):n.t+'('+n.args.map(keyOf).join(',')+')';
+function simplify(n){
+  if(n.t==='var'||n.t==='const') return n;
+  if(n.t==='not'){const a=simplify(n.a);if(a.t==='const')return {t:'const',v:1-a.v};if(a.t==='not')return a.a;return {t:'not',a};}
+  let args=[];
+  n.args.map(simplify).forEach(x=>{if(x.t===n.t)args.push(...x.args);else args.push(x);});
+  if(n.t==='and'||n.t==='or'){
+    const dom=n.t==='and'?0:1;
+    if(args.some(x=>x.t==='const'&&x.v===dom)) return {t:'const',v:dom};
+    args=args.filter(x=>x.t!=='const');
+    const seen=new Set(); args=args.filter(x=>{const k=keyOf(x);if(seen.has(k))return false;seen.add(k);return true;});
+    if(!args.length) return {t:'const',v:1-dom};
+    return args.length===1?args[0]:{t:n.t,args};
+  }
+  const ones=args.filter(x=>x.t==='const'&&x.v===1).length;
+  args=args.filter(x=>x.t!=='const');
+  if(!args.length) return {t:'const',v:ones%2};
+  const core=args.length===1?args[0]:{t:'xor',args};
+  return ones%2?simplify({t:'not',a:core}):core;
+}
+const xor2=(a,b)=>({t:'or',args:[{t:'and',args:[a,{t:'not',a:b}]},{t:'and',args:[{t:'not',a:a},b]}]});
+function basic(n){
+  if(n.t==='var'||n.t==='const') return n;
+  if(n.t==='not') return {t:'not',a:basic(n.a)};
+  const args=n.args.map(basic);
+  if(n.t==='xor') return simplify(args.reduce((x,y)=>xor2(x,y)));
+  return {t:n.t,args};
+}
+function toUni(root,K){
+  const inner=K==='nand'?'and':'or', other=K==='nand'?'or':'and';
+  const U=args=>({t:K,args});
+  const NEG=x=>U([x,x]);
+  function negOf(n){
+    if(n.t==='not') return conv(n.a);
+    if(n.t===inner) return U(n.args.map(conv));
+    return NEG(conv(n));
+  }
+  function conv(n){
+    if(n.t==='var') return n;
+    if(n.t==='not') return negOf(n.a);
+    if(n.t===inner) return NEG(U(n.args.map(conv)));
+    if(n.t===other) return U(n.args.map(negOf));
+    if(n.t==='xor') return conv(basic(n));
+    throw new Error('Unerwarteter Knoten');
+  }
+  return conv(basic(root));
+}
+function chunk(n){
+  if(n.t==='var'||n.t==='const') return n;
+  if(n.t==='not') return {t:'not',a:chunk(n.a)};
+  const args=n.args.map(chunk);
+  if(args.length<=4) return {t:n.t,args};
+  if(n.t==='nand'||n.t==='nor'){
+    const first={t:n.t,args:args.slice(0,4)};
+    return chunk({t:n.t,args:[{t:n.t,args:[first,first]},...args.slice(4)]});
+  }
+  return chunk({t:n.t,args:[{t:n.t,args:args.slice(0,4)},...args.slice(4)]});
+}
+function astE(n){
+  switch(n.t){
+    case 'var':return V(n.v);
+    case 'const':return {s:String(n.v),a:true};
+    case 'not':return negE(astE(n.a));
+    case 'and':return naryE('AND',n.args.map(astE));
+    case 'or':return naryE('OR',n.args.map(astE));
+    case 'xor':return naryE('XOR',n.args.map(astE));
+    case 'nand':return negE(naryE('AND',n.args.map(astE)));
+    case 'nor':return negE(naryE('OR',n.args.map(astE)));
+  }
+}
+/* Quine-McCluskey mit wesentlichen Primimplikanten und gieriger Restüberdeckung */
+function qm(n,ones){
+  if(!ones.length) return C0;
+  if(ones.length===(1<<n)) return C1;
+  let cur=ones.map(m=>({v:m,mask:0,ms:[m]}));
+  const primes=[], pk=new Set();
+  while(cur.length){
+    const next=[], used=new Set(), seen=new Set();
+    for(let i=0;i<cur.length;i++) for(let j=i+1;j<cur.length;j++){
+      const a=cur[i], b=cur[j]; if(a.mask!==b.mask) continue;
+      const d=a.v^b.v; if(!d||(d&(d-1))) continue;
+      used.add(i); used.add(j);
+      const v=a.v&~d, mask=a.mask|d, k=v+'/'+mask;
+      if(!seen.has(k)){seen.add(k);next.push({v,mask,ms:[...new Set([...a.ms,...b.ms])]});}
+    }
+    cur.forEach((c,i)=>{if(!used.has(i)){const k=c.v+'/'+c.mask;if(!pk.has(k)){pk.add(k);primes.push(c);}}});
+    cur=next;
+  }
+  const pop=x=>{let c=0;while(x){c+=x&1;x>>=1;}return c;};
+  const chosen=[], left=new Set(ones);
+  ones.forEach(m=>{const cov=primes.filter(p=>p.ms.includes(m));if(cov.length===1&&!chosen.includes(cov[0]))chosen.push(cov[0]);});
+  chosen.forEach(p=>p.ms.forEach(m=>left.delete(m)));
+  while(left.size){
+    let best=null,bc=-1,bl=99;
+    primes.forEach(p=>{if(chosen.includes(p))return;const c=p.ms.filter(m=>left.has(m)).length,l=n-pop(p.mask);if(c>bc||(c===bc&&l<bl)){best=p;bc=c;bl=l;}});
+    chosen.push(best); best.ms.forEach(m=>left.delete(m));
+  }
+  const vars='ABCD'.slice(0,n);
+  const terms=chosen.map(p=>{
+    const lits=[]; for(let i=0;i<n;i++){const bit=1<<(n-1-i); if(p.mask&bit) continue; lits.push((p.v&bit)?{t:'var',v:vars[i]}:{t:'not',a:{t:'var',v:vars[i]}});}
+    return lits.length===1?lits[0]:{t:'and',args:lits};
+  });
+  return terms.length===1?terms[0]:{t:'or',args:terms};
+}
+function canonical(n,y,kind){
+  const vars='ABCD'.slice(0,n), rows=combos(n);
+  const lit=(i,pos)=>pos?{t:'var',v:vars[i]}:{t:'not',a:{t:'var',v:vars[i]}};
+  if(kind==='dnf'){
+    const ts=rows.filter((_,r)=>y[r]).map(b=>{const l=b.map((v,i)=>lit(i,v));return l.length===1?l[0]:{t:'and',args:l};});
+    if(!ts.length) return C0; if(ts.length===rows.length) return C1;
+    return ts.length===1?ts[0]:{t:'or',args:ts};
+  }
+  const cs=rows.filter((_,r)=>!y[r]).map(b=>{const l=b.map((v,i)=>lit(i,!v));return l.length===1?l[0]:{t:'or',args:l};});
+  if(!cs.length) return C1; if(cs.length===rows.length) return C0;
+  return cs.length===1?cs[0]:{t:'and',args:cs};
+}
+/* relabel: QM und kanonische Formen verwenden A..D in Tabellenreihenfolge; Termvariablen werden darauf abgebildet */
+function mapVars(n,map){if(n.t==='var')return {t:'var',v:map[n.v]};if(n.t==='const')return n;if(n.t==='not')return {t:'not',a:mapVars(n.a,map)};return {t:n.t,args:n.args.map(a=>mapVars(a,map))};}
+
+function generate(ast,vars){
+  clearAll(); B.task=null; setPalette(null); $('#taskSel').value='';
+  const cache=new Map(), inEl={};
+  vars.forEach(v=>{inEl[v]=addEl('IN',40,0,{label:v});});
+  const T={not:'NOT',and:'AND',or:'OR',xor:'XOR',nand:'NAND',nor:'NOR'};
+  function build(n){
+    if(n.t==='var') return inEl[n.v].id;
+    const k=keyOf(n); if(cache.has(k)) return cache.get(k);
+    const args=n.t==='not'?[n.a]:n.args;
+    const ids=args.map(build);
+    const el=addEl(T[n.t],0,0,{n:Math.max(2,ids.length)});
+    ids.forEach((id,i)=>B.wires.push({id:B.nid++,from:id,fk:0,to:el.id,idx:i}));
+    cache.set(k,el.id); return el.id;
+  }
+  const root=build(ast);
+  const out=addEl('OUT',0,0,{label:'Y'});
+  B.wires.push({id:B.nid++,from:root,fk:0,to:out.id,idx:0});
+  layoutAuto();
+  settle(); sample();
+  return B.els.filter(e=>GATES[e.type]).length;
+}
+function layoutAuto(){
+  const lvl=new Map();
+  const L=id=>{if(lvl.has(id))return lvl.get(id);const el=byId(id);let v=0;
+    if(el.type!=='IN'){const ws=B.wires.filter(w=>w.to===id);v=1+Math.max(0,...ws.map(w=>L(w.from)));}
+    lvl.set(id,v);return v;};
+  B.els.forEach(e=>L(e.id));
+  B.els.filter(e=>e.type==='IN').forEach((e,i)=>{e.x=40;e.y=40+i*100;});
+  const gates=B.els.filter(e=>e.type!=='IN'&&e.type!=='OUT');
+  const maxL=Math.max(1,...gates.map(g=>lvl.get(g.id)));
+  const step=Math.max(110,Math.min(170,Math.floor(640/maxL)));
+  const bary=el=>{const ws=B.wires.filter(w=>w.to===el.id);return ws.length?ws.reduce((s,w)=>s+outPort(byId(w.from),w.fk).y,0)/ws.length:0;};
+  for(let l=1;l<=maxL;l++){
+    const col=gates.filter(g=>lvl.get(g.id)===l);
+    col.forEach(g=>g._b=bary(g)); col.sort((a,b)=>a._b-b._b);
+    let y=30;
+    col.forEach(g=>{const h=geom(g).h;g.y=Math.max(y,Math.round((g._b-h/2)/10)*10);g.x=Math.round((190+(l-1)*step)/10)*10;y=g.y+h+34;});
+  }
+  B.els.filter(e=>e.type==='OUT').forEach(o=>{
+    const w=B.wires.find(w=>w.to===o.id);
+    o.x=Math.round((190+(maxL-1)*step+Math.max(150,step))/10)*10;
+    o.y=w?Math.round(outPort(byId(w.from),w.fk).y-20):240;
+  });
+  B.els.forEach(e=>delete e._b);
+}
+function prepare(ast,gates){
+  let a=simplify(ast);
+  if(a.t==='const') return {err:`Der Term ist konstant ${a.v} (${a.v?'Tautologie':'Kontradiktion'}); eine Schaltung ist nicht erforderlich.`};
+  if(gates==='basic') a=simplify(basic(a));
+  else if(gates==='nand'||gates==='nor') a=toUni(a,gates);
+  return {ast:chunk(a)};
+}
+function compareBuilder(vars,fn,what){
+  if(!B.els.length) return {ok:false,msg:'Im Baukasten ist noch keine Schaltung vorhanden.'};
+  if(isSequential()) return {ok:false,msg:'Die Schaltung im Baukasten ist ein Schaltwerk; ein Vergleich ist nur mit Schaltnetzen möglich.'};
+  const tt=truthTable();
+  const hl=tt.ins.map(e=>e.label);
+  if(hl.join()!==[...vars].sort().join()) return {ok:false,msg:`Die Eingänge passen nicht: Erwartet werden ${vars.join(', ')||'keine'}, im Baukasten vorhanden sind ${hl.join(', ')||'keine'}.`};
+  let oi=tt.outs.findIndex(o=>o.label==='Y'); if(oi<0&&tt.outs.length===1) oi=0;
+  if(oi<0) return {ok:false,msg:'Im Baukasten wird eine Lampe Y (oder genau eine Lampe) benötigt.'};
+  const diff=[];
+  tt.rows.forEach((r,ri)=>{const env={};tt.ins.forEach((e,i)=>env[e.label]=r.i[i]);if(fn(env)!==r.o[oi])diff.push(ri);});
+  const m=tt.rows.length;
+  return diff.length?{ok:false,msg:`Nicht äquivalent: Die Schaltung weicht in ${diff.length} von ${m} Belegungen von ${what} ab.`}
+                    :{ok:true,msg:`Äquivalent: Die Schaltung liefert für alle ${m} Belegungen denselben Wert wie ${what}.`};
+}
+function fb(sel,r){const p=$(sel);p.className='fb '+(r.ok?'ok':'no');p.innerHTML=r.msg;}
+
+const SYN={n:3,y:[0,0,0,1,0,1,1,1]};
+function termState(){
+  try{
+    const ast=parse($('#termIn').value), vars=[...varsOf(ast)].sort();
+    return {ast,vars};
+  }catch(err){return {err:err.message};}
+}
+function renderTerm(){
+  const st=termState(), out=$('#termOut');
+  if(st.err){out.innerHTML=`<p class="warn">${esc(st.err)}</p>`;return;}
+  const {ast,vars}=st, n=vars.length;
+  const rows=combos(n).map(b=>{const env={};vars.forEach((v,i)=>env[v]=b[i]);return {i:b,o:[evalAst(ast,env)]};});
+  const map={}; vars.forEach((v,i)=>map['ABCD'[i]]=v);
+  const min=mapVars(qm(n,rows.map((r,i)=>r.o[0]?i:-1).filter(i=>i>=0)),map);
+  out.innerHTML=`<div class="forms"><p><span class="lbl">erkannter Term</span><var>Y</var> = ${astE(ast).s}</p>
+    <p><span class="lbl">minimierte DNF</span><var>Y</var> = ${astE(min).s}</p></div>
+    ${n?`<div class="ttscroll">${ttHTML(vars,['Y'],rows,-1)}</div>`:''}`;
+}
+function renderTab(){
+  const n=SYN.n, rows=combos(n).map((b,r)=>({i:b,o:[SYN.y[r]]}));
+  $('#tabTable').innerHTML=ttHTML('ABCD'.slice(0,n).split(''),['Y'],rows,-1,null,true);
+  const f=k=>astE(k==='min'?qm(n,SYN.y.map((v,i)=>v?i:-1).filter(i=>i>=0)):canonical(n,SYN.y,k)).s;
+  $('#tabForms').innerHTML=`<p><span class="lbl">kanonische disjunktive Normalform (Minterme)</span><var>Y</var> = ${f('dnf')}</p>
+    <p><span class="lbl">kanonische konjunktive Normalform (Maxterme)</span><var>Y</var> = ${f('knf')}</p>
+    <p><span class="lbl">minimierte DNF (Quine-McCluskey)</span><var>Y</var> = ${f('min')}</p>`;
+}
+function renderSyn(){renderTerm();renderTab();}
+$('#termIn').addEventListener('input',()=>{$('#termFb').textContent='';renderTerm();});
+$('#termKeys').addEventListener('click',e=>{
+  const b=e.target.closest('[data-ins]'); if(!b) return;
+  const inp=$('#termIn'), s=inp.selectionStart??inp.value.length, en=inp.selectionEnd??inp.value.length;
+  if(b.dataset.ins==='⌫'){const a=s===en?Math.max(0,s-1):s;inp.value=inp.value.slice(0,a)+inp.value.slice(en);inp.setSelectionRange(a,a);}
+  else{const t=b.dataset.ins;const pad=/[∧∨⊕]/.test(t)?` ${t} `:t;inp.value=inp.value.slice(0,s)+pad+inp.value.slice(en);inp.setSelectionRange(s+pad.length,s+pad.length);}
+  inp.focus(); renderTerm();
+});
+$('#termGen').addEventListener('click',()=>{
+  const st=termState(); if(st.err){fb('#termFb',{ok:false,msg:esc(st.err)});return;}
+  let ast=st.ast;
+  if($('#termMin').checked){
+    const n=st.vars.length, map={}; st.vars.forEach((v,i)=>map['ABCD'[i]]=v);
+    const ones=combos(n).map((b,r)=>{const env={};st.vars.forEach((v,i)=>env[v]=b[i]);return evalAst(ast,env)?r:-1;}).filter(r=>r>=0);
+    ast=mapVars(qm(n,ones),map);
+  }
+  const p=prepare(ast,$('#termGates').value);
+  if(p.err){fb('#termFb',{ok:false,msg:p.err});return;}
+  const g=generate(p.ast,st.vars);
+  fb('#termFb',{ok:true,msg:`Schaltung mit ${g} Gatter${g===1?'':'n'} erzeugt und in den Baukasten übertragen.`});
+  status('Schaltung aus dem Term erzeugt. Die Anordnung lässt sich durch Verschieben verbessern.');
+  showTab('v-bau'); renderBuilder();
+});
+$('#termCmp').addEventListener('click',()=>{
+  const st=termState(); if(st.err){fb('#termFb',{ok:false,msg:esc(st.err)});return;}
+  fb('#termFb',compareBuilder(st.vars,env=>evalAst(st.ast,env),'der Term'));
+});
+$('#tabN').addEventListener('click',e=>{
+  const b=e.target.closest('[data-n]'); if(!b) return;
+  const n=+b.dataset.n; if(n===SYN.n) return;
+  SYN.n=n; SYN.y=new Array(1<<n).fill(0);
+  $$('#tabN button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+  $('#tabFb').textContent=''; renderTab();
+});
+$('#tabZero').addEventListener('click',()=>{SYN.y=SYN.y.map(()=>0);renderTab();});
+function toggleRow(t){const r=+t.dataset.row;SYN.y[r]^=1;$('#tabFb').textContent='';renderTab();const c=$(`#tabTable [data-row="${r}"]`);if(c)c.focus();}
+$('#tabTable').addEventListener('click',e=>{const t=e.target.closest('[data-row]');if(t)toggleRow(t);});
+$('#tabTable').addEventListener('keydown',e=>{const t=e.target.closest('[data-row]');if(t&&(e.key===' '||e.key==='Enter')){e.preventDefault();toggleRow(t);}});
+$('#tabGen').addEventListener('click',()=>{
+  const n=SYN.n, form=$('#tabForm').value;
+  const ast=form==='min'?qm(n,SYN.y.map((v,i)=>v?i:-1).filter(i=>i>=0)):canonical(n,SYN.y,form);
+  const p=prepare(ast,$('#tabGates').value);
+  if(p.err){fb('#tabFb',{ok:false,msg:p.err});return;}
+  const g=generate(p.ast,'ABCD'.slice(0,n).split(''));
+  fb('#tabFb',{ok:true,msg:`Schaltung mit ${g} Gatter${g===1?'':'n'} erzeugt und in den Baukasten übertragen.`});
+  status('Schaltung aus der Wahrheitstabelle erzeugt.');
+  showTab('v-bau'); renderBuilder();
+});
+$('#tabCmp').addEventListener('click',()=>{
+  const n=SYN.n, vars='ABCD'.slice(0,n).split('');
+  fb('#tabFb',compareBuilder(vars,env=>SYN.y[vars.reduce((a,v)=>a*2+env[v],0)],'die Wahrheitstabelle'));
+});
+
+/* ---------- Start ---------- */
+buildCircuits();
+buildLab();
+renderLab();
+renderSyn();
+loadCircuit(PRESETS.alarm);
+renderBuilder();
+</script>
+</body>
+</html>
