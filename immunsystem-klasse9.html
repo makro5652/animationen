@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Das Immunsystem interaktiv</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eaeff2; --surface:#ffffff; --surface2:#f3f6f8; --text:#16202a; --muted:#56636f; --line:#d3dbe1;
+  --accent:#1f5f8b; --accent-soft:#dde9f2;
+  --u:#c46a17; --u-soft:#fbe6d0;
+  --s:#2d5fc0; --s-soft:#dbe5f9;
+  --h:#7350bd; --h-soft:#ebe3f9;
+  --z:#11867a; --z-soft:#d2eeea;
+  --m:#a2760e; --m-soft:#f5ebcd;
+  --e:#bd3a2f; --e-soft:#f8dbd7;
+  --k:#a97a64; --k-soft:#f4e3d8;
+  --ok:#21754a; --ok-soft:#d9f0e2; --bad:#ad241b; --bad-soft:#f7dad7;
+  --skin:#e5c1a1; --skin-d:#c49573; --tissue:#fcf6f4; --tissue-e:#fadcd6; --node:#e9f0f8; --lymph:#9cc1e4;
+  --halo:#fcf6f4; --inl:#ffffff;
+  --shadow:0 1px 2px rgba(20,40,60,.06),0 8px 24px rgba(20,40,60,.06);
+  --font:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11161b; --surface:#1a2026; --surface2:#222a31; --text:#e6eaee; --muted:#9aa7b3; --line:#2f3942;
+    --accent:#7fb2e2; --accent-soft:#1c2c3b;
+    --u:#f0a35d; --u-soft:#3a2815; --s:#86aaf2; --s-soft:#1b2944; --h:#b69ef2; --h-soft:#2b2342;
+    --z:#4fcab8; --z-soft:#13322e; --m:#e2b84f; --m-soft:#352c14; --e:#f07d71; --e-soft:#3d1f1c;
+    --k:#d5a58d; --k-soft:#33251f; --ok:#62d090; --ok-soft:#163423; --bad:#f28c82; --bad-soft:#3a1c19;
+    --skin:#6b513f; --skin-d:#8d6b55; --tissue:#1d1a1a; --tissue-e:#301d1b; --node:#18202d; --lymph:#34597e;
+    --halo:#1d1a1a; --inl:#11161b;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11161b; --surface:#1a2026; --surface2:#222a31; --text:#e6eaee; --muted:#9aa7b3; --line:#2f3942;
+  --accent:#7fb2e2; --accent-soft:#1c2c3b;
+  --u:#f0a35d; --u-soft:#3a2815; --s:#86aaf2; --s-soft:#1b2944; --h:#b69ef2; --h-soft:#2b2342;
+  --z:#4fcab8; --z-soft:#13322e; --m:#e2b84f; --m-soft:#352c14; --e:#f07d71; --e-soft:#3d1f1c;
+  --k:#d5a58d; --k-soft:#33251f; --ok:#62d090; --ok-soft:#163423; --bad:#f28c82; --bad-soft:#3a1c19;
+  --skin:#6b513f; --skin-d:#8d6b55; --tissue:#1d1a1a; --tissue-e:#301d1b; --node:#18202d; --lymph:#34597e;
+  --halo:#1d1a1a; --inl:#11161b;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{background:var(--bg);scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:17px;line-height:1.55;-webkit-text-size-adjust:100%}
+button,input{font:inherit}
+.wrap{max-width:1220px;margin:0 auto;padding:18px clamp(12px,3vw,30px) 56px}
+
+/* Kopf */
+header.top{display:flex;flex-direction:column;gap:12px}
+.brand{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand h1{margin:0;font-size:clamp(1.7rem,3.6vw,2.5rem);line-height:1.1;letter-spacing:-.01em}
+.brand p{margin:4px 0 0;color:var(--muted);max-width:62ch}
+.tabs{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--line);scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{appearance:none;border:0;background:none;color:var(--muted);font-weight:700;padding:10px 14px 9px;border-bottom:3px solid transparent;white-space:nowrap;cursor:pointer}
+.tabs button:hover{color:var(--text)}
+.tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.tabs .num{display:inline-grid;place-items:center;width:1.5em;height:1.5em;border-radius:50%;background:var(--surface2);margin-right:6px;font-size:.85em}
+.tabs button[aria-selected="true"] .num{background:var(--accent);color:var(--surface)}
+.tab{display:none;padding-top:18px}
+.tab.active{display:block}
+
+/* Bausteine */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px}
+.btn{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:999px;padding:8px 16px;font-weight:700;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.btn:disabled{opacity:.45;cursor:default}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+details.auftrag{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:12px;padding:10px 16px;margin-bottom:14px}
+details.auftrag summary{cursor:pointer;font-weight:700}
+details.auftrag ol{margin:8px 0 4px;padding-left:1.4em}
+details.auftrag li{margin:4px 0}
+.afb{font-size:.78em;color:var(--muted);white-space:nowrap}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{--c:var(--accent);appearance:none;border:2px solid var(--c);background:var(--surface);color:var(--text);border-radius:999px;padding:5px 12px;font-weight:700;font-size:.92rem;cursor:pointer}
+.chip.on{background:var(--c);color:var(--surface)}
+.toggles{display:flex;flex-wrap:wrap;gap:6px 16px}
+.tgl{display:inline-flex;align-items:center;gap:7px;font-size:.95rem;cursor:pointer;user-select:none}
+.tgl input{width:18px;height:18px;accent-color:var(--accent)}
+.hint{margin:0 0 10px;color:var(--muted);font-size:.95rem}
+.scene-wrap{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow-x:auto;box-shadow:var(--shadow)}
+.scene{display:block;width:100%;min-width:740px;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px;font-size:.92rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend i{width:14px;height:14px;border-radius:50%;background:var(--c);display:inline-block;border:2px solid var(--c)}
+.modell{margin-top:14px;font-size:.88rem;color:var(--muted);max-width:90ch}
+
+/* SVG-Grafik */
+.skin{fill:var(--skin)} .skin-t{fill:none;stroke:var(--skin-d);stroke-width:1.2}
+.tissue{fill:var(--tissue);transition:fill 1.6s}
+.scene.entz .tissue{fill:var(--tissue-e)}
+.node{fill:var(--node);stroke:var(--s);stroke-width:2;stroke-dasharray:9 6}
+.vessel{fill:none;stroke:var(--lymph);stroke-width:16;stroke-linecap:round;opacity:.7}
+.zone{font-size:15px;font-weight:700;fill:var(--muted)}
+.zone-s{font-size:13px;fill:var(--muted)}
+.cell{stroke-width:2.3}
+.cell.u{fill:var(--u-soft);stroke:var(--u)} .nuc.u{fill:var(--u)}
+.cell.s{fill:var(--s-soft);stroke:var(--s)} .nuc.s{fill:var(--s)}
+.cell.h{fill:var(--h-soft);stroke:var(--h)} .nuc.h{fill:var(--h)}
+.cell.z{fill:var(--z-soft);stroke:var(--z)} .nuc.z{fill:var(--z)}
+.cell.m{fill:var(--m-soft);stroke:var(--m)} .nuc.m{fill:var(--m)}
+.cell.e{fill:var(--e-soft);stroke:var(--e)} .nuc.e{fill:var(--e)}
+.cell.k{fill:var(--k-soft);stroke:var(--k)} .nuc.k{fill:var(--k)}
+.nuc{opacity:.8}
+.nucl{fill:none;stroke-width:4;opacity:.8} .nucl.u{stroke:var(--u)}
+.gran{opacity:.65} .gran.u{fill:var(--u)} .gran.z{fill:var(--z)}
+.vac{fill:var(--e-soft);stroke:var(--u);stroke-width:1.2}
+.ag{fill:var(--e)}
+.mhcm{fill:var(--s)}
+.spk{stroke:var(--e);stroke-width:2}
+.flag{fill:none;stroke:var(--e);stroke-width:1.6}
+.rc{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.rc.s{stroke:var(--s)} .rc.h{stroke:var(--h)} .rc.z{stroke:var(--z)} .rc.m{stroke:var(--m)}
+.halo-r{fill:none;stroke:var(--m);stroke-width:2;stroke-dasharray:4 4}
+.er{fill:none;stroke:var(--h);stroke-width:1.6;opacity:.75}
+.abY{fill:none;stroke:var(--h);stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
+.inlbl{font-size:12px;font-weight:700;fill:var(--inl);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.inlbl.sm{font-size:9.5px}
+.lbl{font-size:15px;font-weight:700;fill:var(--text);text-anchor:middle;paint-order:stroke;stroke:var(--halo);stroke-width:5px;stroke-linejoin:round;pointer-events:none;transition:opacity .3s}
+.lbl.start{text-anchor:start}
+.q{font-size:20px;font-weight:700;fill:var(--accent);text-anchor:middle;opacity:0;pointer-events:none;paint-order:stroke;stroke:var(--halo);stroke-width:5px}
+.scene.test .lbl,.scene.test .inlbl{opacity:0}
+.scene.test .q{opacity:1}
+.scene.nolbl .lbl{opacity:0}
+.ring{fill:none;stroke:var(--accent);stroke-width:3;opacity:0;transition:opacity .2s}
+.item{cursor:pointer;transition:opacity .45s}
+.item:focus{outline:none}
+.item:hover .ring,.item:focus-visible .ring,.item.sel .ring{opacity:.9}
+.lupe-bg{fill:var(--tissue)} .lupe-ring{fill:none;stroke:var(--muted);stroke-width:3} .lupe-h{stroke:var(--muted);stroke-width:7;stroke-linecap:round}
+.lupe-line{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:3 4;fill:none}
+.arr path{fill:none;stroke:var(--muted);stroke-width:1.8;stroke-dasharray:6 5}
+.arr text{font-size:12.5px;font-style:italic;fill:var(--muted);text-anchor:middle;paint-order:stroke;stroke:var(--halo);stroke-width:5px;stroke-linejoin:round}
+.arrhead{fill:var(--muted)}
+.arr{transition:opacity .45s;pointer-events:none}
+.scene.noarr .arr{display:none}
+.scene[data-filter="unspez"] .item:not([data-f~="unspez"]),
+.scene[data-filter="humoral"] .item:not([data-f~="humoral"]),
+.scene[data-filter="zellulaer"] .item:not([data-f~="zellulaer"]){opacity:.12}
+.scene[data-filter="unspez"] .arr:not([data-f~="unspez"]),
+.scene[data-filter="humoral"] .arr:not([data-f~="humoral"]),
+.scene[data-filter="zellulaer"] .arr:not([data-f~="zellulaer"]){opacity:.06}
+.mhc{opacity:0;transition:opacity .9s .6s}
+.show-mhc .mhc{opacity:1}
+.actor{transition:transform 1.5s cubic-bezier(.45,0,.2,1),opacity 1.1s}
+.actor .rot{transition:transform 1.5s cubic-bezier(.45,0,.2,1)}
+.notrans .actor,.notrans .rot{transition:none!important}
+.actor.focus .ring{animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.15}50%{opacity:.95}}
+.apo .cell{stroke-dasharray:7 5}
+.cy{fill:var(--s);animation:cy 1.6s ease-in-out infinite}
+@keyframes cy{0%,100%{opacity:.2;transform:scale(.6)}50%{opacity:1;transform:scale(1.25)}}
+
+/* Ablauf */
+.ab-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(300px,1fr);gap:16px;align-items:start}
+@media (max-width:980px){.ab-grid{grid-template-columns:1fr}}
+.progress{display:grid;grid-template-columns:repeat(9,1fr);gap:4px;margin-bottom:12px}
+.progress button{appearance:none;border:0;height:10px;border-radius:5px;background:var(--c);opacity:.28;cursor:pointer;padding:0}
+.progress button.done{opacity:.6}
+.progress button.cur{opacity:1;outline:2px solid var(--text);outline-offset:1px}
+.phase{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0;font-size:.9rem;font-weight:700;color:var(--c,var(--accent))}
+.phase .time{color:var(--muted);font-weight:400}
+.steppanel h2{margin:4px 0 8px;font-size:1.35rem;line-height:1.25}
+.steppanel p{margin:0 0 10px}
+.simple{background:var(--surface2);border-radius:10px;padding:10px 14px;margin:10px 0}
+.simple h3{margin:0 0 2px;font-size:.88rem;color:var(--muted)}
+.simple p{margin:0}
+.who{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:10px 0}
+.who > span{font-size:.9rem;color:var(--muted);margin-right:2px}
+.mini{--c:var(--accent);appearance:none;border:1.5px solid var(--c);background:var(--surface);color:var(--text);border-radius:999px;padding:3px 10px;font-size:.88rem;cursor:pointer}
+.mini:hover{background:var(--c);color:var(--surface)}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 10px}
+.controls .btn{flex:1 1 auto}
+
+/* Kontakt */
+.k-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,1fr);gap:16px;align-items:start}
+@media (max-width:980px){.k-grid{grid-template-columns:1fr}}
+#chart{display:block;width:100%;height:auto;margin-top:10px}
+.ax{stroke:var(--muted);stroke-width:1.4}
+.grid{stroke:var(--line);stroke-width:1}
+.tick{font-size:12px;fill:var(--muted)}
+.axlbl{font-size:13px;fill:var(--text);font-weight:700}
+.c-ab{fill:none;stroke:var(--h);stroke-width:3.4;stroke-linejoin:round}
+.c-pa{fill:none;stroke:var(--e);stroke-width:2.8;stroke-dasharray:7 5}
+.c-th{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:3 4}
+.ev{stroke:var(--text);stroke-width:1.2;opacity:.5}
+.evt{font-size:12px;fill:var(--text);font-weight:700}
+.thl{font-size:11.5px;fill:var(--muted)}
+.slider{margin-top:12px}
+.slider label{display:block;font-weight:700;margin-bottom:4px}
+.slider input{width:100%;accent-color:var(--accent)}
+.result{border-radius:10px;padding:10px 14px;margin:10px 0;font-weight:700}
+.result.ill{background:var(--bad-soft);color:var(--bad)}
+.result.ok{background:var(--ok-soft);color:var(--ok)}
+.note{font-size:.88rem;color:var(--muted)}
+.keyline{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.9rem;color:var(--muted);margin-top:8px}
+.keyline span{display:inline-flex;align-items:center;gap:7px}
+.keyline svg{width:30px;height:10px}
+
+/* Selbsttest */
+.t-grid{display:grid;gap:16px}
+.t-grid h2{margin:0 0 4px;font-size:1.25rem}
+.t-grid .sub{margin:0 0 12px;color:var(--muted)}
+.zrow{border-top:1px solid var(--line);padding:10px 0}
+.zname{font-weight:700;display:block;margin-bottom:6px}
+.zbtns{display:flex;flex-wrap:wrap;gap:6px}
+.zbtns button,.mc button{appearance:none;border:1.5px solid var(--line);background:var(--surface);color:var(--text);border-radius:10px;padding:6px 11px;cursor:pointer;text-align:left;font-size:.95rem}
+.zbtns button:hover,.mc button:hover{border-color:var(--accent)}
+.zbtns button.pick-ok,.mc button.pick-ok{background:var(--ok-soft);border-color:var(--ok)}
+.zbtns button.pick-bad,.mc button.pick-bad{background:var(--bad-soft);border-color:var(--bad)}
+.fb{margin:6px 0 0;font-size:.93rem}
+.fb b.r{color:var(--ok)} .fb b.f{color:var(--bad)}
+.score{font-weight:700;color:var(--accent);margin-top:10px}
+.order{list-style:none;margin:0;padding:0;counter-reset:o}
+.order li{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;margin:6px 0;background:var(--surface)}
+.order li::before{counter-increment:o;content:counter(o);font-weight:700;color:var(--muted);min-width:1.3em}
+.order li span{flex:1}
+.order li.ok{border-color:var(--ok);background:var(--ok-soft)}
+.order li.bad{border-color:var(--bad);background:var(--bad-soft)}
+.mv{appearance:none;border:1px solid var(--line);background:var(--surface2);color:var(--text);border-radius:8px;width:34px;height:30px;cursor:pointer;font-weight:700}
+.mc{border-top:1px solid var(--line);padding:12px 0}
+.mc p.qq{font-weight:700;margin:0 0 8px}
+.mc .opts{display:grid;gap:6px}
+.row-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+
+/* Seitenpanel */
+#backdrop{position:fixed;inset:0;background:rgba(10,18,26,.32);opacity:0;pointer-events:none;transition:opacity .3s;z-index:40}
+#backdrop.on{opacity:1;pointer-events:auto}
+#panel{position:fixed;top:0;right:0;bottom:0;width:min(470px,100%);background:var(--surface);border-left:1px solid var(--line);box-shadow:-12px 0 32px rgba(0,0,0,.16);transform:translateX(105%);transition:transform .35s cubic-bezier(.3,0,.2,1);z-index:50;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+#panel.open{transform:none}
+@media (max-width:700px){
+  #panel{top:auto;left:0;width:100%;height:84%;border-left:0;border-top:1px solid var(--line);border-radius:18px 18px 0 0;transform:translateY(105%)}
+  #panel.open{transform:none}
+}
+.p-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 20px 6px}
+.tag{--c:var(--accent);display:inline-block;border-radius:999px;padding:3px 11px;font-size:.84rem;font-weight:700;background:var(--c);color:var(--surface)}
+.xbtn{appearance:none;border:1px solid var(--line);background:var(--surface2);color:var(--text);border-radius:50%;width:38px;height:38px;font-size:1.3rem;line-height:1;cursor:pointer;flex:none}
+.p-body{overflow-y:auto;padding:2px 22px 30px;-webkit-overflow-scrolling:touch}
+.p-body h2{margin:6px 0 0;font-size:1.5rem;line-height:1.2}
+.p-body .gram{margin:2px 0 10px;color:var(--muted);font-style:italic}
+.p-body h3{margin:18px 0 6px;font-size:1.02rem}
+.p-body p{margin:0 0 9px}
+.merke{border-left:4px solid var(--c,var(--accent));background:var(--surface2);padding:9px 13px;border-radius:0 10px 10px 0;margin:14px 0}
+dl.ws{margin:0;display:grid;grid-template-columns:auto 1fr;gap:5px 14px}
+dl.ws dt{font-weight:700}
+dl.ws dd{margin:0;color:var(--muted)}
+details.frage{border:1.5px solid var(--line);border-radius:10px;padding:9px 13px;margin-top:14px}
+details.frage summary{cursor:pointer;font-weight:700}
+details.frage p{margin:8px 0 0}
+.rel{display:flex;flex-wrap:wrap;gap:6px}
+.sb li{margin:5px 0}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div class="brand">
+    <div>
+      <h1>Das Immunsystem</h1>
+      <p>Biologie, Klasse 9: Wie der Körper Krankheitserreger abwehrt. Wähle Zellen aus, verfolge den Ablauf einer Infektion und überprüfe dein Wissen.</p>
+    </div>
+    <button class="btn" id="btnWort">Wortspeicher öffnen</button>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Bereiche">
+    <button role="tab" data-tab="uebersicht" aria-selected="true"><span class="num">1</span>Übersicht</button>
+    <button role="tab" data-tab="ablauf" aria-selected="false"><span class="num">2</span>Ablauf einer Infektion</button>
+    <button role="tab" data-tab="kontakt" aria-selected="false"><span class="num">3</span>Erst- und Zweitkontakt</button>
+    <button role="tab" data-tab="test" aria-selected="false"><span class="num">4</span>Selbsttest</button>
+  </nav>
+</header>
+
+<!-- 1 Übersicht -->
+<section class="tab active" id="tab-uebersicht" role="tabpanel">
+  <details class="auftrag" open>
+    <summary>Arbeitsaufträge</summary>
+    <ol>
+      <li>Wähle nacheinander alle Bestandteile der Übersicht aus und lies die Informationen. Beginne mit „Kurz und einfach“. <span class="afb">AFB I</span></li>
+      <li>Ordne die Bestandteile in einer Tabelle der unspezifischen und der spezifischen Abwehr zu. Nutze dazu auch die Filter. <span class="afb">AFB I</span></li>
+      <li>Schalte den Testmodus ein. Benenne die Zellen ohne Beschriftung und überprüfe dich durch Antippen. <span class="afb">AFB I</span></li>
+      <li>Erläutere, warum Makrophagen als Bindeglied zwischen unspezifischer und spezifischer Abwehr bezeichnet werden. <span class="afb">AFB II</span></li>
+    </ol>
+  </details>
+  <div class="toolbar">
+    <div class="chips" role="group" aria-label="Filter">
+      <button class="chip on" data-filter="alle">Alle</button>
+      <button class="chip" data-filter="unspez" style="--c:var(--u)">Unspezifische Abwehr</button>
+      <button class="chip" data-filter="humoral" style="--c:var(--h)">Spezifisch: humoral</button>
+      <button class="chip" data-filter="zellulaer" style="--c:var(--z)">Spezifisch: zellulär</button>
+    </div>
+    <div class="toggles">
+      <label class="tgl"><input type="checkbox" id="tglArr" checked> Wirkungspfeile</label>
+      <label class="tgl"><input type="checkbox" id="tglTest"> Testmodus ohne Beschriftung</label>
+    </div>
+  </div>
+  <p class="hint">Tippe oder klicke auf einen Bestandteil. Rechts werden dann Informationen eingeblendet.</p>
+  <div class="scene-wrap"><svg id="ov" class="scene" viewBox="0 0 1000 640" role="group" aria-label="Übersicht über das Immunsystem"></svg></div>
+  <div class="legend" id="legend"></div>
+</section>
+
+<!-- 2 Ablauf -->
+<section class="tab" id="tab-ablauf" role="tabpanel">
+  <details class="auftrag">
+    <summary>Arbeitsaufträge</summary>
+    <ol>
+      <li>Beschreibe den Ablauf der Immunantwort Schritt für Schritt in eigenen Worten. Nutze den Wortspeicher. <span class="afb">AFB I</span></li>
+      <li>Stelle die humorale Immunantwort in einem Fließdiagramm dar. <span class="afb">AFB II</span></li>
+      <li>Vergleiche die humorale und die zelluläre Immunantwort in einer Tabelle (beteiligte Zellen, Ziel, Wirkungsweise). <span class="afb">AFB II</span></li>
+      <li>Erkläre, warum die spezifische Abwehr bei einer Erstinfektion mehrere Tage benötigt. <span class="afb">AFB II</span></li>
+      <li>Beurteile die Bedeutung der T-Helferzellen für die gesamte spezifische Abwehr. <span class="afb">AFB III</span></li>
+    </ol>
+  </details>
+  <div class="ab-grid">
+    <div class="scene-wrap"><svg id="ab" class="scene" viewBox="0 0 1000 600" role="group" aria-label="Animation der Immunantwort"></svg></div>
+    <div class="card steppanel" aria-live="polite">
+      <div class="progress" id="prog"></div>
+      <p class="phase" id="stPhase"></p>
+      <h2 id="stTitle"></h2>
+      <p id="stText"></p>
+      <div class="simple"><h3>Einfach gesagt</h3><p id="stEinfach"></p></div>
+      <div class="who"><span>Beteiligt:</span><span id="stWho" class="chips"></span></div>
+      <div class="controls">
+        <button class="btn" id="prev">Zurück</button>
+        <button class="btn" id="play">Automatisch abspielen</button>
+        <button class="btn primary" id="next">Weiter</button>
+      </div>
+      <label class="tgl"><input type="checkbox" id="tglAbLbl" checked> Beschriftungen anzeigen</label>
+    </div>
+  </div>
+</section>
+
+<!-- 3 Kontakt -->
+<section class="tab" id="tab-kontakt" role="tabpanel">
+  <details class="auftrag">
+    <summary>Arbeitsaufträge</summary>
+    <ol>
+      <li>Wähle „Erst- und Zweitinfektion“. Beschreibe den Verlauf der Antikörperkonzentration und der Erregermenge. <span class="afb">AFB I</span></li>
+      <li>Erkläre die Unterschiede zwischen der Primär- und der Sekundärantwort mithilfe der Gedächtniszellen. <span class="afb">AFB II</span></li>
+      <li>Vergleiche aktive und passive Impfung. Verändere dazu den Zeitpunkt der Infektion mit dem Schieberegler. <span class="afb">AFB II</span></li>
+      <li>Beurteile, in welcher Situation eine passive Impfung sinnvoll ist (Beispiel: verschmutzte Wunde ohne Tetanus-Impfschutz). <span class="afb">AFB III</span></li>
+    </ol>
+  </details>
+  <div class="k-grid">
+    <div class="card">
+      <div class="chips" id="scChips" role="group" aria-label="Szenario">
+        <button class="chip on" data-sc="A">Erst- und Zweitinfektion</button>
+        <button class="chip" data-sc="B">Aktive Impfung</button>
+        <button class="chip" data-sc="C">Passive Impfung</button>
+        <button class="chip" data-sc="D">Ohne Immunschutz</button>
+      </div>
+      <svg id="chart" viewBox="0 0 720 400" role="img" aria-label="Diagramm: Antikörperkonzentration und Erregermenge in Abhängigkeit von der Zeit"></svg>
+      <div class="keyline">
+        <span><svg viewBox="0 0 30 10"><line x1="0" y1="5" x2="30" y2="5" class="c-ab"/></svg>Antikörperkonzentration</span>
+        <span><svg viewBox="0 0 30 10"><line x1="0" y1="5" x2="30" y2="5" class="c-pa"/></svg>Erregermenge</span>
+        <span><svg viewBox="0 0 30 10"><line x1="0" y1="5" x2="30" y2="5" class="c-th"/></svg>Schwelle für Krankheitszeichen</span>
+      </div>
+      <div class="slider">
+        <label for="ti">Zeitpunkt der Infektion: Tag <output id="tiOut">70</output></label>
+        <input type="range" id="ti" min="30" max="120" step="5" value="70">
+      </div>
+    </div>
+    <div class="card">
+      <h2 id="kTitle" style="margin:0 0 6px;font-size:1.25rem"></h2>
+      <p id="kText" style="margin:0"></p>
+      <div id="kResult" class="result"></div>
+      <p id="kMem" style="margin:0 0 10px"></p>
+      <p class="note">Modellhinweis: Das Diagramm ist ein vereinfachtes, qualitatives Modell. Die Kurven zeigen typische Verläufe, aber keine Messwerte. Die Zeitangaben liegen in der Größenordnung von Lehrbuchangaben.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 4 Selbsttest -->
+<section class="tab" id="tab-test" role="tabpanel">
+  <div class="t-grid">
+    <div class="card">
+      <h2>Teil A: Zuordnen</h2>
+      <p class="sub">Ordne jeden Bestandteil einem Bereich der Abwehr zu.</p>
+      <div id="zuord"></div>
+      <p class="score" id="zScore"></p>
+      <div class="row-btns"><button class="btn" id="zReset">Neu beginnen</button></div>
+    </div>
+    <div class="card">
+      <h2>Teil B: Reihenfolge der humoralen Immunantwort</h2>
+      <p class="sub">Bringe die Schritte mit den Pfeiltasten in die richtige Reihenfolge. Überprüfe dann.</p>
+      <ol class="order" id="order"></ol>
+      <p class="score" id="oScore"></p>
+      <div class="row-btns"><button class="btn primary" id="oCheck">Überprüfen</button><button class="btn" id="oReset">Neu mischen</button></div>
+    </div>
+    <div class="card">
+      <h2>Teil C: Fragen zum Verständnis</h2>
+      <p class="sub">Wähle jeweils eine Antwort. Du erhältst sofort eine Rückmeldung.</p>
+      <div id="mc"></div>
+      <p class="score" id="mScore"></p>
+      <div class="row-btns"><button class="btn" id="mReset">Neu beginnen</button></div>
+    </div>
+  </div>
+</section>
+
+<p class="modell"><b>Hinweise zur Modellbildung:</b> Die Darstellung ist didaktisch reduziert. Als antigenpräsentierende Zelle ist nur der Makrophage gezeigt; im Körper übernehmen vor allem dendritische Zellen diese Aufgabe. Das Komplementsystem, die verschiedenen Antikörperklassen und die Milz als weiteres lymphatisches Organ sind nicht dargestellt. Zeitangaben sind gerundete Richtwerte für eine Erstinfektion.</p>
+</div>
+
+<div id="backdrop"></div>
+<aside id="panel" aria-hidden="true" aria-label="Informationen">
+  <div class="p-head"><span class="tag" id="pTag"></span><button class="xbtn" id="pClose" aria-label="Schließen">×</button></div>
+  <div class="p-body" id="pBody"></div>
+</aside>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const $$=s=>Array.from(document.querySelectorAll(s));
+const R=n=>Math.round(n*10)/10;
+
+/* ---------- Farbgruppen ---------- */
+const GC={unspez:"--u",steu:"--s",hum:"--h",zel:"--z",mem:"--m",erreger:"--e",koerper:"--k",ort:"--accent"};
+const GN={unspez:"Unspezifische Abwehr",steu:"Spezifische Abwehr: Steuerung",hum:"Spezifische Abwehr: humoral",zel:"Spezifische Abwehr: zellulär",mem:"Spezifische Abwehr: Gedächtnis",erreger:"Krankheitserreger",koerper:"Körperzelle",ort:"Ort der Abwehr"};
+
+/* ---------- Inhalte ---------- */
+const INFO={
+barriere:{name:"Haut und Schleimhäute",gram:"die Haut, die Häute / die Schleimhaut, die Schleimhäute",g:"unspez",tag:"Unspezifische Abwehr, erste Abwehrlinie",
+ kurz:"Die Haut und die Schleimhäute sind eine Schutzschicht. Sie verhindern, dass viele Krankheitserreger in den Körper gelangen.",
+ text:["<b>Mechanische Barriere:</b> Die äußere Hautschicht (Epidermis) besteht aus verhornten, abgestorbenen Zellen, die dicht aneinanderliegen. Erreger können diese Schicht meist nur durch Verletzungen überwinden.",
+ "<b>Chemische Barriere:</b> Der Säureschutzmantel der Haut (pH-Wert etwa 5,5) und die Magensäure (pH-Wert 1 bis 2) hemmen das Wachstum vieler Bakterien. Das Enzym Lysozym in Tränenflüssigkeit und Speichel spaltet die Zellwand von Bakterien.",
+ "<b>Schleim und Flimmerhärchen:</b> In den Atemwegen werden Partikel und Erreger im Schleim festgehalten und durch die Bewegung der Flimmerhärchen (Zilien) in Richtung Rachen transportiert.",
+ "<b>Biologische Barriere:</b> Die natürliche Bakterienbesiedlung von Haut und Darm konkurriert mit Krankheitserregern um Nährstoffe und Raum."],
+ merke:"Barrieren wirken gegen alle Erreger auf die gleiche Weise. Deshalb gehören sie zur unspezifischen Abwehr.",
+ woerter:[["die Barriere, die Barrieren","Grenze, Sperre"],["die Schleimhaut, die Schleimhäute","feuchte Haut innen im Körper, z. B. in Mund und Nase"],["das Enzym, die Enzyme","Protein, das eine chemische Reaktion beschleunigt"]],
+ frage:"Erkläre, warum eine Schürfwunde das Risiko für eine Infektion erhöht.",
+ antwort:"Die mechanische Barriere der Haut ist unterbrochen. Erreger gelangen direkt in das darunterliegende Gewebe und damit in die Nähe von Blut- und Lymphgefäßen.",
+ rel:["makrophage","granulozyt","bakterium"]},
+makrophage:{name:"Makrophage (Fresszelle)",gram:"der Makrophage, die Makrophagen",g:"unspez",tag:"Unspezifische Abwehr und Antigenpräsentation",
+ kurz:"Makrophagen sind große Fresszellen. Sie nehmen Erreger auf und bauen sie ab. Danach präsentieren sie Bruchstücke der Erreger an ihrer Oberfläche.",
+ text:["Makrophagen entstehen aus <b>Monozyten</b>. Das sind weiße Blutzellen, die aus dem Blut in das Gewebe übertreten und sich dort zu Makrophagen differenzieren.",
+ "<b>Phagozytose:</b> Der Makrophage umschließt einen Erreger mit Ausstülpungen der Zellmembran. Es entsteht ein Membranbläschen, das Phagosom. Es verschmilzt mit Lysosomen, die Verdauungsenzyme enthalten. Im Phagolysosom wird der Erreger enzymatisch abgebaut.",
+ "<b>Antigenpräsentation:</b> Bruchstücke des Erregers (Antigene) werden an <b>MHC-II-Moleküle</b> gebunden und an der Zelloberfläche präsentiert. Der Makrophage ist damit eine antigenpräsentierende Zelle. Neben Makrophagen erfüllen vor allem dendritische Zellen diese Aufgabe.",
+ "<b>Entzündung:</b> Makrophagen geben Botenstoffe (Zytokine) ab. Diese erweitern die Blutgefäße und lösen die typischen Entzündungszeichen aus: Rötung, Schwellung, Wärme und Schmerz."],
+ merke:"Makrophagen verbinden die unspezifische mit der spezifischen Abwehr: Sie phagozytieren unspezifisch und aktivieren anschließend passende T-Helferzellen.",
+ woerter:[["die Phagozytose","Aufnahme von Partikeln oder Zellen in eine Zelle"],["das Lysosom, die Lysosomen","Zellorganell mit Verdauungsenzymen"],["präsentieren","an der Oberfläche zeigen"]],
+ frage:"Begründe, warum Makrophagen als Bindeglied zwischen unspezifischer und spezifischer Abwehr bezeichnet werden.",
+ antwort:"Die Phagozytose erfolgt unabhängig von der Art des Erregers, also unspezifisch. Die präsentierten Antigenbruchstücke führen jedoch dazu, dass nur passende T-Helferzellen aktiviert werden. Damit wird die spezifische Abwehr eingeleitet.",
+ rel:["granulozyt","antigen","th","lymphknoten"]},
+granulozyt:{name:"Neutrophiler Granulozyt",gram:"der Granulozyt, die Granulozyten",g:"unspez",tag:"Unspezifische Abwehr",
+ kurz:"Granulozyten sind die häufigsten weißen Blutzellen. Sie gelangen sehr schnell zum Ort der Infektion und nehmen dort Bakterien auf.",
+ text:["Neutrophile Granulozyten machen etwa 50 bis 70 Prozent der weißen Blutzellen (Leukozyten) aus. Typisch sind der gelappte Zellkern und viele Körnchen (Granula) im Zellplasma. Sie enthalten Enzyme und antibakterielle Stoffe.",
+ "<b>Chemotaxis:</b> Botenstoffe aus dem entzündeten Gewebe bilden ein Konzentrationsgefälle. Granulozyten treten aus der Blutbahn aus und bewegen sich gerichtet in Richtung der höheren Konzentration, also zum Infektionsort.",
+ "Am Infektionsort phagozytieren sie vor allem Bakterien. Granulozyten sind kurzlebig und sterben nach der Phagozytose ab. <b>Eiter</b> besteht zu einem großen Teil aus abgestorbenen Granulozyten, Erregern und Geweberesten."],
+ merke:"Granulozyten bilden in den ersten Stunden einer Infektion die erste zelluläre Abwehr. Sie präsentieren keine Antigene an T-Helferzellen.",
+ woerter:[["der Leukozyt, die Leukozyten","weiße Blutzelle"],["die Chemotaxis","gerichtete Bewegung entlang eines Konzentrationsgefälles von Stoffen"],["der Eiter","gelbliche Flüssigkeit in entzündeten Wunden"]],
+ frage:"Erläutere, woraus Eiter in einer entzündeten Wunde besteht und was er über die Abwehrvorgänge aussagt.",
+ antwort:"Eiter besteht vor allem aus abgestorbenen Granulozyten, Erregern und Geweberesten. Er zeigt, dass am Infektionsort viele Granulozyten Bakterien phagozytiert haben.",
+ rel:["makrophage","bakterium","barriere"]},
+nk:{name:"Natürliche Killerzelle (NK-Zelle)",gram:"die Killerzelle, die Killerzellen",g:"unspez",tag:"Unspezifische Abwehr, Lymphozyt",
+ kurz:"NK-Zellen gehören zu den Lymphozyten, wirken aber unspezifisch. Sie lösen den Zelltod von virusinfizierten Zellen und Tumorzellen aus.",
+ text:["NK-Zellen sind Lymphozyten, besitzen aber keine antigenspezifischen Rezeptoren. Sie gehören deshalb zur unspezifischen Abwehr.",
+ "Fast alle kernhaltigen Körperzellen tragen <b>MHC-I-Moleküle</b> an ihrer Oberfläche. Manche Viren und Tumorzellen verringern die Anzahl dieser Moleküle. NK-Zellen reagieren auf das Fehlen von MHC-I und geben zellschädigende Stoffe ab, die den programmierten Zelltod (<b>Apoptose</b>) der Zielzelle auslösen.",
+ "NK-Zellen wirken ohne vorherige Aktivierung durch T-Helferzellen und damit schneller als zytotoxische T-Zellen."],
+ merke:"Nicht alle Lymphozyten sind spezifisch: NK-Zellen sind Lymphozyten der unspezifischen Abwehr.",
+ woerter:[["der Lymphozyt, die Lymphozyten","Gruppe weißer Blutzellen (B-Zellen, T-Zellen und NK-Zellen)"],["die Apoptose","programmierter Zelltod"],["der Tumor, die Tumoren","Geschwulst; unkontrollierte Vermehrung von Zellen"]],
+ frage:"Vergleiche NK-Zellen und zytotoxische T-Zellen hinsichtlich Spezifität und Geschwindigkeit.",
+ antwort:"Beide lösen die Apoptose infizierter Zellen aus. NK-Zellen reagieren unspezifisch auf fehlende MHC-I-Moleküle und wirken sofort. Zytotoxische T-Zellen binden spezifisch an ein bestimmtes Antigen auf MHC-I und müssen zuerst aktiviert werden und sich vermehren. Sie wirken daher erst nach einigen Tagen.",
+ rel:["tk","infiziert"]},
+bakterium:{name:"Bakterium",gram:"das Bakterium, die Bakterien",g:"erreger",tag:"Krankheitserreger",
+ kurz:"Bakterien sind einzellige Lebewesen ohne Zellkern. Einige Bakterien lösen Krankheiten aus.",
+ text:["Bakterien sind <b>Prokaryoten</b>: Ihre DNA liegt frei im Zellplasma, ein Zellkern fehlt. Sie besitzen einen eigenen Stoffwechsel und vermehren sich durch Zweiteilung. Unter günstigen Bedingungen verdoppelt sich die Anzahl mancher Arten etwa alle 20 Minuten.",
+ "Krankheitserregende (pathogene) Bakterien schädigen den Körper zum Beispiel durch Giftstoffe (<b>Toxine</b>).",
+ "An ihrer Oberfläche tragen Bakterien charakteristische Moleküle, die <b>Antigene</b>. An diese binden Antikörper und die Rezeptoren von Lymphozyten.",
+ "Bakterien befinden sich meist außerhalb von Körperzellen. Sie sind daher für Fresszellen und Antikörper gut zugänglich. Antibiotika wirken gegen Bakterien, aber nicht gegen Viren."],
+ merke:"Bakterien sind Lebewesen mit eigenem Stoffwechsel, Viren nicht.",
+ woerter:[["der Erreger, die Erreger","Lebewesen oder Partikel, das eine Krankheit verursacht"],["das Toxin, die Toxine","Giftstoff"],["die Zweiteilung","Vermehrung durch Teilung einer Zelle in zwei Zellen"]],
+ frage:"Begründe, warum Antibiotika bei einer Grippe (Influenza) nicht gegen den Erreger wirken.",
+ antwort:"Grippe wird durch Viren verursacht. Antibiotika greifen Strukturen oder Stoffwechselvorgänge von Bakterien an, zum Beispiel die Zellwand. Viren besitzen weder eine Zellwand noch einen eigenen Stoffwechsel.",
+ rel:["virus","antigen","makrophage"]},
+virus:{name:"Virus",gram:"das Virus, die Viren",g:"erreger",tag:"Krankheitserreger",
+ kurz:"Viren sind sehr kleine Partikel. Sie haben keinen eigenen Stoffwechsel und vermehren sich nur in Körperzellen.",
+ text:["Viren bestehen aus Erbinformation (DNA oder RNA) und einer Proteinhülle, manche zusätzlich aus einer Lipidhülle. Sie sind keine Zellen und besitzen keinen eigenen Stoffwechsel.",
+ "Ein Virus bindet an passende Rezeptoren einer Wirtszelle. Seine Erbinformation gelangt in die Zelle. Die Wirtszelle stellt daraufhin neue Viren her, die freigesetzt werden und weitere Zellen infizieren.",
+ "Solange sich Viren <b>außerhalb</b> von Zellen befinden, können Antikörper an sie binden und ihre Bindungsstellen blockieren (Neutralisation). Viren <b>innerhalb</b> von Zellen sind für Antikörper nicht zugänglich. Hier ist die zelluläre Abwehr durch zytotoxische T-Zellen notwendig."],
+ merke:"Gegen Viren innerhalb von Körperzellen wirkt die zelluläre Abwehr: Die infizierte Zelle wird beseitigt.",
+ woerter:[["die Wirtszelle, die Wirtszellen","Zelle, in der sich ein Virus vermehrt"],["infizieren","anstecken; ein Erreger gelangt in den Körper oder in eine Zelle"],["die Neutralisation","Antikörper blockieren die Bindungsstellen eines Virus"]],
+ frage:"Erkläre, warum bei einer Virusinfektion sowohl die humorale als auch die zelluläre Immunantwort notwendig ist.",
+ antwort:"Freie Viren im Blut oder Gewebe können durch Antikörper neutralisiert werden (humoral). Viren, die sich bereits in Körperzellen vermehren, sind für Antikörper unzugänglich. Die infizierten Zellen werden durch zytotoxische T-Zellen in die Apoptose geführt (zellulär).",
+ rel:["infiziert","tk","antikoerper"]},
+antigen:{name:"Antigen",gram:"das Antigen, die Antigene",g:"erreger",tag:"Grundbegriff",
+ kurz:"Ein Antigen ist ein Molekül, zu dem ein Antikörper oder ein Rezeptor eines Lymphozyten genau passt.",
+ text:["Antigene sind meist <b>Proteine</b> oder <b>Polysaccharide</b> an der Oberfläche von Erregern. Auch Giftstoffe oder Moleküle auf fremden Zellen (z. B. bei Bluttransfusionen oder Organtransplantationen) wirken als Antigene.",
+ "Der Bereich eines Antigens, an den ein Antikörper bindet, heißt <b>Epitop</b>. Bindungsstelle und Epitop passen räumlich und chemisch zueinander wie ein Schlüssel zu einem Schloss (<b>Schlüssel-Schloss-Prinzip</b>).",
+ "Jeder Lymphozyt besitzt Rezeptoren für genau ein bestimmtes Epitop. Im Körper gibt es Millionen verschiedener Lymphozyten mit unterschiedlichen Rezeptoren. Bei einer Infektion werden nur die Lymphozyten aktiviert, deren Rezeptoren passen (<b>klonale Selektion</b>)."],
+ merke:"Spezifisch bedeutet: Die Abwehrreaktion richtet sich gegen ein ganz bestimmtes Antigen.",
+ woerter:[["das Antigen, die Antigene","Molekül, das eine spezifische Immunantwort auslöst"],["das Epitop, die Epitope","Bindungsstelle auf dem Antigen"],["spezifisch","genau für eine bestimmte Sache passend"]],
+ frage:"Fachsprachlich heißt es oft, ein Antikörper „erkennt“ ein Antigen. Formuliere diese Aussage sachlich genauer.",
+ antwort:"Die Antigenbindungsstelle des Antikörpers ist räumlich und chemisch komplementär zum Epitop des Antigens. Deshalb bindet der Antikörper nur an dieses Antigen (Schlüssel-Schloss-Prinzip).",
+ rel:["antikoerper","b","th"]},
+lymphknoten:{name:"Lymphknoten",gram:"der Lymphknoten, die Lymphknoten",g:"ort",tag:"Ort der spezifischen Immunantwort",
+ kurz:"Lymphknoten sind kleine Organe an den Lymphgefäßen. Dort treffen antigenpräsentierende Zellen auf T- und B-Lymphozyten.",
+ text:["Die Lymphe ist Gewebeflüssigkeit, die über Lymphgefäße abgeleitet und schließlich in das Blut zurückgeführt wird. In die Lymphbahnen sind Lymphknoten eingeschaltet, die als Filterstationen wirken.",
+ "In Lymphknoten befinden sich sehr viele T- und B-Lymphozyten. Antigenpräsentierende Zellen gelangen mit der Lymphe aus dem infizierten Gewebe dorthin. Dadurch steigt die Wahrscheinlichkeit, dass passende Lymphozyten mit ihrem Antigen in Kontakt kommen.",
+ "Bei einer Infektion vermehren sich die aktivierten Lymphozyten stark. Deshalb schwellen Lymphknoten tastbar an, zum Beispiel am Hals bei einer Mandelentzündung."],
+ merke:"Gebildet werden Lymphozyten im Knochenmark, T-Lymphozyten reifen im Thymus. Aktiviert werden sie vor allem in Lymphknoten, Milz und Mandeln.",
+ woerter:[["die Lymphe","Gewebeflüssigkeit in den Lymphgefäßen"],["das Knochenmark","Gewebe im Inneren von Knochen; Bildungsort der Blutzellen"],["der Thymus","Organ hinter dem Brustbein, in dem T-Zellen reifen"]],
+ frage:"Erkläre, warum bei einer Halsentzündung die Lymphknoten am Hals anschwellen.",
+ antwort:"Antigenpräsentierende Zellen gelangen aus dem entzündeten Gewebe in die nahegelegenen Lymphknoten. Dort werden passende Lymphozyten aktiviert und vermehren sich stark (klonale Expansion). Die Zunahme der Zellzahl führt zur Schwellung.",
+ rel:["th","b","makrophage"]},
+th:{name:"T-Helferzelle",gram:"die T-Helferzelle, die T-Helferzellen",g:"steu",tag:"Spezifische Abwehr: Steuerung",
+ kurz:"T-Helferzellen aktivieren B-Lymphozyten und zytotoxische T-Zellen. Sie sind die zentrale Schaltstelle der spezifischen Abwehr.",
+ text:["T-Helferzellen sind T-Lymphozyten. Sie entstehen im Knochenmark und reifen im <b>Thymus</b> (daher „T“). An ihrer Oberfläche tragen sie das Protein CD4.",
+ "Ihr <b>T-Zell-Rezeptor</b> bindet nur an ein bestimmtes Antigenbruchstück, das eine antigenpräsentierende Zelle auf einem MHC-II-Molekül präsentiert. An freie Antigene binden T-Zell-Rezeptoren nicht.",
+ "Nach der Bindung wird die passende T-Helferzelle aktiviert und teilt sich vielfach (<b>klonale Selektion</b> und <b>klonale Expansion</b>). Die entstehenden Zellen geben Botenstoffe (Zytokine, z. B. Interleukine) ab. Diese aktivieren passende B-Lymphozyten (humorale Antwort) und zytotoxische T-Zellen (zelluläre Antwort).",
+ "Das HI-Virus vermehrt sich in T-Helferzellen und führt langfristig zu ihrem Verlust. Dadurch werden beide Bereiche der spezifischen Abwehr geschwächt (Immunschwäche AIDS)."],
+ merke:"Ohne T-Helferzellen werden weder B-Lymphozyten noch zytotoxische T-Zellen ausreichend aktiviert.",
+ woerter:[["aktivieren","eine Zelle in einen wirksamen Zustand versetzen"],["der Rezeptor, die Rezeptoren","Protein an der Zelloberfläche, an das ein passendes Molekül bindet"],["das Zytokin, die Zytokine","Botenstoff zwischen Zellen des Immunsystems"]],
+ frage:"Begründe, warum eine Infektion mit HIV sowohl die humorale als auch die zelluläre Immunantwort schwächt.",
+ antwort:"HIV befällt T-Helferzellen. Diese aktivieren über Zytokine sowohl B-Lymphozyten (humoral) als auch zytotoxische T-Zellen (zellulär). Fehlen T-Helferzellen, bleibt die Aktivierung beider Zelltypen weitgehend aus.",
+ rel:["makrophage","b","tk","treg"]},
+b:{name:"B-Lymphozyt (B-Zelle)",gram:"der B-Lymphozyt, die B-Lymphozyten",g:"hum",tag:"Spezifische Abwehr: humoral",
+ kurz:"B-Lymphozyten tragen Antikörper als Rezeptoren an ihrer Oberfläche. Nach ihrer Aktivierung entstehen aus ihnen Plasmazellen und Gedächtniszellen.",
+ text:["B-Lymphozyten entstehen und reifen im Knochenmark (engl. <i>bone marrow</i>). Jeder B-Lymphozyt trägt an seiner Membran viele gleiche Rezeptoren. Sie entsprechen in ihrem Aufbau den Antikörpern, die später abgegeben werden.",
+ "Ein B-Lymphozyt, dessen Rezeptor zu einem freien Antigen passt, bindet dieses, nimmt es auf und präsentiert Bruchstücke auf MHC-II-Molekülen.",
+ "Eine bereits aktivierte, passende T-Helferzelle bindet daran und gibt Zytokine ab. Erst dadurch wird der B-Lymphozyt vollständig aktiviert. Er teilt sich vielfach (<b>klonale Expansion</b>). Die Tochterzellen differenzieren sich zu <b>Plasmazellen</b> und <b>B-Gedächtniszellen</b>.",
+ "Weil die Abwehr über Antikörper in Körperflüssigkeiten erfolgt, nennt man sie <b>humorale</b> Immunantwort (lat. <i>humor</i>: Flüssigkeit)."],
+ merke:"B-Lymphozyten benötigen zwei Signale: die Bindung des passenden Antigens und die Aktivierung durch eine T-Helferzelle.",
+ woerter:[["der Klon, die Klone","viele genetisch gleiche Zellen, die aus einer Zelle entstehen"],["differenzieren (sich)","sich zu einem spezialisierten Zelltyp entwickeln"],["humoral","über Körperflüssigkeiten"]],
+ frage:"Erkläre, warum bei einer Infektion nur sehr wenige der Millionen B-Lymphozyten aktiviert werden.",
+ antwort:"Jeder B-Lymphozyt trägt Rezeptoren für nur ein bestimmtes Epitop. Nur Zellen, deren Rezeptoren komplementär zu einem Antigen des Erregers sind, binden dieses und werden durch passende T-Helferzellen aktiviert. Diesen Vorgang nennt man klonale Selektion.",
+ rel:["th","plasma","gedaechtnis","antikoerper"]},
+plasma:{name:"Plasmazelle",gram:"die Plasmazelle, die Plasmazellen",g:"hum",tag:"Spezifische Abwehr: humoral",
+ kurz:"Plasmazellen entstehen aus aktivierten B-Lymphozyten. Sie bilden sehr viele Antikörper und geben sie in Blut und Lymphe ab.",
+ text:["Plasmazellen sind auf die Bildung von Antikörpern spezialisiert. Ihr Zellplasma enthält ein stark ausgeprägtes <b>raues endoplasmatisches Retikulum</b> und einen großen <b>Golgi-Apparat</b>. Hier werden die Antikörper (Proteine) synthetisiert, verpackt und durch Exozytose abgegeben.",
+ "Alle Plasmazellen eines Klons bilden Antikörper mit derselben Antigenbindungsstelle. Sie entspricht dem Rezeptor des ursprünglich aktivierten B-Lymphozyten.",
+ "Die meisten Plasmazellen sind nur wenige Tage aktiv und sterben dann ab. Nach dem Ende einer Infektion sinkt die Antikörperkonzentration daher wieder."],
+ merke:"Plasmazellen geben Antikörper ab. B-Lymphozyten tragen Antikörper nur als Rezeptoren in ihrer Membran.",
+ woerter:[["die Synthese","Herstellung eines Stoffes"],["die Exozytose","Abgabe von Stoffen aus der Zelle durch Verschmelzen von Bläschen mit der Zellmembran"],["das endoplasmatische Retikulum (ER)","Membransystem in der Zelle; am rauen ER werden Proteine hergestellt"]],
+ frage:"Leite aus der Funktion der Plasmazelle ab, warum sie besonders viel raues ER besitzt.",
+ antwort:"Antikörper sind Proteine. Proteine, die aus der Zelle abgegeben werden, werden an den Ribosomen des rauen ER synthetisiert. Da Plasmazellen sehr große Mengen Antikörper bilden, besitzen sie entsprechend viel raues ER (Zusammenhang von Struktur und Funktion).",
+ rel:["b","antikoerper","gedaechtnis"]},
+antikoerper:{name:"Antikörper",gram:"der Antikörper, die Antikörper",g:"hum",tag:"Spezifische Abwehr: humoral",
+ kurz:"Antikörper sind Y-förmige Proteine. Sie binden genau an ein bestimmtes Antigen und verklumpen Erreger. Danach bauen Fresszellen die Erreger ab.",
+ text:["Antikörper (Immunglobuline) bestehen aus vier Proteinketten: zwei schweren und zwei leichten Ketten. Der <b>konstante Bereich</b> ist bei allen Antikörpern einer Klasse gleich. An den beiden Armenden liegt der <b>variable Bereich</b> mit den Antigenbindungsstellen.",
+ "Jeder Antikörper besitzt <b>zwei identische Bindungsstellen</b>. Er kann daher zwei Antigene gleichzeitig binden. So entstehen Netzwerke aus vielen Erregern und Antikörpern: die <b>Agglutination</b> (Verklumpung). Den Vorgang nennt man Antigen-Antikörper-Reaktion.",
+ "Weitere Wirkungen: Antikörper blockieren die Bindungsstellen von Viren und Giftstoffen (<b>Neutralisation</b>) und markieren Erreger, sodass Fresszellen sie leichter phagozytieren (<b>Opsonierung</b>)."],
+ merke:"Antikörper zerstören Erreger nicht selbst. Sie binden, verklumpen und markieren. Den Abbau übernehmen Fresszellen.",
+ woerter:[["die Agglutination","Verklumpung"],["der Komplex, die Komplexe","Verbindung aus mehreren Teilen, hier aus Antigen und Antikörper"],["identisch","völlig gleich"]],
+ frage:"Erkläre mithilfe des Baus eines Antikörpers, wie es zur Agglutination kommt.",
+ antwort:"Ein Antikörper besitzt zwei identische Antigenbindungsstellen und kann deshalb an zwei Erreger gleichzeitig binden. Da jeder Erreger viele Antigene trägt, verbinden viele Antikörper viele Erreger zu einem Netzwerk. Die Erreger verklumpen.",
+ rel:["plasma","antigen","makrophage"]},
+tk:{name:"Zytotoxische T-Zelle (T-Killerzelle)",gram:"die T-Killerzelle, die T-Killerzellen",g:"zel",tag:"Spezifische Abwehr: zellulär",
+ kurz:"Zytotoxische T-Zellen binden an virusinfizierte Körperzellen und lösen deren Zelltod aus. Dadurch endet die Vermehrung der Viren in diesen Zellen.",
+ text:["Zytotoxische T-Zellen reifen im Thymus und tragen das Protein CD8. Ihr T-Zell-Rezeptor bindet an ein bestimmtes Antigenbruchstück auf einem <b>MHC-I-Molekül</b>.",
+ "Fast alle kernhaltigen Körperzellen präsentieren Bruchstücke ihrer Proteine auf MHC-I. In einer virusinfizierten Zelle sind darunter auch Bruchstücke von Virusproteinen. Die Infektion ist dadurch an der Zelloberfläche nachweisbar.",
+ "Nach der Aktivierung durch T-Helferzellen vermehren sich die passenden zytotoxischen T-Zellen. Binden sie an eine infizierte Zelle, geben sie <b>Perforin</b> ab, das Poren in der Zellmembran bildet, und <b>Granzyme</b>, die im Zellinneren die <b>Apoptose</b> (programmierter Zelltod) auslösen.",
+ "Weil hier Zellen und nicht gelöste Antikörper wirksam sind, nennt man dies die <b>zelluläre</b> Immunantwort. Auch Tumorzellen können so beseitigt werden."],
+ merke:"Antikörper erreichen Viren im Zellinneren nicht. Deshalb wird die gesamte infizierte Zelle beseitigt.",
+ woerter:[["zytotoxisch","zellschädigend"],["die Pore, die Poren","sehr kleine Öffnung"],["zellulär","durch Zellen"]],
+ frage:"Bewerte die Aussage: „Zytotoxische T-Zellen schädigen den eigenen Körper.“",
+ antwort:"Die Aussage trifft teilweise zu, denn es werden körpereigene Zellen beseitigt. Dadurch wird aber verhindert, dass sich die Viren in diesen Zellen weiter vermehren und weitere Zellen infizieren. Die verlorenen Zellen werden durch Zellteilung ersetzt. Insgesamt dient der Vorgang dem Schutz des Organismus.",
+ rel:["th","infiziert","virus","nk"]},
+infiziert:{name:"Virusinfizierte Körperzelle",gram:"die Körperzelle, die Körperzellen",g:"koerper",tag:"Zielzelle der zellulären Abwehr",
+ kurz:"In dieser Körperzelle vermehren sich Viren. Die Zelle präsentiert Bruchstücke der Viren an ihrer Oberfläche.",
+ text:["Gelangt ein Virus in eine Körperzelle, werden deren Ribosomen und Stoffwechsel zur Herstellung neuer Viren genutzt.",
+ "Proteine im Zellinneren werden laufend abgebaut. Ihre Bruchstücke werden auf <b>MHC-I-Molekülen</b> an die Zelloberfläche gebracht. Bei einer infizierten Zelle sind darunter auch virale Bruchstücke.",
+ "Passende zytotoxische T-Zellen binden an diese Komplexe und lösen die Apoptose der Zelle aus. Fehlen MHC-I-Moleküle ganz, reagieren NK-Zellen."],
+ merke:"MHC-I: auf (fast) allen Körperzellen, Bindungspartner sind zytotoxische T-Zellen. MHC-II: auf antigenpräsentierenden Zellen, Bindungspartner sind T-Helferzellen.",
+ woerter:[["die Infektion, die Infektionen","Ansteckung"],["das Ribosom, die Ribosomen","Zellbestandteil, an dem Proteine hergestellt werden"]],
+ frage:"Vergleiche MHC-I- und MHC-II-Moleküle hinsichtlich Vorkommen und Bindungspartner.",
+ antwort:"MHC-I kommt auf fast allen kernhaltigen Körperzellen vor und präsentiert Bruchstücke aus dem Zellinneren an zytotoxische T-Zellen. MHC-II kommt nur auf antigenpräsentierenden Zellen (Makrophagen, dendritische Zellen, B-Lymphozyten) vor und präsentiert Bruchstücke aufgenommener Erreger an T-Helferzellen.",
+ rel:["tk","virus","nk"]},
+gedaechtnis:{name:"Gedächtniszelle",gram:"die Gedächtniszelle, die Gedächtniszellen",g:"mem",tag:"Spezifische Abwehr: Immunität",
+ kurz:"Gedächtniszellen bleiben nach einer Infektion viele Jahre im Körper. Bei einem zweiten Kontakt mit demselben Erreger beginnt die Abwehr deshalb schneller und stärker.",
+ text:["Bei der klonalen Expansion entstehen neben Plasmazellen und aktivierten T-Zellen auch langlebige <b>B- und T-Gedächtniszellen</b>. Sie tragen dieselben Rezeptoren wie die ursprünglich aktivierten Lymphozyten.",
+ "Bei einem erneuten Kontakt mit demselben Antigen (<b>Sekundärantwort</b>) sind bereits viele passende Zellen vorhanden. Die Antikörperbildung beginnt nach ein bis zwei Tagen statt nach etwa einer Woche, und es werden deutlich mehr Antikörper gebildet.",
+ "Die Erreger werden meist beseitigt, bevor Krankheitszeichen auftreten. Der Körper ist <b>immun</b>. Auf diesem Prinzip beruht die aktive Impfung."],
+ merke:"Immunität beruht auf Gedächtniszellen, nicht auf den Antikörpern selbst. Antikörper werden nach einigen Wochen abgebaut.",
+ woerter:[["die Immunität","Unempfindlichkeit gegenüber einem bestimmten Erreger"],["die Impfung, die Impfungen","gezielte Auslösung einer Immunantwort zum Schutz vor einer Krankheit"],["langlebig","lebt sehr lange"]],
+ frage:"Erkläre, warum man nach einer Masernerkrankung in der Regel lebenslang immun ist, gegen Grippe aber nicht.",
+ antwort:"Masernviren verändern ihre Antigene kaum. Gedächtniszellen binden daher auch bei späteren Kontakten. Grippeviren verändern ihre Oberflächenantigene durch Mutationen häufig. Die vorhandenen Gedächtniszellen passen dann nicht mehr ausreichend, sodass erneut eine Primärantwort nötig ist.",
+ rel:["b","plasma","th"]},
+treg:{name:"Regulatorische T-Zelle",gram:"die regulatorische T-Zelle, die regulatorischen T-Zellen",g:"steu",tag:"Spezifische Abwehr: Steuerung",
+ kurz:"Regulatorische T-Zellen hemmen die Immunantwort, wenn die Erreger beseitigt sind. Sie verhindern auch Abwehrreaktionen gegen den eigenen Körper.",
+ text:["In älteren Schulbüchern heißen diese Zellen häufig <b>T-Suppressorzellen</b> (lat. <i>supprimere</i>: unterdrücken).",
+ "Nach der Beseitigung der Erreger hemmen regulatorische T-Zellen über Botenstoffe und Zellkontakte die Aktivität von T-Helferzellen, zytotoxischen T-Zellen und B-Lymphozyten. So wird die Immunantwort beendet.",
+ "Außerdem tragen sie zur <b>Selbsttoleranz</b> bei: Sie hemmen Reaktionen gegen körpereigene Strukturen. Eine gestörte Regulation kann zu <b>Autoimmunerkrankungen</b> beitragen, zum Beispiel zu Diabetes Typ 1."],
+ merke:"Eine Immunantwort muss nicht nur ausgelöst, sondern auch gezielt beendet werden.",
+ woerter:[["hemmen","verlangsamen oder stoppen"],["regulieren","steuern, einstellen"],["die Autoimmunerkrankung, die Autoimmunerkrankungen","Krankheit, bei der sich die Immunantwort gegen körpereigene Strukturen richtet"]],
+ frage:"Stelle eine Hypothese auf, welche Folgen ein vollständiges Fehlen regulatorischer T-Zellen hätte.",
+ antwort:"Immunreaktionen würden nach der Beseitigung der Erreger nicht beendet und könnten sich gegen körpereigene Strukturen richten. Mögliche Folgen wären dauerhafte Entzündungen und Autoimmunerkrankungen.",
+ rel:["th","tk","b"]}
+};
+
+const EXTRA=[
+ ["die Abwehr","Schutz des Körpers vor Krankheitserregern"],
+ ["unspezifisch","wirkt gegen alle Erreger auf die gleiche Weise"],
+ ["die klonale Selektion","Auswahl der Lymphozyten, deren Rezeptor zum Antigen passt"],
+ ["die klonale Expansion","starke Vermehrung der ausgewählten Lymphozyten"],
+ ["die Primärantwort","Immunantwort beim ersten Kontakt mit einem Antigen"],
+ ["die Sekundärantwort","schnellere und stärkere Immunantwort beim zweiten Kontakt"],
+ ["die aktive Impfung","Gabe von abgeschwächten oder abgetöteten Erregern bzw. ihren Antigenen; der Körper bildet selbst Antikörper und Gedächtniszellen"],
+ ["die passive Impfung","Gabe fertiger Antikörper; wirkt sofort, aber nur für einige Wochen"],
+ ["die Entzündung, die Entzündungen","Reaktion des Gewebes mit Rötung, Schwellung, Wärme und Schmerz"],
+ ["die Antigen-Antikörper-Reaktion","spezifische Bindung von Antikörpern an Antigene"]
+];
+const SATZ=[
+ "Die/Der … nimmt … durch Phagozytose auf.",
+ "… bindet an …, weil die Bindungsstelle genau zum Antigen passt.",
+ "Nachdem …, wird … aktiviert.",
+ "Aus … entstehen … und … .",
+ "Im Unterschied zur unspezifischen Abwehr richtet sich die spezifische Abwehr gegen … .",
+ "Die humorale Abwehr wirkt über …, die zelluläre Abwehr wirkt über … .",
+ "Bei der zweiten Infektion …, weil … .",
+ "Die Folge davon ist, dass … ."
+];
+
+/* ---------- Grafikbausteine ---------- */
+function mhcAt(deg,r){const a=deg*Math.PI/180;return `<g transform="translate(${R(Math.cos(a)*r)} ${R(Math.sin(a)*r)}) rotate(${deg+90})"><rect x="-2" y="-8" width="4" height="9" class="mhcm"/><path d="M-4.5 -8 L0 -15 L4.5 -8Z" class="ag"/></g>`}
+function receptors(cls,kind,r){let s="";const n=8;for(let i=0;i<n;i++){const a=i/n*Math.PI*2+0.2;const deg=R(a*180/Math.PI+90);const d=kind==="y"?"M0 0 V-6 M0 -6 L-3.5 -10 M0 -6 L3.5 -10":"M0 0 V-5 M-3.2 -8.5 Q0 -4 3.2 -8.5";s+=`<g transform="translate(${R(Math.cos(a)*r)} ${R(Math.sin(a)*r)}) rotate(${deg})"><path class="rc ${cls}" d="${d}"/></g>`}return s}
+function bak(){return `<path d="M22 0 q7 -7 14 0 t14 0" class="flag"/><rect x="-23" y="-11" width="46" height="22" rx="11" class="cell e"/><path class="ag" d="M-14 -11 l4.5 -7 l4.5 7z M5 -11 l4.5 -7 l4.5 7z M-5 11 l4.5 7 l4.5 -7z"/>`}
+const VIR=(function(){let s="";for(let i=0;i<8;i++){const a=i/8*Math.PI*2;s+=`<line x1="${R(Math.cos(a)*10)}" y1="${R(Math.sin(a)*10)}" x2="${R(Math.cos(a)*16)}" y2="${R(Math.sin(a)*16)}" class="spk"/><circle cx="${R(Math.cos(a)*17)}" cy="${R(Math.sin(a)*17)}" r="2.8" class="ag"/>`}return s+`<circle r="10.5" class="cell e"/><circle r="4" class="nuc e"/>`})();
+const AB=`<path class="abY" d="M0 11 V0 M0 0 L-8 -9 M0 0 L8 -9"/>`;
+const MACP="M-38 -14 C-46 -38 -16 -50 2 -42 C20 -54 48 -36 42 -10 C58 8 42 36 18 38 C4 52 -26 48 -30 28 C-52 22 -54 2 -38 -14Z";
+function mac(){return `<path d="${MACP}" class="cell u"/><ellipse cx="-4" cy="2" rx="15" ry="10" class="nuc u" transform="rotate(-20)"/><circle cx="18" cy="-16" r="5" class="vac"/><circle cx="-20" cy="20" r="4" class="vac"/><circle cx="20" cy="16" r="6" class="vac"/><g class="mhc">${mhcAt(-55,47)}${mhcAt(15,48)}${mhcAt(150,42)}${mhcAt(95,44)}</g>`}
+function gra(){const gr=[[-14,12],[-6,-16],[14,10],[16,-12],[-18,-6],[4,18],[0,-6]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="2.2" class="gran u"/>`).join("");return `<circle r="26" class="cell u"/>${gr}<path class="nucl u" d="M-9 -4 L1 7 L10 -5"/><g class="nuc u"><circle cx="-9" cy="-4" r="7"/><circle cx="1" cy="7" r="7"/><circle cx="10" cy="-5" r="7"/></g>`}
+function nk(){const gr=[[-15,10],[14,12],[12,-14],[-12,-15]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="2.4" class="gran u"/>`).join("");return `<circle r="24" class="cell u"/>${gr}<circle r="13" cx="-1" cy="-1" class="nuc u"/><text class="inlbl" y="0">NK</text>`}
+function lym(cls,txt,kind,extra,small){return `${receptors(cls,kind||"t",24)}<circle r="24" class="cell ${cls}"/><circle r="16" cx="1" cy="1" class="nuc ${cls}"/>${extra||""}<text class="inlbl${small?" sm":""}" x="1" y="1">${txt}</text>`}
+function tk(){return lym("z","TK","t")}
+function mem(t){return `<circle r="32" class="halo-r"/>`+lym("m",t||"M",t==="B"?"y":"t")}
+function treg(){return lym("s","Treg","t","",true)}
+function plasma(){return `<ellipse rx="36" ry="27" class="cell h"/><circle cx="-17" cy="2" r="11" class="nuc h"/><path class="er" d="M-2 -18 Q14 -22 26 -8 M0 -10 Q13 -12 22 0 M0 -2 Q12 -2 18 8 M-2 8 Q10 10 20 16"/><g transform="translate(42 -12) rotate(70) scale(.8)">${AB}</g><g transform="translate(44 10) rotate(110) scale(.8)">${AB}</g>`}
+function kz(){const vs=[[20,14],[30,-16],[-6,32],[34,30]].map(p=>`<g transform="translate(${p[0]} ${p[1]}) scale(.55)">${VIR}</g>`).join("");return `<circle r="58" class="cell k"/><circle cx="-16" cy="-10" r="20" class="nuc k"/>${vs}<g class="mhc1">${mhcAt(-60,58)}${mhcAt(20,58)}${mhcAt(125,58)}${mhcAt(200,58)}</g>`}
+function cyto(){return [[-14,-6],[0,-14],[14,-4],[-6,10],[10,12],[2,0]].map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="3.2" class="cy" style="animation-delay:${i*0.27}s"/>`).join("")}
+function agglu(){return `<g transform="translate(-24 -8) rotate(25)">${bak()}</g><g transform="translate(26 12) rotate(-20)">${bak()}</g><g transform="translate(8 -28) rotate(-12)">${bak()}</g><g transform="translate(2 0) rotate(115)">${AB}</g><g transform="translate(-6 -22) rotate(-30)">${AB}</g><g transform="translate(24 -12) rotate(60)">${AB}</g><g transform="translate(-14 14) rotate(200)">${AB}</g>`}
+function lupe(){return `<line x1="34" y1="34" x2="54" y2="54" class="lupe-h"/><g clip-path="url(#lupeClip)"><rect x="-50" y="-50" width="100" height="100" class="lupe-bg"/><path d="M-50 22 Q0 2 50 22 L50 50 L-50 50Z" class="cell e"/><path class="ag" d="M-32 17 l7 -13 l7 13z M-4 12 l7 -13 l7 13z M24 15 l7 -13 l7 13z"/><g transform="translate(3 -14) rotate(180) scale(1.2)">${AB}</g></g><circle r="46" class="lupe-ring"/>`}
+
+/* ---------- Übersicht ---------- */
+const OV=[
+ {id:"bakterium",x:640,y:125,r:44,ly:48,lab:"Bakterien",f:"unspez humoral zellulaer",g:()=>`<g transform="translate(-22 -12) rotate(-12)">${bak()}</g><g transform="translate(22 4) rotate(18)">${bak()}</g><g transform="translate(-6 18) rotate(4)">${bak()}</g>`},
+ {id:"virus",x:290,y:110,r:34,ly:42,lab:"Viren",f:"unspez humoral zellulaer",g:()=>`<g transform="translate(-16 -8)">${VIR}</g><g transform="translate(18 10)">${VIR}</g>`},
+ {id:"antigen",x:900,y:104,r:52,ly:72,lab:"Antigen (Lupe)",f:"humoral zellulaer",g:lupe},
+ {id:"infiziert",x:140,y:225,r:64,ly:82,lab:"infizierte Körperzelle",f:"unspez zellulaer",g:kz},
+ {id:"nk",x:310,y:268,r:30,ly:44,lab:"NK-Zelle",f:"unspez",g:nk},
+ {id:"granulozyt",x:470,y:150,r:32,ly:46,lab:"Granulozyt",f:"unspez",g:gra},
+ {id:"makrophage",x:790,y:235,r:52,ly:66,lab:"Makrophage",f:"unspez humoral zellulaer",cls:"show-mhc",g:mac},
+ {id:"antikoerper",x:575,y:268,r:46,ly:56,lab:"Antikörper an Bakterien",f:"humoral",g:agglu},
+ {id:"tk",x:150,y:500,r:32,ly:46,lab:"zytotoxische T-Zelle",f:"zellulaer",g:tk},
+ {id:"th",x:330,y:480,r:32,ly:46,lab:"T-Helferzelle",f:"humoral zellulaer",g:()=>lym("s","TH")},
+ {id:"treg",x:440,y:570,r:32,ly:46,lab:"regulatorische T-Zelle",f:"humoral zellulaer",g:treg},
+ {id:"b",x:560,y:470,r:32,ly:46,lab:"B-Lymphozyt",f:"humoral",g:()=>lym("h","B","y")},
+ {id:"plasma",x:720,y:530,r:42,ly:50,lab:"Plasmazelle",f:"humoral",g:plasma},
+ {id:"gedaechtnis",x:880,y:480,r:38,ly:52,lab:"Gedächtniszelle",f:"humoral zellulaer",g:()=>mem("M")}
+];
+const ARR=[
+ ["granulozyt","bakterium","Phagozytose",-28,"unspez"],
+ ["makrophage","bakterium","Phagozytose",28,"unspez"],
+ ["makrophage","th","präsentiert Antigen",42,"humoral zellulaer"],
+ ["th","b","aktiviert",-30,"humoral"],
+ ["th","tk","aktiviert",-26,"zellulaer"],
+ ["b","plasma","differenziert sich",-26,"humoral"],
+ ["b","gedaechtnis","bildet auch",-22,"humoral zellulaer"],
+ ["plasma","antikoerper","gibt ab",32,"humoral"],
+ ["tk","infiziert","löst Apoptose aus",-34,"zellulaer"],
+ ["nk","infiziert","löst Apoptose aus",22,"unspez"],
+ ["treg","th","hemmt",26,"humoral zellulaer"]
+];
+function buildOverview(){
+ const P={};OV.forEach(o=>P[o.id]=o);
+ let s=`<defs><clipPath id="lupeClip"><circle r="46"/></clipPath><marker id="arrh" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" class="arrhead"/></marker></defs>`;
+ s+=`<rect x="0" y="54" width="1000" height="586" class="tissue"/>`;
+ s+=`<text class="zone" x="20" y="84">Gewebe</text><text class="zone-s" x="20" y="103">vor allem unspezifische Abwehr</text>`;
+ s+=`<path d="M850 292 C 880 330, 890 352, 880 392" class="vessel"/><text class="zone-s" x="902" y="350">Lymphgefäß</text>`;
+ s+=`<line x1="670" y1="114" x2="852" y2="100" class="lupe-line"/>`;
+ // Lymphknoten
+ s+=`<g class="item" data-id="lymphknoten" data-f="humoral zellulaer" tabindex="0" role="button" aria-label="Lymphknoten"><rect x="30" y="385" width="940" height="240" rx="110" class="node"/><rect x="30" y="385" width="940" height="240" rx="110" class="ring"/><text class="lbl" x="905" y="414" style="text-anchor:end">Lymphknoten</text><text class="q" x="880" y="414">?</text></g>`;
+ // Haut
+ let tex="";for(let x=40;x<1000;x+=40){if(x>595&&x<685)continue;tex+=`M${x} 0 V54 `}
+ s+=`<g class="item" data-id="barriere" data-f="unspez" tabindex="0" role="button" aria-label="Haut und Schleimhäute"><rect x="0" y="0" width="605" height="54" class="skin"/><rect x="675" y="0" width="325" height="54" class="skin"/><path d="${tex} M0 27 H605 M675 27 H1000" class="skin-t"/><rect x="3" y="3" width="994" height="48" rx="6" class="ring"/><text class="lbl start" x="16" y="34">Haut und Schleimhäute (Barriere)</text><text class="q" x="40" y="34">?</text></g>`;
+ s+=`<text class="zone-s" x="640" y="20" text-anchor="middle">Wunde</text>`;
+ // Pfeile
+ s+=`<g id="arrows">`;
+ ARR.forEach(([a,b,lab,bend,f])=>{
+  const A=P[a],B=P[b];const dx=B.x-A.x,dy=B.y-A.y,L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L,px=-uy,py=ux;
+  const x0=A.x+ux*(A.r+4),y0=A.y+uy*(A.r+4),x2=B.x-ux*(B.r+6),y2=B.y-uy*(B.r+6);
+  const cx=(x0+x2)/2+px*bend,cy=(y0+y2)/2+py*bend;const lx=(x0+2*cx+x2)/4,ly=(y0+2*cy+y2)/4;
+  s+=`<g class="arr" data-f="${f}"><path d="M${R(x0)} ${R(y0)} Q${R(cx)} ${R(cy)} ${R(x2)} ${R(y2)}" marker-end="url(#arrh)"/><text x="${R(lx)}" y="${R(ly+4)}">${lab}</text></g>`;
+ });
+ s+=`</g>`;
+ OV.forEach(o=>{s+=`<g class="item${o.cls?" "+o.cls:""}" data-id="${o.id}" data-f="${o.f}" tabindex="0" role="button" aria-label="${INFO[o.id].name}" transform="translate(${o.x} ${o.y})"><circle class="ring" r="${o.r}"/>${o.g()}<text class="lbl" y="${o.ly}">${o.lab}</text><text class="q" y="${o.ly}">?</text></g>`});
+ $("#ov").innerHTML=s;
+}
+
+/* ---------- Ablauf ---------- */
+const T2I={bak:"bakterium",vir:"virus",kz:"infiziert",gra:"granulozyt",mac:"makrophage",th:"th",tk:"tk",b:"b",pla:"plasma",mem:"gedaechtnis",treg:"treg",ab:"antikoerper"};
+const RAD={bak:28,vir:22,kz:64,gra:32,mac:52,cyto:0,th:30,tk:30,b:30,pla:42,mem:38,treg:30,ab:16};
+const GLY={bak:bak,vir:()=>VIR,kz:kz,gra:gra,mac:mac,cyto:cyto,th:()=>lym("s","TH"),tk:tk,b:()=>lym("h","B","y"),pla:plasma,mem:o=>mem(o.t),treg:treg,ab:()=>`<g transform="scale(1.25)">${AB}</g>`};
+const ACT=[
+ ["kz","kz",140,200,{lab:"infizierte Körperzelle",ly:80}],
+ ["b1","bak",505,68],["b2","bak",540,140,{lab:"Bakterium",ly:32}],["b3","bak",610,105],["b4","bak",450,175],["b5","bak",585,195],["b6","bak",650,150],
+ ["v1","vir",250,120],["v2","vir",285,92,{lab:"Virus",ly:-26}],["v3","vir",300,150],
+ ["gra","gra",360,230,{lab:"Granulozyt"}],
+ ["mac","mac",800,200,{lab:"Makrophage",ly:64}],
+ ["cy1","cyto",690,110,{o:0}],["cy2","cyto",448,438,{o:0}],["cy3","cyto",588,432,{o:0}],
+ ["tk","tk",160,460,{lab:"T-Killerzelle"}],["tk2","tk",160,460,{o:0}],
+ ["th","th",380,470,{lab:"T-Helferzelle"}],["th2","th",380,470,{o:0}],["th3","th",380,470,{o:0}],
+ ["b","b",620,450,{lab:"B-Lymphozyt"}],
+ ["p1","pla",620,450,{o:0,s:.4,lab:"Plasmazelle",ly:48}],["p2","pla",620,450,{o:0,s:.4}],["p3","pla",620,450,{o:0,s:.4}],
+ ["mb","mem",620,450,{o:0,s:.4,t:"B",lab:"B-Gedächtniszelle",ly:50}],["mt","mem",380,470,{o:0,s:.4,t:"T",lab:"T-Gedächtniszelle",ly:50}],
+ ["treg","treg",870,500,{lab:"reg. T-Zelle"}],
+ ["ab1","ab",740,470,{o:0,s:.5,lab:"Antikörper",ly:-18}],["ab2","ab",740,470,{o:0,s:.5}],["ab3","ab",740,470,{o:0,s:.5}],["ab4","ab",740,470,{o:0,s:.5}],["ab5","ab",740,470,{o:0,s:.5}],["ab6","ab",740,470,{o:0,s:.5}],["ab7","ab",740,470,{o:0,s:.5}],["ab8","ab",740,470,{o:0,s:.5}],["ab9","ab",740,470,{o:0,s:.5}],["ab10","ab",740,470,{o:0,s:.5}]
+];
+const grp=(ids,v)=>Object.fromEntries(ids.map(i=>[i,Object.assign({},v)]));
+const PH={erreger:["Infektion","--e"],unspez:["Unspezifische Abwehr","--u"],steu:["Spezifische Abwehr: Steuerung","--s"],hum:["Spezifische Abwehr: humoral","--h"],zel:["Spezifische Abwehr: zellulär","--z"],mem:["Spezifische Abwehr: Gedächtnis","--m"]};
+const STEPS=[
+ {ph:"erreger",time:"Zeitpunkt 0",title:"Erreger gelangen in den Körper",
+  text:"Durch eine Verletzung der Haut gelangen Bakterien in das Gewebe. Gleichzeitig sind Viren in eine Körperzelle eingedrungen und vermehren sich dort. Die erste Abwehrlinie, die Barriere aus Haut und Schleimhäuten, ist an dieser Stelle überwunden.",
+  einfach:"Die Haut hat eine Wunde. Bakterien kommen in den Körper. Viren sind in einer Körperzelle und vermehren sich.",
+  who:["barriere","bakterium","virus","infiziert"],focus:["b1","kz"],set:{}},
+ {ph:"unspez",time:"Minuten bis Stunden",title:"Phagozytose und Entzündung",entz:true,
+  text:"Granulozyten und Makrophagen phagozytieren einen Teil der Bakterien. Makrophagen geben Botenstoffe (Zytokine) ab. Die Blutgefäße erweitern sich, und weitere Abwehrzellen treten aus dem Blut in das Gewebe über. Es kommt zur Entzündung mit Rötung, Schwellung, Wärme und Schmerz. Diese Abwehr wirkt gegen alle Erreger gleich: Sie ist unspezifisch.",
+  einfach:"Fresszellen nehmen Bakterien auf und bauen sie ab. Die Wunde wird rot, warm und dick. Das ist eine Entzündung.",
+  who:["granulozyt","makrophage"],focus:["gra","mac"],
+  set:{gra:{x:505,y:104},b1:{x:505,y:104,o:0,s:.3},mac:{x:640,y:140},b3:{x:640,y:140,o:0,s:.3},b6:{x:640,y:140,o:0,s:.3},cy1:{o:1}}},
+ {ph:"steu",time:"ab etwa Tag 1",title:"Der Makrophage präsentiert Antigene",entz:true,
+  text:"Der Makrophage hat die Bakterien enzymatisch abgebaut. Bruchstücke der Bakterien-Antigene bindet er an MHC-II-Moleküle und präsentiert sie an seiner Zelloberfläche (rote Dreiecke). Mit der Lymphe gelangt er in den nächsten Lymphknoten. Dort befinden sich sehr viele verschiedene T- und B-Lymphozyten.",
+  einfach:"Der Makrophage zeigt Teile vom Bakterium an seiner Oberfläche. Er kommt in den Lymphknoten.",
+  who:["makrophage","antigen","lymphknoten"],focus:["mac"],
+  set:{mac:{x:480,y:420,c:"show-mhc"},cy1:{o:0},gra:{x:430,y:160}}},
+ {ph:"steu",time:"etwa Tag 2 bis 4",title:"Klonale Selektion der T-Helferzelle",entz:true,
+  text:"Nur eine T-Helferzelle, deren Rezeptor genau zum präsentierten Antigen passt, bindet an den Makrophagen (Schlüssel-Schloss-Prinzip). Durch diese Bindung und durch Zytokine wird sie aktiviert und teilt sich vielfach. Es entsteht ein Klon gleicher T-Helferzellen (klonale Selektion und klonale Expansion). Diese geben ihrerseits Zytokine ab.",
+  einfach:"Eine passende T-Helferzelle bindet an den Makrophagen. Sie wird aktiviert und teilt sich oft.",
+  who:["th","makrophage","antigen"],focus:["th","th2","th3"],
+  set:{th:{x:412,y:458},th2:{x:335,y:405,o:1},th3:{x:335,y:522,o:1},cy2:{o:1}}},
+ {ph:"hum",time:"etwa Tag 4 bis 6",title:"Aktivierung des B-Lymphozyten",entz:true,
+  text:"Ein B-Lymphozyt hat mit seinen Rezeptoren ein passendes Antigen gebunden. Eine aktivierte T-Helferzelle bindet an ihn und aktiviert ihn durch Zytokine. Der B-Lymphozyt teilt sich vielfach. Die meisten Tochterzellen differenzieren sich zu Plasmazellen, einige zu B-Gedächtniszellen.",
+  einfach:"Die T-Helferzelle aktiviert einen passenden B-Lymphozyten. Aus ihm entstehen viele Plasmazellen und Gedächtniszellen.",
+  who:["b","th","plasma","gedaechtnis"],focus:["b","th2"],
+  set:{th2:{x:556,y:425},b4:{x:655,y:414,s:.8},p1:{x:735,y:395,o:1,s:1},p2:{x:772,y:470,o:1,s:1},p3:{x:730,y:540,o:1,s:1},mb:{x:620,y:532,o:1,s:1},cy2:{o:0},cy3:{o:1}}},
+ {ph:"hum",time:"ab etwa Tag 6 bis 7",title:"Antigen-Antikörper-Reaktion",entz:true,
+  text:"Plasmazellen geben große Mengen Antikörper ab, die mit Lymphe und Blut in das infizierte Gewebe gelangen. Die Antikörper binden an die Antigene der Bakterien und verklumpen sie (Agglutination). Freie Viren werden durch gebundene Antikörper neutralisiert. Fresszellen phagozytieren die Antigen-Antikörper-Komplexe. Diese Abwehr über Antikörper in Körperflüssigkeiten heißt humorale Immunantwort.",
+  einfach:"Plasmazellen bilden Antikörper. Die Antikörper binden an die Bakterien. Die Bakterien verklumpen. Fresszellen bauen sie ab.",
+  who:["plasma","antikoerper","granulozyt","virus"],focus:["p1","p2","p3","ab1","ab8"],
+  set:Object.assign({b4:{o:0,s:.3},b2:{x:545,y:170},b5:{x:592,y:192},gra:{x:478,y:215},cy3:{o:0}},
+   {ab1:{x:568,y:156,o:1,s:1,r:15},ab2:{x:570,y:206,o:1,s:1,r:190},ab3:{x:512,y:182,o:1,s:1,r:-80},ab4:{x:622,y:178,o:1,s:1,r:80},ab5:{x:540,y:206,o:1,s:1,r:200},ab6:{x:612,y:222,o:1,s:1,r:150},ab7:{x:528,y:146,o:1,s:1,r:-30},ab8:{x:262,y:104,o:1,s:1,r:-40},ab9:{x:300,y:76,o:1,s:1,r:20},ab10:{x:318,y:140,o:1,s:1,r:70}})},
+ {ph:"zel",time:"etwa Tag 5 bis 10",title:"Zytotoxische T-Zellen beseitigen infizierte Zellen",entz:true,
+  text:"Viren innerhalb von Körperzellen sind für Antikörper nicht zugänglich. Aktivierte T-Helferzellen aktivieren deshalb passende zytotoxische T-Zellen, die sich ebenfalls vermehren. Diese binden an infizierte Körperzellen, die Virusbruchstücke auf MHC-I-Molekülen präsentieren, und lösen durch Perforin und Granzyme deren Apoptose aus. Die Virusvermehrung wird unterbrochen. Dies ist die zelluläre Immunantwort.",
+  einfach:"Die T-Killerzelle bindet an die Körperzelle mit den Viren. Die Körperzelle stirbt ab. So können sich die Viren nicht weiter vermehren.",
+  who:["tk","th","infiziert"],focus:["tk","kz","th3"],
+  set:Object.assign(grp(["b2","b5","ab1","ab2","ab3","ab4","ab5","ab6","ab7"],{x:560,y:198,o:0,s:.3}),grp(["v1","v2","v3","ab8","ab9","ab10"],{o:0}),
+   {gra:{x:560,y:198},th3:{x:232,y:492},tk2:{x:105,y:525,o:1},tk:{x:218,y:245},mt:{x:292,y:540,o:1,s:1},kz:{c:"apo",o:.45,s:.9}})},
+ {ph:"steu",time:"nach etwa 2 bis 3 Wochen",title:"Regulatorische T-Zellen beenden die Immunantwort",entz:false,
+  text:"Sind die Erreger beseitigt, hemmen regulatorische T-Zellen (früher: T-Suppressorzellen) die Aktivität der übrigen Lymphozyten. Plasmazellen und die meisten aktivierten T-Zellen sterben ab, die Antikörperkonzentration sinkt. Die Entzündung klingt ab.",
+  einfach:"Die Erreger sind beseitigt. Regulatorische T-Zellen stoppen die Abwehr.",
+  who:["treg","th"],focus:["treg"],
+  set:Object.assign(grp(["p1","p2","p3"],{o:.2}),grp(["th","th2","th3","tk","tk2","mac","gra","b"],{o:.25}),{treg:{x:515,y:505},kz:{o:0}})},
+ {ph:"mem",time:"Monate bis Jahrzehnte",title:"Gedächtniszellen bleiben erhalten",entz:false,
+  text:"Zurück bleiben langlebige B- und T-Gedächtniszellen mit Rezeptoren für genau diesen Erreger. Bei einem erneuten Kontakt wird die spezifische Abwehr deutlich schneller und stärker aktiviert, meist ohne dass Krankheitszeichen auftreten: Der Körper ist immun. Im Bereich „Erst- und Zweitkontakt“ kannst du dies untersuchen.",
+  einfach:"Gedächtniszellen bleiben viele Jahre im Körper. Beim nächsten Kontakt ist die Abwehr schneller. Man wird nicht oder kaum krank.",
+  who:["gedaechtnis"],focus:["mb","mt"],
+  set:Object.assign(grp(["p1","p2","p3","th2","th3","tk2","mac","gra"],{o:0}),grp(["tk","th","b"],{o:.18}),{treg:{x:860,y:500,o:.3},mb:{x:570,y:520},mt:{x:690,y:520}})}
+];
+let cur=0,timer=null;
+function buildAblauf(){
+ let tex="";for(let x=40;x<1000;x+=40){if(x>460&&x<550)continue;tex+=`M${x} 0 V50 `}
+ let s=`<rect x="0" y="0" width="1000" height="600" class="tissue"/>`;
+ s+=`<rect x="30" y="345" width="940" height="235" rx="110" class="node"/>`;
+ s+=`<path d="M610 270 C 610 305, 572 318, 560 350" class="vessel"/>`;
+ s+=`<text class="zone" x="20" y="80">Gewebe</text><text class="zone" x="905" y="372" text-anchor="end">Lymphknoten</text><text class="zone-s" x="628" y="320">Lymphgefäß</text>`;
+ s+=`<rect x="0" y="0" width="470" height="50" class="skin"/><rect x="540" y="0" width="460" height="50" class="skin"/><path d="${tex} M0 25 H470 M540 25 H1000" class="skin-t"/><text class="zone-s" x="20" y="31">Haut</text><text class="zone-s" x="505" y="20" text-anchor="middle">Wunde</text>`;
+ ACT.forEach(([id,type,x,y,o])=>{o=o||{};const info=T2I[type];const clickable=info&&o.lab;
+  s+=`<g class="actor${info?" item":""}" id="a-${id}" ${info?`data-id="${info}"`:""} ${clickable?`tabindex="0" role="button" aria-label="${INFO[info].name}"`:""} style="pointer-events:${type==="cyto"?"none":"auto"}"><g class="rot">${GLY[type](o)}</g>${RAD[type]?`<circle class="ring" r="${RAD[type]}"/>`:""}${o.lab?`<text class="lbl" y="${o.ly!=null?o.ly:RAD[type]+16}">${o.lab}</text>`:""}</g>`;
+ });
+ $("#ab").innerHTML=s;
+ $("#prog").innerHTML=STEPS.map((st,i)=>`<button style="--c:var(${PH[st.ph][1]})" data-i="${i}" aria-label="Schritt ${i+1}: ${st.title}"></button>`).join("");
+}
+function stateAt(n){const st={};ACT.forEach(([id,t,x,y,o])=>{o=o||{};st[id]={x:x,y:y,o:o.o!=null?o.o:1,s:o.s!=null?o.s:1,r:0,c:""}});for(let i=1;i<=n;i++){const d=STEPS[i].set;for(const k in d)Object.assign(st[k],d[k])}return st}
+function applyStep(n,instant){
+ cur=Math.max(0,Math.min(STEPS.length-1,n));const svg=$("#ab");
+ if(instant)svg.classList.add("notrans");
+ const st=stateAt(cur),S=STEPS[cur];
+ for(const id in st){const el=document.getElementById("a-"+id),v=st[id];
+  el.style.transform=`translate(${v.x}px,${v.y}px) scale(${v.s})`;el.style.opacity=v.o;
+  el.querySelector(".rot").style.transform=`rotate(${v.r}deg)`;
+  const base=el.dataset.id?"actor item":"actor";
+  el.setAttribute("class",base+(v.c?" "+v.c:"")+(S.focus.indexOf(id)>-1?" focus":""));
+  if(v.o<.2)el.style.pointerEvents="none";else if(!id.startsWith("cy"))el.style.pointerEvents="auto";
+ }
+ svg.classList.toggle("entz",!!S.entz);
+ if(instant){svg.getBoundingClientRect();requestAnimationFrame(()=>requestAnimationFrame(()=>svg.classList.remove("notrans")))}
+ const ph=PH[S.ph];
+ const pe=$("#stPhase");pe.style.setProperty("--c",`var(${ph[1]})`);pe.innerHTML=`<span>Schritt ${cur+1} von ${STEPS.length}: ${ph[0]}</span><span class="time">${S.time}</span>`;
+ $("#stTitle").textContent=S.title;$("#stText").textContent=S.text;$("#stEinfach").textContent=S.einfach;
+ $("#stWho").innerHTML=S.who.map(w=>`<button class="mini" style="--c:var(${GC[INFO[w].g]})" data-info="${w}">${INFO[w].name}</button>`).join("");
+ $$("#prog button").forEach((b,i)=>{b.classList.toggle("cur",i===cur);b.classList.toggle("done",i<cur)});
+ $("#prev").disabled=cur===0;$("#next").disabled=cur===STEPS.length-1;
+}
+function stopPlay(){if(timer){clearInterval(timer);timer=null;$("#play").textContent="Automatisch abspielen"}}
+function togglePlay(){if(timer){stopPlay();return}if(cur===STEPS.length-1)applyStep(0);$("#play").textContent="Pause";timer=setInterval(()=>{if(cur>=STEPS.length-1){stopPlay();return}applyStep(cur+1)},8000)}
+
+/* ---------- Erst- und Zweitkontakt ---------- */
+const CH={W:720,H:400,l:58,r:18,t:34,b:52,tmax:150,ymax:120,thr:40};
+const fx=x=>x<=0?0:x*x*Math.exp(2*(1-x));
+function prim(t,t0,peak,floor){const dt=t-t0-4;if(dt<0)return 0;const x=dt/10;let v=peak*fx(x);if(x>1)v=Math.max(v,floor);return v}
+function sec(t,t0){const dt=t-t0-1;if(dt<0)return 0;const x=dt/6;let v=100*fx(x);if(x>1)v=Math.max(v,15);return v}
+function pas(t,t0){return t<t0?0:45*Math.pow(.5,(t-t0)/21)}
+function path(t,ti,H,tp){return H*fx((t-ti)/tp)}
+let SC="A";
+const SCTXT={
+ A:["Erst- und Zweitinfektion","An Tag 0 erfolgt eine Infektion mit einem Erreger, gegen den noch keine Gedächtniszellen vorhanden sind (Primärantwort). Zum gewählten Zeitpunkt erfolgt eine zweite Infektion mit demselben Erreger."],
+ B:["Aktive Impfung","An Tag 0 werden abgeschwächte oder abgetötete Erreger bzw. deren Antigene verabreicht. Der Körper bildet selbst Antikörper und Gedächtniszellen, ohne zu erkranken. Zum gewählten Zeitpunkt erfolgt eine Infektion mit dem Erreger."],
+ C:["Passive Impfung","An Tag 0 werden fertige Antikörper übertragen, z. B. aus dem Blut immunisierter Spender. Dabei entstehen keine Gedächtniszellen. Die übertragenen Antikörper werden abgebaut, ihre Halbwertszeit beträgt etwa drei Wochen. Zum gewählten Zeitpunkt erfolgt eine Infektion."],
+ D:["Ohne Immunschutz","Es gab weder einen früheren Kontakt mit dem Erreger noch eine Impfung. Zum gewählten Zeitpunkt erfolgt eine Infektion."]
+};
+function model(sc,ti){
+ const m={ab:()=>0,pa:()=>0,ev:[],mem:false,early:null};
+ if(sc==="A"){m.mem=true;m.ab=t=>prim(t,0,20,4)+sec(t,ti);m.pa=t=>path(t,0,85,8)+path(t,ti,15,3);m.ev=[[0,"Erstinfektion"],[ti,"Zweitinfektion"]];m.early=true}
+ if(sc==="B"){m.mem=true;m.ab=t=>prim(t,0,14,3)+sec(t,ti);m.pa=t=>path(t,ti,15,3);m.ev=[[0,"aktive Impfung"],[ti,"Infektion"]]}
+ if(sc==="C"){const L=pas(ti,0),prot=L>=12;m.ab=t=>pas(t,0)+prim(t,ti,20,4);m.pa=t=>path(t,ti,prot?24:85,prot?4:8);m.ev=[[0,"passive Impfung"],[ti,"Infektion"]];m.L=L}
+ if(sc==="D"){m.ab=t=>prim(t,ti,20,4);m.pa=t=>path(t,ti,85,8);m.ev=[[ti,"Infektion"]]}
+ return m;
+}
+function drawChart(){
+ const ti=+$("#ti").value;$("#tiOut").textContent=ti;
+ const m=model(SC,ti);
+ const X=t=>CH.l+t/CH.tmax*(CH.W-CH.l-CH.r),Y=v=>CH.H-CH.b-Math.min(v,CH.ymax)/CH.ymax*(CH.H-CH.t-CH.b);
+ let s="";
+ for(let v=0;v<=CH.ymax;v+=20){s+=`<line x1="${CH.l}" x2="${CH.W-CH.r}" y1="${R(Y(v))}" y2="${R(Y(v))}" class="grid"/><text x="${CH.l-8}" y="${R(Y(v)+4)}" class="tick" text-anchor="end">${v}</text>`}
+ for(let t=0;t<=CH.tmax;t+=10){s+=`<text x="${R(X(t))}" y="${CH.H-CH.b+18}" class="tick" text-anchor="middle">${t}</text>`}
+ s+=`<line x1="${CH.l}" y1="${CH.H-CH.b}" x2="${CH.W-CH.r}" y2="${CH.H-CH.b}" class="ax"/><line x1="${CH.l}" y1="${CH.t-6}" x2="${CH.l}" y2="${CH.H-CH.b}" class="ax"/>`;
+ s+=`<text x="${(CH.l+CH.W-CH.r)/2}" y="${CH.H-10}" class="axlbl" text-anchor="middle">Zeit in Tagen</text>`;
+ s+=`<text transform="translate(16 ${(CH.t+CH.H-CH.b)/2}) rotate(-90)" class="axlbl" text-anchor="middle">Menge (relative Einheiten)</text>`;
+ s+=`<line x1="${CH.l}" x2="${CH.W-CH.r}" y1="${Y(CH.thr)}" y2="${Y(CH.thr)}" class="c-th"/><text x="${CH.W-CH.r-4}" y="${Y(CH.thr)-6}" class="thl" text-anchor="end">Schwelle für Krankheitszeichen</text>`;
+ m.ev.forEach(([t,l],i)=>{s+=`<line x1="${R(X(t))}" x2="${R(X(t))}" y1="${CH.t-4}" y2="${CH.H-CH.b}" class="ev"/><text x="${R(X(t)+5)}" y="${CH.t+8+i*0}" class="evt">${l}</text>`});
+ let pa="",abp="";for(let t=0;t<=CH.tmax;t+=.5){pa+=`${R(X(t))},${R(Y(m.pa(t)))} `;abp+=`${R(X(t))},${R(Y(m.ab(t)))} `}
+ s+=`<polyline points="${pa}" class="c-pa" id="lnPa"/><polyline points="${abp}" class="c-ab" id="lnAb"/>`;
+ $("#chart").innerHTML=s;
+ const ln=$("#lnAb");if(ln.getTotalLength){const L=ln.getTotalLength();if(L>0){ln.style.strokeDasharray=L;ln.style.strokeDashoffset=L;ln.getBoundingClientRect();ln.style.transition="stroke-dashoffset 1.4s ease";ln.style.strokeDashoffset=0}}
+ // Text
+ $("#kTitle").textContent=SCTXT[SC][0];$("#kText").textContent=SCTXT[SC][1];
+ let maxP=0;for(let t=ti;t<=CH.tmax;t+=.5)maxP=Math.max(maxP,m.pa(t)-(SC==="A"?path(t,0,85,8):0));
+ const ill=maxP>CH.thr;const res=$("#kResult");res.className="result "+(ill?"ill":"ok");
+ res.textContent=(SC==="A"?"Zweitinfektion: ":"Infektion an Tag "+ti+": ")+(ill?"Die Erregermenge überschreitet die Schwelle. Es treten Krankheitszeichen auf.":"Die Erregermenge bleibt unter der Schwelle. Es treten keine oder nur schwache Krankheitszeichen auf.");
+ let mt="";
+ if(SC==="A")mt="Erstinfektion: Die Erregermenge überschreitet die Schwelle, Krankheitszeichen treten auf. Gedächtniszellen bei der Zweitinfektion: vorhanden.";
+ if(SC==="B")mt="Gedächtniszellen bei der Infektion: vorhanden (durch die Impfung gebildet).";
+ if(SC==="C")mt="Gedächtniszellen bei der Infektion: nicht vorhanden. Übertragene Antikörper am Tag der Infektion: noch etwa "+Math.round(m.L/45*100)+" Prozent der Ausgangsmenge.";
+ if(SC==="D")mt="Gedächtniszellen bei der Infektion: nicht vorhanden. Es läuft eine Primärantwort ab.";
+ $("#kMem").textContent=mt;
+}
+
+/* ---------- Selbsttest ---------- */
+const CATS=[["u","unspezifisch"],["h","spezifisch: humoral"],["z","spezifisch: zellulär"],["b","spezifisch: beide Wege"]];
+const Z=[
+ ["Haut und Schleimhäute","u","Barrieren wirken gegen alle Erreger auf die gleiche Weise."],
+ ["Makrophage","u","Die Phagozytose ist unspezifisch. Durch die Antigenpräsentation leitet der Makrophage allerdings die spezifische Abwehr ein."],
+ ["Neutrophiler Granulozyt","u","Granulozyten phagozytieren Bakterien unabhängig von deren Antigenen."],
+ ["NK-Zelle","u","NK-Zellen sind Lymphozyten, besitzen aber keine antigenspezifischen Rezeptoren."],
+ ["B-Lymphozyt","h","Aus B-Lymphozyten entstehen Plasmazellen, die Antikörper abgeben."],
+ ["Plasmazelle","h","Plasmazellen geben Antikörper in Körperflüssigkeiten ab."],
+ ["Antikörper","h","Antikörper wirken gelöst in Blut und Lymphe."],
+ ["Zytotoxische T-Zelle","z","Zytotoxische T-Zellen wirken durch direkten Kontakt mit infizierten Zellen."],
+ ["T-Helferzelle","b","T-Helferzellen aktivieren B-Lymphozyten und zytotoxische T-Zellen."],
+ ["Gedächtniszellen","b","Es gibt B-Gedächtniszellen und T-Gedächtniszellen."],
+ ["Regulatorische T-Zelle","b","Regulatorische T-Zellen hemmen sowohl die humorale als auch die zelluläre Abwehr."]
+];
+let zDone={};
+function renderZ(){zDone={};$("#zuord").innerHTML=Z.map((z,i)=>`<div class="zrow" data-i="${i}"><span class="zname">${z[0]}</span><div class="zbtns">${CATS.map(c=>`<button data-c="${c[0]}">${c[1]}</button>`).join("")}</div><p class="fb"></p></div>`).join("");$("#zScore").textContent=""}
+function zClick(btn){const row=btn.closest(".zrow"),i=+row.dataset.i;if(zDone[i]!=null)return;const z=Z[i],ok=btn.dataset.c===z[1];zDone[i]=ok;btn.classList.add(ok?"pick-ok":"pick-bad");
+ const catName=CATS.find(c=>c[0]===z[1])[1];
+ if(!ok)row.querySelector(`button[data-c="${z[1]}"]`).classList.add("pick-ok");
+ row.querySelector(".fb").innerHTML=ok?`<b class="r">richtig.</b> ${z[2]}`:`<b class="f">falsch.</b> Richtig ist: ${catName}. ${z[2]}`;
+ const n=Object.keys(zDone).length,r=Object.values(zDone).filter(Boolean).length;$("#zScore").textContent=`${r} von ${n} richtig`+(n===Z.length?` (alle ${Z.length} Bestandteile bearbeitet)`:"")}
+const ORD=["Fresszellen phagozytieren Erreger.","Ein Makrophage präsentiert Antigenbruchstücke auf MHC-II-Molekülen.","Eine passende T-Helferzelle bindet an den Makrophagen und wird aktiviert.","Die T-Helferzelle teilt sich vielfach (klonale Expansion).","Eine T-Helferzelle aktiviert einen B-Lymphozyten mit passendem Rezeptor.","Der B-Lymphozyt teilt sich und differenziert sich zu Plasmazellen.","Plasmazellen geben Antikörper ab.","Antikörper binden an Antigene, die Erreger verklumpen (Agglutination).","Fresszellen phagozytieren die Antigen-Antikörper-Komplexe."];
+let ordState=[];
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function renderOrder(reset){if(reset){do{ordState=shuffle(ORD.map((_,i)=>i))}while(ordState.every((v,i)=>v===i));$("#oScore").textContent=""}
+ $("#order").innerHTML=ordState.map((k,pos)=>`<li data-pos="${pos}"><span>${ORD[k]}</span><button class="mv" data-d="-1" aria-label="nach oben" ${pos===0?"disabled":""}>&#8593;</button><button class="mv" data-d="1" aria-label="nach unten" ${pos===ordState.length-1?"disabled":""}>&#8595;</button></li>`).join("")}
+function oCheck(){let r=0;$$("#order li").forEach((li,pos)=>{const ok=ordState[pos]===pos;if(ok)r++;li.classList.toggle("ok",ok);li.classList.toggle("bad",!ok)});$("#oScore").textContent=r===ORD.length?`richtig: Alle ${ORD.length} Schritte stehen an der richtigen Stelle.`:`${r} von ${ORD.length} Schritten stehen an der richtigen Stelle. Die rot markierten Schritte sind falsch eingeordnet.`}
+const MC=[
+ ["Welche Zelle gibt Antikörper ab?",["B-Lymphozyt","Plasmazelle","T-Helferzelle","Makrophage"],1,"Plasmazellen entstehen aus aktivierten B-Lymphozyten und geben Antikörper ab. B-Lymphozyten tragen Antikörper nur als Rezeptoren in ihrer Membran."],
+ ["Warum erreichen Antikörper keine Viren, die sich innerhalb einer Körperzelle befinden?",["Antikörper sind große Proteine und gelangen nicht durch die Zellmembran in das Zellinnere.","Viren tragen keine Antigene.","Antikörper binden nur an Bakterien.","Viren werden in der Zelle sofort abgebaut."],0,"Antikörper wirken nur außerhalb von Zellen. Infizierte Zellen werden deshalb durch zytotoxische T-Zellen beseitigt (zelluläre Immunantwort)."],
+ ["Was bedeutet „spezifische Abwehr“?",["Die Abwehr richtet sich gegen ein bestimmtes Antigen.","Die Abwehr wirkt besonders schnell.","Die Abwehr wirkt gegen alle Erreger gleich.","Die Abwehr findet nur in der Haut statt."],0,"Spezifisch bedeutet, dass Rezeptoren und Antikörper nur an ein bestimmtes Antigen binden. Die spezifische Abwehr ist bei einer Erstinfektion sogar langsamer als die unspezifische."],
+ ["Ein Mensch hatte Windpocken. Warum erkrankt er bei einem erneuten Kontakt in der Regel nicht daran?",["Es sind noch viele Antikörper aus der ersten Erkrankung im Blut.","Gedächtniszellen ermöglichen eine schnellere und stärkere Immunantwort.","Die Haut lässt das Virus nicht mehr hindurch.","Die Viren erkennen, dass der Körper geschützt ist."],1,"Antikörper werden nach einigen Wochen abgebaut. Langfristigen Schutz bieten Gedächtniszellen. Die letzte Antwort ist eine Vermenschlichung: Viren besitzen keine Wahrnehmung."],
+ ["HIV vermehrt sich in T-Helferzellen und führt zu ihrem Verlust. Welche Folge ist zu erwarten?",["Nur die unspezifische Abwehr ist betroffen.","Nur die Antikörperbildung ist betroffen.","Die humorale und die zelluläre Immunantwort werden geschwächt.","Die Immunantwort wird stärker."],2,"T-Helferzellen aktivieren sowohl B-Lymphozyten als auch zytotoxische T-Zellen. Fehlen sie, sind beide Wege der spezifischen Abwehr geschwächt."],
+ ["Worin unterscheidet sich eine passive von einer aktiven Impfung?",["Bei der passiven Impfung werden fertige Antikörper übertragen. Es entstehen keine Gedächtniszellen.","Bei der passiven Impfung werden abgeschwächte Erreger verabreicht.","Die passive Impfung schützt lebenslang.","Bei der aktiven Impfung werden fertige Antikörper übertragen."],0,"Die passive Impfung wirkt sofort, schützt aber nur einige Wochen. Die aktive Impfung löst eine eigene Immunantwort mit Gedächtniszellen aus."],
+ ["Welche Aussage über die Agglutination ist richtig?",["Antikörper zerstören die Bakterien durch die Verklumpung vollständig.","Antikörper mit zwei Bindungsstellen verbinden mehrere Erreger zu Komplexen, die Fresszellen phagozytieren.","Die Agglutination ist Teil der zellulären Immunantwort.","Bei der Agglutination teilen sich Bakterien."],1,"Antikörper verklumpen und markieren Erreger. Den Abbau übernehmen Fresszellen. Die Agglutination gehört zur humoralen Immunantwort."]
+];
+let mcDone={};
+function renderMC(){mcDone={};$("#mc").innerHTML=MC.map((q,i)=>`<div class="mc" data-q="${i}"><p class="qq">${i+1}. ${q[0]}</p><div class="opts">${q[1].map((o,j)=>`<button data-o="${j}">${o}</button>`).join("")}</div><p class="fb"></p></div>`).join("");$("#mScore").textContent=""}
+function mcClick(btn){const box=btn.closest(".mc"),i=+box.dataset.q;if(mcDone[i]!=null)return;const q=MC[i],ok=+btn.dataset.o===q[2];mcDone[i]=ok;btn.classList.add(ok?"pick-ok":"pick-bad");if(!ok)box.querySelector(`button[data-o="${q[2]}"]`).classList.add("pick-ok");
+ box.querySelector(".fb").innerHTML=(ok?`<b class="r">richtig.</b> `:`<b class="f">falsch.</b> `)+q[3];
+ const n=Object.keys(mcDone).length,r=Object.values(mcDone).filter(Boolean).length;$("#mScore").textContent=`${r} von ${n} richtig`}
+
+/* ---------- Panel ---------- */
+let lastFocus=null;
+function openPanel(tagText,tagVar,html){$("#pTag").textContent=tagText;$("#pTag").style.setProperty("--c",`var(${tagVar})`);$("#pBody").innerHTML=html;$("#pBody").scrollTop=0;
+ const p=$("#panel");p.classList.add("open");p.setAttribute("aria-hidden","false");$("#backdrop").classList.add("on");lastFocus=document.activeElement;setTimeout(()=>$("#pClose").focus({preventScroll:true}),50)}
+function closePanel(){const p=$("#panel");p.classList.remove("open");p.setAttribute("aria-hidden","true");$("#backdrop").classList.remove("on");$$(".item.sel").forEach(e=>e.classList.remove("sel"));if(lastFocus&&lastFocus.focus)lastFocus.focus({preventScroll:true})}
+function openInfo(id){const I=INFO[id];if(!I)return;const cv=GC[I.g];
+ $$(".item.sel").forEach(e=>e.classList.remove("sel"));$$(`#ov .item[data-id="${id}"]`).forEach(e=>e.classList.add("sel"));
+ let h=`<h2>${I.name}</h2><p class="gram">${I.gram}</p>`;
+ h+=`<div class="simple"><h3>Kurz und einfach</h3><p>${I.kurz}</p></div>`;
+ h+=`<h3>Genauer</h3>`+I.text.map(t=>`<p>${t}</p>`).join("");
+ h+=`<div class="merke" style="--c:var(${cv})"><b>Merke:</b> ${I.merke}</div>`;
+ h+=`<h3>Wortspeicher</h3><dl class="ws">`+I.woerter.map(w=>`<dt>${w[0]}</dt><dd>${w[1]}</dd>`).join("")+`</dl>`;
+ h+=`<details class="frage"><summary>Denkaufgabe: ${I.frage}</summary><p><b>Lösungsvorschlag:</b> ${I.antwort}</p></details>`;
+ h+=`<h3>Hängt zusammen mit</h3><div class="rel">`+I.rel.map(r=>`<button class="mini" style="--c:var(${GC[INFO[r].g]})" data-info="${r}">${INFO[r].name}</button>`).join("")+`</div>`;
+ openPanel(I.tag,cv,h)}
+function openWortspeicher(){
+ const map=new Map();Object.values(INFO).forEach(I=>I.woerter.forEach(w=>{if(!map.has(w[0]))map.set(w[0],w[1])}));EXTRA.forEach(w=>{if(!map.has(w[0]))map.set(w[0],w[1])});
+ const key=s=>s.replace(/^(der|die|das)\s+/,"");
+ const list=[...map.entries()].sort((a,b)=>key(a[0]).localeCompare(key(b[0]),"de"));
+ let h=`<h2>Wortspeicher</h2><p class="gram">Fachbegriffe mit Artikel und Plural</p>`;
+ h+=`<dl class="ws">`+list.map(w=>`<dt>${w[0]}</dt><dd>${w[1]}</dd>`).join("")+`</dl>`;
+ h+=`<h3>Satzbausteine</h3><ul class="sb">`+SATZ.map(s=>`<li>${s}</li>`).join("")+`</ul>`;
+ h+=`<div class="merke"><b>Sprachhinweis:</b> Zellen und Viren handeln nicht absichtlich. Schreibe deshalb nicht „die Zelle will“ oder „das Virus versteckt sich“. Besser sind sachliche Formulierungen: „bindet an“, „wird aufgenommen“, „wird aktiviert“, „bewegt sich gerichtet (Chemotaxis)“. Auch „erkennen“ meint in der Biologie: Ein Rezeptor bindet passgenau an ein Antigen.</div>`;
+ openPanel("Sprachhilfe","--accent",h)}
+
+/* ---------- Ereignisse ---------- */
+document.addEventListener("click",e=>{
+ const t=e.target;
+ const mi=t.closest("[data-info]");if(mi){openInfo(mi.dataset.info);return}
+ const it=t.closest(".item");if(it&&it.dataset.id){stopPlay();openInfo(it.dataset.id);return}
+ const tab=t.closest(".tabs button");if(tab){switchTab(tab.dataset.tab);return}
+ const fc=t.closest("[data-filter]");if(fc){$$("[data-filter]").forEach(b=>b.classList.toggle("on",b===fc));$("#ov").dataset.filter=fc.dataset.filter;return}
+ const sc=t.closest("[data-sc]");if(sc){$$("[data-sc]").forEach(b=>b.classList.toggle("on",b===sc));SC=sc.dataset.sc;drawChart();return}
+ const pb=t.closest("#prog button");if(pb){stopPlay();applyStep(+pb.dataset.i);return}
+ const zb=t.closest(".zbtns button");if(zb){zClick(zb);return}
+ const mb=t.closest(".mc .opts button");if(mb){mcClick(mb);return}
+ const mv=t.closest(".mv");if(mv){const pos=+mv.closest("li").dataset.pos,d=+mv.dataset.d,np=pos+d;if(np<0||np>=ordState.length)return;[ordState[pos],ordState[np]]=[ordState[np],ordState[pos]];renderOrder(false);$$("#order li")[np].querySelector(`.mv[data-d="${d}"]`)?.focus();return}
+});
+document.addEventListener("keydown",e=>{
+ if(e.key==="Escape"&&$("#panel").classList.contains("open")){closePanel();return}
+ if((e.key==="Enter"||e.key===" ")&&e.target.classList&&e.target.classList.contains("item")){e.preventDefault();openInfo(e.target.dataset.id);return}
+ if($("#tab-ablauf").classList.contains("active")&&!$("#panel").classList.contains("open")&&!/INPUT|TEXTAREA/.test(e.target.tagName)){
+  if(e.key==="ArrowRight"){stopPlay();applyStep(cur+1)}if(e.key==="ArrowLeft"){stopPlay();applyStep(cur-1)}}
+});
+$("#pClose").addEventListener("click",closePanel);
+$("#backdrop").addEventListener("click",closePanel);
+$("#btnWort").addEventListener("click",openWortspeicher);
+$("#tglArr").addEventListener("change",e=>$("#ov").classList.toggle("noarr",!e.target.checked));
+$("#tglTest").addEventListener("change",e=>$("#ov").classList.toggle("test",e.target.checked));
+$("#tglAbLbl").addEventListener("change",e=>$("#ab").classList.toggle("nolbl",!e.target.checked));
+$("#prev").addEventListener("click",()=>{stopPlay();applyStep(cur-1)});
+$("#next").addEventListener("click",()=>{stopPlay();applyStep(cur+1)});
+$("#play").addEventListener("click",togglePlay);
+$("#ti").addEventListener("input",drawChart);
+$("#zReset").addEventListener("click",renderZ);
+$("#oReset").addEventListener("click",()=>renderOrder(true));
+$("#oCheck").addEventListener("click",oCheck);
+$("#mReset").addEventListener("click",renderMC);
+function switchTab(id){stopPlay();$$(".tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===id?"true":"false"));$$(".tab").forEach(s=>s.classList.toggle("active",s.id==="tab-"+id));
+ if(id==="kontakt")drawChart();if(id==="ablauf")applyStep(cur,true)}
+
+/* ---------- Legende und Start ---------- */
+$("#legend").innerHTML=[["--u","Unspezifische Abwehr"],["--s","Steuerung (T-Helferzelle, regulatorische T-Zelle)"],["--h","Humorale Abwehr"],["--z","Zelluläre Abwehr"],["--m","Gedächtnis"],["--e","Erreger und Antigene"]].map(l=>`<span><i style="--c:var(${l[0]})"></i>${l[1]}</span>`).join("");
+buildOverview();buildAblauf();applyStep(0,true);renderZ();renderOrder(true);renderMC();
+})();
+</script>
+</body>
+</html>
