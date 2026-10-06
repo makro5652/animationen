@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vom Gen zum Protein – Genexpression interaktiv</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#E4EBE8; --panel:#F7F9F8; --panel-2:#EDF2F0; --ink:#13232A; --muted:#4F6268; --line:#C3CFCB;
+  --accent:#0C6870; --accent-soft:#D2E8E7; --ok:#22714A; --bad:#AE2A20;
+  --scene:#FBFCFC; --nucleo:#DFE8F3; --cyto:#EAF3EC; --memb:#6C877B;
+  --bA:#378857; --bU:#C1443B; --bG:#DFA62C; --bC:#3263A4;
+  --pol:#7155A1; --ribo:#4C7690; --trna:#AD5F1B; --aa:#286B68; --cap:#8A3761;
+  --exon:#2B7B82; --utr:#8FBFC4; --intron:#9775B5; --tail:#A6ADAB; --rf:#A23845; --spl:#B48A10;
+  --golgi:#BE772A; --mito:#C2553E; --lyso:#7A679D; --er:#55849F; --chrom:#4A4E79;
+  --font:"Atkinson Hyperlegible","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1618; --panel:#162125; --panel-2:#1B282C; --ink:#E0EAE8; --muted:#9BAFB2; --line:#2B3B40;
+    --accent:#4FB5B7; --accent-soft:#1D3639; --ok:#5CC08A; --bad:#F07A6E;
+    --scene:#111B1E; --nucleo:#1A2735; --cyto:#15231D; --memb:#7FA295;
+    --bA:#42A169; --bU:#D9574D; --bG:#E8B43E; --bC:#4A7EC4;
+    --pol:#9A80CC; --ribo:#78A3BE; --trna:#D17B30; --aa:#3B8D89; --cap:#B8578A;
+    --exon:#3B99A1; --utr:#5E8E92; --intron:#A88BC6; --tail:#6E7674; --rf:#D25563; --spl:#D2A52A;
+    --golgi:#D68C3E; --mito:#DA6B53; --lyso:#9886BD; --er:#6E9EBA; --chrom:#8F93C6;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1618; --panel:#162125; --panel-2:#1B282C; --ink:#E0EAE8; --muted:#9BAFB2; --line:#2B3B40;
+  --accent:#4FB5B7; --accent-soft:#1D3639; --ok:#5CC08A; --bad:#F07A6E;
+  --scene:#111B1E; --nucleo:#1A2735; --cyto:#15231D; --memb:#7FA295;
+  --bA:#42A169; --bU:#D9574D; --bG:#E8B43E; --bC:#4A7EC4;
+  --pol:#9A80CC; --ribo:#78A3BE; --trna:#D17B30; --aa:#3B8D89; --cap:#B8578A;
+  --exon:#3B99A1; --utr:#5E8E92; --intron:#A88BC6; --tail:#6E7674; --rf:#D25563; --spl:#D2A52A;
+  --golgi:#D68C3E; --mito:#DA6B53; --lyso:#9886BD; --er:#6E9EBA; --chrom:#8F93C6;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.55;-webkit-text-size-adjust:100%}
+.wrap{max-width:1200px;margin:0 auto;padding:18px 18px 64px}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+/* Kopf */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px 24px;padding-bottom:14px;border-bottom:2px solid var(--ink)}
+.top h1{margin:0;font-size:clamp(1.7rem,3.6vw,2.6rem);line-height:1.05;letter-spacing:-0.015em;font-weight:700}
+.seqline{margin:.45rem 0 0;font-family:var(--mono);font-size:clamp(.78rem,1.6vw,.98rem);font-weight:700;letter-spacing:.04em;overflow-x:auto;white-space:nowrap}
+.seqline .e{color:var(--muted);font-weight:500}
+.sA{color:var(--bA)}.sU{color:var(--bU)}.sG{color:var(--bG)}.sC{color:var(--bC)}
+.level{display:inline-flex;border:2px solid var(--ink);border-radius:999px;padding:3px;background:var(--panel)}
+.level button{border:0;background:transparent;padding:.42rem 1rem;border-radius:999px;cursor:pointer;font-weight:700}
+.level button[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
+.tabs{display:flex;gap:4px;margin:14px 0 18px;overflow-x:auto}
+.tabs button{border:0;background:transparent;padding:.5rem .95rem;border-bottom:3px solid transparent;cursor:pointer;font-weight:700;color:var(--muted);white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.hint{color:var(--muted);font-size:.92rem;margin:.2rem 0 .8rem}
+
+/* Zelle */
+.cellgrid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
+.figure{background:var(--scene);border:1px solid var(--line);border-radius:16px;padding:6px;overflow:hidden}
+.figure svg{display:block;width:100%;height:auto}
+.side{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.side h2{font-size:1.05rem;margin:.1rem 0 .6rem}
+.toggle{display:flex;align-items:center;gap:.55rem;padding:.28rem 0;cursor:pointer}
+.toggle input{width:1.1rem;height:1.1rem;accent-color:var(--accent)}
+.swatch{width:.9rem;height:.9rem;border-radius:3px;flex:none}
+.btnrow{display:flex;flex-wrap:wrap;gap:6px;margin:.7rem 0}
+.btn{border:1.5px solid var(--ink);background:var(--panel);padding:.38rem .8rem;border-radius:10px;cursor:pointer;font-weight:700;font-size:.92rem}
+.btn:hover{background:var(--panel-2)}
+.btn.primary{background:var(--ink);color:var(--panel)}
+.btn.small{padding:.25rem .6rem;font-size:.85rem}
+.sep{border:0;border-top:1px solid var(--line);margin:.8rem 0}
+
+/* Ablauf */
+.rail{list-style:none;display:flex;gap:6px;padding:0;margin:0 0 12px;overflow-x:auto;counter-reset:st}
+.rail li{flex:1 0 auto}
+.rail button{width:100%;display:flex;align-items:center;gap:.45rem;border:1.5px solid var(--line);background:var(--panel);border-radius:12px;padding:.42rem .7rem;cursor:pointer;font-weight:700;font-size:.9rem;color:var(--muted);white-space:nowrap}
+.rail .num{display:inline-grid;place-items:center;width:1.5rem;height:1.5rem;border-radius:50%;background:var(--panel-2);color:var(--ink);font-size:.82rem}
+.rail button[aria-current="step"]{border-color:var(--ink);color:var(--ink)}
+.rail button[aria-current="step"] .num{background:var(--accent);color:#fff}
+.rail button.done .num{background:var(--accent-soft)}
+.stagehead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px;margin:4px 0 8px}
+.stagehead h2{margin:0;font-size:1.35rem}
+.ort{font-size:.9rem;color:var(--muted);font-weight:700}
+.scenebox{background:var(--scene);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.scenebox svg{display:block;width:100%;height:auto;touch-action:manipulation}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:10px 0}
+.controls input[type=range]{flex:1 1 220px;accent-color:var(--accent)}
+.controls label{display:inline-flex;align-items:center;gap:.35rem;font-size:.92rem}
+.controls select{border:1.5px solid var(--line);border-radius:8px;background:var(--panel);padding:.2rem .4rem}
+.caption{background:var(--panel);border-left:5px solid var(--accent);border-radius:0 12px 12px 0;padding:.75rem 1rem;min-height:4.2em;max-width:80ch}
+.obs{margin-top:12px;max-width:80ch}
+.obs h3{font-size:1rem;margin:0 0 .2rem}
+.obs p{margin:0}
+
+/* Erarbeiten */
+.taskhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px}
+.task{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin:0 0 16px}
+.task h3{margin:0 0 .4rem;font-size:1.12rem;display:flex;gap:.6rem;align-items:baseline}
+.task h3 .tn{display:inline-grid;place-items:center;min-width:1.7rem;height:1.7rem;border-radius:50%;background:var(--ink);color:var(--panel);font-size:.9rem}
+.task p,.task li{max-width:80ch}
+.task .op{font-weight:700}
+.gap{display:block;margin:.35rem 0}
+.gap select{border:1.5px solid var(--line);border-radius:8px;background:var(--scene);padding:.15rem .35rem;max-width:100%}
+.fb{font-weight:700;margin-left:.4rem}
+.fb.ok{color:var(--ok)}.fb.bad{color:var(--bad)}
+.mono{font-family:var(--mono)}
+.seqbox{font-family:var(--mono);font-weight:700;background:var(--scene);border:1px solid var(--line);border-radius:10px;padding:.5rem .7rem;overflow-x:auto;white-space:nowrap}
+.inp{width:100%;max-width:520px;font-family:var(--mono);border:1.5px solid var(--line);border-radius:10px;padding:.45rem .6rem;background:var(--scene);text-transform:uppercase}
+.codons{display:flex;flex-wrap:wrap;gap:8px;margin:.6rem 0}
+.codon{display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--scene);border:1px solid var(--line);border-radius:10px;padding:.4rem .5rem}
+.codon .mono{font-weight:700}
+.codon select{border:1px solid var(--line);border-radius:6px;background:var(--panel);font-size:.85rem}
+.codon.ok{border-color:var(--ok)}.codon.bad{border-color:var(--bad)}
+.order{list-style:none;padding:0;margin:.5rem 0;counter-reset:o}
+.order li{display:flex;align-items:center;gap:.5rem;background:var(--scene);border:1.5px solid var(--line);border-radius:10px;padding:.4rem .5rem;margin:5px 0}
+.order li::before{counter-increment:o;content:counter(o);display:inline-grid;place-items:center;min-width:1.5rem;height:1.5rem;border-radius:50%;background:var(--panel-2);font-weight:700;font-size:.85rem}
+.order li span{flex:1}
+.order li.ok{border-color:var(--ok)}.order li.bad{border-color:var(--bad)}
+.order .mv{border:1px solid var(--line);background:var(--panel);border-radius:6px;width:2rem;height:2rem;cursor:pointer;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:3px 0;margin:.5rem 0}
+.chipgrp{display:flex;margin-right:10px;position:relative;padding-top:14px}
+.chipgrp::before{content:attr(data-i);position:absolute;top:0;left:0;font-size:.68rem;color:var(--muted);font-family:var(--mono)}
+.chip{width:1.55rem;height:1.85rem;border:1px solid var(--line);background:var(--scene);font-family:var(--mono);font-weight:700;cursor:pointer;padding:0;font-size:.9rem}
+.chip.A{color:var(--bA)}.chip.U{color:var(--bU)}.chip.G{color:#9a7000}.chip.C{color:var(--bC)}
+:root[data-theme="dark"] .chip.G{color:var(--bG)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip.G{color:var(--bG)}}
+.chip.sel{outline:3px solid var(--ink);outline-offset:-3px}
+.chip.f1{background:#F6D9A8;color:#000}.chip.f2{background:#F3B6B0;color:#000}.chip.f3{background:#BFE3C9;color:#000}.chip.f4{background:#BBD3F2;color:#000}.chip.f5{background:#E2C9F2;color:#000}.chip.f6{background:#F2E59E;color:#000}
+.featsel{display:flex;flex-wrap:wrap;gap:6px;margin:.4rem 0}
+.featsel label{display:inline-flex;align-items:center;gap:.35rem;border:1.5px solid var(--line);border-radius:999px;padding:.2rem .65rem;cursor:pointer;font-size:.9rem;background:var(--scene)}
+.featsel .dot{width:.8rem;height:.8rem;border-radius:50%}
+.result{background:var(--scene);border:1px dashed var(--line);border-radius:10px;padding:.55rem .75rem;margin:.5rem 0}
+.exbar{display:flex;gap:3px;margin:.5rem 0;align-items:stretch;min-height:2.2rem}
+.exbar div{display:grid;place-items:center;border-radius:6px;color:#fff;font-weight:700;font-size:.85rem;padding:0 4px}
+.wordbank{display:flex;flex-wrap:wrap;gap:6px;margin:.4rem 0}
+.wordbank span{background:var(--scene);border:1px solid var(--line);border-radius:8px;padding:.15rem .5rem;font-size:.92rem}
+.art-der{color:#2C5DA8}.art-die{color:#A3332B}.art-das{color:#2B7A47}
+:root[data-theme="dark"] .art-der{color:#7FA9E8}:root[data-theme="dark"] .art-die{color:#F08A80}:root[data-theme="dark"] .art-das{color:#78C996}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .art-der{color:#7FA9E8}:root:not([data-theme="light"]) .art-die{color:#F08A80}:root:not([data-theme="light"]) .art-das{color:#78C996}}
+details.ewh{margin-top:.7rem;border-top:1px solid var(--line);padding-top:.5rem}
+details.ewh summary{cursor:pointer;font-weight:700;color:var(--accent)}
+.nosol details.ewh,.nosol .solbtn{display:none}
+table.code{border-collapse:collapse;font-size:.82rem;margin:.5rem 0;min-width:560px}
+table.code th,table.code td{border:1px solid var(--line);padding:.25rem .4rem;vertical-align:top}
+table.code th{background:var(--panel-2)}
+table.code td span{display:block;font-family:var(--mono)}
+.tblwrap{overflow-x:auto}
+table.cmp{border-collapse:collapse;font-size:.92rem;margin:.4rem 0;min-width:520px}
+table.cmp th,table.cmp td{border:1px solid var(--line);padding:.3rem .5rem;text-align:left;vertical-align:top}
+
+/* Glossar */
+.gsearch{width:100%;max-width:420px;border:1.5px solid var(--line);border-radius:10px;padding:.5rem .7rem;background:var(--panel);margin-bottom:12px}
+.gloss{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.gitem{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.gitem h3{margin:0;font-size:1.02rem}
+.gitem .gr{font-size:.86rem;color:var(--muted);margin:.1rem 0 .35rem}
+.gitem p{margin:0;font-size:.95rem}
+
+/* Info-Overlay */
+.info{position:fixed;inset:0;z-index:20;display:flex;justify-content:flex-end;background:rgba(10,20,22,.28)}
+.info[hidden]{display:none}
+.infocard{width:min(440px,100%);height:100%;background:var(--panel);border-left:2px solid var(--ink);padding:calc(18px + env(safe-area-inset-top,0px)) 20px calc(24px + env(safe-area-inset-bottom,0px));overflow-y:auto}
+.infocard h3{margin:.2rem 0 .1rem;font-size:1.3rem}
+.infocard .gr{color:var(--muted);font-size:.9rem;margin:0 0 .8rem}
+.infocard .lv{display:inline-block;font-size:.78rem;font-weight:700;border:1.5px solid var(--accent);color:var(--accent);border-radius:999px;padding:.05rem .55rem;margin-bottom:.5rem}
+.infocard p{margin:.4rem 0}
+.closebtn{float:right}
+@media (max-width:860px){
+  .cellgrid{grid-template-columns:1fr}
+  .info{align-items:flex-end}
+  .infocard{height:auto;max-height:72%;border-left:0;border-top:2px solid var(--ink);border-radius:18px 18px 0 0;width:100%}
+  body{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+/* SVG */
+svg{font-family:var(--font)}
+.hot{cursor:pointer}
+.bA{fill:var(--bA)}.bU,.bT{fill:var(--bU)}.bG{fill:var(--bG)}.bC{fill:var(--bC)}
+.bt{font-family:var(--mono);font-weight:700;fill:#fff;text-anchor:middle;pointer-events:none}
+.btG{fill:#2B2100}
+.bb{fill:none;stroke:var(--muted);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.rb{fill:none;stroke:var(--ink);stroke-opacity:.45;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.hb{stroke:var(--muted);stroke-width:1.4;stroke-dasharray:2 3}
+.pol{fill:var(--pol);fill-opacity:.2;stroke:var(--pol);stroke-width:2}
+.tfb{fill:var(--spl);fill-opacity:.22;stroke:var(--spl);stroke-width:2}
+.lbl{font-size:14px;font-weight:700;fill:var(--ink);paint-order:stroke;stroke:var(--scene);stroke-width:4px;stroke-linejoin:round}
+.lbls{font-size:12px;fill:var(--muted);font-weight:700;paint-order:stroke;stroke:var(--scene);stroke-width:4px;stroke-linejoin:round}
+.region{font-size:16px;font-weight:700;fill:var(--ink);opacity:.75}
+.end{font-family:var(--mono);font-size:13px;fill:var(--muted);font-weight:700}
+.legend{font-size:12.5px;fill:var(--muted)}
+.hlbox{fill:none;stroke:var(--ink);stroke-width:2;stroke-dasharray:4 3}
+.sg-up{fill:var(--line)}.sg-ex{fill:var(--exon)}.sg-utr{fill:var(--utr)}.sg-in{fill:var(--intron)}.sg-tail{fill:var(--tail)}.sg-none{fill:none}
+.cap{fill:var(--cap)}.capt{fill:#fff;font-size:8.5px;font-weight:700;text-anchor:middle;pointer-events:none}
+.splc{fill:var(--spl);fill-opacity:.12;stroke:var(--spl);stroke-width:2;stroke-dasharray:6 4}
+.snrnp{fill:var(--spl)}.snt{fill:#fff;font-size:10px;font-weight:700;text-anchor:middle;pointer-events:none}
+.papol{fill:var(--pol);fill-opacity:.55}
+.cut{stroke:var(--bad);stroke-width:2;stroke-dasharray:3 3}
+.nucbg{fill:var(--nucleo)}.cytbg{fill:var(--cyto)}
+.env{stroke:var(--memb);stroke-width:3}
+.npc{fill:var(--memb)}
+.hit{fill:transparent}
+.expf{fill:var(--spl)}
+.rlg{fill:var(--ribo);fill-opacity:.18;stroke:var(--ribo);stroke-width:2}
+.rsm{fill:var(--ribo);fill-opacity:.36;stroke:var(--ribo);stroke-width:2}
+.tbody{fill:var(--trna)}.rfbody{fill:var(--rf)}
+.tlabel{fill:#fff;font-size:11px;font-weight:700;text-anchor:middle;pointer-events:none}
+.aa{fill:var(--aa);stroke:var(--scene);stroke-width:2}
+.aat{fill:#fff;font-size:10.5px;font-weight:700;text-anchor:middle;pointer-events:none}
+.pb{stroke:var(--aa);stroke-width:4;stroke-linecap:round}
+.flash{stroke:var(--bG);stroke-width:6;stroke-linecap:round}
+.site{font-size:15px;font-weight:700;fill:var(--ribo);text-anchor:middle}
+.sitediv{stroke:var(--ribo);stroke-width:1.5;stroke-dasharray:3 3}
+.cod0{fill:var(--panel-2)}.cod1{fill:var(--accent-soft)}
+.eif{fill:var(--spl);fill-opacity:.75}
+.ef{fill:var(--bG);fill-opacity:.85}
+.arrow{fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mini-cell{fill:var(--cyto);stroke:var(--memb);stroke-width:1.5}.mini-nuc{fill:var(--nucleo);stroke:var(--memb);stroke-width:1.5}.mini-dot{fill:var(--bad)}
+.box{fill:var(--panel);stroke:var(--line);stroke-width:1.5}
+.boxt{font-size:13px;fill:var(--ink)}
+.boxh{font-size:13.5px;font-weight:700;fill:var(--ink)}
+.ln-ex{stroke:var(--exon);stroke-width:6;fill:none;stroke-linecap:round}
+.ln-in{stroke:var(--intron);stroke-width:6;fill:none;stroke-linecap:round}
+.chromline{fill:none;stroke:var(--chrom);stroke-width:3;stroke-linecap:round;opacity:.8}
+.big{font-family:var(--mono);font-size:30px;font-weight:700;fill:var(--aa);text-anchor:middle;letter-spacing:.12em}
+/* Zelle */
+.c-cyto{fill:var(--cyto)}.c-memb{fill:none;stroke:var(--memb);stroke-width:2.5}
+.c-nucleo{fill:var(--nucleo)}.c-env{fill:none;stroke:var(--memb);stroke-width:2.5}
+.c-nucleolus{fill:var(--chrom);fill-opacity:.45}
+.c-chrom{fill:none;stroke:var(--chrom);stroke-width:2.5;stroke-linecap:round;opacity:.75}
+.c-rer{fill:none;stroke:var(--er);stroke-width:9;stroke-linecap:round;stroke-opacity:.6}
+.c-rib{fill:var(--ribo)}
+.c-ser{fill:none;stroke:var(--er);stroke-width:7;stroke-opacity:.38;stroke-linecap:round}
+.c-golgi{fill:none;stroke:var(--golgi);stroke-width:9;stroke-linecap:round;stroke-opacity:.8}
+.c-ves{fill:var(--golgi);fill-opacity:.5;stroke:var(--golgi);stroke-width:1.5}
+.c-mo{fill:var(--mito);fill-opacity:.25;stroke:var(--mito);stroke-width:2}.c-mi{fill:none;stroke:var(--mito);stroke-width:1.8}
+.c-lyso{fill:var(--lyso);fill-opacity:.4;stroke:var(--lyso);stroke-width:2}
+.c-hit{fill:none;stroke:transparent;stroke-width:16;pointer-events:stroke}
+.c-npcfill{fill:var(--nucleo)}
+.clbl{font-size:14px;font-weight:700;fill:var(--ink);paint-order:stroke;stroke:var(--cyto);stroke-width:4px;stroke-linejoin:round}
+.clbl.in{stroke:var(--nucleo)}
+.cline{stroke:var(--ink);stroke-width:1.2;stroke-opacity:.55}
+.pm circle{fill:var(--bad)}.pm text{fill:#fff;font-weight:700;font-size:12px;text-anchor:middle;pointer-events:none}
+.pmt{font-size:12.5px;font-weight:700;fill:var(--bad);paint-order:stroke;stroke:var(--cyto);stroke-width:4px;stroke-linejoin:round}
+.ppath{fill:none;stroke:var(--bad);stroke-width:2;stroke-dasharray:6 5;stroke-opacity:.75}
+.ppath.alt{stroke-dasharray:2 5}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Vom Gen zum Protein</h1>
+      <p class="seqline" id="seqline" aria-label="Modell-mRNA"></p>
+    </div>
+    <div class="level" role="group" aria-label="Niveau">
+      <button type="button" data-lv="sek1">Sekundarstufe I</button>
+      <button type="button" data-lv="ober">Oberstufe</button>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Bereiche">
+    <button role="tab" data-tab="zelle" aria-selected="true">Zelle</button>
+    <button role="tab" data-tab="ablauf" aria-selected="false">Ablauf</button>
+    <button role="tab" data-tab="erarbeiten" aria-selected="false">Erarbeiten</button>
+    <button role="tab" data-tab="glossar" aria-selected="false">Glossar</button>
+  </nav>
+
+  <main>
+    <section id="tab-zelle" role="tabpanel">
+      <p class="hint">Bestandteile anklicken: Ein Fenster zeigt Informationen. Die roten Ziffern markieren den Weg der genetischen Information; ein Klick darauf öffnet den passenden Schritt im Ablauf.</p>
+      <div class="cellgrid">
+        <div class="figure"><svg id="cell" viewBox="0 0 760 500" role="img" aria-label="Schema einer tierischen Zelle mit Organellen"></svg></div>
+        <aside class="side">
+          <h2>Organellen ein- und ausblenden</h2>
+          <div id="orgToggles"></div>
+          <div class="btnrow">
+            <button class="btn small" type="button" id="allOn">Alle einblenden</button>
+            <button class="btn small" type="button" id="pbsOnly">Nur Proteinbiosynthese</button>
+          </div>
+          <hr class="sep">
+          <label class="toggle"><input type="checkbox" id="cellLabels" checked> Beschriftungen</label>
+          <label class="toggle"><input type="checkbox" id="cellPath" checked> Weg der Information</label>
+        </aside>
+      </div>
+    </section>
+
+    <section id="tab-ablauf" role="tabpanel" hidden>
+      <ol class="rail" id="rail"></ol>
+      <div class="stagehead"><h2 id="stTitle"></h2><span class="ort" id="ort"></span></div>
+      <div class="scenebox"><svg id="scene" viewBox="0 0 760 440" role="img" aria-label="Animation des aktuellen Schritts"></svg></div>
+      <div class="controls">
+        <button class="btn" type="button" id="prev">Zurück</button>
+        <button class="btn primary" type="button" id="play">Abspielen</button>
+        <button class="btn" type="button" id="next">Weiter</button>
+        <input type="range" id="scrub" min="0" max="1000" value="0" aria-label="Zeitpunkt im Schritt">
+        <label>Tempo <select id="speed"><option value="0.5">langsam</option><option value="1" selected>normal</option><option value="1.6">schnell</option></select></label>
+        <label><input type="checkbox" id="chain" checked> Alle Schritte nacheinander</label>
+        <label><input type="checkbox" id="labels" checked> Beschriftungen</label>
+      </div>
+      <div class="caption" id="caption" aria-live="polite"></div>
+      <div class="obs"><h3>Beobachtungsauftrag</h3><p id="obs"></p></div>
+      <p class="hint" style="margin-top:12px">Bestandteile in der Animation anklicken, um Informationen zu erhalten. Die Animation pausiert dabei nicht.</p>
+    </section>
+
+    <section id="tab-erarbeiten" role="tabpanel" hidden>
+      <div class="taskhead">
+        <p class="hint" id="taskIntro"></p>
+        <label class="toggle"><input type="checkbox" id="solToggle" checked> Lösungshinweise anzeigen</label>
+      </div>
+      <div id="tasks"></div>
+    </section>
+
+    <section id="tab-glossar" role="tabpanel" hidden>
+      <input class="gsearch" id="gsearch" type="search" placeholder="Begriff suchen …" aria-label="Glossar durchsuchen">
+      <p class="hint">Farben der Artikel: <span class="art-der">der</span>, <span class="art-die">die</span>, <span class="art-das">das</span>.</p>
+      <div class="gloss" id="gloss"></div>
+    </section>
+  </main>
+</div>
+
+<div class="info" id="info" hidden>
+  <div class="infocard" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
+    <button class="btn small closebtn" type="button" id="infoClose">Schließen</button>
+    <span class="lv" id="infoLv"></span>
+    <h3 id="infoTitle"></h3>
+    <p class="gr" id="infoGr"></p>
+    <div id="infoBody"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)), lerp=(a,b,f)=>a+(b-a)*f;
+const ease=f=>{f=clamp(f,0,1);return f<.5?2*f*f:1-Math.pow(-2*f+2,2)/2;};
+const seg=(t,a,b)=>clamp((t-a)/(b-a),0,1);
+const f1=v=>(+v).toFixed(1);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,v);}catch(e){}}};
+let LEVEL=store.get('gx-level','sek1'); if(LEVEL!=='sek1'&&LEVEL!=='ober') LEVEL='sek1';
+const isO=()=>LEVEL==='ober';
+const L=(s,o)=>isO()?(o??s):(s??o);
+
+/* ---------- Genetischer Code ---------- */
+const CODE='FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG';
+const BI={U:0,C:1,A:2,G:3,T:0};
+const code=c=>CODE[16*BI[c[0]]+4*BI[c[1]]+BI[c[2]]];
+const AA3={A:'Ala',R:'Arg',N:'Asn',D:'Asp',C:'Cys',Q:'Gln',E:'Glu',G:'Gly',H:'His',I:'Ile',L:'Leu',K:'Lys',M:'Met',F:'Phe',P:'Pro',S:'Ser',T:'Thr',W:'Trp',Y:'Tyr',V:'Val','*':'Stopp'};
+const AANAME={Ala:'Alanin',Arg:'Arginin',Asn:'Asparagin',Asp:'Asparaginsäure (Aspartat)',Cys:'Cystein',Gln:'Glutamin',Glu:'Glutaminsäure (Glutamat)',Gly:'Glycin',His:'Histidin',Ile:'Isoleucin',Leu:'Leucin',Lys:'Lysin',Met:'Methionin',Phe:'Phenylalanin',Pro:'Prolin',Ser:'Serin',Thr:'Threonin',Trp:'Tryptophan',Tyr:'Tyrosin',Val:'Valin'};
+const DC={A:'T',T:'A',G:'C',C:'G'}, RC={A:'U',U:'A',G:'C',C:'G'};
+const toR=s=>s.replace(/T/g,'U');
+
+/* ---------- Modellgen ---------- */
+const SEQ={up:'CTATAAAAGGCTCGAGC',utr5:'GCCACC',e1:'ATGGAAAAT',intron:'GTAAGTTAACTAACTTTCAG',e2:'GATGAGCTGTAA',utr3:'CAATAAAG',tail:'TTGCA',down:'GCAT'};
+const CDS='AUGGAAAAUGAUGAGCUGUAA';
+const AA3L=['Met','Glu','Asn','Asp','Glu','Leu'];
+function geneModel(lv){
+  const segs=lv==='ober'
+    ?[['up',SEQ.up],['utr5',SEQ.utr5],['e1',SEQ.e1],['intron',SEQ.intron],['e2',SEQ.e2],['utr3',SEQ.utr3],['tail',SEQ.tail],['down',SEQ.down]]
+    :[['up',SEQ.up],['utr5',SEQ.utr5],['cds',SEQ.e1+SEQ.e2],['utr3',SEQ.utr3],['down',SEQ.down]];
+  let coding='';const type=[];
+  segs.forEach(([t,s])=>{coding+=s;for(let i=0;i<s.length;i++)type.push(t);});
+  const tss=SEQ.up.length, tEnd=coding.length-SEQ.down.length;
+  return {coding,type,tss,tEnd,L:tEnd-tss};
+}
+function mature(lv){
+  const s='GCCACC'+CDS+'CAAUAAAG';
+  return lv==='ober'?{seq:s+'AAAAAAAA',cdsStart:6,polyA:true}:{seq:s,cdsStart:6,polyA:false};
+}
+
+/* ---------- Szenen-Zustand ---------- */
+const SC={stage:0,t:0,playing:false,speed:1,chain:true,labels:true,dirty:true};
+
+/* ---------- SVG-Helfer ---------- */
+function nt(x,y,b,o={}){
+  const w=o.w||22,h=o.h||20,fs=o.fs||12,op=o.op??1;
+  if(op<=0.01) return '';
+  const cls='b'+(b==='T'?'U':b);
+  const k=o.key?` data-key="${o.key}" class="hot"`:'';
+  return `<g opacity="${op.toFixed(3)}"${k}><rect x="${f1(x-w/2)}" y="${f1(y-h/2)}" width="${w}" height="${h}" rx="${o.rx??3}" class="${cls}"/>${o.noText?'':`<text x="${f1(x)}" y="${f1(y+fs*0.36)}" class="bt${b==='G'?' btG':''}" font-size="${fs}">${b}</text>`}</g>`;
+}
+function lbl(x,y,txt,o={}){
+  if(!SC.labels&&!o.force) return '';
+  if(o.op!=null&&o.op<=0.01) return '';
+  const k=o.key?` data-key="${o.key}"`:'';
+  return `<text x="${f1(x)}" y="${f1(y)}" text-anchor="${o.a||'middle'}" class="${o.cls||'lbl'}${o.key?' hot':''}"${k}${o.op!=null?` opacity="${o.op.toFixed(2)}"`:''}>${txt}</text>`;
+}
+const poly=(pts,cls,op=1)=>pts.length<2?'':`<polyline points="${pts.map(p=>f1(p[0])+','+f1(p[1])).join(' ')}" class="${cls}" opacity="${op}"/>`;
+const line=(x1,y1,x2,y2,cls,op=1)=>`<line x1="${f1(x1)}" y1="${f1(y1)}" x2="${f1(x2)}" y2="${f1(y2)}" class="${cls}" opacity="${(+op).toFixed(2)}"/>`;
+function hlRect(x1,x2,y,h=26,op=1){return `<rect x="${f1(x1)}" y="${f1(y-h/2)}" width="${f1(x2-x1)}" height="${h}" rx="5" class="hlbox" opacity="${op.toFixed(2)}"/>`;}
+function bracket(x1,x2,y,txt,key,op=1){
+  if(op<=0.01) return '';
+  return `<g opacity="${op.toFixed(2)}"><path d="M${f1(x1)},${f1(y+6)} L${f1(x1)},${f1(y)} L${f1(x2)},${f1(y)} L${f1(x2)},${f1(y+6)}" class="arrow"/></g>`+lbl((x1+x2)/2,y-7,txt,{key,cls:'lbls',op});
+}
+function miniLoc(ort){
+  const pos={kern:[22,24],pore:[33,22],cyto:[48,28]}[ort]||[48,28];
+  return `<g transform="translate(686,10)" aria-hidden="true"><ellipse cx="30" cy="24" rx="30" ry="21" class="mini-cell"/><circle cx="22" cy="24" r="11" class="mini-nuc"/><circle cx="${pos[0]}" cy="${pos[1]}" r="4" class="mini-dot"/></g>`;
+}
+function aaCircle(x,y,name,op=1){
+  if(op<=0.01) return '';
+  return `<g class="hot" data-key="aminosaeure" opacity="${op.toFixed(2)}"><circle cx="${f1(x)}" cy="${f1(y)}" r="15" class="aa"/><text x="${f1(x)}" y="${f1(y+3.8)}" class="aat">${name}</text></g>`;
+}
+function peptide(pts,names,op=1){
+  if(op<=0.01||!pts.length) return '';
+  let s=`<g opacity="${op.toFixed(2)}">`;
+  for(let k=0;k<pts.length-1;k++) s+=line(pts[k][0],pts[k][1],pts[k+1][0],pts[k+1][1],'pb');
+  s+=`</g>`;
+  pts.forEach((p,k)=>s+=aaCircle(p[0],p[1],names[k],op));
+  return s;
+}
+
+/* ---------- Szene: Transkription ---------- */
+function sceneTx(t){
+  const O=isO(), g=geneModel(LEVEL), W=24, X0=44, N=g.coding.length, VW=760;
+  const xs=i=>X0+i*W;
+  let p=0, rel=0, polIn=1;
+  if(t<0.15){polIn=ease(seg(t,0.05,0.15));}
+  else if(t<0.9){p=g.L*(t-0.15)/0.75;}
+  else {p=g.L;rel=ease(seg(t,0.9,1));}
+  const c=g.tss+p;
+  const worldW=X0*2+(N-1)*W;
+  const focus=t<0.15?xs(g.tss)-40:X0+c*W;
+  const camX=clamp(focus-400,0,Math.max(0,worldW-VW));
+  const open=polIn*(1-rel);
+  const sep=i=>open*clamp(Math.min(i-(c-7),(c+2.5)-i)/1.5,0,1);
+  const i0=Math.max(0,Math.floor(camX/W)-2), i1=Math.min(N-1,Math.ceil((camX+VW)/W)+2);
+  let s=`<g transform="translate(${f1(-camX)},0)">`;
+
+  // Gen-Abschnitte (Band)
+  const gm=O?{up:'up',utr5:'ex1',e1:'ex1',intron:'in',e2:'ex2',utr3:'ex2',tail:'tail',down:'down'}:{up:'up',utr5:'gen',cds:'gen',utr3:'gen',down:'down'};
+  const tc={up:'sg-up',utr5:'sg-utr',e1:'sg-ex',cds:'sg-ex',intron:'sg-in',e2:'sg-ex',utr3:'sg-utr',tail:'sg-tail',down:'sg-none'};
+  for(let i=i0;i<=i1;i++) s+=`<rect x="${xs(i)-12}" y="404" width="24" height="8" class="${tc[g.type[i]]}"/>`;
+  const gl=O?{up:['Promotor','promotor'],ex1:['Exon 1','exon'],in:['Intron','intron'],ex2:['Exon 2','exon']}:{up:['Promotor','promotor'],gen:['Gen','gen']};
+  let a=0;
+  for(let i=1;i<=N;i++){
+    if(i===N||gm[g.type[i]]!==gm[g.type[a]]){const key=gm[g.type[a]];if(gl[key]) s+=lbl((xs(a)+xs(i-1))/2,430,gl[key][0],{key:gl[key][1],cls:'lbls'});a=i;}
+  }
+
+  // Transkriptionsfaktoren / TATA
+  const tfo=ease(seg(t,0,0.06))*(t>0.15?0.6:1);
+  if(tfo>0.01){
+    s+=`<g class="hot" data-key="tf" opacity="${tfo.toFixed(2)}"><ellipse cx="${xs(4)}" cy="312" rx="104" ry="54" class="tfb"/></g>`;
+    s+=lbl(xs(4),384,O?'TFIID (TBP) u. a.':'Transkriptionsfaktoren',{key:'tf',cls:'lbls',op:tfo});
+  }
+  if(O){ s+=hlRect(xs(1)-13,xs(7)+13,290,26,1)+lbl(xs(4),252,'TATA-Box',{key:'tata',cls:'lbls'}); }
+
+  // DNA
+  const cy=[],ty=[],cp=[],tp=[];
+  for(let i=i0;i<=i1;i++){const q=sep(i);cy[i]=290-42*q;ty[i]=334+42*q;cp.push([xs(i),cy[i]]);tp.push([xs(i),ty[i]]);}
+  s+=poly(cp,'bb')+poly(tp,'bb');
+  for(let i=i0;i<=i1;i++){const q=sep(i);if(q<0.35) s+=line(xs(i),cy[i]+10,xs(i),ty[i]-10,'hb',1-q/0.35);}
+  for(let i=i0;i<=i1;i++){s+=nt(xs(i),cy[i],g.coding[i],{key:'dna'});s+=nt(xs(i),ty[i],DC[g.coding[i]],{key:'dna'});}
+  s+=lbl(xs(0)-24,295,"5'",{cls:'end',force:true})+lbl(xs(N-1)+24,295,"3'",{cls:'end',force:true});
+  s+=lbl(xs(0)-24,339,"3'",{cls:'end',force:true})+lbl(xs(N-1)+24,339,"5'",{cls:'end',force:true});
+
+  // RNA-Polymerase
+  const pcx=X0+(c-2)*W, pcy=312-(1-polIn)*140-rel*130, pop=polIn*(1-rel);
+  if(pop>0.01){
+    s+=`<g class="hot" data-key="rnapol" opacity="${pop.toFixed(2)}"><ellipse cx="${f1(pcx)}" cy="${f1(pcy)}" rx="125" ry="92" class="pol"/><path d="M${f1(pcx+92)},${f1(pcy+64)} l26,0 m-7,-6 l7,6 l-7,6" class="arrow"/></g>`;
+    s+=lbl(pcx+66,pcy-100,O?'RNA-Polymerase II':'RNA-Polymerase',{key:'rnapol',op:pop});
+  }
+
+  // RNA
+  const n=Math.floor(p+1e-6), rp=[];
+  for(let j=0;j<n;j++){
+    const age=p-j;let x,y;
+    if(age<=5){x=xs(g.tss+j);y=344;}
+    else{const k=age-5,Sx=X0+(c-5)*W;if(k<=11){x=Sx-k*12;y=344-k*20;}else{x=Sx-132-(k-11)*24;y=124;}}
+    if(rel>0){x=lerp(x,xs(g.tss+j)+132,rel);y=lerp(y,124,rel);}
+    rp.push([x,y]);
+  }
+  const rk=O?'premrna':'mrna';
+  s+=poly(rp,'rb');
+  rp.forEach((q,j)=>s+=nt(q[0],q[1],toR(g.coding[g.tss+j]),{key:rk}));
+  if(rp.length){
+    s+=lbl(rp[0][0]-22,rp[0][1]+5,"5'",{cls:'end',force:true});
+    if(rp.length>3) s+=lbl(rp[0][0]+2,rp[0][1]-20,O?'prä-mRNA':'mRNA',{key:rk,a:'start'});
+  }
+  s+=`</g>`;
+  s+=`<text x="14" y="24" class="legend">oben: ${O?'codierender (nicht-codogener) Strang 5′→3′':'nicht-codogener Strang'}</text>`;
+  s+=`<text x="14" y="42" class="legend">unten: ${O?'codogener Strang (Matrize) 3′→5′':'codogener Strang (Vorlage für die mRNA)'}</text>`;
+  return s;
+}
+
+/* ---------- Szene: RNA-Prozessierung (Oberstufe) ---------- */
+function sceneProc(t){
+  const g=geneModel('ober'), r=toR(g.coding.slice(g.tss,g.tEnd)), ty=g.type.slice(g.tss,g.tEnd);
+  const W=11.5, X0=60, Y=250, I0=15, I1=34, BR=27, T0=55, N=r.length;
+  const pC=ease(seg(t,0,0.16));
+  const sp=seg(t,0.18,0.66), sa=ease(seg(sp,0,0.25)), sb=ease(seg(sp,0.25,0.4)), sc=ease(seg(sp,0.4,0.65)), sd=ease(seg(sp,0.65,0.9));
+  const pa=seg(t,0.66,0.88), pa1=ease(seg(pa,0,0.15)), pa2=ease(seg(pa,0.15,0.4)), pa3=seg(pa,0.4,1);
+  const fin=ease(seg(t,0.88,1));
+  const shift=sd*20*W;
+  const P=[];
+  for(let n=0;n<N;n++){
+    let x=X0+n*W,y=Y,op=1;
+    if(n>=I0&&n<=I1){
+      const k=n-I0;
+      if(k<=12){const cx=X0+(I0+6)*W,cyy=Y-48,R=27,th=Math.PI/2+2*Math.PI*(k+0.5)/13;x=lerp(x,cx+R*Math.cos(th),sc);y=lerp(y,cyy+R*Math.sin(th),sc);}
+      y-=sd*130;x-=sd*20;op=1-sd;
+    }
+    if(n>I1) x-=shift;
+    if(n>=T0){y+=pa2*60;op=1-pa2;}
+    P.push({x,y,op});
+  }
+  let s='';
+  s+=lbl(380,40,fin>0.5?'reife mRNA':'prä-mRNA (primäres Transkript)',{key:fin>0.5?'mrna':'premrna',force:true,cls:'lbl'});
+  // Spleißosom
+  const splo=sb*(1-sd);
+  if(splo>0.01) s+=`<g class="hot" data-key="spleissosom" opacity="${splo.toFixed(2)}"><ellipse cx="${f1(X0+(I0+9.5)*W)}" cy="${Y-34}" rx="150" ry="80" class="splc"/></g>`+lbl(X0+(I0+9.5)*W,Y-122,'Spleißosom',{key:'spleissosom',op:splo});
+  // Rückgrat
+  const links=[];
+  for(let n=0;n<N-1;n++){
+    if(n===I0-1&&sc>0.5) continue;
+    if(n===I1&&sd>0.05) continue;
+    if(n===T0-1&&pa2>0.02) continue;
+    links.push([n,n+1]);
+  }
+  if(sd>0.95) links.push([I0-1,I1+1]);
+  for(const [a,b] of links) s+=line(P[a].x,P[a].y,P[b].x,P[b].y,'rb',Math.min(P[a].op,P[b].op));
+  if(sc>0.5) s+=line(P[I0].x,P[I0].y,P[BR].x,P[BR].y,'flash',(1-sd)*0.9);
+  // Typ-Band und Nukleotide
+  const tc={utr5:'sg-utr',e1:'sg-ex',intron:'sg-in',e2:'sg-ex',utr3:'sg-utr',tail:'sg-tail'};
+  for(let n=0;n<N;n++){
+    const q=P[n]; if(q.op<=0.01) continue;
+    s+=`<rect x="${f1(q.x-W/2)}" y="${f1(q.y+9)}" width="${W}" height="4" class="${tc[ty[n]]}" opacity="${q.op.toFixed(2)}"/>`;
+    s+=nt(q.x,q.y,r[n],{w:10.5,h:14,fs:8.5,rx:2,op:q.op,key:ty[n]==='intron'?(sc>0.5?'lariat':'intron'):'exon'});
+  }
+  // snRNPs
+  const sno=sa*(1-sd);
+  if(sno>0.01){
+    s+=`<g class="hot" data-key="spleissosom" opacity="${sno.toFixed(2)}"><circle cx="${f1(X0+(I0+0.5)*W)}" cy="${Y+24}" r="13" class="snrnp"/><text x="${f1(X0+(I0+0.5)*W)}" y="${Y+28}" class="snt">U1</text><circle cx="${f1(X0+BR*W)}" cy="${Y+24}" r="13" class="snrnp"/><text x="${f1(X0+BR*W)}" y="${Y+28}" class="snt">U2</text></g>`;
+  }
+  // Spleißstellen
+  const sso=seg(sp,0,0.1)*(1-sc);
+  if(sso>0.01){
+    s+=hlRect(P[I0].x-7,P[I0+1].x+7,Y,22,sso)+hlRect(P[BR].x-7,P[BR].x+7,Y,22,sso)+hlRect(P[I1-1].x-7,P[I1].x+7,Y,22,sso);
+    s+=lbl(P[I0].x-14,Y+60,"5′-Spleißstelle (GU)",{key:'intron',cls:'lbls',op:sso,a:'end'});
+    s+=lbl(P[BR].x,Y+78,'Verzweigungsstelle (A)',{key:'intron',cls:'lbls',op:sso});
+    s+=lbl(P[I1].x+14,Y+60,"3′-Spleißstelle (AG)",{key:'intron',cls:'lbls',op:sso,a:'start'});
+  }
+  if(sc>0.3&&sd<0.9) s+=lbl(X0+(I0+6)*W,Y-90-sd*130,"Lariat (2′-5′-Bindung)",{key:'lariat',cls:'lbls',op:Math.min(1,(sc-0.3)/0.4)*(1-sd)});
+  // Cap
+  if(pC>0){
+    const cx=X0-22,cy=lerp(110,Y,pC);
+    if(pC>0.95) s+=line(cx+12,cy,P[0].x-6,Y,'rb');
+    s+=`<g class="hot" data-key="cap"><circle cx="${f1(cx)}" cy="${f1(cy)}" r="13" class="cap"/><text x="${f1(cx)}" y="${f1(cy+3)}" class="capt">m⁷G</text></g>`;
+    s+=lbl(cx,cy-20,"5′-Cap",{key:'cap',cls:'lbls'});
+    if(pC>0.95&&t<0.3) s+=lbl(cx+4,cy+32,"5′-5′-Triphosphatbrücke",{key:'cap',cls:'lbls',a:'start',op:1-seg(t,0.24,0.3)});
+  }
+  // Polyadenylierung
+  if(pa>0){
+    const ho=1-fin*0.4;
+    s+=hlRect(P[48].x-7,P[53].x+7,Y,22,ho)+lbl((P[48].x+P[53].x)/2,Y+40,'AAUAAA',{key:'polya',cls:'lbls',op:ho});
+  }
+  if(pa1>0&&pa2<1){const cx=X0+54.5*W-shift;s+=line(cx,Y-22,cx,Y+22,'cut',1-pa2)+lbl(cx,Y-28,'Schnitt',{cls:'lbls',op:1-pa2});}
+  const cnt=Math.floor(pa3*14+1e-6);
+  for(let q=0;q<cnt;q++){
+    const x=X0+(T0+q)*W-shift;
+    s+=line(x-W,Y,x,Y,'rb')+nt(x,Y,'A',{w:10.5,h:14,fs:8.5,rx:2,key:'polya'});
+  }
+  if(pa3>0&&pa3<1){const x=X0+(T0+cnt)*W-shift+8;s+=`<ellipse cx="${f1(x)}" cy="${Y}" rx="15" ry="11" class="papol"/>`+lbl(x,Y-24,'Poly(A)-Polymerase',{key:'polya',cls:'lbls'});}
+  // Abschluss-Beschriftung
+  if(fin>0){
+    const yb=Y-30;
+    s+=hlRect(P[6].x-6,P[8].x+6,Y,20,fin)+hlRect(P[44].x-6,P[46].x+6,Y,20,fin);
+    s+=bracket(P[0].x-5,P[5].x+5,yb,"5′-UTR",'mrna',fin);
+    s+=bracket(P[6].x-5,P[46].x+5,yb,'codierende Sequenz (AUG … UAA)','codon',fin);
+    s+=bracket(P[47].x-5,P[54].x+5,yb,"3′-UTR",'mrna',fin);
+    s+=bracket(X0+T0*W-shift-5,X0+(T0+13)*W-shift+5,yb,'Poly(A)-Schwanz','polya',fin);
+    s+=lbl(380,Y+90,'Poly(A)-Schwanz real ca. 200 Nukleotide; hier verkürzt',{cls:'lbls',op:fin});
+  }
+  return s;
+}
+
+/* ---------- Szene: Export ---------- */
+function sceneExp(t){
+  const O=isO(), m=mature(LEVEL), seq=m.seq.split('');
+  let s=`<rect x="0" y="0" width="372" height="440" class="nucbg hot" data-key="zellkern"/><rect x="384" y="0" width="376" height="440" class="cytbg hot" data-key="cytoplasma"/>`;
+  const pores=[90,225,360], gap=24;
+  s+=`<rect x="368" y="0" width="20" height="440" class="hit hot" data-key="kernhuelle"/>`;
+  const segs=[[0,pores[0]-gap],[pores[0]+gap,pores[1]-gap],[pores[1]+gap,pores[2]-gap],[pores[2]+gap,440]];
+  for(const xx of [372,384]) for(const [a,b] of segs) s+=line(xx,a,xx,b,'env');
+  for(const pc of pores) s+=`<g class="hot" data-key="kernpore"><rect x="366" y="${pc-gap-5}" width="24" height="10" rx="4" class="npc"/><rect x="366" y="${pc+gap-5}" width="24" height="10" rx="4" class="npc"/></g>`;
+  s+=lbl(24,32,O?'Nukleus':'Zellkern',{a:'start',cls:'region',key:'zellkern',force:true});
+  s+=lbl(672,32,O?'Cytosol':'Cytoplasma',{a:'end',cls:'region',key:'cytoplasma',force:true});
+  s+=lbl(398,182,O?'Kernporenkomplex':'Kernpore',{a:'start',key:'kernpore'});
+  s+=lbl(378,432,'Kernhülle (Doppelmembran)',{key:'kernhuelle',cls:'lbls'});
+  // DNA bleibt im Kern
+  s+=`<g class="hot" data-key="chromatin"><path d="M60,96 q14,-20 28,0 t28,0 t28,0 t28,0 t28,0" class="chromline"/><path d="M70,118 q14,20 28,0 t28,0 t28,0 t28,0" class="chromline"/></g>`;
+  s+=lbl(130,150,'DNA (bleibt im Kern)',{key:'chromatin',cls:'lbls'});
+  if(O){
+    s+=`<g class="hot" data-key="premrna"><path d="M50,340 q20,-14 40,0 t40,0" class="ln-ex"/><path d="M130,340 q20,-14 40,0 t40,0" class="ln-in"/><path d="M210,340 q20,-14 40,0 t40,0" class="ln-ex"/></g>`;
+    s+=lbl(170,378,'prä-mRNA mit Intron:',{key:'premrna',cls:'lbls'})+lbl(170,394,'wird zurückgehalten und abgebaut',{key:'premrna',cls:'lbls'});
+  }
+  // Ribosomen-Untereinheiten
+  s+=`<g class="hot" data-key="ribosom" opacity=".7"><ellipse cx="640" cy="356" rx="34" ry="13" class="rsm"/><ellipse cx="640" cy="322" rx="40" ry="22" class="rlg"/><ellipse cx="560" cy="392" rx="30" ry="11" class="rsm"/></g>`;
+  s+=lbl(640,292,O?'Untereinheiten (40S, 60S)':'Teile von Ribosomen',{key:'ribosom',cls:'lbls'});
+  // mRNA
+  const f=ease(seg(t,0.06,0.88)), h=lerp(300,740,f), Y0=225;
+  const wy=x=>Y0+(x<350?16*Math.sin(x/22)*clamp((350-x)/50,0,1):(x>400?12*Math.sin(x/26)*clamp((x-400)/60,0,1):0));
+  const pts=[];
+  for(let k=0;k<seq.length;k++){const x=h-k*8;if(x<-10)continue;pts.push([x,wy(x),k]);}
+  s+=poly(pts.map(q=>[q[0],q[1]]),'rb');
+  for(const [x,y,k] of pts){
+    s+=`<rect x="${f1(x-3.5)}" y="${f1(y-6)}" width="7" height="12" rx="1.5" class="b${seq[k]} hot" data-key="mrna"/>`;
+    if(k%10===5) s+=`<ellipse cx="${f1(x)}" cy="${f1(y-12)}" rx="6" ry="4" class="expf hot" data-key="export"/>`;
+  }
+  if(O) s+=`<g class="hot" data-key="cap"><circle cx="${f1(h+10)}" cy="${f1(wy(h))}" r="7" class="cap"/></g>`;
+  s+=lbl(h-18,wy(h)-26,O?'Exportfaktoren':'Transportproteine',{key:'export',cls:'lbls',op:1-seg(t,0.85,0.95)});
+  const mx=h-150;
+  s+=lbl(mx,wy(mx)+34,O?'reife mRNA (als mRNP)':'mRNA',{key:'mrna'});
+  if(O&&pts.length) s+=lbl(h+10,wy(h)+24,"5′",{cls:'end',force:true});
+  return s;
+}
+
+/* ---------- Translation: gemeinsame Elemente ---------- */
+const TX={W:24,X0:72,Y:330};
+const tX=n=>TX.X0+n*TX.W;
+function mRNAstrip(m,camX,O){
+  const N=m.seq.length;let s='';
+  const i0=Math.max(0,Math.floor((camX-TX.X0)/TX.W)-2), i1=Math.min(N-1,Math.ceil((camX+760-TX.X0)/TX.W)+2);
+  for(let c=0;c<7;c++){const n0=m.cdsStart+3*c;s+=`<rect x="${tX(n0)-12}" y="${TX.Y-15}" width="72" height="30" rx="6" class="${c%2?'cod1':'cod0'}"/>`;}
+  const pts=[];for(let i=i0;i<=i1;i++)pts.push([tX(i),TX.Y]);
+  s+=poly(pts,'rb');
+  for(let i=i0;i<=i1;i++){const inC=i>=m.cdsStart&&i<m.cdsStart+21;s+=nt(tX(i),TX.Y,m.seq[i],{key:inC?'codon':(m.polyA&&i>=N-8?'polya':'mrna')});}
+  if(O) s+=`<g class="hot" data-key="cap"><circle cx="${tX(0)-30}" cy="${TX.Y}" r="13" class="cap"/><text x="${tX(0)-30}" y="${TX.Y+3}" class="capt">m⁷G</text></g>`+line(tX(0)-17,TX.Y,tX(0)-11,TX.Y,'rb');
+  s+=lbl(tX(0)-(O?54:24),TX.Y+5,"5′",{cls:'end',force:true})+lbl(tX(N-1)+24,TX.Y+5,"3′",{cls:'end',force:true});
+  if(m.polyA) s+=lbl(tX(N-4.5),TX.Y+36,'Poly(A)',{key:'polya',cls:'lbls'});
+  return s;
+}
+function ribo(cx,lgOff,smOff,opL,opS){
+  return {
+    large:opL>0.01?`<g opacity="${opL.toFixed(2)}" class="hot" data-key="ribosom"><rect x="${f1(cx-112)}" y="${f1(186+lgOff)}" width="224" height="132" rx="46" class="rlg"/></g>`:'',
+    small:opS>0.01?`<g opacity="${opS.toFixed(2)}" class="hot" data-key="ribosom"><rect x="${f1(cx-108)}" y="${f1(342+smOff)}" width="216" height="50" rx="24" class="rsm"/></g>`:''
+  };
+}
+function sites(cx,op){
+  if(!isO()||op<=0.01) return '';
+  let s=`<g opacity="${op.toFixed(2)}">`;
+  [['E',-72],['P',0],['A',72]].forEach(([l,d])=>s+=`<text x="${f1(cx+d)}" y="414" class="site hot" data-key="eps">${l}</text>`);
+  s+=line(cx-36,398,cx-36,416,'sitediv')+line(cx+36,398,cx+36,416,'sitediv')+`</g>`;
+  return s;
+}
+function trna(x,codon,o={}){
+  const dx=o.dx||0,dy=o.dy||0,op=o.op??1;
+  if(op<=0.01) return '';
+  const anti=codon.split('').map(b=>RC[b]);
+  const body=o.rf?'rfbody':'tbody';
+  let s=`<g transform="translate(${f1(dx)},${f1(dy)})" opacity="${op.toFixed(3)}"><g class="hot" data-key="${o.rf?'rf':'trna'}">`;
+  s+=`<rect x="${f1(x+9)}" y="212" width="11" height="30" rx="3" class="${body}"/><rect x="${f1(x-30)}" y="236" width="60" height="58" rx="16" class="${body}"/>`;
+  if(!o.rf){
+    s+=`<rect x="${f1(x-37)}" y="292" width="74" height="22" rx="6" class="tbody"/>`;
+    s+=`<text x="${f1(x-3)}" y="270" class="tlabel">tRNA</text></g>`;
+    anti.forEach((b,i)=>s+=nt(x-24+i*24,303,b,{w:20,h:16,fs:11,key:'anticodon'}));
+    if(o.paired) for(let i=0;i<3;i++) s+=line(x-24+i*24,312,x-24+i*24,320,'hb');
+  } else {
+    s+=`<rect x="${f1(x-34)}" y="290" width="68" height="22" rx="8" class="rfbody"/><text x="${f1(x-3)}" y="270" class="tlabel">${isO()?'eRF1':'RF'}</text></g>`;
+  }
+  if(o.aa) s+=aaCircle(x+15,198,o.aa);
+  s+=`</g>`;
+  return s;
+}
+const cam=(x,worldW)=>clamp(x-380,0,Math.max(0,worldW-760));
+
+/* ---------- Szene: Initiation ---------- */
+function sceneInit(t){
+  const O=isO(), m=mature(LEVEL), N=m.seq.length;
+  const aug=tX(m.cdsStart+1), start=tX(1);
+  const smIn=ease(seg(t,0,0.2)), mv=ease(seg(t,0.2,0.55)), rx=lerp(start,aug,mv), lgIn=ease(seg(t,0.72,0.92));
+  const camX=cam(rx,TX.X0*2+(N-1)*TX.W);
+  let s=`<g transform="translate(${f1(-camX)},0)">`;
+  s+=mRNAstrip(m,camX,O);
+  const R=ribo(rx,lerp(-220,0,lgIn),lerp(90,0,smIn),lgIn,smIn);
+  s+=R.large;
+  if(O) s+=trna(rx,'AUG',{op:smIn,aa:'Met',paired:mv>=1});
+  else {const a=ease(seg(t,0.55,0.72));s+=trna(aug,'AUG',{dy:lerp(-180,0,a),op:a,aa:'Met',paired:a>=1});}
+  s+=R.small;
+  if(O){
+    const eo=smIn*(1-ease(seg(t,0.66,0.78)));
+    if(eo>0.01) s+=`<g class="hot" data-key="eif" opacity="${eo.toFixed(2)}"><ellipse cx="${f1(rx-126)}" cy="366" rx="18" ry="13" class="eif"/><ellipse cx="${f1(rx+124)}" cy="362" rx="16" ry="12" class="eif"/><ellipse cx="${f1(rx-60)}" cy="398" rx="20" ry="10" class="eif"/></g>`+lbl(rx-126,396,'eIFs',{key:'eif',cls:'lbls',op:eo});
+  }
+  s+=lbl(rx,372,O?'40S':'kleine Untereinheit',{key:'ribosom',cls:'lbls',op:smIn});
+  s+=lbl(rx,176+lerp(-220,0,lgIn),O?'60S-Untereinheit':'große Untereinheit',{key:'ribosom',cls:'lbls',op:lgIn});
+  const ho=seg(t,0.5,0.6);
+  if(ho>0) s+=hlRect(tX(m.cdsStart)-13,tX(m.cdsStart+2)+13,TX.Y,28,ho)+lbl(aug,438,'Startcodon AUG',{key:'startcodon',cls:'lbls',op:ho});
+  s+=sites(rx,ease(seg(t,0.92,1)));
+  s+=`</g>`;
+  return s;
+}
+
+/* ---------- Szene: Elongation ---------- */
+function elongState(t){const cyc=Math.min(4,Math.floor(t*5)),u=t>=1?1:t*5-cyc;return {c:cyc+1,u};}
+function sceneElong(t){
+  const O=isO(), m=mature(LEVEL), N=m.seq.length, cs=m.cdsStart;
+  const cc=i=>tX(cs+3*i+1), cod=i=>m.seq.substr(cs+3*i,3);
+  const {c,u}=elongState(t);
+  const uA=ease(seg(u,0,0.3)), uB=ease(seg(u,0.3,0.5)), uC=ease(seg(u,0.5,0.8)), uD=ease(seg(u,0.8,1));
+  const rx=lerp(cc(c-1),cc(c),uC);
+  const camX=cam(rx+20,TX.X0*2+(N-1)*TX.W);
+  let s=`<g transform="translate(${f1(-camX)},0)">`;
+  s+=mRNAstrip(m,camX,O);
+  const R=ribo(rx,0,0,1,1);
+  s+=R.large;
+  const dyA=lerp(-190,0,uA);
+  s+=trna(cc(c-1),cod(c-1),{dx:-70*uD,dy:-150*uD,op:1-uD,paired:uD===0});
+  s+=trna(cc(c),cod(c),{dy:dyA,op:uA,paired:uA>=1});
+  if(O){
+    const e1=uA*(1-seg(u,0.26,0.32));
+    if(e1>0.01) s+=`<g class="hot" data-key="eef" opacity="${e1.toFixed(2)}"><ellipse cx="${f1(cc(c)+44)}" cy="${f1(258+dyA)}" rx="16" ry="22" class="ef"/></g>`+lbl(cc(c)+66,262+dyA,'eEF1A·GTP',{key:'eef',cls:'lbls',a:'start',op:e1});
+    const e2=seg(u,0.48,0.54)*(1-seg(u,0.78,0.84));
+    if(e2>0.01) s+=`<g class="hot" data-key="eef" opacity="${e2.toFixed(2)}"><ellipse cx="${f1(rx+76)}" cy="250" rx="20" ry="30" class="ef"/></g>`+lbl(rx+102,236,'eEF2·GTP',{key:'eef',cls:'lbls',a:'start',op:e2});
+  }
+  const d=[-22,-24], Pa=[cc(c-1)+15,198], Aa=[cc(c)+15,198+dyA];
+  if(uB<=0){
+    const ch=[];for(let k=0;k<c;k++) ch.push([Pa[0]+d[0]*k,Pa[1]+d[1]*k]);
+    s+=peptide(ch,AA3L.slice(0,c).reverse());
+    s+=aaCircle(Aa[0],Aa[1],AA3L[c],uA);
+  } else {
+    const ch=[[Aa[0],Aa[1]]];
+    for(let k=1;k<=c;k++){const fr=[Pa[0]+d[0]*(k-1),Pa[1]+d[1]*(k-1)],to=[Aa[0]+d[0]*k,Aa[1]+d[1]*k];ch.push([lerp(fr[0],to[0],uB),lerp(fr[1],to[1],uB)]);}
+    if(uB<1) s+=line(Pa[0],Pa[1],Aa[0],Aa[1],'flash',Math.sin(Math.PI*uB));
+    s+=peptide(ch,AA3L.slice(0,c+1).reverse());
+    if(uB<1) s+=lbl((Pa[0]+Aa[0])/2,168,'Peptidbindung',{key:'peptidbindung',cls:'lbls',op:Math.sin(Math.PI*uB)});
+  }
+  s+=R.small;
+  s+=sites(rx,1);
+  s+=`</g>`;
+  s+=`<text x="14" y="24" class="legend">Codon ${c+1} von 7: ${AA3L[c]}</text>`;
+  return s;
+}
+
+/* ---------- Szene: Termination ---------- */
+function sceneTerm(t){
+  const O=isO(), m=mature(LEVEL), N=m.seq.length, cs=m.cdsStart;
+  const cc=i=>tX(cs+3*i+1), cod=i=>m.seq.substr(cs+3*i,3);
+  const c5=cc(5), stp=cc(6);
+  const a=ease(seg(t,0,0.3)), r=ease(seg(t,0.3,0.55)), d=ease(seg(t,0.55,0.85)), fin=ease(seg(t,0.85,1));
+  const camX=cam(c5+36,TX.X0*2+(N-1)*TX.W);
+  let s=`<g transform="translate(${f1(-camX)},0)">`;
+  s+=mRNAstrip(m,camX,O);
+  const R=ribo(c5,-d*170,d*100,1-d*0.75,1-d*0.75);
+  s+=R.large;
+  s+=trna(c5,cod(5),{dx:-d*40,dy:-d*140,op:1-d,paired:d===0});
+  s+=trna(stp,cod(6),{rf:true,dx:d*40,dy:lerp(-190,0,a)-d*140,op:a*(1-d)});
+  s+=lbl(stp+44,268+lerp(-190,0,a)-d*140,O?'Freisetzungsfaktor eRF1':'Freisetzungsfaktor',{key:'rf',cls:'lbls',a:'start',op:a*(1-d)});
+  // Peptid
+  const names=['Leu','Glu','Asp','Asn','Glu','Met'];
+  const pts=[];
+  for(let k=0;k<6;k++){
+    let x=c5+15-22*k+r*30, y=198-24*k-r*40;
+    const rowX=camX+380+((5-k)-2.5)*62, rowY=78;
+    x=lerp(x,rowX,fin);y=lerp(y,rowY,fin);
+    pts.push([x,y]);
+  }
+  s+=peptide(pts,names);
+  if(fin>0.01){
+    pts.forEach((p,k)=>s+=lbl(p[0],p[1]+36,'MENDEL'[5-k],{cls:'lbl',force:true,op:fin}));
+    s+=lbl(pts[5][0]-26,pts[5][1]+5,'N',{cls:'end',force:true,a:'end',op:fin})+lbl(pts[0][0]+26,pts[0][1]+5,'C',{cls:'end',force:true,a:'start',op:fin});
+  }
+  s+=R.small;
+  s+=sites(c5,1-d);
+  s+=hlRect(tX(cs+18)-13,tX(cs+20)+13,TX.Y,28,1-d*0.5)+lbl(stp,438,'Stoppcodon UAA',{key:'stopcodon',cls:'lbls'});
+  s+=`</g>`;
+  return s;
+}
+
+/* ---------- Szene: Protein ---------- */
+function sceneProt(t){
+  const O=isO();
+  const f=ease(seg(t,0.3,0.75));
+  const pts=[];
+  for(let k=0;k<6;k++){
+    const lx=380+(k-2.5)*74, ly=150;
+    const ang=Math.PI*0.8+k*(Math.PI*2/6)*0.92, fx=380+56*Math.cos(ang), fy=160+50*Math.sin(ang);
+    pts.push([lerp(lx,fx,f),lerp(ly,fy,f)]);
+  }
+  let s=`<text x="380" y="56" class="big">M E N D E L</text>`;
+  s+=peptide(pts,AA3L);
+  const lo=1-f;
+  pts.forEach((p,k)=>s+=lbl(p[0],p[1]+36,AANAME[AA3L[k]].split(' ')[0],{cls:'lbls',op:lo}));
+  s+=lbl(pts[0][0]-24,pts[0][1]+5,'N',{cls:'end',a:'end',force:true,op:lo})+lbl(pts[5][0]+24,pts[5][1]+5,'C',{cls:'end',a:'start',force:true,op:lo});
+  if(O){
+    const o=ease(seg(t,0.6,0.75));
+    if(o>0.01){
+      s+=`<g opacity="${o.toFixed(2)}">`;
+      s+=`<path d="M350,236 L200,292" class="arrow"/><path d="M410,236 L560,292" class="arrow"/>`;
+      s+=`<rect x="40" y="296" width="300" height="104" rx="12" class="box"/><text x="56" y="322" class="boxh">ohne Signalsequenz</text><text x="56" y="346" class="boxt">Translation an freien Ribosomen;</text><text x="56" y="366" class="boxt">Protein verbleibt im Cytosol oder wird</text><text x="56" y="386" class="boxt">posttranslational importiert (Kern, Mito.)</text>`;
+      s+=`<rect x="400" y="296" width="330" height="104" rx="12" class="box"/><text x="416" y="322" class="boxh">mit N-terminaler Signalsequenz</text><text x="416" y="346" class="boxt">SRP bindet, Translation wird am rauen ER</text><text x="416" y="366" class="boxt">fortgesetzt (Sec61): ER → Golgi → Vesikel</text><text x="416" y="386" class="boxt">→ Membran, Lysosom oder Sekretion</text>`;
+      s+=`</g>`;
+    }
+  } else {
+    const o=ease(seg(t,0.72,0.85));
+    if(o>0.01) s+=`<g opacity="${o.toFixed(2)}"><rect x="150" y="300" width="460" height="74" rx="12" class="box"/><text x="380" y="330" class="boxh" text-anchor="middle">Die Reihenfolge der Aminosäuren bestimmt die Faltung.</text><text x="380" y="354" class="boxt" text-anchor="middle">Die Form bestimmt die Funktion des Proteins.</text></g>`;
+  }
+  s+=lbl(380,428,'Modellpeptid aus 6 Aminosäuren; reale Proteine bestehen meist aus mehreren hundert.',{cls:'lbls',force:true});
+  return s;
+}
+
+/* ---------- Schritte und Texte ---------- */
+const STG={
+  tx:{t:{s:'Transkription',o:'Transkription'},r:{s:'Transkription',o:'Transkription'},ort:'kern',dur:20,draw:sceneTx,
+    cap:{s:[[0,'Transkriptionsfaktoren binden an den Promotor. Danach bindet die RNA-Polymerase am Startpunkt des Gens.'],[0.15,'Die RNA-Polymerase öffnet die DNA-Doppelhelix an einer kleinen Stelle. Gegenüber dem codogenen Strang werden passende RNA-Nukleotide angelagert und zu einer Kette verknüpft.'],[0.45,'Regel der Basenpaarung: Gegenüber von A wird U eingebaut, gegenüber von T ein A, gegenüber von G ein C und gegenüber von C ein G. In der RNA gibt es kein T, sondern U (Uracil).'],[0.9,'Am Ende des Gens löst sich die RNA-Polymerase von der DNA. Die mRNA ist fertig. Die beiden DNA-Stränge lagern sich wieder zusammen.']],
+         o:[[0,'Initiation: Allgemeine Transkriptionsfaktoren, darunter TFIID mit dem TATA-Bindeprotein (TBP), binden an die TATA-Box. Die RNA-Polymerase II wird gebunden; es entsteht der Präinitiationskomplex.'],[0.15,'Elongation: Die DNA wird lokal entwunden (Transkriptionsblase, ca. 12–14 bp). Ribonukleosidtriphosphate lagern sich komplementär zum codogenen Strang (3′→5′) an; die RNA wird in 5′→3′-Richtung synthetisiert.'],[0.45,'Jedes Nukleotid wird über eine Phosphodiesterbindung an die 3′-OH-Gruppe der wachsenden Kette geknüpft. Die Hydrolyse des abgespaltenen Pyrophosphats macht die Reaktion praktisch irreversibel. Hinter der Polymerase bildet sich die Doppelhelix zurück (RNA-DNA-Hybrid real ca. 8–9 bp, hier verkürzt).'],[0.7,'Exons und Introns werden gleichermaßen transkribiert. Das 5′-Ende der wachsenden RNA erhält bereits kotranskriptionell die Cap-Struktur (im nächsten Schritt separat gezeigt).'],[0.9,'Termination: Hinter dem Polyadenylierungssignal wird die prä-mRNA geschnitten; die Polymerase transkribiert noch ein Stück weiter und löst sich dann von der DNA (Torpedo-Modell, hier vereinfacht).']]},
+    obs:{s:'Vergleiche die Basen der mRNA mit den Basen des codogenen Strangs. Notiere, welche Base in der mRNA jeweils gegenüber A, T, G und C eingebaut wird.',o:'Vergleichen Sie die Basensequenz der prä-mRNA mit dem codierenden und dem codogenen Strang. Begründen Sie, weshalb die Synthese nur in 5′→3′-Richtung erfolgen kann.'}},
+  proc:{t:{o:'RNA-Prozessierung'},r:{o:'Prozessierung'},ort:'kern',dur:26,draw:sceneProc,
+    cap:{o:[[0,'5′-Capping: An das 5′-Ende wird 7-Methylguanosin über eine 5′-5′-Triphosphatbrücke gebunden. Die Cap schützt vor 5′→3′-Exonukleasen und ist Bindestelle für den Cap-Bindekomplex (Export) und eIF4E (Translationsinitiation).'],[0.18,'Spleißen: snRNPs des Spleißosoms binden an die 5′-Spleißstelle (U1, Konsensus GU) und an die Verzweigungsstelle (U2, Adenosin). Weitere snRNPs (U4/U5/U6) vervollständigen das aktive Spleißosom.'],[0.372,'Erste Umesterung: Die 2′-OH-Gruppe des Verzweigungs-Adenosins greift das Phosphat der 5′-Spleißstelle nukleophil an. Exon 1 erhält eine freie 3′-OH-Gruppe; das Intron bildet eine Lasso-Struktur (Lariat) mit 2′-5′-Phosphodiesterbindung.'],[0.492,'Zweite Umesterung: Die 3′-OH-Gruppe von Exon 1 greift das Phosphat der 3′-Spleißstelle (AG) an. Die Exons werden verknüpft, das Intron-Lariat wird freigesetzt, linearisiert und abgebaut.'],[0.66,'Polyadenylierung: Das Polyadenylierungssignal AAUAAA wird von CPSF gebunden; etwa 10–30 Nukleotide stromabwärts wird die RNA geschnitten.'],[0.748,'Die Poly(A)-Polymerase hängt ohne Matrize etwa 200 Adenosin-Nukleotide an (hier verkürzt). Der Poly(A)-Schwanz erhöht die Stabilität und fördert Export und Translation.'],[0.88,'Ergebnis: reife mRNA aus 5′-Cap, 5′-UTR, codierender Sequenz (AUG … UAA), 3′-UTR und Poly(A)-Schwanz. In vivo laufen Capping und Spleißen weitgehend kotranskriptionell ab; die Reihenfolge ist hier zur Übersicht sequenziell dargestellt.']]},
+    obs:{o:'Beschreiben Sie die beiden Umesterungsreaktionen des Spleißens und nennen Sie jeweils die angreifende funktionelle Gruppe sowie die gebildete Bindung.'}},
+  exp:{t:{s:'Export aus dem Zellkern',o:'Kernexport'},r:{s:'Export',o:'Export'},ort:'pore',dur:9,draw:sceneExp,
+    cap:{s:[[0,'Die mRNA wird durch eine Kernpore aus dem Zellkern in das Cytoplasma transportiert. Dabei sind Transportproteine an die mRNA gebunden.'],[0.55,'Die DNA bleibt im Zellkern. Nur die Kopie der Information, die mRNA, gelangt zu den Ribosomen im Cytoplasma.']],
+         o:[[0,'Nur vollständig prozessierte mRNA wird exportiert. Der Exportrezeptor NXF1–NXT1 bindet an mRNA-gebundene Adapterproteine (u. a. TREX-Komplex).'],[0.45,'Der Durchtritt durch den Kernporenkomplex erfolgt mit dem 5′-Ende voran. Auf der cytoplasmatischen Seite werden Exportfaktoren ATP-abhängig abgelöst (Helikase DBP5), was die Richtung des Transports festlegt.'],[0.8,'Qualitätskontrolle: prä-mRNA mit nicht entfernten Introns wird im Kern zurückgehalten und abgebaut (u. a. durch das nukleäre Exosom).']]},
+    obs:{s:'Beschreibe, durch welche Struktur die mRNA den Zellkern verlässt. Nenne, was im Zellkern bleibt.',o:'Erläutern Sie, inwiefern die räumliche Trennung von Transkription und Translation eine Qualitätskontrolle der mRNA ermöglicht.'}},
+  init:{t:{s:'Translation: Start',o:'Translation: Initiation'},r:{s:'Start',o:'Initiation'},ort:'cyto',dur:12,draw:sceneInit,
+    cap:{s:[[0,'Die kleine Untereinheit des Ribosoms bindet am Anfang der mRNA.'],[0.2,'Die kleine Untereinheit bewegt sich entlang der mRNA, bis sie das Startcodon AUG erreicht.'],[0.5,'Eine tRNA mit der Aminosäure Methionin (Met) bindet. Ihr Anticodon UAC passt zum Startcodon AUG.'],[0.72,'Die große Untereinheit lagert sich an. Das Ribosom ist jetzt vollständig.']],
+         o:[[0,'Der 43S-Präinitiationskomplex (40S-Untereinheit, eIF1, eIF1A, eIF3, eIF5 und ternärer Komplex eIF2·GTP·Met-tRNAᵢ) wird über eIF4F an das 5′-Ende gebunden; eIF4E bindet dabei die Cap-Struktur.'],[0.2,'Scanning: Der Komplex wird ATP-abhängig (Helikase eIF4A) in 5′→3′-Richtung entlang der 5′-UTR verschoben.'],[0.55,'Das AUG im Kozak-Kontext (GCCACCAUGG) gelangt in die P-Stelle und paart mit dem Anticodon 3′-UAC-5′ der Initiator-tRNA. eIF2 hydrolysiert GTP; Initiationsfaktoren dissoziieren.'],[0.72,'Die 60S-Untereinheit bindet (eIF5B·GTP-abhängig). Es entsteht das 80S-Ribosom: Met-tRNAᵢ in der P-Stelle, A-Stelle frei.']]},
+    obs:{s:'Notiere das Startcodon und das Anticodon der ersten tRNA. Welche Aminosäure steht deshalb am Anfang jeder Aminosäurekette?',o:'Beschreiben Sie die Bedeutung von 5′-Cap und Kozak-Sequenz für die Auswahl des Startcodons. Stellen Sie einen Vergleich zur Shine-Dalgarno-Sequenz der Prokaryoten an.'}},
+  elong:{t:{s:'Translation: Verlängerung der Kette',o:'Translation: Elongation'},r:{s:'Verlängerung',o:'Elongation'},ort:'cyto',dur:26,draw:sceneElong,cap:'elong',
+    obs:{s:'Beobachte einen Durchgang genau. Beschreibe in drei Schritten, wie eine neue Aminosäure an die Kette angehängt wird.',o:'Stellen Sie einen Elongationszyklus tabellarisch dar: Besetzung von A-, P- und E-Stelle vor und nach Peptidyltransfer und Translokation, beteiligte Faktoren und Energieverbrauch.'}},
+  term:{t:{s:'Translation: Ende',o:'Translation: Termination'},r:{s:'Ende',o:'Termination'},ort:'cyto',dur:12,draw:sceneTerm,
+    cap:{s:[[0,'Das Stoppcodon UAA liegt jetzt im Ribosom. Für Stoppcodons gibt es keine tRNA mit passendem Anticodon.'],[0.3,'Ein Freisetzungsfaktor (ein Protein) bindet am Stoppcodon. Die Aminosäurekette wird von der letzten tRNA abgetrennt.'],[0.55,'Das Ribosom zerfällt in seine beiden Untereinheiten. Sie können für eine neue Translation verwendet werden.'],[0.85,'Ergebnis: eine Kette aus sechs Aminosäuren, Met-Glu-Asn-Asp-Glu-Leu. Im Einbuchstabencode: M-E-N-D-E-L.']],
+         o:[[0,'Stoppcodon UAA in der A-Stelle: Keine Aminoacyl-tRNA besitzt ein komplementäres Anticodon. Der Freisetzungsfaktor eRF1 (tRNA-ähnliche Form) bindet als Komplex mit eRF3·GTP.'],[0.3,'Das GGQ-Motiv von eRF1 ragt in das Peptidyltransferase-Zentrum: Die Esterbindung zwischen Polypeptid und P-Stellen-tRNA wird hydrolysiert, das Polypeptid freigesetzt.'],[0.55,'Ribosomen-Recycling: Die Untereinheiten werden unter ATP-Verbrauch (ABCE1) getrennt; mRNA und deacylierte tRNA dissoziieren.'],[0.85,'Produkt: Met-Glu-Asn-Asp-Glu-Leu (N- → C-Terminus), Einbuchstabencode M-E-N-D-E-L. In der Zelle wird eine mRNA meist gleichzeitig von mehreren Ribosomen translatiert (Polysom).']]},
+    obs:{s:'Erkläre, warum am Codon UAA keine tRNA bindet und wie die Translation trotzdem beendet wird.',o:'Erklären Sie, weshalb das Stoppcodon nicht durch eine tRNA, sondern durch ein Protein gebunden wird, und beschreiben Sie die Hydrolysereaktion.'}},
+  prot:{t:{s:'Das fertige Protein',o:'Faltung und Zielsteuerung'},r:{s:'Protein',o:'Faltung'},ort:'cyto',dur:10,draw:sceneProt,
+    cap:{s:[[0,'Die Reihenfolge der Aminosäuren ist durch die Reihenfolge der Basen in der DNA festgelegt: Drei Basen (ein Codon) legen eine Aminosäure fest.'],[0.3,'Die Aminosäurekette faltet sich zu einer räumlichen Struktur.'],[0.72,'Die Form eines Proteins bestimmt seine Funktion, zum Beispiel als Enzym, als Transportprotein oder als Baustoff.']],
+         o:[[0,'Primärstruktur: Met-Glu-Asn-Asp-Glu-Leu. Die Sequenz legt die thermodynamisch günstigste Konformation fest (Anfinsen-Prinzip).'],[0.3,'Die Faltung beginnt bereits kotranslational, sobald die Kette den ribosomalen Austrittstunnel verlässt. Chaperone (z. B. Hsp70, Chaperonine) verhindern Fehlfaltung und Aggregation.'],[0.6,'Zielsteuerung: Ohne Signalsequenz verbleibt das Protein im Cytosol oder wird posttranslational in Kern, Mitochondrien oder Peroxisomen importiert. Eine N-terminale Signalsequenz wird vom SRP gebunden; die Translation wird dann am rauen ER fortgesetzt (kotranslationaler Import über Sec61).']]},
+    obs:{s:'Lies die Aminosäuren im Einbuchstabencode. Welches Wort ergibt sich? Finde heraus, wer diese Person war und was sie erforscht hat.',o:'Erläutern Sie den Zusammenhang zwischen Primärstruktur, Faltung und Zielort eines Proteins. Begründen Sie, wo das Modellpeptid MENDEL in der Zelle verbleiben würde.'}}
+};
+const ORDER={sek1:['tx','exp','init','elong','term','prot'],ober:['tx','proc','exp','init','elong','term','prot']};
+const stages=()=>ORDER[LEVEL];
+const ORT={kern:{s:'Ort: Zellkern',o:'Ort: Nukleus'},pore:{s:'Ort: Kernhülle mit Kernpore',o:'Ort: Kernporenkomplex'},cyto:{s:'Ort: Cytoplasma, am Ribosom',o:'Ort: Cytosol, am Ribosom'}};
+function capElong(t){
+  const {c,u}=elongState(t);
+  const cd=CDS.substr(3*c,3), an=cd.split('').map(b=>RC[b]).join(''), aa=AA3L[c];
+  if(isO()){
+    if(u<0.3) return `Zyklus ${c}: Die Aminoacyl-tRNA (${aa}) gelangt als ternärer Komplex mit eEF1A·GTP in die A-Stelle. Codon 5′-${cd}-3′ paart mit Anticodon 3′-${an}-5′; bei korrekter Paarung wird GTP hydrolysiert und eEF1A·GDP dissoziiert.`;
+    if(u<0.5) return `Peptidyltransfer: Die α-Aminogruppe von ${aa} greift die Esterbindung der Peptidyl-tRNA in der P-Stelle nukleophil an. Die Kette wird auf die A-Stellen-tRNA übertragen. Katalysiert wird die Reaktion von der rRNA der großen Untereinheit (Ribozym).`;
+    if(u<0.8) return 'Translokation: eEF2·GTP bewirkt die Verschiebung des Ribosoms um genau ein Codon in 3′-Richtung. Die Peptidyl-tRNA gelangt in die P-Stelle, die deacylierte tRNA in die E-Stelle; die A-Stelle ist wieder frei.';
+    return 'Die deacylierte tRNA dissoziiert aus der E-Stelle. Eine Aminoacyl-tRNA-Synthetase belädt sie erneut (ATP → AMP + PPᵢ).';
+  }
+  if(u<0.3) return `Eine tRNA mit dem Anticodon ${an} bindet an das Codon ${cd}. Sie trägt die Aminosäure ${aa} (${AANAME[aa]}).`;
+  if(u<0.5) return `Die Aminosäurekette wird auf die neue Aminosäure ${aa} übertragen. Dabei entsteht eine Peptidbindung.`;
+  if(u<0.8) return 'Das Ribosom rückt um genau ein Codon (drei Basen) auf der mRNA weiter.';
+  return 'Die leere tRNA löst sich vom Ribosom. Im Cytoplasma wird sie wieder mit einer passenden Aminosäure beladen.';
+}
+function captionFor(id,t){
+  const st=STG[id];
+  if(st.cap==='elong') return capElong(t);
+  const arr=L(st.cap.s,st.cap.o);let txt=arr[0][1];
+  for(const [f,x] of arr) if(t>=f) txt=x;
+  return txt;
+}
+
+/* ---------- Ablauf-Steuerung ---------- */
+const sceneEl=$('#scene');
+function renderRail(){
+  const ids=stages();
+  $('#rail').innerHTML=ids.map((id,i)=>`<li><button type="button" data-i="${i}"${i===SC.stage?' aria-current="step"':''} class="${i<SC.stage?'done':''}"><span class="num">${i+1}</span>${L(STG[id].r.s,STG[id].r.o)}</button></li>`).join('');
+}
+function setStage(i,t=0){
+  const ids=stages();SC.stage=clamp(i,0,ids.length-1);SC.t=t;
+  const st=STG[ids[SC.stage]];
+  $('#stTitle').textContent=`${SC.stage+1}. ${L(st.t.s,st.t.o)}`;
+  $('#ort').textContent=L(ORT[st.ort].s,ORT[st.ort].o);
+  $('#obs').textContent=L(st.obs.s,st.obs.o);
+  renderRail();SC.dirty=true;
+}
+let lastCap='';
+function drawScene(){
+  const id=stages()[SC.stage], st=STG[id];
+  sceneEl.innerHTML=`<rect x="0" y="0" width="760" height="440" fill="transparent"/>`+st.draw(SC.t)+miniLoc(st.ort);
+  const c=captionFor(id,SC.t);
+  if(c!==lastCap){$('#caption').textContent=c;lastCap=c;}
+  $('#scrub').value=Math.round(SC.t*1000);
+}
+function updatePlay(){$('#play').textContent=SC.playing?'Pause':(SC.t>=1&&SC.stage===stages().length-1?'Von vorn':'Abspielen');}
+let lastTs=null;
+function loop(ts){
+  if(lastTs==null) lastTs=ts;
+  const dt=Math.min(0.1,(ts-lastTs)/1000);lastTs=ts;
+  if(SC.playing){
+    const st=STG[stages()[SC.stage]];
+    SC.t+=dt*SC.speed/st.dur;
+    if(SC.t>=1){
+      if(SC.chain&&SC.stage<stages().length-1){setStage(SC.stage+1,0);}
+      else{SC.t=1;SC.playing=false;updatePlay();}
+    }
+    SC.dirty=true;
+  }
+  if(SC.dirty&&!$('#tab-ablauf').hidden){drawScene();SC.dirty=false;}
+  requestAnimationFrame(loop);
+}
+$('#play').addEventListener('click',()=>{
+  if(!SC.playing&&SC.t>=1){ if(SC.stage===stages().length-1) setStage(0,0); else setStage(SC.stage+1,0); }
+  SC.playing=!SC.playing;updatePlay();
+});
+$('#prev').addEventListener('click',()=>{ if(SC.t>0.05) setStage(SC.stage,0); else setStage(SC.stage-1,0); updatePlay(); });
+$('#next').addEventListener('click',()=>{setStage(SC.stage+1,0);updatePlay();});
+$('#scrub').addEventListener('input',e=>{SC.t=e.target.value/1000;SC.playing=false;updatePlay();SC.dirty=true;});
+$('#speed').addEventListener('change',e=>SC.speed=+e.target.value);
+$('#chain').addEventListener('change',e=>SC.chain=e.target.checked);
+$('#labels').addEventListener('change',e=>{SC.labels=e.target.checked;SC.dirty=true;});
+$('#rail').addEventListener('click',e=>{const b=e.target.closest('button[data-i]');if(b){setStage(+b.dataset.i,0);updatePlay();}});
+sceneEl.addEventListener('pointerdown',e=>{const k=e.target.closest('[data-key]');if(k) openInfo(k.dataset.key);});
+function gotoStage(id){
+  const i=stages().indexOf(id);if(i<0) return;
+  showTab('ablauf');setStage(i,0);SC.playing=!window.matchMedia('(prefers-reduced-motion: reduce)').matches;updatePlay();
+  window.scrollTo({top:0});
+}
+
+/* ---------- Informationen ---------- */
+const INFO={
+ zellkern:{n:'Zellkern (Nukleus)',a:'der',p:'Zellkerne',s:'Der Zellkern enthält die DNA, also die Erbinformation. Hier findet die Transkription statt: Die Information eines Gens wird in eine mRNA umgeschrieben.',o:'Membranumhülltes Kompartiment mit dem größten Teil des Genoms (Chromatin). Ort von Replikation, Transkription und RNA-Prozessierung. Die räumliche Trennung von Transkription (Kern) und Translation (Cytosol) ermöglicht die Prozessierung der prä-mRNA vor der Translation. Bei Prokaryoten laufen beide Prozesse dagegen gekoppelt im Cytoplasma ab.'},
+ kernhuelle:{n:'Kernhülle',a:'die',p:'Kernhüllen',s:'Die Kernhülle besteht aus zwei Membranen. Sie trennt den Zellkern vom Cytoplasma. In der Kernhülle liegen viele Kernporen.',o:'Doppelmembran; die äußere Kernmembran geht kontinuierlich in das raue ER über und trägt Ribosomen. Die innere Membran wird von der Kernlamina (Lamine, Intermediärfilamente) gestützt, an der auch Chromatin verankert ist.'},
+ kernpore:{n:'Kernpore',a:'die',p:'Kernporen',s:'Kernporen sind Öffnungen in der Kernhülle. Durch sie gelangt die mRNA aus dem Zellkern ins Cytoplasma. Die DNA ist zu groß und bleibt im Kern.',o:'Kernporenkomplexe (bei Vertebraten ca. 110–125 MDa, aufgebaut aus ca. 30 verschiedenen Nukleoporinen) vermitteln einen selektiven Transport. Kleine Moleküle diffundieren frei; Makromoleküle wie mRNPs werden rezeptorvermittelt transportiert (mRNA-Export über NXF1–NXT1; Proteintransport über Importine/Exportine mit Ran-GTP-Gradient).'},
+ nukleolus:{n:'Nukleolus (Kernkörperchen)',a:'der',p:'Nukleoli',s:'Im Kernkörperchen werden die Bausteine der Ribosomen hergestellt.',o:'Nicht membranumgrenzte Region des Kerns: Ort der rRNA-Synthese durch RNA-Polymerase I, der rRNA-Prozessierung und der Assemblierung der ribosomalen Untereinheiten aus rRNA und ribosomalen Proteinen. Die Untereinheiten werden getrennt ins Cytoplasma exportiert.'},
+ chromatin:{n:'Chromatin',a:'das',p:null,s:'Im Zellkern liegt die DNA als Chromatin vor: lange DNA-Fäden, die um Proteine gewickelt sind. Ein Gen ist ein bestimmter Abschnitt der DNA.',o:'Komplex aus DNA und Histonen; Grundeinheit ist das Nukleosom (ca. 147 bp um ein Histon-Oktamer). Euchromatin ist locker gepackt und transkriptionell zugänglich, Heterochromatin dicht gepackt. Histonmodifikationen und DNA-Methylierung regulieren die Zugänglichkeit und damit die Genexpression (Epigenetik).'},
+ rer:{n:'raues ER (raues endoplasmatisches Retikulum)',a:'das',p:null,s:'Das raue ER ist ein Netz aus Membranen mit Ribosomen auf der Oberfläche. Dort entstehen Proteine, die aus der Zelle ausgeschleust oder in Membranen eingebaut werden.',o:'Membransystem mit gebundenen Ribosomen. Proteine mit N-terminaler Signalsequenz werden über SRP und SRP-Rezeptor an das ER gebracht und kotranslational durch das Sec61-Translokon in das ER-Lumen bzw. in die Membran eingebaut. Im Lumen erfolgen Faltung (Chaperone wie BiP), Disulfidbrückenbildung, N-Glykosylierung und Qualitätskontrolle (ERAD bei Fehlfaltung).'},
+ ser:{n:'glattes ER',a:'das',p:null,s:'Das glatte ER hat keine Ribosomen. Hier werden zum Beispiel Fette (Lipide) hergestellt.',o:'Ribosomenfreies ER: Lipid- und Steroidsynthese, Biotransformation (Cytochrom-P450-Enzyme, v. a. in Hepatocyten), Ca²⁺-Speicher (in Muskelzellen als sarkoplasmatisches Retikulum).'},
+ ribosom:{n:'Ribosom',a:'das',p:'Ribosomen',s:'Ribosomen sind kleine Teilchen aus RNA und Proteinen. Sie bestehen aus einer kleinen und einer großen Untereinheit. Am Ribosom wird die Basenfolge der mRNA in eine Aminosäurefolge übersetzt (Translation).',o:'80S-Ribosomen der Eukaryoten aus 40S-Untereinheit (18S-rRNA) und 60S-Untereinheit (28S-, 5,8S-, 5S-rRNA) sowie ca. 80 ribosomalen Proteinen. Die Decodierung erfolgt an der kleinen, die Peptidbindung an der großen Untereinheit; die Peptidyltransferase-Aktivität geht von der rRNA aus (Ribozym). Freie Ribosomen synthetisieren cytosolische, nukleäre, mitochondriale und peroxisomale Proteine, ER-gebundene Ribosomen sekretorische und Membranproteine.'},
+ golgi:{n:'Golgi-Apparat',a:'der',p:'Golgi-Apparate',s:'Im Golgi-Apparat werden Proteine verändert, sortiert und in kleine Bläschen (Vesikel) verpackt.',o:'Stapel von Zisternen mit cis- und trans-Seite. Modifikation von Glykoproteinen (Prozessierung der N-Glykane, O-Glykosylierung), Sortierung im trans-Golgi-Netzwerk zur Plasmamembran, zur Sekretion oder zu den Lysosomen (Mannose-6-phosphat als Sortiersignal).'},
+ vesikel:{n:'Vesikel',a:'das',p:'Vesikel',s:'Vesikel sind kleine Bläschen aus Membran. In ihnen werden Proteine transportiert, zum Beispiel vom Golgi-Apparat zur Zellmembran.',o:'Membranumhüllte Transportvesikel (z. B. COPII: ER → Golgi; COPI: retrograd; Clathrin: trans-Golgi-Netzwerk und Endocytose). Die Fusion mit der Zielmembran wird durch SNARE-Proteine vermittelt; Exocytose setzt sekretorische Proteine frei.'},
+ mito:{n:'Mitochondrium',a:'das',p:'Mitochondrien',s:'In den Mitochondrien wird durch die Zellatmung Energie in Form von ATP bereitgestellt. Diese Energie wird auch für die Herstellung von Proteinen benötigt.',o:'Ort der oxidativen Phosphorylierung. Die Translation ist energetisch aufwendig (vier energiereiche Phosphatbindungen pro Peptidbindung). Mitochondrien besitzen eine eigene DNA (beim Menschen ca. 16,6 kb mit 13 Proteingenen) und eigene Ribosomen (beim Menschen 55S) – ein Argument für die Endosymbiontentheorie und relevant für die Nebenwirkungen mancher Antibiotika.'},
+ lysosom:{n:'Lysosom',a:'das',p:'Lysosomen',s:'Lysosomen enthalten Verdauungsenzyme. Sie bauen alte oder fehlerhafte Zellbestandteile ab.',o:'Saures Kompartiment (pH ca. 4,5–5) mit sauren Hydrolasen; Abbau von Makromolekülen (Autophagie, Endocytose). Lysosomale Enzyme werden am rauen ER synthetisiert und im Golgi-Apparat über Mannose-6-phosphat sortiert.'},
+ membran:{n:'Zellmembran',a:'die',p:'Zellmembranen',s:'Die Zellmembran grenzt die Zelle nach außen ab und reguliert, welche Stoffe hinein- und hinausgelangen.',o:'Phospholipid-Doppelschicht mit integralen und peripheren Proteinen (Flüssig-Mosaik-Modell). Membranproteine werden am rauen ER synthetisiert und über den sekretorischen Weg in die Plasmamembran eingebaut.'},
+ cytoplasma:{n:'Cytoplasma',a:'das',p:null,s:'Das Cytoplasma ist der Zellinhalt außerhalb des Zellkerns. Hier findet die Translation an den Ribosomen statt.',o:'Cytosol mit Organellen und Cytoskelett. Im Cytosol erfolgen Translation an freien Ribosomen, Aminoacylierung der tRNAs durch Aminoacyl-tRNA-Synthetasen, Faltung durch Chaperone und Proteinabbau über das Proteasom.'},
+ dna:{n:'DNA (Desoxyribonukleinsäure)',a:'die',p:null,s:'Die DNA ist ein Doppelstrang aus Nukleotiden. Die Basen bilden Paare: A mit T, G mit C. Die Reihenfolge der Basen enthält die Information für den Bau von Proteinen.',o:'Antiparallele Doppelhelix. Der codogene Strang (Matrizenstrang) wird in 3′→5′-Richtung abgelesen, die RNA entsteht in 5′→3′-Richtung. Der nicht-codogene (codierende) Strang stimmt in seiner Sequenz mit der mRNA überein (T statt U) und wird deshalb in Datenbanken angegeben.'},
+ gen:{n:'Gen',a:'das',p:'Gene',s:'Ein Gen ist ein Abschnitt der DNA, der die Information für ein Protein (oder eine RNA) enthält.',o:'Funktionelle Einheit der DNA einschließlich regulatorischer Sequenzen (Promotor, Enhancer), transkribierter Exons und Introns. Ein Gen kann durch alternatives Spleißen mehrere Proteinisoformen codieren.'},
+ rnapol:{n:'RNA-Polymerase',a:'die',p:'RNA-Polymerasen',s:'Die RNA-Polymerase ist ein Enzym. Sie öffnet die DNA-Doppelhelix und verknüpft RNA-Nukleotide zu einer mRNA.',o:'Eukaryoten besitzen drei nukleäre RNA-Polymerasen; RNA-Polymerase II transkribiert proteincodierende Gene. Sie benötigt allgemeine Transkriptionsfaktoren, aber keinen Primer. Die phosphorylierte C-terminale Domäne (CTD) koordiniert Capping, Spleißen und Polyadenylierung kotranskriptionell.'},
+ promotor:{n:'Promotor',a:'der',p:'Promotoren',s:'Der Promotor ist ein DNA-Abschnitt vor dem Gen. Hier bindet die RNA-Polymerase und die Transkription beginnt.',o:'Regulatorische DNA-Sequenz stromaufwärts des Transkriptionsstarts. Kernpromotor (z. B. TATA-Box ca. 25–30 bp stromaufwärts, Initiator-Element) und proximale Elemente; Enhancer und Silencer können auch weit entfernt liegen.'},
+ tata:{n:'TATA-Box',a:'die',p:'TATA-Boxen',s:'Ein kurzer Abschnitt im Promotor mit vielen A und T. Hier binden Proteine, die den Start der Transkription ermöglichen.',o:'Konsensussequenz TATAWAWR; Bindestelle des TATA-Bindeproteins (TBP, Untereinheit von TFIID), das die DNA stark biegt. Nur ein Teil der menschlichen Promotoren enthält eine TATA-Box. In der Animation ist der Abstand zum Transkriptionsstart verkürzt dargestellt.'},
+ tf:{n:'Transkriptionsfaktor',a:'der',p:'Transkriptionsfaktoren',s:'Transkriptionsfaktoren sind Proteine. Sie binden am Promotor. Erst dann kann die RNA-Polymerase binden.',o:'Allgemeine Transkriptionsfaktoren (TFIIA, -B, -D, -E, -F, -H) bilden mit der RNA-Polymerase II den Präinitiationskomplex; TFIIH besitzt Helikaseaktivität und phosphoryliert die CTD. Spezifische Transkriptionsfaktoren (Aktivatoren, Repressoren) binden an Enhancer bzw. Silencer und regulieren die Transkriptionsrate, u. a. über den Mediator-Komplex.'},
+ premrna:{n:'prä-mRNA',a:'die',p:'prä-mRNAs',o:'Primäres Transkript der RNA-Polymerase II. Enthält Exons und Introns und wird noch während der Transkription gekappt und gespleißt. Unvollständig prozessierte prä-mRNA wird im Kern zurückgehalten.'},
+ mrna:{n:'mRNA (Boten-RNA)',a:'die',p:'mRNAs',s:'Die mRNA ist eine einzelsträngige Kopie eines Gens. Sie enthält die Base U (Uracil) statt T und den Zucker Ribose statt Desoxyribose. Sie gelangt aus dem Zellkern zu den Ribosomen.',o:'Reife mRNA: 5′-Cap, 5′-UTR, offenes Leseraster (ORF) vom Startcodon AUG bis zum Stoppcodon, 3′-UTR, Poly(A)-Schwanz. Die UTRs enthalten regulatorische Elemente, z. B. Bindestellen für miRNAs in der 3′-UTR.'},
+ cap:{n:'5′-Cap',a:'die',p:null,o:'7-Methylguanosin, über eine 5′-5′-Triphosphatbrücke an das erste Nukleotid gebunden. Funktionen: Schutz vor 5′→3′-Exonukleasen, Bindestelle für den Cap-Bindekomplex (Spleißen des ersten Introns, Export) und für eIF4E (Translationsinitiation).'},
+ polya:{n:'Poly(A)-Schwanz',a:'der',p:'Poly(A)-Schwänze',o:'Bei Säugern ca. 200 Adenosin-Nukleotide, matrizenunabhängig durch die Poly(A)-Polymerase nach Schnitt hinter dem Signal AAUAAA angefügt. Poly(A)-Bindeproteine (PABP) stabilisieren die mRNA und interagieren mit eIF4G (Ringschluss der mRNA, effizientere Reinitiation). Die Verkürzung des Schwanzes (Deadenylierung) leitet den Abbau ein.'},
+ exon:{n:'Exon',a:'das',p:'Exons',o:'Abschnitte des Gens, die in der reifen mRNA erhalten bleiben. Exons sind nicht gleichbedeutend mit codierenden Bereichen: Auch die 5′- und 3′-UTR liegen in Exons.'},
+ intron:{n:'Intron',a:'das',p:'Introns',o:'Transkribierte, aber herausgespleißte Abschnitte. Konservierte Sequenzen: 5′-Spleißstelle (GU), Verzweigungsstelle mit Adenosin, Polypyrimidin-Trakt und 3′-Spleißstelle (AG) (GU-AG-Regel). Im Modell enthält das Intron im Leseraster ein vorzeitiges Stoppcodon.'},
+ spleissosom:{n:'Spleißosom',a:'das',p:'Spleißosomen',o:'Ribonukleoproteinkomplex aus fünf snRNPs (U1, U2, U4, U5, U6) und zahlreichen Proteinen. U1-snRNA paart mit der 5′-Spleißstelle, U2-snRNA mit der Verzweigungsstelle. Das katalytische Zentrum wird wesentlich von der U6-snRNA gebildet (Ribozym); die Umesterungen verlaufen ohne Nettoverbrauch energiereicher Bindungen, der Auf- und Umbau des Komplexes ist jedoch ATP-abhängig.'},
+ lariat:{n:'Lariat (Lasso-Struktur)',a:'das',p:'Lariats',o:'Nach der ersten Umesterung ist das 5′-Ende des Introns über eine 2′-5′-Phosphodiesterbindung mit dem Verzweigungs-Adenosin verknüpft. Nach der Freisetzung wird das Lariat durch ein Debranching-Enzym linearisiert und abgebaut.'},
+ trna:{n:'tRNA (Transfer-RNA)',a:'die',p:'tRNAs',s:'Die tRNA trägt an einem Ende eine bestimmte Aminosäure. Am anderen Ende hat sie das Anticodon aus drei Basen. Das Anticodon passt zu einem Codon der mRNA.',o:'Ca. 76 Nukleotide, kleeblattförmige Sekundär- und L-förmige Tertiärstruktur. Am 3′-CCA-Ende wird die Aminosäure durch eine spezifische Aminoacyl-tRNA-Synthetase verestert (ATP → AMP + PPᵢ). Die Spezifität der Synthetasen sichert die korrekte Zuordnung von Codon und Aminosäure. An der dritten Codonposition ist Wobble-Paarung möglich.'},
+ aminosaeure:{n:'Aminosäure',a:'die',p:'Aminosäuren',s:'Aminosäuren sind die Bausteine der Proteine. Es gibt 20 verschiedene Aminosäuren, aus denen Proteine aufgebaut sind.',o:'Proteinogene α-Aminosäuren (20 kanonische; zusätzlich Selenocystein und Pyrrolysin über Umcodierung von Stoppcodons). Die Abkürzungen in der Animation sind Dreibuchstabencodes (z. B. Met = Methionin).'},
+ eps:{n:'A-, P- und E-Stelle',a:'die',p:null,s:'Im Ribosom gibt es drei Bindestellen für tRNAs.',o:'A-Stelle: Bindung der Aminoacyl-tRNA. P-Stelle: Peptidyl-tRNA mit der wachsenden Kette. E-Stelle (Exit): deacylierte tRNA vor dem Verlassen des Ribosoms.'},
+ codon:{n:'Codon (Basentriplett)',a:'das',p:'Codons',s:'Ein Codon ist eine Folge von drei Basen auf der mRNA. Jedes Codon steht für eine bestimmte Aminosäure oder für „Stopp“.',o:'Basentriplett der mRNA. 64 Codons: 61 Sinncodons für 20 Aminosäuren (degenerierter Code) und 3 Stoppcodons (UAA, UAG, UGA). Der Code ist nahezu universell, kommafrei und nicht überlappend.'},
+ anticodon:{n:'Anticodon',a:'das',p:'Anticodons',s:'Das Anticodon besteht aus drei Basen an der tRNA. Es paart mit dem passenden Codon der mRNA.',o:'Basentriplett der tRNA, antiparallel komplementär zum Codon (Codon 5′-AUG-3′, Anticodon 3′-UAC-5′). Modifizierte Basen wie Inosin an der ersten Anticodonposition erweitern die Wobble-Paarung.'},
+ startcodon:{n:'Startcodon',a:'das',p:'Startcodons',s:'Das Codon AUG ist das Startcodon. Hier beginnt die Translation. AUG steht für die Aminosäure Methionin.',o:'AUG legt das Leseraster fest und codiert Methionin (Initiator-tRNA Met-tRNAᵢ). Bei Eukaryoten wird in der Regel das erste AUG in günstigem Kozak-Kontext (gccRccAUGG) genutzt.'},
+ stopcodon:{n:'Stoppcodon',a:'das',p:'Stoppcodons',s:'UAA, UAG und UGA sind Stoppcodons. Für sie gibt es keine passende tRNA. Hier endet die Translation.',o:'UAA, UAG, UGA. Sie werden durch den Freisetzungsfaktor eRF1 gebunden, der alle drei Stoppcodons erfasst.'},
+ rf:{n:'Freisetzungsfaktor',a:'der',p:'Freisetzungsfaktoren',s:'Der Freisetzungsfaktor ist ein Protein. Er bindet am Stoppcodon und bewirkt, dass die fertige Aminosäurekette abgetrennt wird.',o:'eRF1 ähnelt in seiner Form einer tRNA (molekulare Mimikry). Sein GGQ-Motiv ragt in das Peptidyltransferase-Zentrum und bewirkt die Hydrolyse der Esterbindung der Peptidyl-tRNA. Die GTPase eRF3 unterstützt die Termination.'},
+ peptid:{n:'Peptid / Polypeptid',a:'das',p:'Peptide',s:'Eine Kette aus Aminosäuren, die über Peptidbindungen verknüpft sind. Lange Ketten heißen Polypeptide oder Proteine.',o:'Synthese vom N- zum C-Terminus. Die Primärstruktur bestimmt die Faltung zu Sekundär-, Tertiär- und ggf. Quartärstruktur.'},
+ peptidbindung:{n:'Peptidbindung',a:'die',p:'Peptidbindungen',s:'Die Verbindung zwischen zwei Aminosäuren in einer Aminosäurekette.',o:'Amidbindung zwischen der Carboxygruppe einer und der Aminogruppe der folgenden Aminosäure; im Ribosom durch Aminolyse der Esterbindung der Peptidyl-tRNA gebildet. Durch Mesomerie hat die C–N-Bindung partiellen Doppelbindungscharakter: Die Peptidgruppe ist planar.'},
+ export:{n:'Exportfaktor',a:'der',p:'Exportfaktoren',s:'Proteine, die an die mRNA gebunden sind und ihren Transport durch die Kernpore ermöglichen.',o:'Der Exportrezeptor NXF1–NXT1 bindet an mRNPs (vermittelt durch Adapter wie den TREX-Komplex) und interagiert mit FG-Nukleoporinen des Porenkomplexes. Die Helikase DBP5 entfernt auf der cytoplasmatischen Seite Exportfaktoren und macht den Export gerichtet.'},
+ eif:{n:'Initiationsfaktoren (eIFs)',a:'die',p:null,o:'Eukaryotische Initiationsfaktoren. eIF4F (eIF4E, eIF4G, eIF4A) bindet die Cap-Struktur und entwindet Sekundärstrukturen; eIF2·GTP bringt die Met-tRNAᵢ; eIF1 und eIF1A sichern die Auswahl des korrekten AUG; eIF5B vermittelt die Bindung der 60S-Untereinheit.'},
+ eef:{n:'Elongationsfaktoren (eEFs)',a:'die',p:null,o:'eEF1A·GTP bringt die Aminoacyl-tRNA in die A-Stelle; die GTP-Hydrolyse erfolgt erst nach korrekter Codon-Anticodon-Paarung (kinetisches Proofreading). eEF2·GTP katalysiert die Translokation. Pro Elongationszyklus werden also zwei GTP verbraucht.'},
+ nukleotid:{n:'Nukleotid',a:'das',p:'Nukleotide',s:'Baustein von DNA und RNA aus Zucker, Phosphat und einer Base.',o:'Für die Transkription werden Ribonukleosidtriphosphate (ATP, GTP, CTP, UTP) verwendet; die Energie für die Polymerisation stammt aus der Abspaltung von Pyrophosphat und dessen Hydrolyse.'}
+};
+const GEXTRA={
+ genexpression:{n:'Genexpression',a:'die',p:null,s:'Der Weg vom Gen zum fertigen Protein: Transkription und Translation.',o:'Umsetzung der genetischen Information in ein Genprodukt: Transkription, RNA-Prozessierung, Export, Translation und posttranslationale Modifikation; auf jeder Ebene regulierbar.'},
+ transkription:{n:'Transkription',a:'die',p:null,s:'Das Umschreiben der Information eines Gens von der DNA in eine mRNA. Sie findet im Zellkern statt.',o:'DNA-abhängige RNA-Synthese durch RNA-Polymerasen in den Phasen Initiation, Elongation und Termination.'},
+ translation:{n:'Translation',a:'die',p:null,s:'Das Übersetzen der Basenfolge der mRNA in eine Aminosäurefolge. Sie findet an den Ribosomen statt.',o:'mRNA-abhängige Polypeptidsynthese am Ribosom in den Phasen Initiation, Elongation und Termination.'},
+ prozessierung:{n:'RNA-Prozessierung',a:'die',p:null,o:'Gesamtheit der Reifungsschritte der prä-mRNA: 5′-Capping, Spleißen, 3′-Schnitt und Polyadenylierung; ggf. RNA-Editing.'},
+ spleissen:{n:'Spleißen',a:'das',p:null,o:'Entfernen der Introns und Verknüpfen der Exons durch zwei aufeinanderfolgende Umesterungen am Spleißosom.'},
+ altspleissen:{n:'alternatives Spleißen',a:'das',p:null,o:'Unterschiedliche Kombination von Exons aus derselben prä-mRNA (Exon-Skipping, alternative Spleißstellen, Intron-Retention). Bei über 90 % der menschlichen Gene mit mehreren Exons nachgewiesen; erhöht die Proteinvielfalt.'},
+ utr:{n:'UTR (untranslatierte Region)',a:'die',p:'UTRs',o:'Nicht translatierte Abschnitte der mRNA vor dem Startcodon (5′-UTR) und nach dem Stoppcodon (3′-UTR) mit regulatorischer Funktion.'},
+ leseraster:{n:'Leseraster',a:'das',p:'Leseraster',s:'Die Einteilung der Basenfolge in Dreiergruppen (Codons). Es beginnt am Startcodon.',o:'Durch das Startcodon festgelegte Einteilung in Tripletts. Insertionen oder Deletionen, deren Länge kein Vielfaches von drei ist, verschieben das Leseraster.'},
+ mutation:{n:'Mutation',a:'die',p:'Mutationen',s:'Eine dauerhafte Veränderung der Basenfolge der DNA.',o:'Veränderung der DNA-Sequenz. Punktmutationen: stumm, Missense, Nonsense; Insertionen/Deletionen können Rasterverschiebungen verursachen.'},
+ gcode:{n:'genetischer Code',a:'der',p:null,s:'Die Regel, nach der jeweils drei Basen (ein Codon) einer Aminosäure zugeordnet sind.',o:'Zuordnung der 64 Codons zu 20 Aminosäuren und Stoppsignalen; Triplett-Code, degeneriert, nahezu universell, kommafrei, nicht überlappend.'},
+ chaperon:{n:'Chaperon',a:'das',p:'Chaperone',o:'Protein, das die korrekte Faltung anderer Proteine unterstützt und Aggregation verhindert (z. B. Hsp70, Chaperonine wie TRiC).'},
+ signalseq:{n:'Signalsequenz',a:'die',p:'Signalsequenzen',o:'N-terminale, überwiegend hydrophobe Sequenz, die vom SRP gebunden wird und die kotranslationale Translokation ins ER einleitet; wird meist durch die Signalpeptidase abgespalten.'},
+ nmd:{n:'Nonsense-mediated decay (NMD)',a:'der',p:null,o:'Abbauweg für mRNAs mit vorzeitigem Stoppcodon. Liegt ein Stoppcodon mehr als ca. 50–55 Nukleotide vor der letzten Exon-Exon-Verbindung, bleibt ein Exon-Junction-Komplex stromabwärts gebunden und löst den Abbau aus.'},
+ codogen:{n:'codogener Strang',a:'der',p:'codogene Stränge',s:'Der DNA-Strang, der als Vorlage für die mRNA dient.',o:'Matrizenstrang (template strand), 3′→5′ abgelesen; komplementär und antiparallel zur entstehenden RNA.'}
+};
+
+const infoEl=$('#info');
+let lastFocus=null;
+function openInfo(key){
+  const it=INFO[key]||GEXTRA[key]; if(!it) return;
+  lastFocus=document.activeElement;
+  $('#infoTitle').textContent=it.n;
+  $('#infoGr').innerHTML=`<span class="art-${it.a}">${it.a}</span> ${it.n.split(' (')[0]}${it.p?`, Plural: <span class="art-die">die</span> ${it.p}`:''}`;
+  const txt=L(it.s,it.o);
+  $('#infoLv').textContent=(isO()&&it.o)||(!isO()&&!it.s)?'Oberstufe':'Sekundarstufe I';
+  $('#infoBody').innerHTML=`<p>${txt}</p>`;
+  infoEl.hidden=false;$('#infoClose').focus();
+}
+function closeInfo(){infoEl.hidden=true;if(lastFocus) lastFocus.focus();}
+$('#infoClose').addEventListener('click',closeInfo);
+infoEl.addEventListener('click',e=>{if(e.target===infoEl) closeInfo();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!infoEl.hidden) closeInfo();});
+
+/* ---------- Zellansicht ---------- */
+const ORG=[
+ {id:'membran',s:'Zellmembran',o:'Plasmamembran',col:'var(--memb)'},
+ {id:'kern',s:'Zellkern mit Kernhülle',o:'Nukleus mit Kernhülle',col:'var(--nucleo)'},
+ {id:'chromatin',s:'DNA (Chromatin)',o:'Chromatin',col:'var(--chrom)'},
+ {id:'nukleolus',s:'Kernkörperchen',o:'Nukleolus',col:'var(--chrom)'},
+ {id:'rer',s:'raues ER',o:'raues ER',col:'var(--er)'},
+ {id:'ser',s:'glattes ER',o:'glattes ER',col:'var(--er)'},
+ {id:'ribo',s:'freie Ribosomen',o:'freie Ribosomen',col:'var(--ribo)'},
+ {id:'golgi',s:'Golgi-Apparat',o:'Golgi-Apparat',col:'var(--golgi)'},
+ {id:'ves',s:'Vesikel',o:'Vesikel',col:'var(--golgi)'},
+ {id:'mito',s:'Mitochondrien',o:'Mitochondrien',col:'var(--mito)'},
+ {id:'lyso',s:'Lysosomen',o:'Lysosomen',col:'var(--lyso)'}
+];
+const cellVis=new Set(ORG.map(o=>o.id));
+let cellLabels=true, cellPath=true;
+const NC=[255,245];
+const pol=(r,deg)=>[NC[0]+r*Math.cos(deg*Math.PI/180),NC[1]+r*Math.sin(deg*Math.PI/180)];
+function arc(r,a0,a1){const p0=pol(r,a0),p1=pol(r,a1);return `M${f1(p0[0])},${f1(p0[1])} A${r},${r} 0 0 1 ${f1(p1[0])},${f1(p1[1])}`;}
+let RIBOPOS=null;
+function riboPositions(){
+  if(RIBOPOS) return RIBOPOS;
+  let seed=11;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+  const out=[];let tries=0;
+  const mitos=[[90,250],[470,92],[650,330],[300,452]];
+  while(out.length<46&&tries<5000){
+    tries++;const x=30+rnd()*700,y=30+rnd()*440;
+    const e=((x-380)/365)**2+((y-250)/235)**2; if(e>0.86) continue;
+    if(Math.hypot(x-NC[0],y-NC[1])<184) continue;
+    if(x>495&&x<625&&y>135&&y<245) continue;
+    if(x>440&&x<615&&y>365&&y<448) continue;
+    if(mitos.some(m=>Math.hypot(x-m[0],y-m[1])<48)) continue;
+    if(Math.hypot(x-420,y-62)<22||Math.hypot(x-705,y-300)<22) continue;
+    if(x>455&&x<520&&y>215&&y<250) continue;
+    if(out.some(q=>Math.hypot(q[0]-x,q[1]-y)<16)) continue;
+    out.push([x,y]);
+  }
+  return RIBOPOS=out;
+}
+function buildCell(){
+  const O=isO();let s='';
+  const G=(id,inner,key)=>`<g data-org="${id}"${cellVis.has(id)?'':' display="none"'}${key?` class="hot" data-key="${key}"`:''}>${inner}</g>`;
+  // Cytoplasma und Membran
+  s+=`<ellipse cx="380" cy="250" rx="362" ry="232" class="c-cyto hot" data-key="cytoplasma"/>`;
+  s+=G('membran',`<ellipse cx="380" cy="250" rx="365" ry="235" class="c-memb"/><ellipse cx="380" cy="250" rx="359" ry="229" class="c-memb" stroke-opacity=".5"/><ellipse cx="380" cy="250" rx="362" ry="232" class="c-hit"/>`,'membran');
+  // glattes ER
+  s+=G('ser',`<path d="M455,398 c20,-22 40,22 60,0 s40,22 60,0" class="c-ser"/><path d="M468,428 c20,-16 40,16 60,0 s40,-12 58,6" class="c-ser"/><path d="M515,398 c4,12 6,20 13,30" class="c-ser"/>`,'ser');
+  // raues ER
+  let rer='';
+  for(const r of [130,148,166]){rer+=`<path d="${arc(r,-52,72)}" class="c-rer"/>`;for(let a=-48;a<=68;a+=6.5){const p=pol(r+7,a);rer+=`<circle cx="${f1(p[0])}" cy="${f1(p[1])}" r="2.6" class="c-rib"/>`;}}
+  s+=G('rer',rer,'rer');
+  // Golgi
+  let gol='';[[0,110],[16,96],[32,82],[48,66]].forEach(([dy,w])=>{gol+=`<path d="M${560-w/2},${158+dy} q${w/2},-26 ${w},0" class="c-golgi"/>`;});
+  s+=G('golgi',gol,'golgi');
+  // Vesikel
+  s+=G('ves',[[624,150,6],[642,188,7],[620,232,6],[668,226,5],[690,170,6],[602,262,5],[712,250,6],[676,282,5]].map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" class="c-ves"/>`).join(''),'vesikel');
+  // Mitochondrien
+  const mito=(x,y,rot)=>`<g transform="translate(${x},${y}) rotate(${rot})"><ellipse rx="40" ry="17" class="c-mo"/><path d="M-30,0 l6,-11 l6,22 l6,-22 l6,22 l6,-22 l6,22 l6,-22 l6,22 l6,-11" class="c-mi"/></g>`;
+  s+=G('mito',mito(90,250,80)+mito(470,92,10)+mito(650,330,-25)+mito(300,452,4),'mito');
+  // Lysosomen
+  s+=G('lyso',[[420,62],[705,300]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="14" class="c-lyso"/><circle cx="${x-4}" cy="${y-3}" r="2" class="c-lyso"/><circle cx="${x+4}" cy="${y+3}" r="2" class="c-lyso"/>`).join(''),'lysosom');
+  // freie Ribosomen inkl. Polysom
+  let rib=riboPositions().map(([x,y])=>`<circle cx="${f1(x)}" cy="${f1(y)}" r="3" class="c-rib"/>`).join('');
+  rib+=`<path d="M462,236 q10,-8 20,0 t20,0 t20,0" fill="none" stroke="var(--muted)" stroke-width="1.2"/>`+[[468,230],[482,236],[496,229],[510,236]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="4" class="c-rib"/>`).join('');
+  s+=G('ribo',rib,'ribosom');
+  // Zellkern
+  let kern=`<circle cx="${NC[0]}" cy="${NC[1]}" r="108" class="c-nucleo hot" data-key="zellkern"/><circle cx="${NC[0]}" cy="${NC[1]}" r="104" class="c-env"/><circle cx="${NC[0]}" cy="${NC[1]}" r="112" class="c-env"/><circle cx="${NC[0]}" cy="${NC[1]}" r="108" class="c-hit hot" data-key="kernhuelle"/>`;
+  for(const a of [10,55,100,150,200,245,290,335]){const p=pol(108,a);kern+=`<g transform="translate(${f1(p[0])},${f1(p[1])}) rotate(${a})" class="hot" data-key="kernpore"><rect x="-8" y="-6" width="16" height="12" class="c-npcfill"/><rect x="-8" y="-8" width="16" height="3" rx="1" fill="var(--memb)"/><rect x="-8" y="5" width="16" height="3" rx="1" fill="var(--memb)"/></g>`;}
+  s+=G('kern',kern,null);
+  s+=G('chromatin',['M178,214 q12,-18 24,0 t24,0 t24,0','M196,178 q10,14 20,0 t20,0 t20,0 t20,0','M172,262 q12,16 24,0 t24,0','M210,312 q12,-16 24,0 t24,0 t24,0','M300,196 q10,-14 20,0 t20,0','M170,240 q-10,12 4,20'].map(d=>`<path d="${d}" class="c-chrom"/>`).join(''),'chromatin');
+  s+=G('nukleolus',`<circle cx="292" cy="262" r="30" class="c-nucleolus"/>`,'nukleolus');
+  // Beschriftungen
+  if(cellLabels){
+    const LB=[
+      ['membran','membran',[330,18],[330,44],'Zellmembran','Plasmamembran','middle'],
+      ['kern','zellkern',[200,165],[150,112],'Zellkern','Nukleus','middle'],
+      ['kern','kernpore',pol(108,200),[62,186],'Kernpore','Kernporenkomplex','start'],
+      ['kern','kernhuelle',pol(112,150),[54,330],'Kernhülle','Kernhülle','start'],
+      ['nukleolus','nukleolus',[292,262],[292,310],'Kernkörperchen','Nukleolus','middle',true],
+      ['chromatin','chromatin',[226,214],[214,244],'DNA','Chromatin','middle',true],
+      ['rer','rer',pol(166,30),[440,334],'raues ER','raues ER','start'],
+      ['ser','ser',[540,398],[540,368],'glattes ER','glattes ER','middle'],
+      ['ribo','ribosom',[489,232],[489,206],'Ribosomen','Polysom','middle'],
+      ['golgi','golgi',[560,150],[560,124],'Golgi-Apparat','Golgi-Apparat','middle'],
+      ['ves','vesikel',[690,170],[700,140],'Vesikel','Vesikel','middle'],
+      ['mito','mito',[470,92],[470,56],'Mitochondrium','Mitochondrium','middle'],
+      ['lyso','lysosom',[705,300],[700,340],'Lysosom','Lysosom','middle']
+    ];
+    for(const [org,key,an,tp,ts,to,anc,inn] of LB){
+      s+=`<g data-org="${org}"${cellVis.has(org)?'':' display="none"'}>`+line(an[0],an[1],tp[0],tp[1]+(tp[1]>an[1]?-12:4),'cline')+`<text x="${f1(tp[0])}" y="${f1(tp[1])}" text-anchor="${anc}" class="clbl${inn?' in':''} hot" data-key="${key}">${O?to:ts}</text></g>`;
+    }
+    s+=`<text x="150" y="420" class="clbl hot" data-key="cytoplasma">${O?'Cytosol':'Cytoplasma'}</text>`;
+  }
+  // Weg der Information
+  if(cellPath){
+    const M=O?[
+      {x:214,y:202,st:'tx',l:'Transkription',lx:0,ly:-16},
+      {x:244,y:290,st:'proc',l:'Prozessierung',lx:0,ly:26},
+      {x:361,y:264,st:'exp',l:'Export',lx:6,ly:26},
+      {x:489,y:262,st:'init',l:'Translation',lx:0,ly:26},
+      {x:392,y:196,st:'prot',l:'Import ins rER',lx:0,ly:-16},
+      {x:560,y:196,st:'prot',l:'Sortierung',lx:0,ly:26}
+    ]:[
+      {x:214,y:202,st:'tx',l:'Transkription',lx:0,ly:-16},
+      {x:361,y:264,st:'exp',l:'Export',lx:6,ly:26},
+      {x:489,y:262,st:'init',l:'Translation',lx:0,ly:26},
+      {x:600,y:300,st:'prot',l:'Protein',lx:0,ly:26}
+    ];
+    const main=O?[M[0],M[1],M[2],M[3]]:M;
+    s+=poly(main.map(m=>[m.x,m.y]),'ppath');
+    if(O) s+=poly([[M[2].x,M[2].y],[M[4].x,M[4].y],[M[5].x,M[5].y]],'ppath alt');
+    M.forEach((m,i)=>{s+=`<g class="pm hot" data-goto="${m.st}" role="button" aria-label="Schritt ${m.l} im Ablauf öffnen"><circle cx="${m.x}" cy="${m.y}" r="11"/><text x="${m.x}" y="${m.y+4}">${i+1}</text></g><text x="${m.x+m.lx}" y="${m.y+m.ly}" text-anchor="middle" class="pmt hot" data-goto="${m.st}">${m.l}</text>`;});
+  }
+  $('#cell').innerHTML=s;
+}
+function renderOrgToggles(){
+  $('#orgToggles').innerHTML=ORG.map(o=>`<label class="toggle"><input type="checkbox" data-org="${o.id}"${cellVis.has(o.id)?' checked':''}><span class="swatch" style="background:${o.col}"></span>${L(o.s,o.o)}</label>`).join('');
+}
+$('#orgToggles').addEventListener('change',e=>{const id=e.target.dataset.org;if(!id)return;e.target.checked?cellVis.add(id):cellVis.delete(id);buildCell();});
+$('#allOn').addEventListener('click',()=>{ORG.forEach(o=>cellVis.add(o.id));renderOrgToggles();buildCell();});
+$('#pbsOnly').addEventListener('click',()=>{cellVis.clear();['membran','kern','chromatin','nukleolus','rer','ribo','golgi','ves'].forEach(i=>cellVis.add(i));renderOrgToggles();buildCell();});
+$('#cellLabels').addEventListener('change',e=>{cellLabels=e.target.checked;buildCell();});
+$('#cellPath').addEventListener('change',e=>{cellPath=e.target.checked;buildCell();});
+$('#cell').addEventListener('click',e=>{
+  const g=e.target.closest('[data-goto]');if(g){gotoStage(g.dataset.goto);return;}
+  const k=e.target.closest('[data-key]');if(k) openInfo(k.dataset.key);
+});
+
+/* ---------- Aufgaben ---------- */
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const translate=s=>{
+  if(s.slice(0,3)!=='AUG') return {start:false,aa:[],stop:false};
+  const out=[];
+  for(let i=0;i+2<s.length;i+=3){const a=code(s.substr(i,3));if(a==='*') return {start:true,aa:out,stop:true};out.push(AA3[a]);}
+  return {start:true,aa:out,stop:false};
+};
+const protStr=r=>!r.start?'keine Translation: Startcodon AUG fehlt':(r.aa.join('-')+(r.stop?'-Stopp':' (kein Stoppcodon im Abschnitt)'));
+function codeTable(){
+  const B='UCAG';let h='<div class="tblwrap"><table class="code"><thead><tr><th>1. Base</th>'+[...B].map(b=>`<th>2. Base: ${b}</th>`).join('')+'</tr></thead><tbody>';
+  for(const a of B){h+=`<tr><th>${a}</th>`;for(const b of B){h+='<td>'+[...B].map(c=>{const x=AA3[code(a+b+c)];return `<span>${a}${b}${c} ${x}</span>`;}).join('')+'</td>';}h+='</tr>';}
+  return h+'</tbody></table></div>';
+}
+function goBtn(id,txt){return stages().includes(id)?`<button class="btn small" type="button" data-goto="${id}">${txt}</button>`:'';}
+function task(n,title,body,ewh){
+  return `<article class="task"><h3><span class="tn">${n}</span>${title}</h3>${body}${ewh?`<details class="ewh"><summary>${isO()?'Erwartungshorizont':'Lösung'}</summary>${ewh}</details>`:''}</article>`;
+}
+// Lückentext
+const GAPS=[
+ ['Die Transkription findet im',['Zellkern','Cytoplasma','Ribosom'],0,'statt.'],
+ ['Die RNA-Polymerase bindet am',['Promotor','Stoppcodon','Ribosom'],0,'des Gens.'],
+ ['In der mRNA steht statt Thymin (T) die Base',['Uracil (U)','Adenin (A)','Guanin (G)'],0,'.'],
+ ['Die mRNA gelangt durch die',['Kernporen','Zellmembran','Mitochondrien'],0,'in das Cytoplasma.'],
+ ['Drei Basen der mRNA bilden ein',['Codon','Anticodon','Gen'],0,'.'],
+ ['Die tRNA trägt eine',['Aminosäure','DNA','Kernpore'],0,'.'],
+ ['Die Translation findet an den',['Ribosomen','Lysosomen','Chromosomen'],0,'statt.'],
+ ['Die Translation endet am',['Stoppcodon','Startcodon','Promotor'],0,'.']
+];
+function renderGaps(){
+  return GAPS.map(([pre,opts,ci,post],i)=>{
+    const rot=opts.map((o,j)=>opts[(j+i)%opts.length]);
+    return `<label class="gap">${pre} <select data-gap="${i}" aria-label="Lücke ${i+1}"><option value="">…</option>${rot.map(o=>`<option>${o}</option>`).join('')}</select> ${post}<span class="fb" data-fb="gap${i}"></span></label>`;
+  }).join('');
+}
+// Reihenfolge
+const ORD={
+ sek1:['Die RNA-Polymerase bindet am Promotor.','Die mRNA wird am codogenen Strang der DNA gebildet.','Die mRNA gelangt durch eine Kernpore in das Cytoplasma.','Die kleine Untereinheit des Ribosoms bindet an die mRNA und erreicht das Startcodon AUG.','tRNAs mit Aminosäuren binden an die Codons; die Aminosäuren werden durch Peptidbindungen verknüpft.','Am Stoppcodon wird die Aminosäurekette freigesetzt.','Die Kette faltet sich zum fertigen Protein.'],
+ ober:['Allgemeine Transkriptionsfaktoren binden an die TATA-Box; RNA-Polymerase II wird gebunden.','Transkription der prä-mRNA; kotranskriptionell wird die 5′-Cap angefügt.','Spleißen und Polyadenylierung führen zur reifen mRNA.','Export des mRNPs durch den Kernporenkomplex.','Der 43S-Präinitiationskomplex bindet an die Cap-Struktur und tastet die 5′-UTR ab (Scanning).','Am AUG im Kozak-Kontext lagert sich die 60S-Untereinheit an; das 80S-Ribosom entsteht.','Elongationszyklen aus Decodierung, Peptidyltransfer und Translokation.','eRF1 bindet am Stoppcodon; das Polypeptid wird hydrolytisch freigesetzt.','Faltung, gegebenenfalls Zielsteuerung und posttranslationale Modifikation.']
+};
+const ordState={};
+function initOrder(){const items=ORD[LEVEL];const perm=LEVEL==='ober'?[3,0,6,1,8,4,2,7,5]:[2,5,0,4,1,6,3];ordState.cur=perm.map(i=>i);ordState.items=items;}
+function renderOrder(){return `<ol class="order" id="orderList">${ordState.cur.map((k,i)=>`<li data-pos="${i}"><span>${ordState.items[k]}</span><button class="mv" type="button" data-mv="-1" aria-label="nach oben">↑</button><button class="mv" type="button" data-mv="1" aria-label="nach unten">↓</button></li>`).join('')}</ol>`;}
+// Mutationslabor
+const mut={seq:CDS.split(''),sel:null};
+function renderMut(){
+  const s=mut.seq.join('');
+  let chips='<div class="chips">';
+  for(let i=0;i<mut.seq.length;i+=3){chips+=`<div class="chipgrp" data-i="${i/3+1}">`;for(let j=i;j<Math.min(i+3,mut.seq.length);j++) chips+=`<button type="button" class="chip ${mut.seq[j]}${mut.sel===j?' sel':''}" data-mi="${j}" aria-label="Position ${j+1}: ${mut.seq[j]}">${mut.seq[j]}</button>`;chips+='</div>';}
+  chips+='</div>';
+  const o=translate(CDS), m=translate(s);
+  let typ='';
+  if(s===CDS) typ='keine Mutation';
+  else if(s.length!==CDS.length) typ=(Math.abs(s.length-CDS.length)%3)?'Leserasterverschiebung (Frameshift) durch Insertion oder Deletion':'Insertion bzw. Deletion ohne Rasterverschiebung (ganze Codons)';
+  else if(!m.start) typ='Mutation im Startcodon: keine Translation an dieser Stelle';
+  else if(m.aa.join()===o.aa.join()&&m.stop) typ='stumme Mutation: gleiche Aminosäuresequenz (degenerierter Code)';
+  else if(m.stop&&m.aa.length<o.aa.length&&o.aa.slice(0,m.aa.length).join()===m.aa.join()) typ='Nonsense-Mutation: vorzeitiges Stoppcodon, verkürzte Kette';
+  else if(!m.stop) typ='Stoppcodon verloren: Translation läuft über das ursprüngliche Ende hinaus';
+  else typ='Missense-Mutation: eine Aminosäure ist ausgetauscht';
+  return chips+`<div class="btnrow" role="group" aria-label="Werkzeuge">${'AUGC'.split('').map(b=>`<button class="btn small" type="button" data-mset="${b}">${b} einsetzen</button>`).join('')}<button class="btn small" type="button" data-mdel="1">Base entfernen</button><button class="btn small" type="button" data-mins="1">A davor einfügen</button><button class="btn small" type="button" data-mreset="1">Zurücksetzen</button></div>
+  <div class="result"><div><b>Original:</b> ${protStr(o)}</div><div><b>Mutiert:</b> ${protStr(m)}</div><div><b>Art:</b> ${typ}</div></div>`;
+}
+// Sequenzanalyse
+const PRE=toR(SEQ.utr5+SEQ.e1+SEQ.intron+SEQ.e2+SEQ.utr3+SEQ.tail);
+const FEAT=[
+ {id:'ss5',n:'5′-Spleißstelle (2 Basen)',set:[15,16],c:'f1',col:'#F6D9A8'},
+ {id:'br',n:'Verzweigungs-Adenosin',set:[27],c:'f2',col:'#F3B6B0'},
+ {id:'ss3',n:'3′-Spleißstelle (2 Basen)',set:[33,34],c:'f3',col:'#BFE3C9'},
+ {id:'start',n:'Startcodon',set:[6,7,8],c:'f4',col:'#BBD3F2'},
+ {id:'stop',n:'Stoppcodon der reifen mRNA',set:[44,45,46],c:'f5',col:'#E2C9F2'},
+ {id:'pas',n:'Polyadenylierungssignal',set:[48,49,50,51,52,53],c:'f6',col:'#F2E59E'}
+];
+const marks={};FEAT.forEach(f=>marks[f.id]=new Set());let activeFeat='ss5';
+function renderSeqA(){
+  let h=`<div class="featsel" role="radiogroup">${FEAT.map(f=>`<label><input type="radio" name="feat" value="${f.id}"${f.id===activeFeat?' checked':''}><span class="dot" style="background:${f.col}"></span>${f.n}</label>`).join('')}</div><div class="chips" id="seqChips">`;
+  for(let i=0;i<PRE.length;i+=10){h+=`<div class="chipgrp" data-i="${i+1}">`;for(let j=i;j<Math.min(i+10,PRE.length);j++){const f=FEAT.find(F=>marks[F.id].has(j));h+=`<button type="button" class="chip ${PRE[j]} ${f?f.c:''}" data-si="${j}" aria-label="Position ${j+1}: ${PRE[j]}">${PRE[j]}</button>`;}h+='</div>';}
+  return h+`</div><div class="btnrow"><button class="btn small" type="button" id="seqCheck">Prüfen</button><button class="btn small solbtn" type="button" id="seqSol">Lösung einblenden</button><button class="btn small" type="button" id="seqReset">Markierungen löschen</button></div><div class="result" id="seqRes" hidden></div>`;
+}
+// Intron-Retention
+let retained=false;
+function renderRet(){
+  const s=retained?toR(SEQ.e1+SEQ.intron+SEQ.e2):CDS;
+  let h='<div class="codons">';
+  for(let i=0;i+2<s.length;i+=3){const c=s.substr(i,3),a=AA3[code(c)];h+=`<div class="codon"><span class="mono">${c}</span><span>${a}</span></div>`;if(a==='Stopp')break;}
+  return `<div class="btnrow"><button class="btn small${retained?'':' primary'}" type="button" data-ret="0">reife mRNA</button><button class="btn small${retained?' primary':''}" type="button" data-ret="1">Intron nicht entfernt</button></div>`+h+'</div>';
+}
+// Alternatives Spleißen
+const ALT={e2:true,e3:true};
+function renderAlt(){
+  const ex=[{n:'Exon 1',len:30,on:true,c:'var(--exon)'},{n:'Exon 2',len:36,on:ALT.e2,c:'#3D8F6B'},{n:'Exon 3',len:26,on:ALT.e3,c:'#5A6FB0'},{n:'Exon 4',len:43,on:true,c:'var(--exon)'}];
+  const tot=ex.filter(e=>e.on).reduce((a,e)=>a+e.len,0);
+  const ok=tot%3===0;
+  const bar=ex.filter(e=>e.on).map(e=>`<div style="flex:${e.len};background:${e.c}">${e.n} (${e.len})</div>`).join('');
+  return `<div class="btnrow"><label class="toggle"><input type="checkbox" data-alt="e2"${ALT.e2?' checked':''}> Exon 2 einschließen</label><label class="toggle"><input type="checkbox" data-alt="e3"${ALT.e3?' checked':''}> Exon 3 einschließen</label></div><div class="exbar">${bar}</div><div class="result">Länge der codierenden Sequenz: <b>${tot} Nukleotide</b>. ${ok?`Das Leseraster bleibt erhalten: Isoform mit ${tot/3-1} Aminosäuren.`:`${tot} ist nicht durch 3 teilbar: Ab der Exon-Verknüpfung ist das Leseraster verschoben. Es entsteht eine abweichende Aminosäuresequenz, meist mit vorzeitigem Stoppcodon.`}</div>`;
+}
+
+function renderTasks(){
+  const O=isO();let h='';
+  $('#taskIntro').textContent=O?'Bearbeiten Sie die Aufgaben in der angegebenen Reihenfolge. Die Schaltflächen öffnen den passenden Schritt der Animation.':'Bearbeite die Aufgaben der Reihe nach. Mit den Schaltflächen kannst du dir den passenden Schritt in der Animation noch einmal ansehen.';
+  if(!O){
+    h+=task(1,'Grundbegriffe',`<p><span class="op">Wähle</span> jeweils das passende Wort aus.</p>${renderGaps()}<div class="btnrow"><button class="btn small" type="button" id="gapCheck">Prüfen</button>${goBtn('tx','Animation: Transkription')}</div>`,null);
+    h+=task(2,'Von der DNA zur mRNA',`<p>Hier siehst du den codogenen Strang eines Gens.</p><div class="seqbox">3′- TAC CTT TTA CTA CTC GAC ATT -5′</div><p><span class="op">Schreibe</span> die Basenfolge der mRNA auf (vom 5′-Ende zum 3′-Ende). Leerzeichen sind erlaubt.</p><input class="inp" id="bpIn" autocomplete="off" spellcheck="false" placeholder="5′- … -3′"><div class="btnrow"><button class="btn small" type="button" id="bpCheck">Prüfen</button>${goBtn('tx','Animation: Transkription')}</div><div class="result" id="bpRes" hidden></div><p class="hint">Hilfe: Gegenüber von A wird U eingebaut, gegenüber von T ein A, gegenüber von G ein C, gegenüber von C ein G.</p>`,`<p>mRNA: 5′- AUG GAA AAU GAU GAG CUG UAA -3′</p>`);
+    h+=task(3,'Von der mRNA zum Protein',`<p><span class="op">Ordne</span> jedem Codon mithilfe der Codetabelle die passende Aminosäure <span class="op">zu</span>.</p><div class="codons">${CDS.match(/.{3}/g).map((c,i)=>`<div class="codon" data-ci="${i}"><span class="mono">${c}</span><select data-dec="${i}" aria-label="Aminosäure für ${c}"><option value="">…</option>${[...new Set(Object.values(AA3))].sort().map(a=>`<option>${a}</option>`).join('')}</select></div>`).join('')}</div><div class="btnrow"><button class="btn small" type="button" id="decCheck">Prüfen</button>${goBtn('elong','Animation: Verlängerung')}</div><div class="result" id="decRes" hidden></div><details><summary>Codetabelle anzeigen</summary>${codeTable()}</details>`,`<p>Met – Glu – Asn – Asp – Glu – Leu – Stopp. Im Einbuchstabencode ergibt sich M-E-N-D-E-L. Gregor Mendel (1822–1884) hat mit Kreuzungsversuchen an Erbsen die Grundregeln der Vererbung entdeckt.</p>`);
+    h+=task(4,'Die richtige Reihenfolge',`<p><span class="op">Bringe</span> die Schritte mit den Pfeilen in die richtige Reihenfolge.</p>${renderOrder()}<div class="btnrow"><button class="btn small" type="button" id="ordCheck">Prüfen</button></div>`,null);
+    h+=task(5,'Mutationslabor',`<p>Eine Mutation ist eine Veränderung der Basenfolge. Wähle eine Base durch Anklicken aus und verändere sie.</p><ol><li><span class="op">Ändere</span> im 2. Codon (GAA) die erste Base zu U. <span class="op">Beschreibe</span> die Folge.</li><li><span class="op">Ändere</span> im 6. Codon (CUG) die letzte Base zu A. Was fällt dir auf?</li><li><span class="op">Ändere</span> im 4. Codon (GAU) das U zu A.</li><li><span class="op">Entferne</span> die erste Base des 3. Codons. <span class="op">Erkläre</span>, warum sich so viele Aminosäuren ändern.</li></ol><div id="mutBox">${renderMut()}</div>`,`<ol><li>UAA ist ein Stoppcodon: Die Kette bricht nach Met ab (Nonsense-Mutation).</li><li>CUA codiert ebenfalls Leucin: Das Protein bleibt gleich (stumme Mutation).</li><li>GAA codiert Glutaminsäure statt Asparaginsäure: Eine Aminosäure ist ausgetauscht (Missense-Mutation).</li><li>Ab der Deletion werden alle folgenden Basen in neuen Dreiergruppen gelesen: Das Leseraster ist verschoben.</li></ol>`);
+    h+=task(6,'Schreibauftrag: Vom Gen zum Protein',`<p><span class="op">Beschreibe</span> den Weg vom Gen zum Protein in sechs bis acht Sätzen. Nutze die Satzanfänge und die Fachbegriffe.</p><p><b>Satzanfänge:</b> Zuerst bindet … / Dabei wird … / Anschließend gelangt … / Am Ribosom … / Jede tRNA trägt … / Zum Schluss …</p><div class="wordbank">${[['der','Zellkern'],['die','DNA'],['die','mRNA'],['die','RNA-Polymerase'],['die','Kernpore'],['das','Ribosom'],['die','tRNA'],['das','Codon'],['das','Anticodon'],['die','Aminosäure'],['das','Protein']].map(([a,w])=>`<span><span class="art-${a}">${a}</span> ${w}</span>`).join('')}</div>`,`<p>Zuerst bindet die RNA-Polymerase im Zellkern am Promotor eines Gens. Dabei wird gegenüber dem codogenen Strang eine mRNA gebildet. Anschließend gelangt die mRNA durch eine Kernpore in das Cytoplasma. Am Ribosom wird die Basenfolge der mRNA in Dreiergruppen (Codons) übersetzt. Jede tRNA trägt eine Aminosäure und besitzt ein Anticodon, das zu einem Codon passt. Die Aminosäuren werden durch Peptidbindungen verknüpft. Zum Schluss wird die Kette am Stoppcodon freigesetzt und faltet sich zum Protein.</p>`);
+  } else {
+    h+=task(1,'Ablauf ordnen',`<p><span class="op">Ordnen</span> Sie die Teilschritte der Genexpression in die richtige Reihenfolge.</p>${renderOrder()}<div class="btnrow"><button class="btn small" type="button" id="ordCheck">Prüfen</button></div>`,`<p>Hinweis: Capping, Spleißen und Polyadenylierung laufen in vivo teilweise gleichzeitig und kotranskriptionell ab; die Reihenfolge ist hier didaktisch vereinfacht.</p>`);
+    h+=task(2,'Sequenzanalyse der prä-mRNA',`<p>Gegeben ist die prä-mRNA des Modellgens (5′→3′, ohne Cap). <span class="op">Analysieren</span> Sie die Sequenz: Wählen Sie oben ein Merkmal und markieren Sie die zugehörigen Basen durch Anklicken.</p>${renderSeqA()}<p><span class="op">Begründen</span> Sie anschließend, weshalb das AUG an den Positionen 37–39 und das UAA an den Positionen 22–24 nicht als Start- bzw. Stoppcodon des Proteins fungieren.</p><div class="btnrow">${goBtn('proc','Animation: Prozessierung')}</div>`,`<p>5′-Spleißstelle: G16 U17; Verzweigungs-A: A28 (im Motiv CUAAC); 3′-Spleißstelle: A34 G35; Startcodon: A7 U8 G9 (Kozak-Kontext GCCACCAUGG); Stoppcodon: U45 A46 A47; Polyadenylierungssignal: A49–A54 (AAUAAA). Positionsangaben beginnen bei 1.</p><p>Das AUG an Position 37–39 liegt stromabwärts des ersten AUG (Scanning-Mechanismus: in der Regel wird das erste AUG in günstigem Kontext genutzt) und zudem außerhalb des Leserasters. Das UAA an Position 22–24 liegt im Intron und wird vor der Translation herausgespleißt.</p>`);
+    h+=task(3,'Gedankenexperiment: Intron-Retention',`<p>Bei einer Mutation der 5′-Spleißstelle wird das Intron nicht entfernt. <span class="op">Erklären</span> Sie mithilfe der Darstellung die Folgen für das Genprodukt. <span class="op">Beurteilen</span> Sie, ob ein solches Transkript in der Zelle überhaupt in nennenswertem Umfang translatiert würde.</p><div id="retBox">${renderRet()}</div>`,`<p>Mit Intron entsteht nach Met-Glu-Asn die Folge Val-Ser und anschließend das Stoppcodon UAA: ein vorzeitiges Stoppcodon (premature termination codon). Das Produkt wäre stark verkürzt und funktionslos.</p><p>Beurteilung: Unvollständig gespleißte prä-mRNA wird überwiegend im Kern zurückgehalten und abgebaut. Gelangt sie dennoch ins Cytoplasma, wird sie bei vorzeitigem Stoppcodon häufig durch Nonsense-mediated decay (NMD) abgebaut. Die Translation in nennenswertem Umfang ist daher unwahrscheinlich; NMD schützt die Zelle vor verkürzten, potenziell dominant-negativen Proteinen.</p>`);
+    h+=task(4,'Alternatives Spleißen',`<p>Modellgen mit vier Exons; Exon 1 enthält das Startcodon, Exon 4 das Stoppcodon des ursprünglichen Leserasters. <span class="op">Untersuchen</span> Sie, welche Exon-Kombinationen funktionsfähige Isoformen liefern, und <span class="op">leiten</span> Sie eine allgemeine Regel <span class="op">ab</span>.</p><div id="altBox">${renderAlt()}</div><p><span class="op">Erläutern</span> Sie die Bedeutung des alternativen Spleißens für die Proteinvielfalt des Menschen.</p>`,`<p>Regel: Das Überspringen eines Exons erhält das Leseraster nur, wenn dessen Länge ein Vielfaches von 3 ist (Exon 2: 36 nt). Exon 3 (26 nt) führt beim Überspringen zur Rasterverschiebung.</p><p>Bedeutung: Mit ca. 20 000 proteincodierenden Genen entstehen durch alternatives Spleißen deutlich mehr Proteinisoformen; über 90 % der Gene mit mehreren Exons werden alternativ gespleißt. Gewebespezifische Spleißfaktoren (SR-Proteine, hnRNPs) steuern die Exonwahl. Beispiel: Aus dem Calcitonin-Gen entsteht in der Schilddrüse Calcitonin, in Neuronen CGRP. Extremfall: Das Dscam-Gen von Drosophila kann theoretisch über 38 000 Isoformen liefern.</p>`);
+    h+=task(5,'Mutationslabor',`<p>Wählen Sie Basen durch Anklicken aus und verändern Sie die codierende Sequenz. <span class="op">Erzeugen</span> Sie je ein Beispiel für eine stumme, eine Missense-, eine Nonsense-Mutation und eine Leserasterverschiebung. <span class="op">Erklären</span> Sie, weshalb Mutationen an der dritten Codonposition häufig stumm sind, und <span class="op">beurteilen</span> Sie die zu erwartenden Folgen einer Rasterverschiebung nahe dem 5′- bzw. 3′-Ende eines Gens.</p><div id="mutBox">${renderMut()}</div>`,`<p>Beispiele: CUG → CUA (Leu → Leu, stumm); GAU → GAA (Asp → Glu, Missense, konservativ, da beide sauer); GAA → UAA im 2. Codon (Nonsense); Deletion einer Base (Frameshift).</p><p>Stumme Mutationen an Position 3 beruhen auf der Degeneriertheit des Codes und der Wobble-Paarung. Eine Rasterverschiebung nahe dem 5′-Ende verändert nahezu die gesamte Sequenz und erzeugt meist ein vorzeitiges Stoppcodon (oft NMD); nahe dem 3′-Ende ist nur der C-Terminus betroffen, eine Restfunktion ist möglich. Hinweis: Auch „stumme“ Mutationen können Spleißen oder Translationseffizienz beeinflussen.</p>`);
+    h+=task(6,'Energiebilanz der Translation',`<p><span class="op">Berechnen</span> Sie die Zahl der energiereichen Phosphatbindungen, die für Aminoacylierung und Elongation bei der Synthese des Peptids MENDEL mindestens benötigt werden. <span class="op">Nennen</span> Sie weitere energieverbrauchende Schritte, die in dieser Rechnung nicht enthalten sind.</p><div class="btnrow">${goBtn('elong','Animation: Elongation')}</div>`,`<p>Aminoacylierung: 6 Aminosäuren × 2 (ATP → AMP + PPᵢ) = 12. Elongation: 5 Peptidbindungen × 2 GTP (eEF1A, eEF2) = 10. Summe: 22 energiereiche Bindungen.</p><p>Nicht enthalten: Initiation (GTP bei eIF2 und eIF5B, ATP-Verbrauch beim Scanning durch eIF4A), Termination und Recycling (GTP bei eRF3, ATP bei ABCE1), Korrekturlesen (Proofreading) bei falscher Beladung bzw. Fehlpaarung sowie Transkription, Prozessierung und Export.</p>`);
+    h+=task(7,'Vergleich: Prokaryoten und Eukaryoten',`<p><span class="op">Vergleichen</span> Sie die Genexpression bei Pro- und Eukaryoten tabellarisch hinsichtlich Ort, Kopplung von Transkription und Translation, RNA-Prozessierung, Struktur der mRNA, Initiation und Ribosomen.</p>`,`<div class="tblwrap"><table class="cmp"><tr><th>Kriterium</th><th>Prokaryoten</th><th>Eukaryoten</th></tr><tr><td>Ort</td><td>Cytoplasma</td><td>Transkription im Kern, Translation im Cytosol bzw. am rER</td></tr><tr><td>Kopplung</td><td>Transkription und Translation gekoppelt</td><td>räumlich und zeitlich getrennt</td></tr><tr><td>Prozessierung</td><td>kaum (keine Cap, kein spleißosomales Spleißen)</td><td>Capping, Spleißen, Polyadenylierung</td></tr><tr><td>mRNA</td><td>häufig polycistronisch (Operon)</td><td>in der Regel monocistronisch</td></tr><tr><td>Initiation</td><td>Shine-Dalgarno-Sequenz paart mit 16S-rRNA; fMet-tRNA</td><td>Cap-abhängiges Scanning, Kozak-Kontext; Met-tRNAᵢ</td></tr><tr><td>Ribosomen</td><td>70S (30S + 50S)</td><td>80S (40S + 60S); in Mitochondrien eigene Ribosomen</td></tr><tr><td>RNA-Polymerase</td><td>eine (Sigma-Faktor für Promotorbindung)</td><td>drei nukleäre (Pol II für mRNA) mit Transkriptionsfaktoren</td></tr></table></div>`);
+    h+=task(8,'Transfer: Antibiotika',`<p>Tetracyclin blockiert die Bindung der Aminoacyl-tRNA an die A-Stelle bakterieller 70S-Ribosomen, Chloramphenicol hemmt deren Peptidyltransferase. <span class="op">Erklären</span> Sie die selektive Wirkung dieser Antibiotika und <span class="op">erläutern</span> Sie mögliche Nebenwirkungen beim Menschen.</p>`,`<p>Selektivität: Die Stoffe binden spezifisch an Strukturen der bakteriellen 30S- bzw. 50S-Untereinheit, die sich von den cytosolischen 80S-Ribosomen unterscheiden. Die bakterielle Proteinbiosynthese wird gehemmt, die menschliche cytosolische kaum.</p><p>Nebenwirkungen: Mitochondriale Ribosomen ähneln bakteriellen (Endosymbiontentheorie). Chloramphenicol kann daher die mitochondriale Translation hemmen (u. a. dosisabhängige Knochenmarksuppression); Aminoglykoside wirken bei Trägern bestimmter mitochondrialer rRNA-Varianten (z. B. m.1555A>G) ototoxisch.</p>`);
+  }
+  $('#tasks').innerHTML=h;
+}
+// Aufgaben-Interaktionen (delegiert)
+$('#tasks').addEventListener('click',e=>{
+  const t=e.target;
+  const go=t.closest('[data-goto]');if(go){gotoStage(go.dataset.goto);return;}
+  if(t.id==='gapCheck'){
+    $$('select[data-gap]').forEach(sel=>{const i=+sel.dataset.gap,ok=sel.value===GAPS[i][1][GAPS[i][2]];const fb=$(`[data-fb="gap${i}"]`);fb.textContent=sel.value?(ok?'richtig':'falsch'):'fehlt';fb.className='fb '+(ok?'ok':'bad');});
+  }
+  if(t.id==='bpCheck'){
+    const v=$('#bpIn').value.toUpperCase().replace(/[^AUGCT]/g,'');
+    const target=CDS.replace(/ /g,''),res=$('#bpRes');res.hidden=false;
+    if(!v){res.innerHTML='Bitte gib eine Basenfolge ein.';return;}
+    if(v===target){res.innerHTML='<span class="fb ok">richtig</span> Die mRNA lautet 5′-AUG GAA AAU GAU GAG CUG UAA-3′.';return;}
+    let msg='<span class="fb bad">falsch</span> ';
+    if(v.includes('T')) msg+='In der RNA gibt es kein T. Statt T steht U. ';
+    let wrong=0;for(let i=0;i<Math.max(v.length,target.length);i++) if(v[i]!==target[i]) wrong++;
+    msg+=v.length!==target.length?`Deine Folge hat ${v.length} Basen, richtig sind ${target.length}.`:`${wrong} von ${target.length} Basen stimmen nicht.`;
+    res.innerHTML=msg;
+  }
+  if(t.id==='decCheck'){
+    const target=CDS.match(/.{3}/g).map(c=>AA3[code(c)]);let ok=0;
+    $$('select[data-dec]').forEach(sel=>{const i=+sel.dataset.dec,r=sel.value===target[i];if(r)ok++;sel.closest('.codon').classList.toggle('ok',r);sel.closest('.codon').classList.toggle('bad',!r);});
+    const res=$('#decRes');res.hidden=false;
+    res.innerHTML=ok===7?'<span class="fb ok">richtig</span> Lies die Aminosäuren im Einbuchstabencode: M-E-N-D-E-L. Wer war das?':`<span class="fb bad">falsch</span> ${7-ok} Zuordnung(en) stimmen noch nicht. Die rot umrandeten Codons noch einmal in der Codetabelle nachsehen.`;
+  }
+  const mv=t.closest('[data-mv]');
+  if(mv){const li=mv.closest('li'),i=+li.dataset.pos,j=i+(+mv.dataset.mv);if(j>=0&&j<ordState.cur.length){[ordState.cur[i],ordState.cur[j]]=[ordState.cur[j],ordState.cur[i]];$('#orderList').outerHTML=renderOrder();}return;}
+  if(t.id==='ordCheck'){$$('#orderList li').forEach((li,i)=>{const r=ordState.cur[i]===i;li.classList.toggle('ok',r);li.classList.toggle('bad',!r);});const n=ordState.cur.filter((k,i)=>k===i).length;t.textContent=n===ordState.cur.length?'Alles richtig':`Prüfen (${n} von ${ordState.cur.length} richtig)`;}
+  const mi=t.closest('[data-mi]');if(mi){mut.sel=+mi.dataset.mi;$('#mutBox').innerHTML=renderMut();return;}
+  if(t.dataset.mset&&mut.sel!=null){mut.seq[mut.sel]=t.dataset.mset;$('#mutBox').innerHTML=renderMut();}
+  if(t.dataset.mdel&&mut.sel!=null){mut.seq.splice(mut.sel,1);mut.sel=Math.min(mut.sel,mut.seq.length-1);$('#mutBox').innerHTML=renderMut();}
+  if(t.dataset.mins&&mut.sel!=null){mut.seq.splice(mut.sel,0,'A');$('#mutBox').innerHTML=renderMut();}
+  if(t.dataset.mreset){mut.seq=CDS.split('');mut.sel=null;$('#mutBox').innerHTML=renderMut();}
+  const si=t.closest('[data-si]');
+  if(si){const j=+si.dataset.si,set=marks[activeFeat];set.has(j)?set.delete(j):(FEAT.forEach(F=>marks[F.id].delete(j)),set.add(j));refreshSeq();return;}
+  if(t.id==='seqCheck'){const res=$('#seqRes');res.hidden=false;res.innerHTML=FEAT.map(F=>{const m=[...marks[F.id]].sort((a,b)=>a-b).join(),ok=m===F.set.join();return `<div>${F.n}: <span class="fb ${ok?'ok':'bad'}">${marks[F.id].size?(ok?'richtig':'falsch'):'nicht markiert'}</span></div>`;}).join('');}
+  if(t.id==='seqSol'){FEAT.forEach(F=>marks[F.id]=new Set(F.set));refreshSeq();}
+  if(t.id==='seqReset'){FEAT.forEach(F=>marks[F.id]=new Set());refreshSeq();$('#seqRes').hidden=true;}
+  if(t.dataset.ret!=null){retained=t.dataset.ret==='1';$('#retBox').innerHTML=renderRet();}
+});
+$('#tasks').addEventListener('change',e=>{
+  if(e.target.name==='feat') activeFeat=e.target.value;
+  if(e.target.dataset.alt){ALT[e.target.dataset.alt]=e.target.checked;$('#altBox').innerHTML=renderAlt();}
+});
+function refreshSeq(){
+  $$('#seqChips [data-si]').forEach(b=>{const j=+b.dataset.si;FEAT.forEach(F=>b.classList.remove(F.c));const f=FEAT.find(F=>marks[F.id].has(j));if(f)b.classList.add(f.c);});
+}
+$('#solToggle').addEventListener('change',e=>$('#tab-erarbeiten').classList.toggle('nosol',!e.target.checked));
+
+/* ---------- Glossar ---------- */
+function renderGloss(){
+  const q=$('#gsearch').value.trim().toLowerCase();
+  const all=[...Object.entries(INFO),...Object.entries(GEXTRA)].map(([k,v])=>({k,...v}));
+  const list=all.filter(it=>(isO()||it.s)&&(!q||(it.n+' '+(it.s||'')+' '+(it.o||'')).toLowerCase().includes(q))).sort((a,b)=>a.n.localeCompare(b.n,'de'));
+  $('#gloss').innerHTML=list.map(it=>`<div class="gitem"><h3>${it.n}</h3><p class="gr"><span class="art-${it.a}">${it.a}</span> ${it.n.split(' (')[0]}${it.p?`, Plural: <span class="art-die">die</span> ${it.p}`:''}</p><p>${L(it.s,it.o)}</p></div>`).join('')||'<p>Kein Eintrag gefunden. Anderen Suchbegriff eingeben.</p>';
+}
+$('#gsearch').addEventListener('input',renderGloss);
+
+/* ---------- Tabs, Niveau ---------- */
+function showTab(id){
+  $$('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===id?'true':'false'));
+  ['zelle','ablauf','erarbeiten','glossar'].forEach(t=>$('#tab-'+t).hidden=t!==id);
+  if(id==='ablauf') SC.dirty=true;
+}
+$('.tabs').addEventListener('click',e=>{const b=e.target.closest('button[data-tab]');if(b) showTab(b.dataset.tab);});
+function renderSeqLine(){
+  const cod=CDS.match(/.{3}/g).map(c=>[...c].map(b=>`<span class="s${b}">${b}</span>`).join('')).join(' ');
+  $('#seqline').innerHTML=`<span class="e">mRNA 5′-</span>${cod}<span class="e">-3′ &nbsp;→&nbsp; Met-Glu-Asn-Asp-Glu-Leu</span>`;
+}
+function applyLevel(){
+  $$('.level button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lv===LEVEL?'true':'false'));
+  document.documentElement.dataset.level=LEVEL;
+  SC.playing=false;updatePlay();
+  setStage(0,0);
+  renderOrgToggles();buildCell();
+  initOrder();mut.seq=CDS.split('');mut.sel=null;retained=false;
+  renderTasks();renderGloss();
+}
+$('.level').addEventListener('click',e=>{const b=e.target.closest('button[data-lv]');if(!b||b.dataset.lv===LEVEL) return;LEVEL=b.dataset.lv;store.set('gx-level',LEVEL);applyLevel();});
+
+renderSeqLine();
+applyLevel();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
