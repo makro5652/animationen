@@ -1,0 +1,786 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>DNA-Replikation interaktiv</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@500;600&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout: einspaltiges Arbeitsblatt; Kopf mit Niveauwahl, darunter Simulation (Bühne + Schrittpanel), Wortspeicher, Aufgabenkarten */
+:root{
+  --bg:#EDF1F0; --surface:#FFFFFF; --surface-2:#F4F7F6; --ink:#15242A; --muted:#55676D; --line:#D0DAD8;
+  --old:#2B5A6F; --old-soft:#E1EDF2; --new:#C9581E; --new-soft:#FBE8DC; --rna:#8445B8; --rna-soft:#F1E5FA;
+  --enz:#DCE8D2; --enz-line:#5E7B45; --ssb:#93AA80;
+  --accent:#1E6870; --accent-ink:#FFFFFF;
+  --ok:#23704A; --ok-bg:#E1F2E7; --bad:#AE3529; --bad-bg:#FBE4E0;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1618; --surface:#152023; --surface-2:#1B292D; --ink:#E3EBE9; --muted:#9AADB1; --line:#2D3E42;
+    --old:#86BBD1; --old-soft:#1B3440; --new:#F28C52; --new-soft:#3E2517; --rna:#C595EE; --rna-soft:#2E2140;
+    --enz:#283A22; --enz-line:#9DC17E; --ssb:#6F8A5A;
+    --accent:#5FB9C1; --accent-ink:#0E1618;
+    --ok:#6CCB93; --ok-bg:#15301F; --bad:#F2887B; --bad-bg:#3A1C18;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1618; --surface:#152023; --surface-2:#1B292D; --ink:#E3EBE9; --muted:#9AADB1; --line:#2D3E42;
+  --old:#86BBD1; --old-soft:#1B3440; --new:#F28C52; --new-soft:#3E2517; --rna:#C595EE; --rna-soft:#2E2140;
+  --enz:#283A22; --enz-line:#9DC17E; --ssb:#6F8A5A;
+  --accent:#5FB9C1; --accent-ink:#0E1618;
+  --ok:#6CCB93; --ok-bg:#15301F; --bad:#F2887B; --bad-bg:#3A1C18;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 17px/1.55 var(--f-body)}
+body:not([data-level="ok"]) .ok-only{display:none}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:20px;padding-block:28px 72px;display:grid;gap:26px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-weight:800;font-size:clamp(2.1rem,6vw,3.4rem);letter-spacing:-.02em}
+h2{font-weight:800;font-size:1.32rem;letter-spacing:-.01em}
+h3{font-weight:600;font-size:1.3rem}
+p{margin:0}
+.eyebrow,.tag,.flabel{font:600 12.5px/1.2 var(--f-body);letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.mast{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px 32px;align-items:end}
+.mast-t{display:grid;gap:10px;min-width:0}
+.lede{max-width:62ch;color:var(--muted)}
+.mast-c{display:grid;gap:12px;justify-items:start}
+.field{display:grid;gap:6px}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:999px;padding:3px;background:var(--surface)}
+.seg button{font:600 15px var(--f-body);border:0;background:transparent;color:var(--ink);padding:7px 16px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+#sname{font:inherit;font-size:15px;padding:6px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);width:15em;max-width:100%}
+.progress{font:600 14px var(--f-mono);color:var(--accent)}
+@media (max-width:720px){.mast{grid-template-columns:minmax(0,1fr)}}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:clamp(16px,3vw,28px);display:grid;gap:16px;min-width:0}
+.sec-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.sec-head .tag{flex-basis:100%}
+.sec-head h2{flex:1 1 auto;min-width:0}
+.chip{font:600 12.5px var(--f-body);letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:999px;border:1.5px solid var(--line);color:var(--muted)}
+.chip.done{border-color:var(--ok);color:var(--ok);background:var(--ok-bg)}
+.card > p, .task p{max-width:70ch}
+
+.stage{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)}
+#sim{display:block;width:100%;min-width:660px;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:14.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.sw{width:22px;height:6px;border-radius:3px;display:inline-block}
+.sw.old{background:var(--old)} .sw.new{background:var(--new)} .sw.rna{background:var(--rna)}
+.sw.enz{height:14px;width:22px;border-radius:7px;background:var(--enz);border:1.5px solid var(--enz-line)}
+.sw.ssb{width:12px;height:12px;border-radius:50%;background:var(--ssb)}
+.sw.hb{height:0;border-top:2px dashed var(--muted);border-radius:0}
+
+.steppanel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,290px);gap:24px}
+@media (max-width:760px){.steppanel{grid-template-columns:minmax(0,1fr)}}
+.steptext{display:grid;gap:10px;align-content:start;min-width:0}
+.stepno{font:600 13px var(--f-mono);color:var(--accent)}
+.observe{background:var(--surface-2);border-radius:8px;padding:10px 14px;font-size:16px}
+.observe b{font-weight:700}
+.ctrl{display:grid;gap:14px;align-content:start}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px}
+.btn{font:600 15px var(--f-body);padding:9px 16px;border-radius:8px;border:1.5px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.4;cursor:default}
+.dots{display:flex;flex-wrap:wrap;gap:6px}
+.dot{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);font:600 13px var(--f-mono);color:var(--muted);cursor:pointer;padding:0}
+.dot.past{border-color:var(--accent);color:var(--accent)}
+.dot[aria-current="step"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chk{display:flex;gap:8px;align-items:center;font-size:15px}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+
+/* SVG */
+.bb{fill:none;stroke-width:5;stroke-linecap:round}
+.pc{stroke-linecap:butt}
+.bb-old{stroke:var(--old)} .bb-new{stroke:var(--new)} .bb-rna{stroke:var(--rna)}
+.p-old{fill:var(--old-soft);stroke:var(--old);stroke-width:1.5}
+.p-new{fill:var(--new-soft);stroke:var(--new);stroke-width:1.5}
+.p-rna{fill:var(--rna-soft);stroke:var(--rna);stroke-width:1.5}
+.base{font:600 13px var(--f-mono);fill:var(--ink);text-anchor:middle}
+.hb{stroke:var(--muted);stroke-width:1.4;stroke-dasharray:2 2}
+.enz{fill:var(--enz);stroke:var(--enz-line);stroke-width:1.5}
+.enz-t{font:700 12.5px var(--f-body);fill:var(--ink);text-anchor:middle}
+.ssb{fill:var(--ssb)}
+.end{font:600 12.5px var(--f-mono);fill:var(--muted)}
+.lab{font:600 13px var(--f-body);fill:var(--muted)}
+.res{font:700 14.5px var(--f-display);fill:var(--ink);text-anchor:middle}
+
+/* Wortspeicher */
+details.words summary{cursor:pointer;font:800 1.15rem var(--f-display)}
+.wtable{overflow-x:auto}
+.wtable table{border-collapse:collapse;width:100%;min-width:560px;font-size:15.5px}
+.wtable th,.wtable td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.wtable th{font:600 12.5px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.art{font-weight:700;color:var(--accent)}
+.verbs{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:15.5px}
+
+/* Aufgaben */
+.tasks{display:grid;gap:22px}
+details.help{background:var(--surface-2);border-radius:8px;padding:8px 14px;font-size:15.5px}
+details.help summary{cursor:pointer;font-weight:600;color:var(--accent)}
+details.help p{margin-top:6px}
+.seqscroll{overflow-x:auto;padding-bottom:4px}
+.seqgrid{display:grid;grid-template-columns:3.6em repeat(var(--n),2.5em) 3.6em;gap:6px 4px;align-items:center;width:max-content}
+.sl{font:600 15px var(--f-mono);color:var(--muted);text-align:center}
+.sb{display:grid;place-items:center;height:2.3em;font:600 17px var(--f-mono);border:1.5px solid var(--old);background:var(--old-soft);border-radius:6px}
+.bin{width:2.5em;height:2.3em;text-align:center;font:600 17px var(--f-mono);border:1.5px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);text-transform:uppercase;padding:0}
+select{font:inherit;font-size:16px;padding:7px 8px;border:1.5px solid var(--line);border-radius:7px;background:var(--surface);color:var(--ink);max-width:100%}
+.ok-f{border-color:var(--ok)!important;background:var(--ok-bg)!important}
+.bad-f{border-color:var(--bad)!important;background:var(--bad-bg)!important}
+.rows{display:grid;gap:10px}
+.mrow{display:grid;grid-template-columns:minmax(0,12em) minmax(0,1fr);gap:8px 14px;align-items:center}
+.mrow select{width:100%}
+.orow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center}
+@media (max-width:600px){.mrow{grid-template-columns:minmax(0,1fr)}}
+.bank{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bank .w{font-size:15.5px;padding:3px 10px;border:1.5px dashed var(--line);border-radius:6px;background:var(--surface-2)}
+.cloze{line-height:2.5;max-width:75ch}
+.cloze select{padding:3px 6px;font-size:15.5px;margin:0 2px}
+.fb{padding:10px 14px;border-radius:8px;font-size:16px}
+.fb.ok{background:var(--ok-bg);color:var(--ink);border:1.5px solid var(--ok)}
+.fb.bad{background:var(--bad-bg);color:var(--ink);border:1.5px solid var(--bad)}
+.fb strong{text-transform:uppercase;letter-spacing:.05em;font-size:14px}
+.fb.ok strong{color:var(--ok)} .fb.bad strong{color:var(--bad)}
+.models{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.model{display:grid;gap:6px;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;background:var(--surface)}
+.model:has(input:checked){border-color:var(--accent);background:var(--surface-2)}
+.model svg{width:100%;height:auto;display:block}
+.m-old{fill:var(--old)} .m-new{fill:var(--new)} .m-ar{stroke:var(--muted);stroke-width:2;fill:none} .m-ah{fill:var(--muted)}
+.mtxt{font:600 11px var(--f-body);fill:var(--muted)}
+.ms{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,280px);gap:22px;align-items:start}
+@media (max-width:720px){.ms{grid-template-columns:minmax(0,1fr)}}
+.gtable{overflow-x:auto}
+.gtable table{border-collapse:collapse;font-size:15px}
+.gtable th,.gtable td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:center}
+.gtable th:first-child,.gtable td:first-child{text-align:left}
+.tubes svg{width:100%;height:auto;display:block}
+.tube{fill:var(--surface-2);stroke:var(--muted);stroke-width:1.5}
+.band{fill:var(--ink)}
+.tl{font:600 12px var(--f-body);fill:var(--muted)}
+.radios{display:grid;gap:6px}
+.radios label,.inline label{display:flex;gap:8px;align-items:center}
+.inline{display:flex;flex-wrap:wrap;gap:6px 20px}
+textarea{width:100%;min-height:9em;font:inherit;font-size:16.5px;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);resize:vertical}
+.terms{display:flex;flex-wrap:wrap;gap:6px}
+.term{font-size:14px;padding:2px 10px;border-radius:999px;border:1.5px solid var(--line);color:var(--muted)}
+.term.hit{border-color:var(--ok);color:var(--ok);background:var(--ok-bg)}
+.starters{display:flex;flex-wrap:wrap;gap:6px}
+.starters span{font-size:15px;padding:2px 10px;border-radius:6px;background:var(--surface-2);border:1px solid var(--line)}
+details.sol{border:1.5px solid var(--line);border-radius:8px;padding:8px 14px}
+details.sol summary{cursor:pointer;font-weight:600;color:var(--accent)}
+details.sol p{margin-top:8px}
+.calc{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.calc input{font:600 17px var(--f-mono);width:7em;padding:7px 10px;border:1.5px solid var(--line);border-radius:7px;background:var(--surface);color:var(--ink)}
+.data{font-size:16px;display:grid;gap:4px;background:var(--surface-2);border-radius:8px;padding:10px 14px}
+.foot{font-size:14.5px;color:var(--muted);display:grid;gap:6px;max-width:80ch}
+.foot h2{font-size:1rem;color:var(--ink)}
+@media (max-width:480px){body{font-size:16px}.wrap{padding-inline:16px}}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important}}
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div class="mast-t">
+      <p class="eyebrow">Biologie · Klasse 10 · Molekulargenetik</p>
+      <h1>DNA-Replikation</h1>
+      <p class="lede">Verfolge die Verdopplung der DNA an einer Replikationsgabel Schritt für Schritt. Bearbeite danach die Aufgaben. Der Wortspeicher hilft dir bei den Fachbegriffen.</p>
+    </div>
+    <div class="mast-c">
+      <div class="field">
+        <span class="flabel" id="lvl-l">Niveau wählen</span>
+        <div class="seg" role="group" aria-labelledby="lvl-l">
+          <button type="button" id="lvl-rs" data-lvl="rs" aria-pressed="false">Realschule</button>
+          <button type="button" id="lvl-gym" data-lvl="gym" aria-pressed="true">Gymnasium</button>
+          <button type="button" id="lvl-ok" data-lvl="ok" aria-pressed="false">Oberstufe</button>
+        </div>
+      </div>
+      <div class="field">
+        <label class="flabel" for="sname">Name</label>
+        <input id="sname" type="text" autocomplete="off">
+      </div>
+      <p class="progress" id="progress" aria-live="polite"></p>
+    </div>
+  </header>
+
+  <section class="card" aria-labelledby="sim-h">
+    <div class="sec-head"><span class="tag">Teil A · Simulation</span><h2 id="sim-h">Die Replikationsgabel</h2></div>
+    <p>Klicke auf <b>Weiter</b> oder auf <b>Abspielen</b>. Lies zu jedem Schritt den Text und bearbeite den Beobachtungsauftrag.</p>
+    <div class="stage"><svg id="sim" viewBox="0 0 840 400" role="img" aria-label="Simulation der DNA-Replikation"></svg></div>
+    <div class="legend">
+      <span><i class="sw old"></i>alter Strang (Elternstrang)</span>
+      <span><i class="sw new"></i>neuer Strang</span>
+      <span class="ok-only"><i class="sw rna"></i>RNA-Primer</span>
+      <span><i class="sw hb"></i>Wasserstoffbrücken</span>
+      <span><i class="sw enz"></i>Enzym</span>
+      <span class="ok-only"><i class="sw ssb"></i>SSB-Protein</span>
+    </div>
+    <div class="steppanel">
+      <div class="steptext" aria-live="polite">
+        <p class="stepno" id="stepno"></p>
+        <h3 id="steptitle"></h3>
+        <p id="stepdesc"></p>
+        <p class="observe" id="stepq"></p>
+      </div>
+      <div class="ctrl">
+        <div class="btnrow">
+          <button class="btn" type="button" id="b-prev">Zurück</button>
+          <button class="btn primary" type="button" id="b-next">Weiter</button>
+          <button class="btn" type="button" id="b-play">Abspielen</button>
+        </div>
+        <div class="dots" id="dots" aria-label="Schritte"></div>
+        <label class="chk"><input type="checkbox" id="ends"> 5′- und 3′-Enden anzeigen</label>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" aria-label="Wortspeicher">
+    <details class="words">
+      <summary>Wortspeicher: Fachbegriffe mit Artikel und Plural</summary>
+      <div class="wtable" style="margin-top:12px"><table><thead><tr><th>Begriff</th><th>Plural</th><th>Bedeutung</th></tr></thead><tbody id="wbody"></tbody></table></div>
+      <p style="margin-top:12px"><b>Wichtige Verben</b></p>
+      <div class="verbs" id="verbs"></div>
+    </details>
+  </section>
+
+  <div class="tasks" id="tasks"></div>
+
+  <footer class="foot">
+    <h2>Hinweise zur Darstellung</h2>
+    <p>Die Simulation zeigt einen Ausschnitt von 12 Basenpaaren an einer einzelnen Replikationsgabel. Die Windung der Doppelhelix ist nicht dargestellt. Primer und Okazaki-Fragmente sind stark verkürzt (in der Zelle: Primer ca. 10 Nukleotide, Okazaki-Fragmente ca. 100–2000 Nukleotide).</p>
+    <p class="rs-note" id="rsnote">In den Niveaus Realschule und Gymnasium sind Primase, RNA-Primer, Topoisomerase und SSB-Proteine bewusst weggelassen; die DNA-Polymerasen werden nicht unterschieden. Die vollständige Darstellung enthält das Niveau Oberstufe.</p>
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const cl=v=>v<0?0:v>1?1:v;
+const reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let level="gym";
+try{const v=localStorage.getItem("rep-level");if(v==="rs"||v==="gym"||v==="ok")level=v;}catch(e){}
+
+/* ---------- Geometrie ---------- */
+const N=12,DX=62,X0=72,YC=200,O=110,W=840;
+const TOP=[..."ATGCCGTATAGC"];
+const COMP={A:"T",T:"A",G:"C",C:"G"};
+const BOT=TOP.map(b=>COMP[b]);
+const xi=i=>X0+i*DX;
+const xL=X0-DX/2, xR=xi(N-1)+DX/2;
+function openAt(x,f){const k=DX*0.22;return Math.min(1,f*2)/(1+Math.exp((x-(X0+f*DX-DX/2))/k));}
+const nPairs=(a)=>(a==="A"||a==="T")?2:3;
+
+/* ---------- Schlüsselbilder ---------- */
+const DEF={fork:0,lead:0,f1:0,f2:0,rna:1,lig:0,res:0,heli:0,topo:0,ssb:0,prim:0,pol3G:0,pol3L:0,pol1:0,ligE:0,primAt:[],polLag:1};
+function chain(list){let cur=Object.assign({},DEF);return list.map(o=>(cur=Object.assign({},cur,o)));}
+const KF_G=chain([
+  {},
+  {fork:6,heli:1,topo:1,ssb:1},
+  {lead:2,f1:2,prim:1,primAt:[["lead",0.5],["lag",4.5]]},
+  {lead:6,f1:6,prim:0,pol3G:1,pol3L:1,polLag:1},
+  {fork:12.6,lead:12,f2:2,prim:1,primAt:[["lag",10.5]],pol3L:0,topo:0},
+  {f2:6,prim:0,pol3G:0,pol3L:1,polLag:2,heli:0},
+  {rna:0,pol1:1,pol3L:0},
+  {lig:1,ligE:1,pol1:0},
+  {res:1,ligE:0,ssb:0}
+]);
+const KF_R=chain([
+  {rna:0},
+  {fork:6,heli:1},
+  {lead:6,f1:6,pol3G:1,pol3L:1,polLag:1},
+  {fork:12.6,lead:12,pol3L:0},
+  {f2:6,pol3L:1,polLag:2,pol3G:0,heli:0},
+  {lig:1,ligE:1,pol3L:0},
+  {res:1,ligE:0}
+]);
+
+const STEPS_G=[
+ {t:"Ausgangslage",d:"Ausschnitt eines DNA-Doppelstrangs mit 12 Basenpaaren. Die beiden Einzelstränge verlaufen <b>antiparallel</b>: oben von 5′ nach 3′, unten von 3′ nach 5′. Komplementäre Basen sind über <b>Wasserstoffbrücken</b> verbunden (A–T: zwei, G–C: drei). Die Replikation beginnt am <b>Replikationsursprung (ori)</b>, hier am linken Rand.",q:"Vergleiche die Anzahl der Wasserstoffbrücken zwischen G und C mit der zwischen A und T."},
+ {t:"Entwindung und Öffnung",d:"Die <b>Topoisomerase</b> baut vor der Replikationsgabel die Torsionsspannung ab, indem sie Strangbrüche einführt und wieder verschließt. Die <b>Helicase</b> trennt unter ATP-Hydrolyse die Wasserstoffbrücken; es entsteht die <b>Replikationsgabel</b>. <b>SSB-Proteine</b> binden an die Einzelstränge und verhindern eine erneute Basenpaarung.",q:"Welche Bindungen werden getrennt, welche Bindungen innerhalb der Einzelstränge bleiben erhalten?"},
+ {t:"Synthese der RNA-Primer",d:"DNA-Polymerasen können keinen Strang neu beginnen, sondern nur ein vorhandenes <b>3′-OH-Ende</b> verlängern. Die <b>Primase</b>, eine RNA-Polymerase, synthetisiert deshalb kurze <b>RNA-Primer</b> (in der Zelle ca. 10 Nukleotide, hier auf zwei verkürzt). RNA enthält <b>Uracil</b> anstelle von Thymin.",q:"Welche Base steht im Primer jeweils gegenüber von Adenin?"},
+ {t:"Synthese durch DNA-Polymerase III",d:"Die <b>DNA-Polymerase III</b> verknüpft Desoxyribonukleosidtriphosphate komplementär zur Matrize und verlängert das 3′-Ende des Primers. Die Synthese erfolgt ausschließlich in <b>5′→3′-Richtung</b>, die Matrize wird in 3′→5′-Richtung abgelesen. Unten verläuft die Synthese in Bewegungsrichtung der Gabel (<b>Leitstrang</b>), oben entgegengesetzt (<b>Folgestrang</b>).",q:"Vergleiche die Syntheserichtung oben und unten mit der Bewegungsrichtung der Gabel (nach rechts)."},
+ {t:"Fortschreiten der Gabel",d:"Die Helicase trennt weitere Basenpaare. Der Leitstrang wird ohne Unterbrechung verlängert. Am Folgestrang liegt ein neuer Abschnitt der Matrize einzelsträngig vor; die Primase synthetisiert dort einen weiteren Primer.",q:"Begründe, warum der Leitstrang keinen weiteren Primer benötigt."},
+ {t:"Okazaki-Fragmente",d:"Die DNA-Polymerase III verlängert den neuen Primer, bis das zuvor synthetisierte Fragment erreicht ist. Diese diskontinuierlich synthetisierten Abschnitte heißen <b>Okazaki-Fragmente</b> (Bakterien: ca. 1000–2000 Nukleotide, Eukaryoten: ca. 100–200 Nukleotide).",q:"Zwischen welchen Nukleotiden bleibt eine Lücke im Zucker-Phosphat-Rückgrat?"},
+ {t:"Austausch der Primer",d:"Die <b>DNA-Polymerase I</b> entfernt die RNA-Primer mit ihrer 5′→3′-Exonukleaseaktivität und ersetzt sie durch DNA-Nukleotide; sie verlängert dabei das 3′-OH-Ende des benachbarten Fragments. Im Rückgrat bleibt ein Einzelstrangbruch (<b>Nick</b>) zurück. Im Ausschnitt werden alle Primer gleichzeitig ersetzt; die Primer am Rand werden in der Zelle von benachbarten Fragmenten aus ersetzt.",q:"Nenne zwei chemische Unterschiede zwischen dem RNA-Primer und DNA."},
+ {t:"Ligation",d:"Die <b>DNA-Ligase</b> verknüpft unter Energieaufwand (bei E. coli aus NAD⁺, bei Eukaryoten aus ATP) das 3′-OH-Ende des einen Fragments mit dem 5′-Phosphat des nächsten durch eine <b>Phosphodiesterbindung</b>. Der Folgestrang ist nun durchgehend.",q:"Welche beiden funktionellen Gruppen werden bei der Ligation verknüpft?"},
+ {t:"Ergebnis: semikonservative Replikation",d:"Es liegen zwei DNA-Doppelstränge mit identischer Basensequenz vor. Jeder enthält einen <b>Elternstrang</b> (die Matrize) und einen <b>neu synthetisierten Strang</b>. Dieses Prinzip heißt <b>semikonservative Replikation</b>.",q:"Erkläre, warum beide Tochter-DNA-Moleküle dieselbe Basensequenz besitzen."}
+];
+const STEPS_R=[
+ {t:"Ausgangslage",d:"Die DNA besteht aus <b>zwei Strängen</b>. Die Basen stehen sich paarweise gegenüber: <b>A mit T</b> und <b>G mit C</b>. Zwischen den Basen bestehen <b>Wasserstoffbrücken</b>.",q:"Welche Base steht gegenüber von G? Welche steht gegenüber von A?"},
+ {t:"Die Helicase öffnet die DNA",d:"Das Enzym <b>Helicase</b> trennt die Wasserstoffbrücken zwischen den Basen. Die beiden Stränge lösen sich voneinander. Es entsteht eine Y-Form. Sie heißt <b>Replikationsgabel</b>.",q:"Was geschieht mit den Wasserstoffbrücken?"},
+ {t:"Neue Stränge entstehen",d:"Jeder alte Strang dient als Vorlage. Die Vorlage heißt <b>Matrize</b>. Freie Nukleotide paaren nach der Regel A–T und G–C mit den Basen des alten Strangs. Das Enzym <b>DNA-Polymerase</b> verknüpft die Nukleotide zu einem neuen Strang.",q:"Welche Farbe haben die alten Stränge? Welche Farbe haben die neuen Stränge?"},
+ {t:"Die Gabel öffnet sich weiter",d:"Die Helicase trennt weitere Basenpaare. Unten verlängert die DNA-Polymerase den neuen Strang ohne Unterbrechung. Dieser Strang heißt <b>Leitstrang</b>.",q:"In welche Richtung wird der untere neue Strang verlängert?"},
+ {t:"Der Folgestrang entsteht in Stücken",d:"Die DNA-Polymerase verknüpft Nukleotide nur in <b>einer Richtung</b>. Oben ist diese Richtung der Bewegung der Gabel entgegengesetzt. Deshalb entsteht der obere neue Strang in kurzen <b>Stücken</b>. Dieser Strang heißt <b>Folgestrang</b>.",q:"Wie viele Stücke erkennst du im oberen neuen Strang?"},
+ {t:"Die Ligase verbindet die Stücke",d:"Das Enzym <b>Ligase</b> verbindet die Stücke des Folgestrangs zu einem durchgehenden Strang.",q:"Was verändert sich zwischen den beiden Stücken?"},
+ {t:"Ergebnis: semikonservative Replikation",d:"Aus einem DNA-Molekül sind <b>zwei gleiche DNA-Moleküle</b> entstanden. Jedes besteht aus einem alten und einem neuen Strang. Das nennt man <b>semikonservative Replikation</b> (semi = halb, konservativ = erhaltend).",q:"Erkläre, warum beide DNA-Moleküle gleich sind."}
+];
+
+const STEPS_M=[
+ {t:"Ausgangslage",d:"Die DNA besteht aus zwei Strängen, die <b>antiparallel</b> (gegenläufig) angeordnet sind: Ein Strang verläuft von 5′ nach 3′, der andere von 3′ nach 5′. Komplementäre Basen sind über <b>Wasserstoffbrücken</b> verbunden: A–T (zwei), G–C (drei).",q:"Vergleiche die Anzahl der Wasserstoffbrücken bei A–T und bei G–C."},
+ {t:"Die Helicase öffnet die DNA",d:"Das Enzym <b>Helicase</b> trennt die Wasserstoffbrücken zwischen den Basen. Die Doppelhelix öffnet sich, und es entsteht die <b>Replikationsgabel</b>.",q:"Welche Bindungen werden getrennt? Welche Bindungen innerhalb der Einzelstränge bleiben erhalten?"},
+ {t:"Synthese der neuen Stränge",d:"Jeder Elternstrang dient als <b>Matrize</b>. Freie Nukleotide paaren komplementär mit dessen Basen. Die <b>DNA-Polymerase</b> verknüpft sie zu einem neuen Strang. Sie verlängert einen Strang ausschließlich in <b>5′→3′-Richtung</b>.",q:"In welche Richtung wächst der obere, in welche der untere neue Strang?"},
+ {t:"Der Leitstrang",d:"Die Helicase trennt weitere Basenpaare. Unten zeigt die 5′→3′-Richtung zur Replikationsgabel hin. Dieser neue Strang wird daher ohne Unterbrechung verlängert. Er heißt <b>Leitstrang</b>.",q:"Begründe, warum der untere neue Strang durchgehend synthetisiert werden kann."},
+ {t:"Der Folgestrang",d:"Oben zeigt die 5′→3′-Richtung von der Gabel weg. Ein neuer Abschnitt kann erst synthetisiert werden, wenn die Helicase weitere Basenpaare getrennt hat. Der <b>Folgestrang</b> entsteht deshalb in kurzen Stücken, den <b>Okazaki-Fragmenten</b>.",q:"Wie viele Okazaki-Fragmente erkennst du im Ausschnitt?"},
+ {t:"Die DNA-Ligase verbindet",d:"Das Enzym <b>DNA-Ligase</b> verknüpft die Okazaki-Fragmente zu einem durchgehenden Strang.",q:"Was verändert sich zwischen den beiden Fragmenten?"},
+ {t:"Ergebnis: semikonservative Replikation",d:"Es liegen zwei DNA-Moleküle mit identischer Basensequenz vor. Jedes besteht aus einem <b>Elternstrang</b> und einem <b>neuen Strang</b>. Dieses Prinzip heißt <b>semikonservative Replikation</b>.",q:"Erkläre, warum beide Tochter-DNA-Moleküle dieselbe Basensequenz besitzen."}
+];
+
+/* ---------- Zeichnen ---------- */
+const f1=v=>v.toFixed(1);
+function hbonds(x,y1,y2,b,a){const n=nPairs(b);const off=n===2?[-3.5,3.5]:[-6,0,6];return `<g opacity="${a.toFixed(3)}">${off.map(o=>`<line class="hb" x1="${f1(x+o)}" y1="${f1(y1)}" x2="${f1(x+o)}" y2="${f1(y2)}"/>`).join("")}</g>`;}
+function pill(x,y,letter,kind,a){return `<g opacity="${a.toFixed(3)}"><rect class="p-${kind}" x="${f1(x-11)}" y="${f1(y-10)}" width="22" height="20" rx="5"/><text class="base" x="${f1(x)}" y="${f1(y+4.6)}">${letter}</text></g>`;}
+function bpath(xa,xb,yfn,cls,a){let d="";for(let x=xa;x<=xb+0.01;x+=5){d+=(d?"L":"M")+f1(x)+" "+f1(yfn(x));}return `<path class="${cls}" d="${d}" opacity="${a}"/>`;}
+function piece(i,yfn,cls,a,tr){const x=xi(i);const xa=x-DX/2+tr[0],xb=x+DX/2-tr[1];const pts=[xa,(xa+x)/2,x,(x+xb)/2,xb];return `<path class="bb pc ${cls}" opacity="${a.toFixed(3)}" d="${pts.map((p,k)=>(k?"L":"M")+f1(p)+" "+f1(yfn(p))).join("")}"/>`;}
+function enzP(x,y,label,a){if(a<0.02)return "";const w=label.length*7.1+22,h=26;x=Math.max(w/2+4,Math.min(W-w/2-4,x));return `<g opacity="${a.toFixed(3)}"><rect class="enz" x="${f1(x-w/2)}" y="${f1(y-h/2)}" width="${f1(w)}" height="${h}" rx="13"/><text class="enz-t" x="${f1(x)}" y="${f1(y+4.4)}">${label}</text></g>`;}
+function txt(x,y,s,cls,anchor,a){if(a!==undefined&&a<0.02)return "";return `<text class="${cls}" x="${f1(x)}" y="${f1(y)}" text-anchor="${anchor||"start"}"${a!==undefined?` opacity="${a.toFixed(3)}"`:""}>${s}</text>`;}
+
+let showEnds=true;
+function render(s){
+  const gym=level==="ok",f=s.fork;
+  const op=x=>openAt(x,f);
+  const yT=x=>YC-36-O*op(x), yB=x=>YC+36+O*op(x);
+  const yLag=x=>yT(x)+72, yLead=x=>yB(x)-72;
+  const rnaOn=gym&&s.rna>0.5;
+  const nb=(!gym||s.rna>0.5)?5:3;          // Lage des Einzelstrangbruchs (Nick)
+  const gap=5*(1-s.lig);
+  const lagA=i=>i<=5?cl(s.f1-(5-i)):cl(s.f2-(11-i));
+  const leadA=i=>cl(s.lead-i);
+  const isPrimLag=i=>i===4||i===5||i===10||i===11;
+  const isPrimLead=i=>i===0||i===1;
+  let hb="",bb="",pl="",ez="",lb="";
+  bb+=bpath(xL,xR,yT,"bb bb-old",1)+bpath(xL,xR,yB,"bb bb-old",1);
+  for(let i=0;i<N;i++){
+    const x=xi(i),o=op(x),ty=yT(x),by=yB(x);
+    const ha=cl(1-o*2.6);
+    if(ha>0.02)hb+=hbonds(x,ty+28,by-28,TOP[i],ha);
+    pl+=pill(x,ty+18,TOP[i],"old",1)+pill(x,by-18,BOT[i],"old",1);
+    const la=lagA(i);
+    if(la>0.01){
+      const r=rnaOn&&isPrimLag(i);
+      const letter=r?(TOP[i]==="A"?"U":COMP[TOP[i]]):COMP[TOP[i]];
+      hb+=hbonds(x,ty+28,ty+44,TOP[i],la);
+      pl+=pill(x,ty+54,letter,r?"rna":"new",la);
+      const tr=[i===nb+1?gap:0,i===nb?gap:0];
+      bb+=piece(i,yLag,r?"bb-rna":"bb-new",la,tr);
+    }
+    const da=leadA(i);
+    if(da>0.01){
+      const r=rnaOn&&isPrimLead(i);
+      const letter=r?(BOT[i]==="A"?"U":COMP[BOT[i]]):COMP[BOT[i]];
+      hb+=hbonds(x,by-44,by-28,BOT[i],da);
+      pl+=pill(x,by-54,letter,r?"rna":"new",da);
+      bb+=piece(i,yLead,r?"bb-rna":"bb-new",da,[0,0]);
+    }
+    if(gym&&s.ssb>0.02&&o>0.55){
+      const at=s.ssb*o*(1-la), ab=s.ssb*o*(1-da);
+      if(at>0.02)ez+=`<circle class="ssb" cx="${f1(x-14)}" cy="${f1(ty-9)}" r="6" opacity="${at.toFixed(3)}"/><circle class="ssb" cx="${f1(x+14)}" cy="${f1(ty-9)}" r="6" opacity="${at.toFixed(3)}"/>`;
+      if(ab>0.02)ez+=`<circle class="ssb" cx="${f1(x-14)}" cy="${f1(by+9)}" r="6" opacity="${ab.toFixed(3)}"/><circle class="ssb" cx="${f1(x+14)}" cy="${f1(by+9)}" r="6" opacity="${ab.toFixed(3)}"/>`;
+    }
+  }
+  /* Beschriftung der Stränge */
+  const fa=cl(f-1);
+  lb+=txt(xL,yT(xL)-14,"Elternstrang","lab","start",fa);
+  lb+=txt(xL,yB(xL)+25,"Elternstrang","lab","start",fa);
+  lb+=txt(xL,YC-22,"Folgestrang (neu)","lab","start",lagA(0)>0.5||lagA(5)>0.5?1:0);
+  lb+=txt(xL,YC+31,"Leitstrang (neu)","lab","start",cl(s.lead-1));
+  if(showEnds){
+    lb+=txt(xL-12,yT(xL)+5,"5′","end","end")+txt(xR+12,yT(xR)+5,"3′","end","start");
+    lb+=txt(xL-12,yB(xL)+5,"3′","end","end")+txt(xR+12,yB(xR)+5,"5′","end","start");
+    const vl=[];for(let i=0;i<N;i++)if(leadA(i)>0.5)vl.push(i);
+    if(vl.length){const m=vl[0],M=vl[vl.length-1];lb+=txt(xi(m)-DX/2-6,yLead(xi(m)-DX/2)+5,"5′","end","end");lb+=txt(xi(M)+DX/2+6,yLead(xi(M)+DX/2)+5,"3′","end","start");}
+    const segOf=i=>s.lig>0.5?0:(i<=nb?1:2);
+    const vg=[];for(let i=0;i<N;i++)if(lagA(i)>0.5)vg.push(i);
+    if(vg.length){
+      const groups={};vg.forEach(i=>{const g=segOf(i);(groups[g]=groups[g]||[]).push(i);});
+      const keys=Object.keys(groups);
+      keys.forEach(k=>{const arr=groups[k],m=arr[0],M=arr[arr.length-1];
+        const innerL=vg.some(i=>i<m), innerR=vg.some(i=>i>M);
+        const hide=s.ligE>0.3||s.pol1>0.3;
+        if(innerL){if(!hide)lb+=txt(xi(m)-DX/2+5,yLag(xi(m))+19,"3′","end","start");}
+        else lb+=txt(xi(m)-DX/2-6,yLag(xi(m)-DX/2)+5,"3′","end","end");
+        if(innerR){if(!hide)lb+=txt(xi(M)+DX/2-5,yLag(xi(M))+19,"5′","end","end");}
+        else lb+=txt(xi(M)+DX/2+6,yLag(xi(M)+DX/2)+5,"5′","end","start");
+      });
+    }
+  }
+  /* Enzyme */
+  const fx=X0+f*DX-DX/2;
+  if(gym)ez+=enzP(fx+DX*2.2,YC,"Topoisomerase",s.topo);
+  ez+=enzP(fx+4,YC,"Helicase",s.heli);
+  if(gym&&s.prim>0.02)s.primAt.forEach(p=>{ez+=enzP(xi(p[1]),p[0]==="lag"?YC-50:YC+50,"Primase",s.prim);});
+  const polLabel=gym?"DNA-Pol III":"DNA-Polymerase";
+  ez+=enzP(X0-DX/2+s.lead*DX,YC+50,polLabel,s.pol3G);
+  {const hi=s.polLag===1?5:11,p=s.polLag===1?s.f1:s.f2;ez+=enzP(xi(hi)+DX/2-p*DX,YC-50,polLabel,s.pol3L);}
+  if(gym)ez+=enzP(xi(4.5),YC-50,"DNA-Pol I",s.pol1);
+  ez+=enzP(xi(nb)+DX/2,YC-50,level!=="rs"?"DNA-Ligase":"Ligase",s.ligE);
+  /* Ergebnis */
+  const mx=(xL+xR)/2;
+  lb+=txt(mx,YC-12,"Tochter-DNA 1: Elternstrang + neuer Strang","res","middle",s.res);
+  lb+=txt(mx,YC+22,"Tochter-DNA 2: Elternstrang + neuer Strang","res","middle",s.res);
+  $("#sim").innerHTML=hb+bb+pl+lb+ez;
+}
+
+/* ---------- Ablaufsteuerung ---------- */
+let KF=KF_G,STEPS=STEPS_G,step=0,shown=Object.assign({},KF_G[0]),anim=0,playing=false,playTimer=0;
+const SYN=["lead","f1","f2"];
+function lerpState(a,b,t){const o={};for(const k in DEF){if(typeof DEF[k]!=="number"||k==="polLag")continue;const tt=SYN.indexOf(k)>=0?cl((t-0.3)/0.7):t;o[k]=a[k]+(b[k]-a[k])*tt;}
+  o.primAt=b.prim>=a.prim?b.primAt:a.primAt;o.polLag=b.pol3L>0.01?b.polLag:a.polLag;return o;}
+function go(n){
+  n=Math.max(0,Math.min(KF.length-1,n));
+  const from=Object.assign({},shown),to=KF[n];step=n;updPanel();
+  cancelAnimationFrame(anim);
+  const D=reduce?0:1500,t0=performance.now();
+  function fr(now){const t=D?cl((now-t0)/D):1;const e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+    shown=lerpState(from,to,e);render(shown);
+    if(t<1)anim=requestAnimationFrame(fr);else{shown=Object.assign({},to);render(shown);animEnd();}}
+  anim=requestAnimationFrame(fr);
+}
+function animEnd(){if(!playing)return;if(step<KF.length-1)playTimer=setTimeout(()=>go(step+1),3200);else stopPlay();}
+function stopPlay(){playing=false;clearTimeout(playTimer);$("#b-play").textContent="Abspielen";}
+function updPanel(){
+  const s=STEPS[step];
+  $("#stepno").textContent=`Schritt ${step+1} von ${STEPS.length}`;
+  $("#steptitle").textContent=s.t;
+  $("#stepdesc").innerHTML=s.d;
+  $("#stepq").innerHTML=`<b>Beobachte:</b> ${s.q}`;
+  $("#sim").setAttribute("aria-label","Simulation der DNA-Replikation, Schritt "+(step+1)+": "+s.t);
+  $("#b-prev").disabled=step===0;$("#b-next").disabled=step===STEPS.length-1;
+  document.querySelectorAll(".dot").forEach((d,i)=>{d.classList.toggle("past",i<step);if(i===step)d.setAttribute("aria-current","step");else d.removeAttribute("aria-current");});
+}
+function buildDots(){$("#dots").innerHTML=STEPS.map((s,i)=>`<button class="dot" type="button" data-i="${i}" aria-label="Schritt ${i+1}: ${s.t}">${i+1}</button>`).join("");
+  document.querySelectorAll(".dot").forEach(d=>d.onclick=()=>{stopPlay();go(+d.dataset.i);});}
+$("#b-prev").onclick=()=>{stopPlay();go(step-1);};
+$("#b-next").onclick=()=>{stopPlay();go(step+1);};
+$("#b-play").onclick=()=>{if(playing){stopPlay();return;}playing=true;$("#b-play").textContent="Pause";if(step>=KF.length-1){shown=Object.assign({},KF[0]);step=0;render(shown);updPanel();playTimer=setTimeout(()=>go(1),900);}else go(step+1);};
+$("#ends").onchange=e=>{showEnds=e.target.checked;render(shown);};
+
+/* ---------- Wortspeicher ---------- */
+const WORDS=[
+ ["die","DNA","–","Desoxyribonukleinsäure; Träger der Erbinformation","both"],
+ ["die","Replikation","die Replikationen","Verdopplung der DNA vor der Zellteilung","both"],
+ ["der","Strang","die Stränge","eine lange Kette aus Nukleotiden","both"],
+ ["das","Nukleotid","die Nukleotide","Baustein der DNA: Zucker, Phosphat, Base","both"],
+ ["die","Base","die Basen","A (Adenin), T (Thymin), G (Guanin), C (Cytosin)","both"],
+ ["das","Basenpaar","die Basenpaare","zwei Basen, die sich gegenüberstehen: A–T, G–C","both"],
+ ["die","Wasserstoffbrücke","die Wasserstoffbrücken","schwache Bindung zwischen zwei gepaarten Basen","both"],
+ ["die","Matrize","die Matrizen","Vorlage: der alte Strang, nach dem der neue Strang gebaut wird","both"],
+ ["das","Enzym","die Enzyme","Protein, das eine chemische Reaktion beschleunigt (Biokatalysator)","both"],
+ ["die","Helicase","die Helicasen","Enzym; trennt die Wasserstoffbrücken zwischen den Basen","both"],
+ ["die","DNA-Polymerase","die DNA-Polymerasen","Enzym; verknüpft Nukleotide zu einem neuen DNA-Strang","both"],
+ ["die","Ligase","die Ligasen","Enzym; verbindet DNA-Stücke miteinander","both"],
+ ["die","Replikationsgabel","die Replikationsgabeln","Y-förmiger Bereich, in dem die DNA geöffnet ist","both"],
+ ["der","Leitstrang","die Leitstränge","neuer Strang, der ohne Unterbrechung entsteht","both"],
+ ["der","Folgestrang","die Folgestränge","neuer Strang, der in Stücken entsteht","both"],
+ ["","komplementär","–","passend ergänzend (A passt zu T, G passt zu C)","both"],
+ ["","semikonservativ","–","halb erhaltend: jedes neue DNA-Molekül enthält einen alten Strang","both"],
+ ["","antiparallel","–","gegenläufig: ein Strang 5′→3′, der andere 3′→5′","mid"],
+ ["der","Primer","die Primer","kurzes RNA-Stück; Startpunkt für die DNA-Polymerase","ok"],
+ ["die","Primase","die Primasen","Enzym; synthetisiert RNA-Primer","ok"],
+ ["die","Topoisomerase","die Topoisomerasen","Enzym; baut die Torsionsspannung vor der Gabel ab","ok"],
+ ["das","SSB-Protein","die SSB-Proteine","stabilisiert Einzelstränge (single-strand binding)","ok"],
+ ["das","Okazaki-Fragment","die Okazaki-Fragmente","kurzer, diskontinuierlich synthetisierter Abschnitt des Folgestrangs","mid"],
+ ["die","Phosphodiesterbindung","die Phosphodiesterbindungen","Bindung zwischen Zucker und Phosphat im Rückgrat der DNA","ok"]
+];
+const VERBS=[["trennen","er trennt"],["paaren","sie paaren"],["verknüpfen","sie verknüpft"],["verbinden","sie verbindet"],["synthetisieren (= herstellen)","sie synthetisiert"],["ersetzen","sie ersetzt"],["verlängern","sie verlängert"]];
+function buildWords(){
+  $("#wbody").innerHTML=WORDS.filter(w=>w[4]==="both"||(w[4]==="mid"&&level!=="rs")||level==="ok").map(w=>`<tr><td>${w[0]?`<span class="art">${w[0]}</span> `:""}<b>${w[1]}</b></td><td>${w[2]}</td><td>${w[3]}</td></tr>`).join("");
+  $("#verbs").innerHTML=VERBS.filter((v,i)=>level!=="rs"||i<5||i===6).map(v=>`<span><b>${v[0]}</b> – ${v[1]}</span>`).join("");
+}
+
+/* ---------- Hilfsfunktionen Aufgaben ---------- */
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function shuffleD(arr,seed,derange){for(let s=seed;s<seed+200;s++){const r=rng(s),a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  const lim=derange||arr.length;let ok=true;for(let i=0;i<lim;i++)if(a[i]===arr[i]){ok=false;break;}if(ok)return a;}return arr.slice().reverse();}
+const TASKS={rs:["t1","t2","t3","t4","t5","t6"],gym:["t1","t2","t3","t4","t5","t6"],ok:["t1","t2","t3","t4","t5","t6","t7"]};
+let solved={},tries={};
+function mark(id,ok,label){solved[id]=ok;const c=document.getElementById("st-"+id);if(c){c.textContent=ok?(label||"gelöst"):"offen";c.classList.toggle("done",!!ok);}updProg();}
+function updProg(){const l=TASKS[level];const n=l.filter(t=>solved[t]).length;$("#progress").textContent=`${n} von ${l.length} Aufgaben erledigt`;}
+function fb(id,ok,msg){const e=document.getElementById(id);e.hidden=false;e.className="fb "+(ok?"ok":"bad");e.innerHTML=`<strong>${ok?"richtig":"falsch"}</strong> – ${msg}`;}
+function attempt(id){tries[id]=(tries[id]||0)+1;return tries[id];}
+function setF(el,ok){el.classList.toggle("ok-f",ok);el.classList.toggle("bad-f",!ok);}
+function card(id,num,title,body){return `<section class="card task" id="${id}"><div class="sec-head"><span class="tag">Aufgabe ${num}</span><h2>${title}</h2><span class="chip" id="st-${id}">offen</span></div>${body}</section>`;}
+const checkBtn=id=>`<div class="btnrow"><button class="btn primary" type="button" id="${id}-check">Überprüfen</button></div><div class="fb" id="${id}-fb" hidden></div>`;
+
+/* ---------- Aufgabe 1: Basenpaarung ---------- */
+function t1(){
+  const g=level!=="rs",tpl=[...(level==="ok"?"ATGGCATTCGAC":level==="gym"?"ATGGCATTCG":"TACGGCATTC")];
+  const endSel=id=>`<select id="${id}" aria-label="Strangende"><option value="">?</option><option>5′</option><option>3′</option></select>`;
+  const html=card("t1",1,"Komplementären Strang ergänzen",
+   `<p>${g?"Der obere Strang dient als Matrize. Ergänze den komplementären Tochterstrang. Gib außerdem an, wo dessen 5′-Ende und 3′-Ende liegen.":"Der obere Strang ist ein alter DNA-Strang. Er dient als Vorlage (Matrize). Ergänze die Basen des neuen Strangs."}</p>
+   <details class="help"><summary>Hilfe</summary><p>A paart mit T, G paart mit C.${g?" Die beiden Stränge eines Doppelstrangs verlaufen antiparallel.":" Schreibe in jedes Feld einen Buchstaben."}</p></details>
+   <div class="seqscroll"><div class="seqgrid" style="--n:${tpl.length}">
+     <span class="sl">${g?"5′":"alt"}</span>${tpl.map(b=>`<span class="sb">${b}</span>`).join("")}<span class="sl">${g?"3′":""}</span>
+     ${g?endSel("t1-l"):`<span class="sl">neu</span>`}${tpl.map((b,i)=>`<input class="bin" id="t1-b${i}" maxlength="1" autocomplete="off" autocapitalize="characters" aria-label="Base ${i+1} des neuen Strangs">`).join("")}${g?endSel("t1-r"):`<span class="sl"></span>`}
+   </div></div>${checkBtn("t1")}`);
+  const bind=()=>{
+    tpl.forEach((b,i)=>{const el=$("#t1-b"+i);
+      el.addEventListener("input",()=>{el.value=el.value.toUpperCase().replace(/[^A-Z]/g,"").slice(-1);if(el.value&&i<tpl.length-1)$("#t1-b"+(i+1)).focus();});
+      el.addEventListener("keydown",e=>{if(e.key==="Backspace"&&!el.value&&i>0)$("#t1-b"+(i-1)).focus();});});
+    $("#t1-check").onclick=()=>{
+      let c=0,hasU=false;
+      tpl.forEach((b,i)=>{const el=$("#t1-b"+i),v=el.value.trim().toUpperCase();if(v==="U")hasU=true;const ok=v===COMP[b];setF(el,ok);if(ok)c++;});
+      let endsOk=true;
+      if(g){const l=$("#t1-l"),r=$("#t1-r");const lo=l.value==="3′",ro=r.value==="5′";setF(l,lo);setF(r,ro);endsOk=lo&&ro;}
+      const all=c===tpl.length&&endsOk,a=attempt("t1");
+      let msg;
+      if(all)msg="Alle Basen sind komplementär"+(g?", und die Strangenden sind korrekt angegeben: Der Tochterstrang verläuft antiparallel zur Matrize.":".");
+      else{msg=`${c} von ${tpl.length} Basen sind korrekt.`+(g&&!endsOk?" Die Angabe der Strangenden ist nicht korrekt.":"")+(hasU?" Hinweis: Uracil (U) kommt nur in RNA vor, nicht in DNA.":"")+" Prüfe die rot markierten Felder.";
+        if(a>=2)msg+=` <br>Lösung: ${g?"3′-":""}${tpl.map(b=>COMP[b]).join("")}${g?"-5′":""}`;}
+      fb("t1-fb",all,msg);mark("t1",all);
+    };
+  };
+  return [html,bind];
+}
+
+/* ---------- Aufgabe 2: Enzyme zuordnen ---------- */
+function t2(){
+  const g=level==="ok";
+  const items=level==="gym"?[
+    ["die","Helicase","trennt die Wasserstoffbrücken zwischen den Basen; die Doppelhelix öffnet sich"],
+    ["die","DNA-Polymerase","verknüpft Nukleotide in 5′→3′-Richtung zu einem neuen Strang"],
+    ["die","DNA-Ligase","verknüpft die Okazaki-Fragmente zu einem durchgehenden Strang"]
+  ]:g?[
+    ["die","Helicase","trennt die Wasserstoffbrücken zwischen den Basen"],
+    ["die","Topoisomerase","baut die Torsionsspannung vor der Replikationsgabel ab"],
+    ["das","SSB-Protein","stabilisiert die Einzelstränge und verhindert eine erneute Basenpaarung"],
+    ["die","Primase","synthetisiert kurze RNA-Primer"],
+    ["die","DNA-Polymerase III","verlängert Primer am 3′-Ende in 5′→3′-Richtung"],
+    ["die","DNA-Polymerase I","ersetzt RNA-Primer durch DNA-Nukleotide"],
+    ["die","DNA-Ligase","verknüpft Okazaki-Fragmente durch Phosphodiesterbindungen"]
+  ]:[
+    ["die","Helicase","trennt die Wasserstoffbrücken und öffnet so die DNA"],
+    ["die","DNA-Polymerase","verknüpft Nukleotide zu einem neuen DNA-Strang"],
+    ["die","Ligase","verbindet die Stücke des Folgestrangs miteinander"]
+  ];
+  const funcs=items.map((it,i)=>({t:it[2],v:String(i)}));
+  if(!g)funcs.push({t:"verknüpft Aminosäuren zu einem Protein",v:"x"});
+  if(level==="gym")funcs.push({t:"überträgt die Basenfolge der DNA auf eine RNA",v:"y"});
+  const opts=shuffleD(funcs,g?11:level==="gym"?13:7,items.length);
+  const html=card("t2",2,"Enzyme und ihre Funktion",
+   `<p>Ordne jedem ${g?"Protein":"Enzym"} die passende Funktion zu.${g?"":level==="gym"?" Zwei Funktionen bleiben übrig.":" Eine Funktion bleibt übrig."}</p>
+   <div class="rows">${items.map((it,i)=>`<div class="mrow"><label for="t2-${i}"><span class="art">${it[0]}</span> <b>${it[1]}</b></label><select id="t2-${i}"><option value="">– Funktion wählen –</option>${opts.map(o=>`<option value="${o.v}">${o.t}</option>`).join("")}</select></div>`).join("")}</div>
+   ${checkBtn("t2")}`);
+  const bind=()=>{$("#t2-check").onclick=()=>{let c=0;items.forEach((it,i)=>{const el=$("#t2-"+i),ok=el.value===String(i);setF(el,ok);if(ok)c++;});
+    const all=c===items.length,a=attempt("t2");let msg=all?"Alle Zuordnungen stimmen.":`${c} von ${items.length} Zuordnungen sind korrekt. Nutze die Simulation und den Wortspeicher.`;
+    if(!all&&a>=2)msg+="<br>Lösung: "+items.map(it=>`${it[1]} – ${it[2]}`).join("; ")+".";
+    fb("t2-fb",all,msg);mark("t2",all);};};
+  return [html,bind];
+}
+
+/* ---------- Aufgabe 3: Ablauf ordnen ---------- */
+function t3(){
+  const g=level==="ok";
+  const steps=level==="gym"?[
+    "Die Helicase trennt die Wasserstoffbrücken; eine Replikationsgabel entsteht.",
+    "Freie Nukleotide paaren komplementär mit den Basen der Elternstränge (Matrizen).",
+    "Die DNA-Polymerase verknüpft die Nukleotide in 5′→3′-Richtung: am Leitstrang durchgehend, am Folgestrang in Okazaki-Fragmenten.",
+    "Die DNA-Ligase verknüpft die Okazaki-Fragmente.",
+    "Es liegen zwei identische DNA-Moleküle aus je einem Elternstrang und einem neuen Strang vor."
+  ]:g?[
+    "Die Helicase trennt die Basenpaare; eine Replikationsgabel entsteht.",
+    "Die Primase synthetisiert RNA-Primer an beiden Matrizensträngen.",
+    "Die DNA-Polymerase III verlängert die Primer in 5′→3′-Richtung (Leitstrang und Okazaki-Fragmente).",
+    "Die DNA-Polymerase I ersetzt die RNA-Primer durch DNA-Nukleotide.",
+    "Die DNA-Ligase schließt die Einzelstrangbrüche durch Phosphodiesterbindungen."
+  ]:[
+    "Die Helicase trennt die Wasserstoffbrücken; die beiden Stränge lösen sich voneinander.",
+    "Freie Nukleotide paaren komplementär mit den Basen der alten Stränge.",
+    "Die DNA-Polymerase verknüpft die Nukleotide zu neuen Strängen.",
+    "Die Ligase verbindet die Stücke des Folgestrangs.",
+    "Es liegen zwei gleiche DNA-Moleküle aus je einem alten und einem neuen Strang vor."
+  ];
+  const idx=steps.map((s,i)=>i);const disp=shuffleD(idx,g?23:level==="gym"?29:5);
+  const n=steps.length;
+  const html=card("t3",3,"Den Ablauf ordnen",
+   `<p>Bringe die Schritte in die richtige Reihenfolge. Wähle für jeden Satz eine Nummer (1 = zuerst).</p>
+   <div class="rows">${disp.map(k=>`<div class="orow"><select id="t3-${k}" aria-label="Position"><option value="">–</option>${idx.map(j=>`<option value="${j+1}">${j+1}</option>`).join("")}</select><span>${steps[k]}</span></div>`).join("")}</div>
+   ${checkBtn("t3")}`);
+  const bind=()=>{$("#t3-check").onclick=()=>{let c=0;const vals=[];idx.forEach(k=>{const el=$("#t3-"+k),ok=el.value===String(k+1);vals.push(el.value);setF(el,ok);if(ok)c++;});
+    const dup=vals.filter(v=>v).length!==new Set(vals.filter(v=>v)).size;
+    const all=c===n,a=attempt("t3");let msg=all?"Die Reihenfolge stimmt.":`${c} von ${n} Positionen sind korrekt.`+(dup?" Du hast eine Nummer mehrfach vergeben.":"");
+    if(!all&&a>=2)msg+="<br>Lösung: "+steps.map((s,i)=>`(${i+1}) ${s}`).join(" ");
+    fb("t3-fb",all,msg);mark("t3",all);};};
+  return [html,bind];
+}
+
+/* ---------- Aufgabe 4: Lückentext ---------- */
+function t4(){
+  const g=level==="ok",m=level==="gym";
+  const parts=m?["Die beiden Stränge der DNA verlaufen ",0,". Zu Beginn der Replikation trennt die ",1," die ",2," zwischen den Basen. Jeder Elternstrang dient als ",3,". Die DNA-Polymerase verknüpft ",4," Nukleotide zu einem neuen Strang, und zwar ausschließlich in ",5,"-Richtung. Der neue Strang, der ohne Unterbrechung entsteht, heißt ",6,". Der ",7," entsteht in Stücken, den Okazaki-Fragmenten. Jedes neue DNA-Molekül besteht aus einem alten und einem neuen Strang; die Replikation ist ",8,"."]
+   :g?["Die beiden Einzelstränge der DNA verlaufen ",0,". DNA-Polymerasen synthetisieren ausschließlich in ",1,"-Richtung und benötigen ein freies ",2,". Dieses stellt zu Beginn ein kurzer ",3," bereit. Der Tochterstrang, der kontinuierlich in Bewegungsrichtung der Replikationsgabel synthetisiert wird, heißt ",4,". Der ",5," wird diskontinuierlich in Form von ",6," synthetisiert. Die verbleibenden Einzelstrangbrüche verschließt die ",7," durch Ausbildung einer ",8,"."]
+   :["Bei der Replikation wird die DNA ",0,". Zuerst trennt das Enzym ",1," die ",2," zwischen den Basen. Jeder alte Strang dient als ",3," für einen neuen Strang. Adenin paart mit ",4,", Guanin paart mit ",5,". Das Enzym ",6," verknüpft die Nukleotide zu einem neuen Strang. Am Ende besteht jedes DNA-Molekül aus einem alten und einem neuen Strang. Man nennt diesen Vorgang ",7," Replikation."];
+  const words=m?["antiparallel","Helicase","Wasserstoffbrücken","Matrize","komplementäre","5′→3′","Leitstrang","Folgestrang","semikonservativ"]
+   :g?["antiparallel","5′→3′","3′-OH-Ende","RNA-Primer","Leitstrang","Folgestrang","Okazaki-Fragmenten","DNA-Ligase","Phosphodiesterbindung"]
+   :["verdoppelt","Helicase","Wasserstoffbrücken","Matrize","Thymin","Cytosin","DNA-Polymerase","semikonservative"];
+  const distr=m?["parallel","3′→5′","konservativ","Ribosom"]:g?["parallel","3′→5′","5′-Phosphat-Ende","Peptidbindung"]:["Uracil","konservative","Ribosom"];
+  const bank=shuffleD(words.concat(distr),g?41:m?31:17,words.length);
+  const html=card("t4",4,"Lückentext",
+   `<p>Wähle für jede Lücke das passende Wort. Einige Wörter im Wortkasten passen nicht.</p>
+   <div class="bank" aria-label="Wortkasten">${bank.map(w=>`<span class="w">${w}</span>`).join("")}</div>
+   <p class="cloze">${parts.map(p=>typeof p==="number"?`<select id="t4-${p}" aria-label="Lücke ${p+1}"><option value="">……</option>${bank.map(w=>`<option>${w}</option>`).join("")}</select>`:p).join("")}</p>
+   ${checkBtn("t4")}`);
+  const bind=()=>{$("#t4-check").onclick=()=>{let c=0;words.forEach((w,i)=>{const el=$("#t4-"+i),ok=el.value===w;setF(el,ok);if(ok)c++;});
+    const all=c===words.length,a=attempt("t4");let msg=all?"Alle Lücken sind korrekt gefüllt.":`${c} von ${words.length} Lücken sind korrekt.`;
+    if(!all&&a>=2)msg+="<br>Lösung: "+words.map((w,i)=>`(${i+1}) ${w}`).join(", ");
+    fb("t4-fb",all,msg);mark("t4",all);};};
+  return [html,bind];
+}
+
+/* ---------- Aufgabe 5 RS: Modelle ---------- */
+function modelSVG(type){
+  const bar=(x,y,k)=>{if(k==="old"||k==="new")return `<rect x="${x}" y="${y}" width="76" height="9" rx="2" class="m-${k}"/>`;
+    const seq=k==="mixA"?["old","new","old","new"]:["new","old","new","old"];return seq.map((s,i)=>`<rect x="${x+i*19}" y="${y}" width="19" height="9" class="m-${s}"/>`).join("");};
+  const D={konservativ:[["old","old"],["new","new"]],semikonservativ:[["old","new"],["new","old"]],dispersiv:[["mixA","mixB"],["mixB","mixA"]]}[type];
+  return `<svg viewBox="0 0 230 104" aria-hidden="true">${bar(6,40,"old")}${bar(6,53,"old")}<text class="mtxt" x="6" y="30">vorher</text>
+   <path class="m-ar" d="M92 51 H124"/><path class="m-ah" d="M130 51 L121 46 L121 56 Z"/>
+   ${bar(146,16,D[0][0])}${bar(146,29,D[0][1])}${bar(146,66,D[1][0])}${bar(146,79,D[1][1])}<text class="mtxt" x="146" y="10">nachher</text></svg>`;
+}
+function t5rs(){
+  const opts=[["A","dispersiv"],["B","konservativ"],["C","semikonservativ"]];
+  const html=card("t5",5,"Semikonservative Replikation",
+   `<p>Die Abbildungen zeigen drei Möglichkeiten, wie aus einem DNA-Molekül zwei DNA-Moleküle entstehen könnten (<span style="color:var(--old);font-weight:700">alt</span>, <span style="color:var(--new);font-weight:700">neu</span>).</p>
+   <p><b>a)</b> Welche Abbildung zeigt das Ergebnis der semikonservativen Replikation?</p>
+   <div class="models">${opts.map(o=>`<label class="model"><span class="inline"><input type="radio" name="t5a" value="${o[1]}"> <b>Abbildung ${o[0]}</b></span>${modelSVG(o[1])}</label>`).join("")}</div>
+   <p><b>b)</b> Wie viele alte Stränge enthält jedes neue DNA-Molekül nach der Replikation?</p>
+   <div class="inline">${["0","1","2"].map(v=>`<label><input type="radio" name="t5b" value="${v}"> ${v}</label>`).join("")}</div>
+   ${checkBtn("t5")}`);
+  const bind=()=>{$("#t5-check").onclick=()=>{const a=(document.querySelector('input[name="t5a"]:checked')||{}).value,b=(document.querySelector('input[name="t5b"]:checked')||{}).value;
+    const oa=a==="semikonservativ",ob=b==="1",all=oa&&ob;
+    let msg=all?"Abbildung C zeigt das Ergebnis: Jedes neue DNA-Molekül besteht aus einem alten und einem neuen Strang. Abbildung A zeigt das dispersive, Abbildung B das konservative Modell.":
+      `Teil a ist ${oa?"richtig":"falsch"}, Teil b ist ${ob?"richtig":"falsch"}. Tipp: Sieh dir den letzten Schritt der Simulation an.`;
+    fb("t5-fb",all,msg);mark("t5",all);};};
+  return [html,bind];
+}
+
+/* ---------- Aufgabe 5 Gym: Meselson-Stahl ---------- */
+function tubeSVG(sel){
+  const ys={l:64,m:92,h:120};let s=`<svg viewBox="0 0 290 182" aria-hidden="true">`;
+  s+=`<text class="tl" x="62" y="${ys.l+4}" text-anchor="end">leicht</text><text class="tl" x="62" y="${ys.m+4}" text-anchor="end">mittel</text><text class="tl" x="62" y="${ys.h+4}" text-anchor="end">schwer</text>`;
+  [0,1,2].forEach(gn=>{const x=80+gn*70;s+=`<path class="tube" d="M${x} 14 V140 Q${x} 160 ${x+20} 160 Q${x+40} 160 ${x+40} 140 V14 Z"/>`;
+    ["l","m","h"].forEach(k=>{if(sel[gn][k])s+=`<rect class="band" x="${x+5}" y="${ys[k]-3}" width="30" height="6" rx="2"/>`;});
+    s+=`<text class="tl" x="${x+20}" y="176" text-anchor="middle">Gen. ${gn}</text>`;});
+  return s+`</svg>`;
+}
+function t5gym(){
+  const cols=[["h","schwer (¹⁵N/¹⁵N)"],["m","mittel (¹⁵N/¹⁴N)"],["l","leicht (¹⁴N/¹⁴N)"]];
+  const radio=(n)=>["konservativ","semikonservativ","dispersiv"].map(v=>`<label><input type="radio" name="${n}" value="${v}"> ${v}es Modell</label>`).join("");
+  const html=card("t5",5,"Das Meselson-Stahl-Experiment",
+   `<p>Meselson und Stahl (1958) kultivierten <i>E. coli</i> über viele Generationen in einem Medium mit dem schweren Stickstoffisotop ¹⁵N. Anschließend überführten sie die Bakterien in ein Medium mit ¹⁴N. Nach jeder Zellteilung isolierten sie die DNA und trennten sie durch Dichtegradientenzentrifugation in Caesiumchlorid nach ihrer Dichte auf. Generation 0 zeigt eine einzige schwere Bande.</p>
+   <div class="ms"><div style="display:grid;gap:12px;min-width:0">
+     <p><b>a)</b> Gib an, welche Banden nach der <b>semikonservativen</b> Hypothese in Generation 1 und 2 zu erwarten sind. Das Röhrchen zeigt deine Vorhersage.</p>
+     <div class="gtable"><table><thead><tr><th></th>${cols.map(c=>`<th>${c[1]}</th>`).join("")}</tr></thead><tbody>
+       ${[1,2].map(gn=>`<tr><td>Generation ${gn}</td>${cols.map(c=>`<td><input type="checkbox" id="t5-${gn}${c[0]}" aria-label="Generation ${gn}, ${c[1]}"></td>`).join("")}</tr>`).join("")}
+     </tbody></table></div>
+   </div><div class="tubes" id="t5-tubes"></div></div>
+   <p><b>b)</b> In Generation 1 fanden Meselson und Stahl ausschließlich eine mittlere Bande. Welches Modell ist damit widerlegt?</p>
+   <div class="radios">${radio("t5b")}</div>
+   <p><b>c)</b> In Generation 2 fanden sie eine mittlere und eine leichte Bande. Welches weitere Modell ist damit widerlegt?</p>
+   <div class="radios">${radio("t5c")}</div>
+   ${checkBtn("t5")}`);
+  const bind=()=>{
+    const cur=()=>({0:{h:1},1:{h:$("#t5-1h").checked,m:$("#t5-1m").checked,l:$("#t5-1l").checked},2:{h:$("#t5-2h").checked,m:$("#t5-2m").checked,l:$("#t5-2l").checked}});
+    const draw=()=>{$("#t5-tubes").innerHTML=tubeSVG(cur());};draw();
+    document.querySelectorAll('#t5 input[type="checkbox"]').forEach(c=>c.onchange=draw);
+    $("#t5-check").onclick=()=>{const s=cur();
+      const oa=!s[1].h&&s[1].m&&!s[1].l&&!s[2].h&&s[2].m&&s[2].l;
+      const b=(document.querySelector('input[name="t5b"]:checked')||{}).value,c=(document.querySelector('input[name="t5c"]:checked')||{}).value;
+      const ob=b==="konservativ",oc=c==="dispersiv",all=oa&&ob&&oc,at=attempt("t5");
+      let msg=all?"Nach der ersten Teilung besteht jedes Molekül aus einem ¹⁵N- und einem ¹⁴N-Strang (mittlere Bande). Nach der zweiten Teilung entstehen je zur Hälfte Hybrid- und reine ¹⁴N-Moleküle. Das konservative Modell sagt für Generation 1 eine schwere und eine leichte Bande voraus; das dispersive Modell sagt für Generation 2 eine einzige Bande zwischen mittel und leicht voraus.":
+        `Teil a ist ${oa?"richtig":"falsch"}, Teil b ist ${ob?"richtig":"falsch"}, Teil c ist ${oc?"richtig":"falsch"}.`;
+      if(!all&&at>=2)msg+="<br>Lösung: a) Gen. 1: nur mittel; Gen. 2: mittel und leicht. b) konservatives Modell. c) dispersives Modell.";
+      fb("t5-fb",all,msg);mark("t5",all);};
+  };
+  return [html,bind];
+}
+
+/* ---------- Aufgabe 6: Freitext ---------- */
+function t6(){
+  const g=level==="ok",m=level==="gym";
+  const terms=m?[
+    ["Helicase",t=>/helicase/i.test(t)],
+    ["Matrize",t=>/matrize|vorlage/i.test(t)],
+    ["komplementär",t=>/komplement|basenpaar/i.test(t)],
+    ["antiparallel / gegenläufig",t=>/antiparallel|gegenläufig/i.test(t)],
+    ["5′→3′-Richtung",t=>/5\s*[′'’´`]/.test(t)&&/3\s*[′'’´`]/.test(t)],
+    ["Leitstrang / Folgestrang",t=>/leitstrang|folgestrang/i.test(t)],
+    ["Okazaki-Fragment",t=>/okazaki/i.test(t)],
+    ["semikonservativ",t=>/semikonservativ/i.test(t)]
+  ]:g?[
+    ["antiparallel",t=>/antiparallel/i.test(t)],
+    ["5′→3′-Richtung",t=>/5\s*[′'’´`]/.test(t)&&/3\s*[′'’´`]/.test(t)],
+    ["3′-OH-Ende",t=>/3\s*[′'’´`]?\s*-?\s*OH/i.test(t)],
+    ["Replikationsgabel",t=>/gabel/i.test(t)],
+    ["Primer",t=>/primer/i.test(t)],
+    ["Okazaki-Fragment",t=>/okazaki/i.test(t)],
+    ["DNA-Ligase",t=>/ligase/i.test(t)]
+  ]:[
+    ["Helicase",t=>/helicase/i.test(t)],
+    ["Wasserstoffbrücken",t=>/wasserstoff/i.test(t)],
+    ["Matrize / Vorlage",t=>/matrize|vorlage/i.test(t)],
+    ["komplementär / A–T, G–C",t=>/komplement|basenpaar|\bA\s*[–-]\s*T\b|\bG\s*[–-]\s*C\b/i.test(t)],
+    ["DNA-Polymerase",t=>/polymerase/i.test(t)],
+    ["Ligase",t=>/ligase/i.test(t)],
+    ["semikonservativ",t=>/semikonservativ/i.test(t)]
+  ];
+  const need=m?6:5;
+  const sol=m?"Zuerst trennt die Helicase die Wasserstoffbrücken zwischen den Basen; es entsteht eine Replikationsgabel. Jeder Elternstrang dient als Matrize: Freie Nukleotide paaren komplementär mit seinen Basen (A–T, G–C), und die DNA-Polymerase verknüpft sie zu einem neuen Strang. Die DNA-Polymerase verlängert einen Strang nur in 5′→3′-Richtung. Da die beiden Stränge der DNA antiparallel sind, zeigt diese Richtung an einem Strang zur Replikationsgabel hin, am anderen von ihr weg. Der Leitstrang wird deshalb durchgehend synthetisiert. Der Folgestrang entsteht in kurzen Stücken (Okazaki-Fragmenten), weil jeweils erst ein neuer Abschnitt der Matrize freigelegt werden muss. Die DNA-Ligase verknüpft die Fragmente. Das Ergebnis sind zwei identische DNA-Moleküle aus je einem alten und einem neuen Strang: Die Replikation ist semikonservativ."
+   :g?"Die beiden Einzelstränge der DNA sind antiparallel. Die DNA-Polymerase III kann Nukleotide nur an ein freies 3′-OH-Ende anfügen; die Synthese verläuft daher ausschließlich in 5′→3′-Richtung, die Matrize wird in 3′→5′-Richtung abgelesen. Am Leitstrang stimmt diese Syntheserichtung mit der Bewegungsrichtung der Replikationsgabel überein, sodass nach einem einzigen Primer kontinuierlich synthetisiert werden kann. Am Folgestrang ist die Syntheserichtung der Gabelbewegung entgegengesetzt. Eine Synthese ist dort erst möglich, wenn die Helicase einen weiteren Abschnitt der Matrize freigelegt hat. Für jeden Abschnitt synthetisiert die Primase einen neuen RNA-Primer, den die DNA-Polymerase III bis zum vorherigen Fragment verlängert. So entstehen Okazaki-Fragmente. Die DNA-Polymerase I ersetzt anschließend die Primer durch DNA, und die DNA-Ligase schließt die verbleibenden Einzelstrangbrüche durch Phosphodiesterbindungen."
+   :"Zuerst trennt das Enzym Helicase die Wasserstoffbrücken zwischen den Basen. Die beiden DNA-Stränge lösen sich voneinander, und es entsteht eine Replikationsgabel. Jeder alte Strang dient als Matrize. Freie Nukleotide paaren komplementär mit den Basen des alten Strangs: A mit T und G mit C. Die DNA-Polymerase verknüpft die Nukleotide zu einem neuen Strang. Der Leitstrang entsteht ohne Unterbrechung, der Folgestrang in Stücken. Die Ligase verbindet diese Stücke. Das Ergebnis sind zwei gleiche DNA-Moleküle, die jeweils aus einem alten und einem neuen Strang bestehen. Diesen Vorgang nennt man semikonservative Replikation.";
+  const html=card("t6",6,g?"Diskontinuierliche Synthese erklären":m?"Ablauf beschreiben und erklären":"Den Ablauf beschreiben",
+   `<p>${m?"Beschreibe den Ablauf der DNA-Replikation (etwa 6–8 Sätze). Erkläre dabei, warum einer der beiden neuen Stränge in Stücken entsteht.":g?"Erkläre, warum der Folgestrang diskontinuierlich synthetisiert wird. Beziehe die Antiparallelität der DNA und die Arbeitsweise der DNA-Polymerase ein. Gehe auch darauf ein, wie die Fragmente zu einem durchgehenden Strang werden.":"Beschreibe den Ablauf der DNA-Replikation in eigenen Worten (etwa 5–7 Sätze). Verwende die Fachbegriffe aus dem Wortspeicher."}</p>
+   ${g?"":m?`<details class="help"><summary>Satzanfänge</summary><div class="starters" style="margin-top:8px"><span>Zuerst …</span><span>Jeder Elternstrang dient als …</span><span>Die DNA-Polymerase …</span><span>Da die Stränge antiparallel sind, …</span><span>Deshalb …</span><span>Das Ergebnis ist …</span></div></details>`:`<details class="help" open><summary>Satzanfänge</summary><div class="starters" style="margin-top:8px"><span>Zuerst …</span><span>Danach …</span><span>Dabei gilt die Regel …</span><span>Das Enzym … verknüpft …</span><span>Zum Schluss …</span><span>Das Ergebnis ist …</span></div></details>`}
+   <label for="t6-txt" class="flabel">Deine Antwort</label>
+   <textarea id="t6-txt" spellcheck="true"></textarea>
+   <p class="flabel">Verwendete Fachbegriffe (mindestens ${need})</p>
+   <div class="terms">${terms.map((t,i)=>`<span class="term" id="t6-term${i}">${t[0]}</span>`).join("")}</div>
+   <details class="sol"><summary>Musterlösung anzeigen (erst nach dem Schreiben)</summary><p>${sol}</p></details>`);
+  const bind=()=>{const ta=$("#t6-txt");const upd=()=>{const t=ta.value;let n=0;terms.forEach((tm,i)=>{const h=tm[1](t);$("#t6-term"+i).classList.toggle("hit",h);if(h)n++;});
+    const done=n>=need&&t.trim().length>=160;if(!!solved.t6!==done)mark("t6",done,"bearbeitet");};ta.addEventListener("input",upd);};
+  return [html,bind];
+}
+
+/* ---------- Aufgabe 7 Gym: Rechnung ---------- */
+function t7(){
+  const html=card("t7",7,"Dauer der Replikation bei <i>E. coli</i>",
+   `<div class="data"><span>Genom von <i>E. coli</i>: ca. 4,6 · 10⁶ Basenpaare, ringförmig, ein Replikationsursprung</span><span>Die Replikation verläuft vom Ursprung aus <b>bidirektional</b> (zwei Replikationsgabeln).</span><span>Syntheserate der DNA-Polymerase III: ca. 1000 Nukleotide pro Sekunde und Gabel</span></div>
+   <p>Berechne, wie viele Minuten die Replikation des gesamten Genoms dauert. Runde auf ganze Minuten.</p>
+   <div class="calc"><label for="t7-in">Ergebnis:</label><input id="t7-in" inputmode="decimal" autocomplete="off"><span>min</span></div>
+   ${checkBtn("t7")}`);
+  const bind=()=>{$("#t7-check").onclick=()=>{const v=parseFloat($("#t7-in").value.replace(",","."));const ok=v>=37&&v<=40;setF($("#t7-in"),ok);const a=attempt("t7");
+    let msg;if(ok)msg="4,6 · 10⁶ bp : 2 Gabeln = 2,3 · 10⁶ bp je Gabel; 2,3 · 10⁶ : 1000 s⁻¹ = 2300 s ≈ 38 min.";
+    else if(v>=75&&v<=80)msg="Du hast nur eine Replikationsgabel berücksichtigt. Die Replikation verläuft bidirektional.";
+    else if(isNaN(v))msg="Bitte gib eine Zahl ein.";
+    else msg="Prüfe deine Rechnung: Wie viele Basenpaare entfallen auf jede Gabel, und wie rechnest du Sekunden in Minuten um?";
+    if(!ok&&a>=2)msg+="<br>Lösung: 4,6 · 10⁶ : 2 : 1000 = 2300 s ≈ 38 min.";
+    fb("t7-fb",ok,msg);mark("t7",ok);};};
+  return [html,bind];
+}
+
+function buildTasks(){
+  solved={};tries={};
+  const list=level==="ok"?[t1(),t2(),t3(),t4(),t5gym(),t6(),t7()]:[t1(),t2(),t3(),t4(),t5rs(),t6()];
+  $("#tasks").innerHTML=list.map(x=>x[0]).join("");
+  list.forEach(x=>x[1]());
+  updProg();
+}
+
+/* ---------- Niveau ---------- */
+function setLevel(l){
+  level=l;document.body.dataset.level=l;
+  try{localStorage.setItem("rep-level",l);}catch(e){}
+  ["rs","gym","ok"].forEach(k=>$("#lvl-"+k).setAttribute("aria-pressed",String(k===l)));
+  stopPlay();cancelAnimationFrame(anim);
+  KF=l==="ok"?KF_G:KF_R;STEPS=l==="ok"?STEPS_G:l==="gym"?STEPS_M:STEPS_R;
+  showEnds=l!=="rs";$("#ends").checked=showEnds;
+  step=0;shown=Object.assign({},KF[0]);
+  buildDots();updPanel();render(shown);buildWords();buildTasks();
+  $("#rsnote").hidden=l==="ok";
+}
+document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{if(b.dataset.lvl!==level)setLevel(b.dataset.lvl);});
+setLevel(level);
+})();
+</script>
+
+</body></html>
