@@ -1,0 +1,1052 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Mitose im Zellzyklus · Variante B</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: Arbeitsplatz eines Fluoreszenzmikroskops – große Bühne für das Präparat, rechts das Protokoll (Zyklus, Zähler, Befund), darunter Aufträge, Test, Glossar */
+:root{
+  --bg:#eef2f0; --surface:#ffffff; --surface-2:#f6f9f7; --ink:#15201b; --muted:#56655f; --line:#cfd9d4;
+  --accent:#0d7454; --accent-ink:#ffffff; --accent-2:#a8306f;
+  --mat:#cf5426; --pat:#2a64c4;
+  --cyto:#e3eee8; --membrane:#33564a; --nucenv:#5f7a70; --nucleoplasm:#d5e5dd; --nucleolus:#7f8f88;
+  --spindle:#1a9466; --centro:#a8306f; --stage:#f9fbfa; --label:#24342d;
+  --ok:#17733a; --ok-bg:#e3f4e8; --bad:#b42318; --bad-bg:#fbe7e4;
+  --f-display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", Verdana, system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0d1311; --surface:#151e1b; --surface-2:#1a2521; --ink:#e3ece8; --muted:#9bada6; --line:#2a3833;
+  --accent:#48cc9a; --accent-ink:#06120d; --accent-2:#ee7cb6;
+  --mat:#f08c5e; --pat:#74a6ff;
+  --cyto:#16221e; --membrane:#8ab8a6; --nucenv:#7f9a91; --nucleoplasm:#1f2f29; --nucleolus:#5c6e67;
+  --spindle:#4fd09c; --centro:#ee7cb6; --stage:#0f1714; --label:#d6e4de;
+  --ok:#62d38f; --ok-bg:#12291c; --bad:#ff8574; --bad-bg:#2e1714;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0d1311; --surface:#151e1b; --surface-2:#1a2521; --ink:#e3ece8; --muted:#9bada6; --line:#2a3833;
+  --accent:#48cc9a; --accent-ink:#06120d; --accent-2:#ee7cb6;
+  --mat:#f08c5e; --pat:#74a6ff;
+  --cyto:#16221e; --membrane:#8ab8a6; --nucenv:#7f9a91; --nucleoplasm:#1f2f29; --nucleolus:#5c6e67;
+  --spindle:#4fd09c; --centro:#ee7cb6; --stage:#0f1714; --label:#d6e4de;
+  --ok:#62d38f; --ok-bg:#12291c; --bad:#ff8574; --bad-bg:#2e1714;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;padding-inline:16px;padding-block:0 48px}
+.wrap{max-width:1200px;margin-inline:auto}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(1.9rem,4.4vw,3rem);font-weight:700;letter-spacing:-.02em}
+h2{font-size:clamp(1.4rem,2.6vw,1.9rem);font-weight:700;letter-spacing:-.01em}
+h3{font-size:1.12rem;font-weight:700}
+p{margin:0}
+.eyebrow{font-family:var(--f-mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent)}
+.muted{color:var(--muted)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
+
+/* Kopf */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line);margin-inline:-16px;padding:10px 16px}
+.top-in{max-width:1200px;margin-inline:auto;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between}
+.brand{font-family:var(--f-display);font-weight:700;font-size:1.05rem}
+.brand span{color:var(--accent)}
+nav.links{display:flex;flex-wrap:wrap;gap:4px}
+nav.links a{color:var(--muted);text-decoration:none;font-size:.92rem;padding:5px 10px;border-radius:999px}
+nav.links a:hover{color:var(--ink);background:var(--surface)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--surface)}
+.seg button{border:0;background:transparent;padding:5px 13px;border-radius:999px;font-size:.88rem;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.hero{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:24px;align-items:end;padding-block:30px 22px}
+.hero p.lead{font-size:1.08rem;max-width:62ch;margin-top:12px}
+.hero .note{font-size:.92rem;color:var(--muted);border-left:3px solid var(--accent-2);padding-left:12px}
+@media (max-width:820px){.hero{grid-template-columns:1fr}}
+
+/* Simulation */
+section{scroll-margin-top:80px}
+.sim{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+@media (max-width:980px){.sim{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.stage{padding:10px;min-width:0}
+.stage-head{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:space-between;align-items:center;padding:4px 6px 10px}
+.phase-now{font-family:var(--f-display);font-size:1.45rem;font-weight:700}
+.phase-now small{font-family:var(--f-mono);font-size:.75rem;font-weight:400;color:var(--muted);margin-left:8px;letter-spacing:.04em}
+.toggles{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface-2);border-radius:999px;padding:4px 11px;font-size:.84rem}
+.chip[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:700}
+.canvas-box{position:relative;border-radius:8px;overflow:hidden;background:var(--stage);border:1px solid var(--line)}
+#cv{display:block;width:100%;height:auto;aspect-ratio:720/440;max-width:100%}
+.canvas-hint{position:absolute;left:10px;bottom:8px;font-size:.78rem;color:var(--muted);font-family:var(--f-mono);pointer-events:none}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.84rem;color:var(--muted);padding:8px 6px 0}
+.legend i{display:inline-block;width:18px;height:6px;border-radius:3px;margin-right:6px;vertical-align:middle}
+
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 4px 4px}
+.btn{border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:7px 12px;font-size:.92rem;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700;min-width:118px;justify-content:center}
+.speed{display:flex;align-items:center;gap:8px;font-size:.86rem;color:var(--muted);margin-left:auto}
+.speed output{font-family:var(--f-mono);min-width:3.2em;color:var(--ink)}
+input[type=range]{accent-color:var(--accent)}
+
+.timeline{padding:8px 4px 2px}
+.tl-label{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);font-family:var(--f-mono);margin-bottom:4px}
+.tl-bar{position:relative;display:flex;height:34px;border-radius:7px;overflow:hidden;border:1px solid var(--line)}
+.tl-bar button{border:0;border-right:1px solid var(--line);background:var(--surface-2);font-size:.74rem;padding:0 2px;color:var(--muted);min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.tl-bar button:last-child{border-right:0}
+.tl-bar button.inter{background:color-mix(in srgb,var(--accent) 9%,var(--surface-2))}
+.tl-bar button.cur{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.tl-bar .cursor{position:absolute;top:0;bottom:0;width:2px;background:var(--accent-2);pointer-events:none}
+#scrub{width:100%;margin-top:6px}
+
+
+/* Seitenspalte */
+.side{display:flex;flex-direction:column;gap:16px;min-width:0}
+.panel{padding:14px 16px}
+.panel h3{margin-bottom:8px}
+#wheel{width:100%;max-width:300px;display:block;margin-inline:auto}
+#wheel .seg-path{cursor:pointer}
+#wheel .seg-path:hover{opacity:.82}
+.counters{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ctr{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.ctr b{display:block;font-family:var(--f-mono);font-size:1.35rem;font-variant-numeric:tabular-nums;line-height:1.2}
+.ctr span{font-size:.78rem;color:var(--muted);line-height:1.25;display:block}
+.ctr.wide{grid-column:1/-1}
+.info p{margin-bottom:8px}
+.info ul{margin:6px 0 10px;padding-left:20px}
+.info li{margin-bottom:3px}
+.info .warn{background:var(--bad-bg);border-radius:8px;padding:8px 10px;font-size:.92rem;margin-top:8px}
+.info .warn strong{color:var(--bad)}
+.info .ober{border-top:1px dashed var(--line);margin-top:10px;padding-top:10px}
+.tag{display:inline-block;font-family:var(--f-mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--accent-2);color:var(--accent-2);border-radius:4px;padding:1px 6px;margin-bottom:6px}
+.term{border:0;background:none;padding:0;color:var(--accent);text-decoration:underline dotted;text-underline-offset:3px;font-weight:700}
+.struct-box{display:none;background:var(--surface-2);border:1px solid var(--accent);border-radius:8px;padding:10px 12px;margin-bottom:10px}
+.struct-box.show{display:block}
+.struct-box h4{margin:0 0 4px;font-family:var(--f-display);font-size:1rem}
+.close-x{float:right;border:0;background:none;color:var(--muted);font-size:.85rem}
+.termpop{position:fixed;z-index:50;max-width:min(340px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--accent);border-radius:10px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.18);font-size:.94rem}
+.termpop .gr{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);margin-bottom:6px}
+
+/* Phasenliste neben der Animation */
+.plist{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.pgroup{font-family:var(--f-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:12px 2px 3px}
+.pgroup:first-child{padding-top:2px}
+.phead{width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px;border:0;background:transparent;border-radius:7px;padding:6px 10px;text-align:left;font-family:var(--f-display);font-weight:500;font-size:1rem;color:var(--ink)}
+.phead:hover{background:var(--surface-2)}
+.pitem.cur .phead{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.phead .now{font-family:var(--f-mono);font-size:.66rem;font-weight:400;text-transform:uppercase;letter-spacing:.08em}
+.pbody{border-left:3px solid var(--accent);margin:6px 0 8px 10px;padding:2px 0 2px 10px;font-size:.95rem;line-height:1.45}
+.info .pbody ul{margin:0;padding-left:16px}
+.info .pbody li{margin-bottom:4px}
+.pbody .ober{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+details.warn{background:var(--bad-bg);border-radius:8px;padding:6px 10px;font-size:.9rem;margin-top:10px}
+details.warn summary{cursor:pointer;font-weight:700;color:var(--bad)}
+details.warn p{margin:6px 0 2px}
+.side .info{order:-1}
+
+/* Abschnitte unten */
+.block{padding-block:44px 8px}
+.block-head{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:baseline;justify-content:space-between;margin-bottom:16px}
+.block-head p{max-width:70ch;color:var(--muted)}
+.stages{display:grid;gap:18px}
+.stages>*,.task,.q{min-width:0}
+.stage-block h3{display:flex;gap:10px;align-items:baseline;margin-bottom:10px}
+.stage-block h3 .n{font-family:var(--f-mono);font-size:.8rem;color:var(--accent)}
+.tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:12px}
+.task{padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.task-top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.task-top .nr{font-family:var(--f-display);font-weight:700;font-size:1.05rem}
+.afb{font-family:var(--f-mono);font-size:.7rem;border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:var(--muted);white-space:nowrap}
+.afb.o{border-color:var(--accent-2);color:var(--accent-2)}
+.op{font-weight:700;color:var(--accent)}
+.helps{display:flex;flex-wrap:wrap;gap:6px}
+.helps button{font-size:.8rem;border:1px dashed var(--line);background:transparent;border-radius:6px;padding:3px 9px;color:var(--muted)}
+.helps button[aria-expanded="true"]{border-style:solid;border-color:var(--accent);color:var(--accent)}
+.helpbox{background:var(--surface-2);border-radius:8px;padding:8px 10px;font-size:.92rem}
+.wordbank{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.wordbank span{border:1px solid var(--line);border-radius:5px;padding:1px 7px;font-size:.86rem;background:var(--surface)}
+table.data{border-collapse:collapse;font-size:.9rem;margin-top:4px;font-variant-numeric:tabular-nums}
+table.data th,table.data td{border:1px solid var(--line);padding:4px 9px;text-align:left}
+table.data th{background:var(--surface-2)}
+.tablewrap{overflow-x:auto}
+
+/* Test */
+.quiz{display:grid;gap:12px}
+.q{padding:14px 16px}
+.q .qhead{display:flex;justify-content:space-between;gap:10px;margin-bottom:8px;align-items:baseline}
+.q .qtext{font-weight:700}
+.opts{display:grid;gap:6px}
+.opts label{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;padding:7px 10px;cursor:pointer;background:var(--surface-2)}
+.opts label:hover{border-color:var(--accent)}
+.opts input{margin-top:4px;accent-color:var(--accent)}
+.order-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.order-list li{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:5px 8px;background:var(--surface-2)}
+.order-list li .pos{font-family:var(--f-mono);color:var(--muted);width:1.6em}
+.order-list li .lbl{flex:1}
+.order-list li button{border:1px solid var(--line);background:var(--surface);border-radius:6px;width:32px;height:30px}
+.numin{font:inherit;font-family:var(--f-mono);width:8em;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink)}
+.qcanvas{width:100%;max-width:420px;aspect-ratio:720/440;height:auto;border:1px solid var(--line);border-radius:8px;display:block;margin-bottom:8px;background:var(--stage)}
+.fb{margin-top:10px;border-radius:8px;padding:8px 10px;font-size:.93rem;display:none}
+.fb.show{display:block}
+.fb.ok{background:var(--ok-bg)} .fb.ok strong{color:var(--ok)}
+.fb.no{background:var(--bad-bg)} .fb.no strong{color:var(--bad)}
+.quiz-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}
+.score{font-family:var(--f-display);font-size:1.25rem;font-weight:700}
+
+/* Glossar */
+.gloss{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));gap:10px}
+.gl{padding:11px 14px}
+.gl h4{margin:0;font-family:var(--f-display);font-size:1.02rem}
+.gl .gr{font-family:var(--f-mono);font-size:.76rem;color:var(--muted);margin:2px 0 6px}
+.gl p{font-size:.92rem}
+.gl.flash{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+#glSearch{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);width:min(100%,300px)}
+
+/* Lehrkräfte */
+details.teach{padding:0}
+details.teach summary{cursor:pointer;padding:14px 16px;font-family:var(--f-display);font-weight:700;font-size:1.1rem}
+.teach-body{padding:0 16px 16px;display:grid;gap:14px;max-width:80ch}
+.teach-body h4{margin:6px 0 2px;font-family:var(--f-display)}
+.teach-body ul{margin:4px 0;padding-left:20px}
+footer{margin-top:40px;font-size:.84rem;color:var(--muted)}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important}}
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">Mitose <span>im Zellzyklus</span></div>
+    <nav class="links" aria-label="Abschnitte">
+      <a href="#simulation">Simulation</a>
+      <a href="#auftraege">Arbeitsaufträge</a>
+      <a href="#test">Test</a>
+      <a href="#glossar">Glossar</a>
+      <a href="#lehrkraefte">Für Lehrkräfte</a>
+    </nav>
+    <div class="seg" role="group" aria-label="Niveau wählen">
+      <button type="button" id="lvlSek" aria-pressed="true">Sek I</button>
+      <button type="button" id="lvlOber" aria-pressed="false">Oberstufe</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Biologie · Zellbiologie · Sek I und Sek II</div>
+      <h1>Wie aus einer Zelle zwei identische Zellen werden</h1>
+      <p class="lead">Die Animation zeigt eine tierische Zelle mit vier Chromosomen (2n = 4) durch den ganzen Zellzyklus. Halte die Animation an, klicke auf Strukturen in der Zelle und auf <button type="button" class="term" data-term="Chromosom">markierte Begriffe</button>, um Erklärungen zu sehen.</p>
+    </div>
+    <p class="note">Wähle oben dein Niveau. <b>Sek I</b> zeigt die Grundlagen. <b>Oberstufe</b> ergänzt Prometaphase, Kontrollpunkte und molekulare Steuerung sowie zusätzliche Aufgaben und Testfragen.</p>
+  </div>
+
+  <section id="simulation" aria-label="Simulation">
+    <div class="sim">
+      <div class="card stage">
+        <div class="stage-head">
+          <div class="phase-now" id="phaseNow" aria-live="polite">G1-Phase <small>Interphase</small></div>
+          <div class="toggles">
+            <button type="button" class="chip" id="tLabels" aria-pressed="true">Beschriftung</button>
+            <button type="button" class="chip" id="tFluo" aria-pressed="false">Fluoreszenz-Ansicht</button>
+          </div>
+        </div>
+        <div class="canvas-box">
+          <canvas id="cv" width="720" height="440" aria-label="Animierte Zelle im Zellzyklus"></canvas>
+          <div class="canvas-hint">Klick auf eine Struktur zeigt Details</div>
+        </div>
+        <div class="legend" id="legend">
+          <span><i style="background:var(--mat)"></i>Chromosom von der Mutter</span>
+          <span><i style="background:var(--pat)"></i>Chromosom vom Vater</span>
+          <span><i style="background:var(--spindle)"></i>Mikrotubuli (Spindel)</span>
+          <span><i style="background:var(--centro)"></i>Centrosom</span>
+          <span>Die Farben sind ein Modell. In echten Zellen haben Chromosomen keine Farbe.</span>
+        </div>
+
+        <div class="controls">
+          <button type="button" class="btn" id="bPrev" aria-label="Vorherige Phase">&#9664;&#9664; Phase</button>
+          <button type="button" class="btn primary" id="bPlay">Pause</button>
+          <button type="button" class="btn" id="bNext" aria-label="Nächste Phase">Phase &#9654;&#9654;</button>
+          <label class="speed" for="speed">Tempo <input type="range" id="speed" min="0.25" max="3" step="0.25" value="1"><output id="speedOut">1×</output></label>
+        </div>
+
+        <div class="timeline">
+          <div class="tl-label"><span>Ablauf in der Animation (nicht maßstabsgetreu)</span><span id="tlPct">0 %</span></div>
+          <div class="tl-bar" id="tlBar"></div>
+          <input type="range" id="scrub" min="0" max="1000" value="0" aria-label="Zeitpunkt im Zellzyklus wählen">
+        </div>
+
+      </div>
+
+      <aside class="side">
+        <div class="card panel info" id="info">
+          <div class="struct-box" id="structBox" role="region" aria-live="polite"></div>
+          <div class="eyebrow" style="margin-bottom:6px">Phasen in Stichpunkten</div>
+          <div id="phaseInfo"></div>
+        </div>
+        <div class="card panel">
+          <h3>Zähler für diese Zelle</h3>
+          <div class="counters">
+            <div class="ctr"><b id="cChr">4</b><span>Chromosomen</span></div>
+            <div class="ctr"><b id="cCtd">1</b><span>Chromatiden pro Chromosom</span></div>
+            <div class="ctr wide"><b id="cTot">4</b><span>Chromatiden insgesamt</span></div>
+            <div class="ctr wide"><span id="cNote">Jedes Chromosom besteht aus einer Chromatide.</span></div>
+          </div>
+        </div>
+        <div class="card panel">
+          <h3>Zellzyklus mit echten Zeitanteilen</h3>
+          <svg id="wheel" viewBox="0 0 300 300" role="img" aria-label="Zellzyklus-Rad"></svg>
+          <p class="muted" style="font-size:.85rem;margin-top:6px">Richtwerte für eine sich schnell teilende menschliche Zelle in Kultur (etwa 24 h). Andere Zelltypen weichen stark ab.</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="auftraege" class="block">
+    <div class="block-head">
+      <h2>Arbeitsaufträge</h2>
+      <p>Arbeite in der Reihenfolge der drei Schritte. Bei jeder Aufgabe gibt es Hilfen. Öffne eine Hilfe erst, wenn du allein nicht weiterkommst.</p>
+    </div>
+    <div class="stages" id="taskStages"></div>
+  </section>
+
+  <section id="test" class="block">
+    <div class="block-head">
+      <h2>Test: Überprüfe dein Wissen</h2>
+      <p>Bearbeite zuerst alle Fragen. Dann klicke auf „Auswerten“. Die Ergebnisse werden nicht gespeichert.</p>
+    </div>
+    <div class="quiz" id="quiz"></div>
+    <div class="quiz-bar">
+      <button type="button" class="btn primary" id="qEval">Auswerten</button>
+      <button type="button" class="btn" id="qReset">Neu starten</button>
+      <span class="score" id="qScore" aria-live="polite"></span>
+    </div>
+  </section>
+
+  <section id="glossar" class="block">
+    <div class="block-head">
+      <h2>Glossar</h2>
+      <input type="search" id="glSearch" placeholder="Begriff suchen" aria-label="Glossar durchsuchen">
+    </div>
+    <p class="muted" style="margin-bottom:12px">Zu jedem Nomen stehen Artikel und Plural. In Klammern steht das englische Wort.</p>
+    <div class="gloss" id="gloss"></div>
+  </section>
+
+  <section id="lehrkraefte" class="block">
+    <details class="card teach">
+      <summary>Für Lehrkräfte: didaktischer Kommentar und Erwartungshorizont</summary>
+      <div class="teach-body" id="teachBody"></div>
+    </details>
+  </section>
+
+  <footer>Modell einer tierischen Körperzelle mit 2n = 4. Zeitanteile, Größen und Bewegungen sind vereinfacht dargestellt.</footer>
+</div>
+
+<div class="termpop" id="termPop" hidden role="dialog" aria-label="Begriffserklärung"></div>
+
+<script>
+/* ===================== Inhalte: Phasen ===================== */
+const PHASES = [
+ {id:'g1', name:'G1-Phase', group:'Interphase', dur:12, short:'G1'},
+ {id:'s',  name:'S-Phase',  group:'Interphase', dur:12, short:'S'},
+ {id:'g2', name:'G2-Phase', group:'Interphase', dur:8,  short:'G2'},
+ {id:'pro', name:'Prophase', group:'Mitose', dur:12, short:'Pro'},
+ {id:'prometa', name:'Prometaphase', group:'Mitose', dur:10, short:'Prometa'},
+ {id:'meta', name:'Metaphase', group:'Mitose', dur:10, short:'Meta'},
+ {id:'ana', name:'Anaphase', group:'Mitose', dur:10, short:'Ana'},
+ {id:'telo', name:'Telophase', group:'Mitose', dur:12, short:'Telo'},
+ {id:'zyto', name:'Zytokinese', group:'Zellteilung', dur:10, short:'Zyto'}
+];
+const TOTAL = PHASES.reduce((a,p)=>a+p.dur,0);
+let acc=0; PHASES.forEach(p=>{p.start=acc; acc+=p.dur;});
+
+const PINFO = {
+ g1:{
+  sek:['Zelle <b>wächst</b> nach der Teilung','bildet Proteine und neue [[Zellorganell|Zellorganellen]]','DNA liegt locker als [[Chromatin]] im [[Zellkern]] vor','jedes [[Chromosom]] besteht aus <b>1</b> [[Chromatide]]','1 [[Centrosom]]'],
+  ober:['Restriktionspunkt (späte G1): Entscheidung über den Eintritt in die S-Phase','Wachstumsfaktoren → Cyclin D–CDK4/6 → Phosphorylierung von Rb → Transkriptionsfaktor E2F wird frei → Gene der S-Phase werden exprimiert','ohne Teilungssignal: Übergang in die [[G0-Phase]] (z. B. die meisten Nervenzellen)'],
+  fehler:'„Die Interphase ist eine Ruhephase.“ Das ist <b>falsch</b>. Die Zelle wächst, betreibt Stoffwechsel und verdoppelt in der S-Phase ihre DNA.'
+ },
+ s:{
+  sek:['[[DNA-Replikation]]: die DNA wird <b>verdoppelt</b>','danach: jedes Chromosom aus <b>2</b> identischen [[Schwesterchromatiden]]','Schwesterchromatiden am [[Centromer]] verbunden','Zahl der Chromosomen bleibt gleich (4)','[[Centrosom]] wird verdoppelt'],
+  ober:['semikonservative Replikation an vielen Replikationsursprüngen gleichzeitig','Start durch Cyclin E/A–CDK2; jeder Ursprung wird nur einmal pro Zyklus aktiviert (Lizenzierung)','neue Histone verpacken die Tochter-DNA','[[Cohesin]] hält die Schwesterchromatiden ab ihrer Entstehung zusammen'],
+  fehler:'„In der S-Phase verdoppelt sich die Zahl der Chromosomen.“ Das ist <b>falsch</b>. Die Zahl der Chromatiden verdoppelt sich. Die Zahl der Chromosomen (Zahl der Centromere) bleibt gleich.'
+ },
+ g2:{
+  sek:['Zelle <b>wächst weiter</b>','Vorbereitung der Kernteilung, z. B. Bildung von Proteinen für den [[Spindelapparat]]','2 Centrosomen liegen nebeneinander','Chromosomen aus 2 Chromatiden, noch nicht kondensiert'],
+  ober:['G2/M-[[Kontrollpunkt]]: Ist die DNA vollständig und fehlerfrei repliziert?','bei DNA-Schäden: Stopp des Zyklus (u. a. über p53 und die Kinasen ATM/ATR)','danach Aktivierung von Cyclin B–CDK1 (MPF) → Beginn der Mitose'],
+  fehler:'„Chromosomen gibt es nur während der Mitose.“ Das ist <b>falsch</b>. Die Chromosomen sind immer da. In der Interphase sind sie nur so locker, dass man sie im Lichtmikroskop nicht einzeln erkennt.'
+ },
+ pro:{
+  sek:['Chromosomen <b>kondensieren</b>: DNA wird stark aufgewickelt und verkürzt','Chromosomen werden im Lichtmikroskop sichtbar (2 Chromatiden)','[[Nucleolus]] löst sich auf','Centrosomen bewegen sich zu entgegengesetzten Seiten des Kerns','[[Spindelapparat]] aus [[Mikrotubuli]] wird aufgebaut','[[Kernhülle]] ist noch vorhanden'],
+  ober:['Kondensation durch Condensin-Komplexe (Bildung von Chromatinschleifen)','Trennung der Centrosomen durch Motorproteine (u. a. Kinesin-5) zwischen überlappenden Mikrotubuli','Mikrotubuli wechseln ständig zwischen Wachstum und Verkürzung (dynamische Instabilität)'],
+  fehler:'„In der Prophase entstehen die Chromosomen.“ Das ist <b>falsch</b>. Sie werden nur durch die Kondensation sichtbar. Ihre zwei Chromatiden gibt es schon seit der S-Phase.'
+ },
+ prometa:{
+  sek:['[[Kernhülle]] <b>zerfällt</b> in kleine Bläschen','Mikrotubuli erreichen die Chromosomen','Anheftung der Mikrotubuli am [[Kinetochor]]','die beiden Schwesterchromatiden werden mit <b>verschiedenen</b> Polen verbunden','Chromosomen werden in Richtung Zellmitte bewegt','<i>in vielen Schulbüchern: Teil der späten Prophase</i>'],
+  ober:['CDK1 phosphoryliert die Lamine → Kernlamina depolymerisiert → Kernhülle zerfällt in Vesikel','„search and capture“: Mikrotubuli treffen durch dynamische Instabilität zufällig auf Kinetochore','korrekt: bipolare (amphitelische) Anheftung; Fehlanheftungen werden durch die Kinase Aurora B gelöst'],
+  fehler:'„Die Mikrotubuli suchen gezielt die Chromosomen.“ Diese Formulierung ist eine Vermenschlichung. Richtig ist: Mikrotubuli wachsen und verkürzen sich ständig, stabil bleiben nur jene, die ein Kinetochor getroffen haben.'
+ },
+ meta:{
+  sek:['Chromosomen <b>maximal kondensiert</b>','Anordnung in einer Ebene in der Zellmitte: [[Äquatorialebene]]','jede Chromatide ist mit einem Pol verbunden','jedes Chromosom liegt einzeln, <b>keine</b> Paare','beste Phase zum Zählen der Chromosomen ([[Karyogramm]])'],
+  ober:['Spindel-[[Kontrollpunkt]] (SAC): Anaphase erst, wenn alle Kinetochore korrekt angeheftet sind','freie Kinetochore → Mad2 hemmt APC/C–Cdc20','alle Kinetochore unter Spannung → APC/C wird aktiv'],
+  fehler:'„In der Metaphase liegen die homologen Chromosomen paarweise nebeneinander.“ Das ist <b>falsch</b>. Das geschieht nur in der Meiose I. In der Mitose ordnet sich jedes Chromosom einzeln an.'
+ },
+ ana:{
+  sek:['Verbindung der Schwesterchromatiden wird <b>gelöst</b>','Chromatiden: gerichtete Bewegung zu <b>entgegengesetzten Polen</b>','das Centromer geht voran','jede Chromatide = eigenes Chromosom (1-Chromatid-Chromosom)','an jedem Pol: vollständiger Chromosomensatz','Zelle wird länger'],
+  ober:['APC/C → Abbau von Securin → [[Separase]] wird aktiv → spaltet [[Cohesin]]','Anaphase A: Kinetochor-Mikrotubuli verkürzen sich durch Depolymerisation, Chromatiden bleiben angeheftet','Anaphase B: Polmikrotubuli werden durch Motorproteine gegeneinander verschoben → Pole entfernen sich voneinander'],
+  fehler:'„Die Spindelfasern ziehen die Chromatiden wie Seile.“ Das ist stark vereinfacht. Die Bewegung entsteht vor allem durch den Abbau (Depolymerisation) der Mikrotubuli und durch Motorproteine.'
+ },
+ telo:{
+  sek:['an jedem Pol: 4 Chromosomen','neue [[Kernhülle]] um jeden Chromosomensatz → <b>2 Zellkerne</b>','Chromosomen <b>dekondensieren</b> zu [[Chromatin]]','neue Nucleoli entstehen','[[Spindelapparat]] wird abgebaut','[[Teilungsfurche]] beginnt'],
+  ober:['APC/C baut Cyclin B ab → CDK1-Aktivität sinkt','Phosphatasen dephosphorylieren die Lamine → Kernhülle und Kernporen werden neu gebildet'],
+  fehler:'„Mit der Telophase ist die Zelle geteilt.“ Das ist <b>falsch</b>. Die Mitose ist nur die <b>Kernteilung</b>. Die Teilung des Zellplasmas ist die Zytokinese.'
+ },
+ zyto:{
+  sek:['[[Zytokinese]]: Teilung des <b>Zellplasmas</b>','Ring aus Proteinfasern schnürt die Zelle in der Mitte ein ([[Teilungsfurche]])','Ergebnis: <b>2 genetisch identische</b> [[Tochterzelle|Tochterzellen]]','jede Tochterzelle: 4 Chromosomen aus je 1 Chromatide','danach: G1-Phase der Tochterzellen'],
+  ober:['kontraktiler Ring aus Actin- und Myosin-II-Filamenten; Lage durch die Spindelmitte festgelegt','Abszission: Trennung der letzten Plasmabrücke (Midbody) durch ESCRT-III-Proteine','Pflanzenzellen: Zellplatte aus Golgi-Vesikeln (Phragmoplast) statt Teilungsfurche'],
+  fehler:'„Bei der Mitose entstehen Zellen mit halbem Chromosomensatz.“ Das ist <b>falsch</b>. Das gilt für die Meiose. Nach der Mitose haben die Tochterzellen dieselbe Chromosomenzahl wie die Ausgangszelle.'
+ }
+};
+
+
+/* ===================== Strukturen (Klick in die Zelle) ===================== */
+const STRUCT = {
+ membrane:{t:'Zellmembran', d:'Die Zellmembran begrenzt die Zelle. Bei der Zytokinese wird sie in der Zellmitte durch einen Ring aus Actin- und Myosinfilamenten eingeschnürt.'},
+ cyto:{t:'Cytoplasma', d:'Das Zellplasma mit Cytosol und Zellorganellen. Es wird bei der Zytokinese auf die beiden Tochterzellen verteilt. In der Animation sind die Organellen nicht dargestellt.'},
+ env:{t:'Kernhülle', d:'Doppelte Membran um den Zellkern mit Kernporen. Sie zerfällt in der Prometaphase und wird in der Telophase um jeden Chromosomensatz neu gebildet.'},
+ nucleolus:{t:'Nucleolus (Kernkörperchen)', d:'Ort der Bildung der ribosomalen RNA und der Ribosomen-Untereinheiten. Er löst sich in der Prophase auf und entsteht in der Telophase neu.'},
+ centro:{t:'Centrosom', d:'Organisationszentrum der Mikrotubuli in tierischen Zellen, mit zwei Centriolen. Es wird in der S-Phase verdoppelt. Die beiden Centrosomen bilden die Pole des Spindelapparats. Pflanzenzellen haben keine Centrosomen.'},
+ spindle:{t:'Spindelapparat', d:'Aus Mikrotubuli (Röhrchen aus dem Protein Tubulin). Kinetochor-Mikrotubuli verbinden Pole und Chromosomen, Polmikrotubuli überlappen in der Zellmitte, Astralmikrotubuli strahlen zur Zellmembran.'},
+ equator:{t:'Äquatorialebene', d:'Gedachte Ebene in der Mitte zwischen den beiden Polen. In der Metaphase liegen die Centromere aller Chromosomen in dieser Ebene. Sie ist keine echte Struktur.'},
+ furrow:{t:'Teilungsfurche', d:'Einschnürung der Zellmembran bei tierischen Zellen. Sie entsteht durch einen kontraktilen Ring aus Actin und Myosin unter der Membran.'}
+};
+
+/* ===================== Glossar (DaZ: Artikel, Plural, Englisch) ===================== */
+const GLOSS = [
+ ['Zellzyklus','der','die Zellzyklen','cell cycle','Die regelmäßige Abfolge von Interphase (G1, S, G2) und M-Phase (Mitose und Zytokinese) bei sich teilenden Zellen.'],
+ ['Interphase','die','die Interphasen','interphase','Der Abschnitt zwischen zwei Teilungen: G1-, S- und G2-Phase. Die Zelle wächst und verdoppelt ihre DNA.'],
+ ['G0-Phase','die','–','G0 phase','Zustand, in dem eine Zelle sich nicht mehr teilt, aber voll aktiv ist, z. B. die meisten Nervenzellen.'],
+ ['Mitose','die','die Mitosen','mitosis','Die Kernteilung. Aus einem Zellkern entstehen zwei Zellkerne mit identischem Erbgut. Phasen: Prophase, (Prometaphase), Metaphase, Anaphase, Telophase.'],
+ ['Zytokinese','die','die Zytokinesen','cytokinesis','Die Teilung des Zellplasmas nach der Kernteilung. Aus einer Zelle entstehen zwei Tochterzellen.'],
+ ['Tochterzelle','die','die Tochterzellen','daughter cell','Eine der beiden Zellen, die bei einer Zellteilung entstehen.'],
+ ['Zellkern','der','die Zellkerne','nucleus','Organell mit dem größten Teil der DNA, umgeben von der Kernhülle.'],
+ ['Kernhülle','die','die Kernhüllen','nuclear envelope','Doppelmembran mit Poren um den Zellkern.'],
+ ['Nucleolus','der','die Nucleoli','nucleolus','Kernkörperchen. Hier werden Bestandteile der Ribosomen gebildet.'],
+ ['Zellorganell','das','die Zellorganellen','organelle','Abgegrenzter Bereich in der Zelle mit einer bestimmten Funktion, z. B. Mitochondrium.'],
+ ['Chromatin','das','–','chromatin','DNA mit Proteinen (vor allem Histonen) in lockerer Form, wie sie in der Interphase vorliegt.'],
+ ['Chromosom','das','die Chromosomen','chromosome','Ein DNA-Molekül mit Proteinen. Es kann aus einer Chromatide oder aus zwei Chromatiden bestehen. Man zählt Chromosomen an der Zahl der Centromere.'],
+ ['Chromatide','die','die Chromatiden','chromatid','Ein DNA-Doppelstrang mit Proteinen; eine „Hälfte“ eines 2-Chromatid-Chromosoms.'],
+ ['Schwesterchromatiden','die (Pl.)','–','sister chromatids','Die zwei identischen Chromatiden eines Chromosoms. Sie entstehen bei der DNA-Replikation.'],
+ ['Centromer','das','die Centromere','centromere','Einschnürung des Chromosoms, an der die Schwesterchromatiden verbunden sind.'],
+ ['Kinetochor','das','die Kinetochore','kinetochore','Proteinkomplex am Centromer. Hier heften die Mikrotubuli an.'],
+ ['Centrosom','das','die Centrosomen','centrosome','Organisationszentrum der Mikrotubuli in tierischen Zellen. Es bildet einen Pol des Spindelapparats.'],
+ ['Mikrotubuli','die (Pl.)','Sg.: der Mikrotubulus','microtubules','Röhrchen aus dem Protein Tubulin. Sie können sich schnell verlängern und verkürzen.'],
+ ['Spindelapparat','der','die Spindelapparate','mitotic spindle','Gesamtheit der Mikrotubuli zwischen den Polen. Er verteilt die Chromatiden auf die Tochterkerne.'],
+ ['Äquatorialebene','die','die Äquatorialebenen','metaphase plate','Gedachte Ebene in der Zellmitte, in der die Chromosomen in der Metaphase liegen.'],
+ ['Teilungsfurche','die','die Teilungsfurchen','cleavage furrow','Einschnürung der Zellmembran bei der Zytokinese tierischer Zellen.'],
+ ['DNA-Replikation','die','die DNA-Replikationen','DNA replication','Die Verdopplung der DNA in der S-Phase. Danach gibt es von jedem DNA-Molekül zwei identische Kopien.'],
+ ['homologe Chromosomen','die (Pl.)','–','homologous chromosomes','Zwei Chromosomen mit denselben Genen an denselben Orten: eines von der Mutter, eines vom Vater.'],
+ ['diploid','Adjektiv','–','diploid','Mit zwei Chromosomensätzen (2n). Körperzellen des Menschen: 2n = 46.'],
+ ['Karyogramm','das','die Karyogramme','karyogram','Geordnete Darstellung aller Chromosomen einer Zelle, meist aus Metaphase-Chromosomen.'],
+ ['Kontrollpunkt','der','die Kontrollpunkte','checkpoint','Stelle im Zellzyklus, an der die Zelle prüft, ob der nächste Schritt beginnen darf.'],
+ ['Cohesin','das','die Cohesine','cohesin','Ringförmiger Proteinkomplex, der die Schwesterchromatiden zusammenhält.'],
+ ['Separase','die','die Separasen','separase','Enzym (Protease), das Cohesin spaltet und so die Anaphase auslöst.'],
+ ['Cyclin','das','die Cycline','cyclin','Regulatorisches Protein. Zusammen mit einer CDK (Cyclin-abhängige Kinase) steuert es den Zellzyklus.']
+];
+</script>
+
+<script>
+/* ===================== Arbeitsaufträge ===================== */
+const TASKS = [
+ {n:'Schritt 1', title:'Orientieren', tasks:[
+  {nr:'1', afb:'AFB I', lvl:'all', text:'Schalte die <b>Beschriftung</b> aus. Sieh dir die Animation einmal vollständig an. <span class="op">Beschreibe</span> in vier bis sechs Sätzen, was mit der Zelle geschieht.',
+   helps:[{l:'Satzbausteine', h:'Zuerst … · Danach … · Gleichzeitig … · Am Ende … · Man kann beobachten, dass …'},
+          {l:'Wortliste', w:['die Teilungsfurche','sich verdoppeln','kondensieren','die Tochterzelle','der Zellkern','sichtbar werden','sich teilen']}]},
+  {nr:'2', afb:'AFB II', lvl:'all', text:'<span class="op">Vergleiche</span> die Dauer der Phasen im <b>Zellzyklus-Rad</b> mit der Dauer in der Animation. <span class="op">Erkläre</span>, warum die Animation die Zeitanteile verändert.',
+   helps:[{l:'Hilfe 1', h:'Lies die Stunden im Rad ab. Wie viel Prozent von 24 h dauert die M-Phase?'},
+          {l:'Hilfe 2', h:'Überlege: Was könntest du von der Mitose sehen, wenn sie in der Animation nur 4 % der Zeit dauern würde?'},
+          {l:'Satzbausteine', h:'Im Rad dauert … etwa … Stunden. · In der Animation … · Das ist sinnvoll, weil … · Ein Nachteil ist, dass …'}]}
+ ]},
+ {n:'Schritt 2', title:'Erarbeiten', tasks:[
+  {nr:'3', afb:'AFB I', lvl:'all', text:'Lege in deinem Heft eine Tabelle mit den Spalten <i>Phase</i>, <i>Chromosomen</i>, <i>Kernhülle</i>, <i>Spindelapparat</i> an. <span class="op">Stelle</span> die Phasen der Mitose in der Tabelle <span class="op">dar</span>. Nutze die Stichpunkte rechts neben der Animation.',
+   helps:[{l:'Hilfe 1', h:'Halte die Animation an und springe mit „Phase ▶▶“ von Phase zu Phase.'},
+          {l:'Wortliste', w:['zerfällt','in der Äquatorialebene','wird abgebaut','dekondensieren','wird neu gebildet','werden getrennt','wird aufgebaut','kondensieren']}]},
+  {nr:'4', afb:'AFB I–II', lvl:'all', text:'Beobachte die <b>Zähler</b>. <span class="op">Bestimme</span> für G1, G2, Metaphase, späte Anaphase und nach der Zytokinese: die Zahl der Chromosomen, die Zahl der Chromatiden pro Chromosom und die Gesamtzahl der Chromatiden. <span class="op">Erkläre</span> die Veränderung in der Anaphase.',
+   helps:[{l:'Hilfe 1', h:'Chromosomen zählt man an den Centromeren. Ein Chromosom kann aus einer oder aus zwei Chromatiden bestehen.'},
+          {l:'Hilfe 2', h:'In der Anaphase wird jede Chromatide zu einem eigenen Chromosom. Die Zahl der Chromatiden in der Zelle ändert sich dabei nicht.'}]},
+  {nr:'5', afb:'AFB II', lvl:'all', text:'<span class="op">Erkläre</span>, warum die beiden Tochterzellen genetisch identisch sind. Gehe dabei auf die S-Phase und die Anaphase ein. Nutze die Farben der Chromosomen als Beleg.',
+   helps:[{l:'Hilfe 1', h:'Was passiert mit der DNA in der S-Phase? Wie sehen die beiden Schwesterchromatiden aus?'},
+          {l:'Hilfe 2', h:'Verfolge ein orangefarbenes Chromosom: Wohin kommen seine beiden Chromatiden in der Anaphase?'},
+          {l:'Satzbausteine', h:'In der S-Phase entsteht … · Die beiden Chromatiden sind … · In der Anaphase wird … · Deshalb erhält jede Tochterzelle …'}]},
+ ]},
+ {n:'Schritt 3', title:'Vertiefen und anwenden', tasks:[
+  {nr:'6', afb:'AFB III', lvl:'all', text:'Die Interphase wird in manchen Texten „Ruhephase“ genannt. <span class="op">Beurteile</span> diese Bezeichnung.',
+   helps:[{l:'Hilfe 1', h:'Sammle, was in G1, S und G2 in der Zelle geschieht.'},
+          {l:'Satzbausteine', h:'Für die Bezeichnung spricht, dass … · Dagegen spricht, dass … · Insgesamt halte ich die Bezeichnung für …, weil …'}]},
+  {nr:'7', afb:'AFB II', lvl:'all', text:'In einem Präparat aus der Wurzelspitze einer Küchenzwiebel wurden 500 Zellen ausgezählt (Beispieldaten, siehe Tabelle). <span class="op">Berechne</span> den Mitoseindex (Anteil der Zellen in Mitose). Nimm an, dass ein Zellzyklus 20 h dauert, und <span class="op">berechne</span> die Dauer jeder Phase.<div class="tablewrap"><table class="data"><tr><th>Interphase</th><th>Prophase</th><th>Metaphase</th><th>Anaphase</th><th>Telophase</th></tr><tr><td>412</td><td>46</td><td>18</td><td>9</td><td>15</td></tr></table></div>',
+   helps:[{l:'Hilfe 1', h:'Mitoseindex = Zahl der Zellen in Mitose ÷ Zahl aller Zellen · 100 %'},
+          {l:'Hilfe 2', h:'Je länger eine Phase dauert, desto mehr Zellen findet man in ihr. Dauer einer Phase ≈ (Zellen in der Phase ÷ alle Zellen) · 20 h'}]},
+  {nr:'8', afb:'AFB III', lvl:'ober', text:'Colchicin bindet an Tubulin und verhindert die Bildung von Mikrotubuli. <span class="op">Stelle</span> eine begründete <span class="op">Hypothese auf</span>, in welcher Phase sich behandelte Zellen anhäufen. <span class="op">Erläutere</span> die Rolle des Spindelkontrollpunkts und <span class="op">beurteile</span>, warum Colchicin für die Herstellung von Karyogrammen und in der Pflanzenzüchtung (Polyploidie) genutzt wird.',
+   helps:[{l:'Hilfe 1', h:'Ohne Mikrotubuli gibt es keine Anheftung an die Kinetochore. Was „meldet“ ein freies Kinetochor an APC/C?'},
+          {l:'Hilfe 2', h:'Wenn Zellen nach langer Zeit doch ohne Chromatidenverteilung weiterlaufen, wie viele Chromosomensätze liegen dann in einem Kern?'}]},
+  {nr:'9', afb:'AFB III', lvl:'ober', text:'Mutationen in Genen für Kontrollpunkt-Proteine (z. B. p53) findet man in vielen Tumoren. <span class="op">Erläutere</span> den Zusammenhang zwischen einem fehlenden Kontrollpunkt, Aneuploidie und unkontrollierter Zellvermehrung.',
+   helps:[{l:'Hilfe 1', h:'Lies die Oberstufen-Texte zu G1, G2 und Metaphase.'},
+          {l:'Hilfe 2', h:'Aneuploidie bedeutet: Die Zelle hat eine falsche Zahl von Chromosomen. Wie kann sie bei einer fehlerhaften Anaphase entstehen?'}]}
+ ]}
+];
+
+/* ===================== Testfragen ===================== */
+/* type: mc | order | num | img ; lvl: all | ober */
+const QUESTIONS = [
+ {id:'q1', lvl:'all', type:'mc', q:'In welcher Phase wird die DNA verdoppelt?', o:['G1-Phase','S-Phase','G2-Phase','Prophase'], a:1,
+  ex:'In der S-Phase (Synthesephase) findet die DNA-Replikation statt. Danach besteht jedes Chromosom aus zwei Chromatiden.'},
+ {id:'q2', lvl:'all', type:'order', q:'Bringe die Phasen der Mitose in die richtige Reihenfolge.', items:['Prophase','Metaphase','Anaphase','Telophase'], itemsOber:['Prophase','Prometaphase','Metaphase','Anaphase','Telophase'],
+  ex:'Die Reihenfolge ist Prophase – (Prometaphase) – Metaphase – Anaphase – Telophase. Danach folgt die Zytokinese.'},
+ {id:'q3', lvl:'all', type:'img', q:'Welche Phase zeigt dieses Bild?', at:'ana', u:.55, o:['Prophase','Metaphase','Anaphase','Telophase'], a:2,
+  ex:'Die Schwesterchromatiden sind getrennt und werden zu den Polen bewegt; das Centromer geht voran. Das ist die Anaphase.'},
+ {id:'q4', lvl:'all', type:'mc', q:'Was wird in der Anaphase der Mitose voneinander getrennt?', o:['die homologen Chromosomen','die Schwesterchromatiden','die beiden Centrosomen','die beiden Zellkerne'], a:1,
+  ex:'In der Mitose werden die Schwesterchromatiden getrennt. Die Trennung homologer Chromosomen geschieht in der Meiose I.'},
+ {id:'q5', lvl:'all', type:'num', q:'Eine Körperzelle des Menschen hat 46 Chromosomen. Wie viele Chromatiden liegen in der Metaphase in dieser Zelle vor?', a:92,
+  ex:'In der Metaphase besteht jedes der 46 Chromosomen aus zwei Chromatiden: 46 · 2 = 92.'},
+ {id:'q6', lvl:'all', type:'num', q:'Wie viele Chromosomen hat jede Tochterzelle nach Mitose und Zytokinese einer menschlichen Körperzelle?', a:46,
+  ex:'Die Mitose erhält die Chromosomenzahl: Jede Tochterzelle hat 46 Chromosomen (aus je einer Chromatide).'},
+ {id:'q7', lvl:'all', type:'img', q:'Welche Phase zeigt dieses Bild?', at:'pro', u:.75, o:['G2-Phase','Prophase','Metaphase','Telophase'], a:1,
+  ex:'Die Chromosomen sind kondensiert und sichtbar, die Kernhülle ist noch vorhanden, die Centrosomen liegen an gegenüberliegenden Seiten des Kerns: Prophase.'},
+ {id:'q8', lvl:'all', type:'mc', q:'Die Aussage lautet: „Die Interphase ist eine Ruhephase der Zelle.“ Wie beurteilst du sie?', o:['richtig, weil sich die Zelle nicht teilt','falsch, weil die Zelle wächst und ihre DNA verdoppelt','richtig, weil die Chromosomen nicht sichtbar sind','falsch, weil die Kernhülle fehlt'], a:1,
+  ex:'In der Interphase ist der Stoffwechsel sehr aktiv: Die Zelle wächst (G1, G2) und repliziert ihre DNA (S).'},
+ {id:'q9', lvl:'all', type:'mc', q:'Welche Phase dauert in den meisten Zellen am längsten?', o:['Interphase','Prophase','Metaphase','Zytokinese'], a:0,
+  ex:'Die Interphase macht meist mehr als 90 % des Zellzyklus aus. Deshalb findet man im Mikroskop die meisten Zellen in der Interphase.'},
+ {id:'q10', lvl:'all', type:'mc', q:'Was ist das Ergebnis von Mitose und Zytokinese?', o:['vier Zellen mit halbem Chromosomensatz','zwei genetisch identische Tochterzellen','zwei Zellen mit verschiedenem Erbgut','eine Zelle mit zwei Zellkernen'], a:1,
+  ex:'Es entstehen zwei Tochterzellen mit identischem Erbgut und derselben Chromosomenzahl wie die Ausgangszelle.'},
+ {id:'q12', lvl:'ober', type:'mc', q:'Welche Funktion hat die Separase?', o:['Sie baut den Spindelapparat ab.','Sie spaltet Cohesin und ermöglicht so die Trennung der Schwesterchromatiden.','Sie repliziert die DNA in der S-Phase.','Sie phosphoryliert die Lamine der Kernhülle.'], a:1,
+  ex:'Separase ist eine Protease. Nach dem Abbau ihres Inhibitors Securin durch APC/C spaltet sie Cohesin.'},
+ {id:'q13', lvl:'ober', type:'mc', q:'Was bewirkt der Spindelkontrollpunkt?', o:['Er startet die DNA-Replikation.','Er verhindert den Beginn der Anaphase, bis alle Kinetochore korrekt an Mikrotubuli angeheftet sind.','Er löst die Zytokinese aus.','Er verdoppelt das Centrosom.'], a:1,
+  ex:'Freie Kinetochore erzeugen ein Hemmsignal (Mad2), das APC/C–Cdc20 blockiert. So wird eine fehlerhafte Verteilung der Chromatiden verhindert.'},
+ {id:'q14', lvl:'ober', type:'num', q:'Wie viele Chromosomen liegen in einer menschlichen Zelle in der späten Anaphase vor (vor der Zytokinese)?', a:92,
+  ex:'Nach der Trennung zählt jede der 92 Chromatiden als eigenes Chromosom (1-Chromatid-Chromosom). Erst die Zytokinese verteilt sie auf zwei Zellen mit je 46.'}
+];
+
+/* ===================== Lehrkräfte ===================== */
+const TEACH = `
+<div><h4>Didaktische Entscheidungen</h4>
+<ul>
+<li><b>Mitose eingebettet in den Zellzyklus.</b> Die Animation beginnt mit G1 und macht die S-Phase sichtbar, weil die Verdopplung der Chromatiden sonst als Ereignis der Prophase missverstanden wird.</li>
+<li><b>Zwei Zeitachsen.</b> Das Rad zeigt realistische Anteile (M-Phase etwa 1 von 24 h), die Animation dehnt die Mitose. Aufgabe 2 macht diese Modellentscheidung selbst zum Gegenstand (Modellkritik).</li>
+<li><b>2n = 4 mit mütterlicher und väterlicher Farbe.</b> So lassen sich identische Verteilung und die fehlende Paarung der Homologen (Abgrenzung zur Meiose I) direkt beobachten. Die Metaphase-Anordnung ist absichtlich nicht nach Paaren sortiert.</li>
+<li><b>Zähler</b> trennen die oft vermischten Größen Chromosomenzahl und Chromatidenzahl. Der kritische Punkt ist die späte Anaphase (8 Chromosomen in einer Zelle).</li>
+<li><b>Fluoreszenz-Ansicht</b> als Brücke zu echten Mikroskopaufnahmen (DNA blau, Tubulin grün). Sie ersetzt aber nicht das Mikroskopieren, etwa an der Wurzelspitze von <i>Allium cepa</i>.</li>
+<li><b>Sprache.</b> Auf Vermenschlichungen („wandern“, „ziehen“, „suchen“) wird verzichtet bzw. sie werden im Text als solche thematisiert.</li>
+</ul></div>
+<div><h4>Adressierte Fehlvorstellungen</h4>
+<ul><li>Interphase als Ruhephase</li><li>Chromosomen entstehen erst in der Prophase / Chromosom heißt immer X-Form</li><li>Mitose = Zellteilung (Kernteilung und Zytokinese werden nicht unterschieden)</li><li>Chromosomenzahl verdoppelt sich in der S-Phase</li><li>Homologe paaren sich in der Mitose</li></ul></div>
+<div><h4>Differenzierung und DaF/DaZ</h4>
+<ul><li>Niveau-Schalter Sek I / Oberstufe ändert Detailtexte, Aufgaben und Testfragen; die Oberstufen-Inhalte erscheinen zusätzlich, nicht anstelle der Basis.</li>
+<li>Gestufte Hilfen je Aufgabe; Satzbausteine; Wortlisten in gemischter Reihenfolge.</li>
+<li>Glossar mit Artikel, Plural und englischer Entsprechung; Fachbegriffe im Text sind direkt anklickbar.</li>
+<li>Kurze Hauptsätze in den Sek-I-Texten, Operatoren hervorgehoben.</li></ul></div>
+<div><h4>Möglicher Einsatz</h4>
+<p>Partnerarbeit am Tablet oder Laptop. Schritt 1 und 2 in einer Doppelstunde, anschließend Sicherung im Plenum (Tabelle aus Aufgabe 3). Schritt 3 und der Test als Vertiefung oder Hausaufgabe. Der Test ist als formative Selbstüberprüfung gedacht; es werden keine Ergebnisse gespeichert.</p></div>
+<div><h4>Grenzen des Modells</h4>
+<ul><li>Dargestellt ist eine <b>tierische</b> Zelle. Pflanzenzellen haben keine Centrosomen und bilden statt einer Teilungsfurche eine Zellplatte.</li>
+<li>Zweidimensional; Chromosomen in der Interphase sind in Wirklichkeit in Chromosomenterritorien organisiert, nicht als einzelne Fäden erkennbar.</li>
+<li>Organellen, Größenverhältnisse und die Zahl der Mikrotubuli sind stark reduziert.</li>
+<li>Die Phasendauern im Rad sind Richtwerte aus Lehrbüchern für Säugerzellen in Kultur; sie variieren je nach Zelltyp stark.</li></ul></div>
+<div><h4>Erwartungshorizont (Kurzfassung)</h4>
+<ul>
+<li><b>A2:</b> M-Phase etwa 1 h von 24 h (ca. 4 %); gedehnt, damit Abläufe beobachtbar sind; Nachteil: falscher Eindruck der Zeitverhältnisse.</li>
+<li><b>A4:</b> (Chromosomen / Chromatiden pro Chromosom / Chromatiden gesamt) G1: 4 / 1 / 4 · G2: 4 / 2 / 8 · Metaphase: 4 / 2 / 8 · späte Anaphase: 8 / 1 / 8 · Tochterzelle: 4 / 1 / 4.</li>
+<li><b>A5:</b> Semikonservative Replikation erzeugt identische Schwesterchromatiden; in der Anaphase gelangt von jedem Chromosom genau eine Chromatide an jeden Pol; daher identische Chromosomensätze.</li>
+<li><b>A6:</b> Begriff ist irreführend: hohe Stoffwechselaktivität, Wachstum, Replikation, Kontrollpunkte; „Ruhe“ bezieht sich höchstens auf die fehlende Kernteilung. Ruhezustand im engeren Sinn ist eher G0.</li>
+<li><b>A7:</b> Mitoseindex = 88/500 = 17,6 %. Dauer: Interphase 16,5 h; Prophase 1,8 h; Metaphase 0,7 h; Anaphase 0,4 h; Telophase 0,6 h. Annahme: Zellen sind zufällig (asynchron) über den Zyklus verteilt. Streng genommen ist die Altersverteilung in wachsenden Populationen nicht gleichverteilt; das kann in der Oberstufe als Fehlerquelle diskutiert werden.</li>
+<li><b>A8:</b> Anhäufung in der (Pro-)Metaphase, da ohne Kinetochor-Anheftung der SAC aktiv bleibt (Mad2 hemmt APC/C–Cdc20). Karyogramm: viele kondensierte Chromosomen. Bei Pflanzen kann eine Kernteilung ohne Verteilung zu Polyploidie führen (4n), genutzt in der Züchtung.</li>
+<li><b>A9:</b> Ohne Kontrollpunkte werden DNA-Schäden und Fehlanheftungen nicht erkannt; Fehlverteilungen führen zu Aneuploidie; ausgefallene Wachstumskontrolle (z. B. p53, Rb) erlaubt Teilung ohne Signal; Akkumulation weiterer Mutationen.</li>
+</ul></div>`;
+</script>
+
+<script>
+/* ===================== Simulation: Zustand ===================== */
+const W=720,H=440,CX=360,CY=222,R=150;
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const polar=(a,dist)=>[Math.cos(a)*dist,Math.sin(a)*dist];
+const angDiff=(a,b)=>{let d=b-a;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return d;};
+function phaseAt(T){T=((T%TOTAL)+TOTAL)%TOTAL;for(const p of PHASES){if(T<p.start+p.dur)return{p,u:(T-p.start)/p.dur};}return{p:PHASES[PHASES.length-1],u:.999};}
+
+/* 2n = 4: zwei homologe Paare (lang A, kurz B), mütterlich / väterlich */
+const CH=[
+ {id:'Am',len:'L',par:'mat',pos:[-30,-20],om:.5,my:-66,seed:1.3},
+ {id:'Bp',len:'S',par:'pat',pos:[24,-32],om:2.4,my:-22,seed:4.1},
+ {id:'Ap',len:'L',par:'pat',pos:[20,22],om:-.9,my:22,seed:2.7},
+ {id:'Bm',len:'S',par:'mat',pos:[-22,28],om:1.6,my:66,seed:5.9}
+];
+const ARMS={L:[13,24],S:[8,15]};
+
+function computeState(T,time){
+ const {p,u}=phaseAt(T),e=ease(u),id=p.id;
+ const S={id,u,p,alpha:1};
+ let r=R,d=0,h=R;
+ if(id==='g1'){r=R*(.82+.18*e);h=r;S.alpha=clamp(u/.08);}
+ else if(id==='ana'){d=45*e;r=R*(1-.12*e);h=r;}
+ else if(id==='telo'){d=45+65*e;r=R*(.88-.10*e);h=r*(1-.45*e);}
+ else if(id==='zyto'){d=110+40*e;r=R*(.78-.04*e);h=r*.55*(1-e);S.alpha=u>.9?clamp(1-(u-.9)/.1):1;}
+ S.r=r;S.d=d;S.h=h;S.rn=r*.46;
+ S.rep=id==='g1'?0:id==='s'?clamp(u*1.1-.05):1;
+ S.c={g1:0,s:0,g2:0,pro:.8*e,prometa:.8+.2*u,meta:1,ana:1,telo:1-.8*e,zyto:.2*(1-u)}[id];
+ S.env={g1:1,s:1,g2:1,pro:1,prometa:1-clamp(u*1.6),meta:0,ana:0,telo:e,zyto:1}[id];
+ S.envFrag=id==='prometa'?clamp(u*1.6):0;
+ S.nucleolus={g1:1,s:1,g2:1,pro:1-clamp(u*2),prometa:0,meta:0,ana:0,telo:clamp((u-.5)*2),zyto:1}[id];
+ S.split=['ana','telo','zyto'].includes(id);
+ S.ls=id==='telo'?1-.25*e:id==='zyto'?.75:1;
+ S.spindle={g1:0,s:0,g2:0,pro:e,prometa:1,meta:1,ana:1,telo:1-e,zyto:0}[id];
+ S.centDup=id==='s'?clamp((u-.5)*4):(id==='g1'?0:1);
+ const rn=S.rn;let poles;
+ if(id==='g1')poles=[polar(-2.2,rn+16)];
+ else if(id==='s')poles=u<.5?[polar(-2.2,rn+16)]:[polar(-2.27,rn+16),polar(-2.08,rn+16)];
+ else if(id==='g2')poles=[polar(-2.27,rn+16),polar(-2.08,rn+16)];
+ else if(id==='pro')poles=[polar(lerp(-2.27,-Math.PI,e),rn+16),polar(lerp(-2.08,0,e),rn+16)];
+ else if(id==='prometa'){const x=lerp(rn+16,.78*R,e);poles=[[-x,0],[x,0]];}
+ else if(id==='meta')poles=[[-.78*R,0],[.78*R,0]];
+ else if(id==='ana'){const x=d+.78*r;poles=[[-x,0],[x,0]];}
+ else if(id==='telo'){const x=d+r*(.78-.15*e);poles=[[-x,0],[x,0]];}
+ else{const x=d+r*.63;poles=[[-x,0],[x,0]];}
+ S.poles=poles;
+ const sc=r/R,gap0=4.5,e2=ease(clamp((u-.2)/.8));
+ S.chr=[];S.dn=[];
+ CH.forEach((ch,i)=>{
+  const att=id==='prometa'?clamp((u-.25-.13*i)*5):(['meta','ana','telo'].includes(id)?1:0);
+  if(!S.split){
+   let cx,cy,om;
+   const ip=[ch.pos[0]*sc,ch.pos[1]*sc];
+   if(['g1','s','g2','pro'].includes(id)){cx=ip[0];cy=ip[1];om=ch.om;}
+   else if(id==='prometa'){cx=lerp(ip[0],0,e2);cy=lerp(ip[1],ch.my,e2);om=ch.om+angDiff(ch.om,Math.PI/2)*e2;}
+   else{cx=0;cy=ch.my;om=Math.PI/2;cx+=Math.sin(time*1.3+i*1.7)*2.2;}
+   const gap=(2+2.5*S.c)*S.rep,delta=Math.PI/2+.14*S.c,tl=om-Math.PI/2,dx=Math.cos(tl)*gap,dy=Math.sin(tl)*gap;
+   S.chr.push({ch,i,side:0,x:cx-dx,y:cy-dy,tau:tl,s:1,delta,a:1,att});
+   if(S.rep>0)S.chr.push({ch,i,side:1,x:cx+dx,y:cy+dy,tau:om+Math.PI/2,s:-1,delta,a:S.rep,att});
+  }else{
+   let x,y,dl,w=0;
+   if(id==='ana'){x=gap0+e*(d+.4*r-gap0);y=ch.my*(1-.25*e);dl=lerp(Math.PI/2+.14,.5,e);}
+   else if(id==='telo'){x=d+.4*r*(1-.7*e);y=ch.my*.75;dl=lerp(.5,Math.PI/2,e);w=e;}
+   else{x=d+.4*r*.3;y=ch.my*.75;dl=Math.PI/2;w=1;}
+   const nx=d+.4*r*.3*(id==='telo'?1:1),ps=.5*sc;
+   [[-1,0,0,1],[1,1,Math.PI,-1]].forEach(([sg,side,tau0,sv])=>{
+    const cx0=sg*x,tx=sg*(id==='telo'?d+.4*r*(1-.7*e):nx)+ch.pos[0]*ps*sg,ty=ch.pos[1]*ps;
+    const om=sg<0?ch.om:Math.PI-ch.om,tauT=sv>0?om-Math.PI/2:om+Math.PI/2;
+    S.chr.push({ch,i,side,x:lerp(cx0,tx,w),y:lerp(y,ty,w),tau:tau0+angDiff(tau0,tauT)*w,s:sv,delta:dl,a:1,att});
+   });
+  }
+ });
+ if(S.split&&S.env>0){
+  const cx=id==='telo'?d+.4*r*(1-.7*e):d+.4*r*.3;
+  S.dn=[[-cx,0],[cx,0]];S.dnr=r*(.25+.17*S.env);
+ }
+ return S;
+}
+
+/* ===================== Simulation: Zeichnen ===================== */
+function readColors(){
+ const cs=getComputedStyle(document.documentElement),g=n=>cs.getPropertyValue(n).trim();
+ return {stage:g('--stage'),cyto:g('--cyto'),membrane:g('--membrane'),nucenv:g('--nucenv'),nucleoplasm:g('--nucleoplasm'),
+  nucleolus:g('--nucleolus'),spindle:g('--spindle'),centro:g('--centro'),mat:g('--mat'),pat:g('--pat'),label:g('--label'),ink:g('--ink')};
+}
+const FLUO={stage:'#04070a',cyto:'#0a1114',membrane:'#2f4a4f',nucenv:'#2c4757',nucleoplasm:'rgba(70,110,235,0.30)',nucleolus:'#060a10',
+ spindle:'#43e383',centro:'#ff5aa8',mat:'#7aa3ff',pat:'#7aa3ff',label:'#d2e4ff',ink:'#d2e4ff'};
+
+function shapeCircle(ctx,x,y,r){ctx.beginPath();ctx.arc(x,y,Math.max(0,r),0,Math.PI*2);ctx.fill();}
+function shapeEll(ctx,x,y,rx,ry){if(rx<=0||ry<=0)return;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill();}
+
+function drawCell(ctx,S,C){
+ const lw=3,{d,r,h}=S;
+ const pass=(grow,col)=>{ctx.fillStyle=col;shapeCircle(ctx,-d,0,r+grow);if(d>0){shapeCircle(ctx,d,0,r+grow);if(h>0)shapeEll(ctx,0,0,d,h+grow);}};
+ pass(lw,C.membrane);pass(0,C.cyto);
+}
+
+function drawChromatid(ctx,k,S,C,fluo,time){
+ const [pl,ql]=ARMS[k.ch.len],c=S.c,f=(1+1.7*(1-c))*S.ls;
+ const col=k.ch.par==='mat'?C.mat:C.pat;
+ ctx.save();ctx.globalAlpha*=k.a*(.5+.5*c);ctx.strokeStyle=col;ctx.lineCap='round';ctx.lineJoin='round';
+ ctx.lineWidth=1.3+4.4*c;
+ if(fluo){ctx.shadowColor=col;ctx.shadowBlur=6;}
+ [[k.tau-k.s*k.delta,pl],[k.tau+k.s*k.delta,ql]].forEach(([dir,len],ai)=>{
+  const N=16,step=len*f/N;let x=k.x,y=k.y,a=dir;
+  ctx.beginPath();ctx.moveTo(x,y);
+  for(let j=1;j<=N;j++){
+   a=dir+(1-c)*1.25*Math.sin(j*1.9+k.ch.seed*3+ai*2+k.side*.7+time*.5);
+   x+=Math.cos(a)*step;y+=Math.sin(a)*step;ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+ });
+ if(c>.5){ctx.shadowBlur=0;ctx.globalAlpha=k.a*(c-.5)*2;ctx.fillStyle=fluo?'#ffffff':C.ink;ctx.beginPath();ctx.arc(k.x,k.y,1.8,0,Math.PI*2);ctx.fill();}
+ ctx.restore();
+}
+
+function drawCentro(ctx,p,a,C,fluo){
+ const [x,y]=p;ctx.save();ctx.globalAlpha*=a;
+ ctx.fillStyle=C.centro;ctx.globalAlpha*=.22;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();
+ ctx.globalAlpha/=.22;if(fluo){ctx.shadowColor=C.centro;ctx.shadowBlur=8;}
+ ctx.fillRect(x-6,y-1.6,9,3.2);ctx.fillRect(x+4,y-4.5,3.2,9);
+ ctx.restore();
+}
+
+function drawSpindle(ctx,S,C,fluo){
+ const a=S.spindle;if(a<=0||S.poles.length<2)return;
+ ctx.save();ctx.strokeStyle=C.spindle;ctx.lineWidth=1.2;if(fluo){ctx.shadowColor=C.spindle;ctx.shadowBlur=5;}
+ const [A,B]=S.poles,sc=S.r/R;
+ [A,B].forEach(P=>{ // Astralmikrotubuli
+  const out=Math.atan2(P[1],P[0]);ctx.globalAlpha=.55*a;
+  for(let k=-3;k<=3;k++){const an=out+k*.38,L=(14+16*a)*(1-Math.abs(k)*.06);ctx.beginPath();ctx.moveTo(P[0],P[1]);ctx.lineTo(P[0]+Math.cos(an)*L,P[1]+Math.sin(an)*L);ctx.stroke();}
+ });
+ const mx=(A[0]+B[0])/2,my=(A[1]+B[1])/2,ax=B[0]-A[0],ay=B[1]-A[1],len=Math.hypot(ax,ay)||1,ux=ax/len,uy=ay/len,nx=-uy,ny=ux;
+ ctx.globalAlpha=.5*a;
+ [-2,-1,0,1,2].forEach(k=>{ // Polmikrotubuli, überlappend in der Mitte
+  const off=k*13*sc,ov=16;
+  ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.quadraticCurveTo(mx-ux*len*.2+nx*off*1.2,my-uy*len*.2+ny*off*1.2,mx+ux*ov+nx*off,my+uy*ov+ny*off);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(B[0],B[1]);ctx.quadraticCurveTo(mx+ux*len*.2+nx*off*1.2,my+uy*len*.2+ny*off*1.2,mx-ux*ov+nx*off,my-uy*ov+ny*off);ctx.stroke();
+ });
+ ctx.restore();
+}
+
+function drawKMT(ctx,S,C,fluo){
+ if(S.poles.length<2)return;
+ ctx.save();ctx.strokeStyle=C.spindle;ctx.lineWidth=1.4;if(fluo){ctx.shadowColor=C.spindle;ctx.shadowBlur=5;}
+ S.chr.forEach(k=>{
+  const al=k.att*Math.max(S.spindle,0)*k.a;if(al<=0)return;
+  const P=S.poles[k.side],dx=k.x-P[0],dy=k.y-P[1],L=Math.hypot(dx,dy)||1,nx=-dy/L*2,ny=dx/L*2;
+  ctx.globalAlpha=.85*al;
+  [-1,1].forEach(sg=>{ctx.beginPath();ctx.moveTo(P[0],P[1]);ctx.lineTo(k.x+nx*sg,k.y+ny*sg);ctx.stroke();});
+ });
+ ctx.restore();
+}
+
+function drawNucleus(ctx,x,y,rad,envA,frag,C,fluo){
+ ctx.save();
+ ctx.globalAlpha*=clamp(envA+ (frag>0?(1-frag)*.3:0));
+ ctx.fillStyle=C.nucleoplasm;ctx.beginPath();ctx.arc(x,y,rad,0,Math.PI*2);ctx.fill();
+ ctx.restore();ctx.save();
+ ctx.strokeStyle=C.nucenv;ctx.lineWidth=1.6;
+ if(frag>0){ctx.setLineDash([Math.max(2,16*(1-frag)),6+22*frag]);ctx.globalAlpha*=1-frag;rad*=1+.12*frag;}
+ else ctx.globalAlpha*=envA;
+ ctx.beginPath();ctx.arc(x,y,rad,0,Math.PI*2);ctx.stroke();
+ ctx.beginPath();ctx.arc(x,y,rad-3.2,0,Math.PI*2);ctx.stroke();
+ ctx.restore();
+}
+
+function label(ctx,ax,ay,tx,ty,text,align,C,fs){
+ ctx.save();ctx.strokeStyle=C.label;ctx.fillStyle=C.label;ctx.globalAlpha=.85;ctx.lineWidth=1;
+ ctx.font=`${fs}px "Atkinson Hyperlegible", Verdana, sans-serif`;ctx.textAlign=align;ctx.textBaseline='middle';
+ const w=ctx.measureText(text).width,ex=align==='left'?tx+w+6:align==='right'?tx-w-6:tx;
+ const ey=align==='center'?ty+fs*.8:ty;
+ ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ex,ey);ctx.stroke();
+ ctx.beginPath();ctx.arc(ax,ay,2.2,0,Math.PI*2);ctx.fill();
+ ctx.globalAlpha=1;ctx.fillText(text,tx,ty);ctx.restore();
+}
+
+function drawLabels(ctx,S,C,fs){
+ const A=(x,y)=>[CX+x,CY+y],id=S.id,L=(a,t,p,al)=>label(ctx,a[0],a[1],p[0],p[1],t,al,C,fs);
+ const k0=S.chr.find(k=>k.ch.id==='Am'&&k.side===0),kp=S.chr.find(k=>k.ch.id==='Ap'&&k.side===1);
+ if(['g1','s','g2'].includes(id)){
+  L(A(S.r*Math.cos(-.6),S.r*Math.sin(-.6)),'Zellmembran',[700,40],'right');
+  L(A(-S.rn*.72,S.rn*.72),'Zellkern mit Kernhülle',[18,404],'left');
+  L(A(S.rn*.35,-S.rn*.3),'Nucleolus',[700,404],'right');
+  L(A(S.poles[0][0],S.poles[0][1]),S.poles.length>1?'2 Centrosomen':'Centrosom',[18,40],'left');
+  L(A(k0.x,k0.y),'Chromatin (lockere DNA)',[18,222],'left');
+ }else if(id==='pro'){
+  L(A(k0.x,k0.y),'Chromosom aus 2 Chromatiden',[18,222],'left');
+  L(A(-S.rn*.72,S.rn*.72),'Kernhülle',[18,404],'left');
+  L(A(S.poles[1][0],S.poles[1][1]),'Centrosom',[700,40],'right');
+  if(S.spindle>.4)L(A(S.poles[0][0]-12,S.poles[0][1]-12),'Spindelapparat entsteht',[18,40],'left');
+ }else if(id==='prometa'){
+  L(A(-S.rn*.75,-S.rn*.75),'Kernhülle zerfällt',[18,40],'left');
+  if(kp)L(A((kp.x+S.poles[1][0])/2,(kp.y+S.poles[1][1])/2),'Kinetochor-Mikrotubuli',[700,40],'right');
+  L(A(k0.x,k0.y),'Chromosom',[18,404],'left');
+ }else if(id==='meta'){
+  L(A(0,-R*.62),'Äquatorialebene',[CX,22],'center');
+  L(A(S.poles[0][0],S.poles[0][1]),'Centrosom (Pol)',[18,404],'left');
+  L(A(-R*.42,-16),'Spindelapparat',[18,40],'left');
+  L(A(kp.x,kp.y),'Chromosom in der Mitte',[700,404],'right');
+ }else if(id==='ana'){
+  L(A(k0.x,k0.y),'getrennte Chromatiden',[18,40],'left');
+  L(A(S.poles[1][0],S.poles[1][1]),'Pol',[700,404],'right');
+  L(A(0,0),'Polmikrotubuli',[700,40],'right');
+ }else if(id==='telo'){
+  if(S.dn.length)L(A(S.dn[0][0]-S.dnr,0),'neue Kernhülle',[18,404],'left');
+  L(A(0,-S.h),'Teilungsfurche',[CX,22],'center');
+  L(A(k0.x,k0.y),'Chromosomen dekondensieren',[18,40],'left');
+ }else if(id==='zyto'){
+  L(A(-S.d,-S.r*.75),'Tochterzelle',[18,40],'left');
+  L(A(S.d,-S.r*.75),'Tochterzelle',[700,40],'right');
+ }
+}
+
+function drawScene(ctx,S,opt){
+ const C=opt.fluo?FLUO:opt.colors,fluo=opt.fluo;
+ ctx.save();ctx.fillStyle=C.stage;ctx.fillRect(0,0,W,H);
+ ctx.translate(CX,CY);ctx.globalAlpha=S.alpha;
+ drawCell(ctx,S,C);
+ drawSpindle(ctx,S,C,fluo);
+ if(!S.split&&(S.env>0||S.envFrag>0))drawNucleus(ctx,0,0,S.rn,S.env,S.envFrag,C,fluo);
+ if(S.split&&S.dn.length)S.dn.forEach(p=>drawNucleus(ctx,p[0],p[1],S.dnr,S.env,0,C,fluo));
+ if(S.nucleolus>0){ctx.save();ctx.globalAlpha*=S.nucleolus;ctx.fillStyle=C.nucleolus;
+  if(!S.split){shapeCircle(ctx,S.rn*.35,-S.rn*.3,S.rn*.17);}else S.dn.forEach(p=>shapeCircle(ctx,p[0]+(p[0]<0?-1:1)*S.dnr*.35,p[1]-S.dnr*.4,S.dnr*.2));
+  ctx.restore();}
+ drawKMT(ctx,S,C,fluo);
+ S.chr.forEach(k=>drawChromatid(ctx,k,S,C,fluo,opt.time));
+ S.poles.forEach((p,i)=>drawCentro(ctx,p,i===1&&S.id==='s'?S.centDup:1,C,fluo));
+ if(S.id==='telo'&&S.u>.5||S.id==='zyto'){ctx.save();ctx.globalAlpha*=S.id==='zyto'?1-S.u*.6:(S.u-.5)*2;ctx.strokeStyle=C.spindle;ctx.lineWidth=2;
+  for(let k=-1;k<=1;k++){ctx.beginPath();ctx.moveTo(-14,k*3);ctx.lineTo(14,k*3);ctx.stroke();}ctx.restore();}
+ if(opt.labels&&(S.id==='meta'||(S.id==='prometa'&&S.u>.6))){ctx.save();ctx.setLineDash([4,5]);ctx.strokeStyle=C.label;ctx.globalAlpha=.45;
+  ctx.beginPath();ctx.moveTo(0,-R*.82);ctx.lineTo(0,R*.82);ctx.stroke();ctx.restore();}
+ ctx.restore();
+ if(opt.labels)drawLabels(ctx,S,C,opt.fs||12.5);
+}
+</script>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const terms=t=>t.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g,(m,a,b)=>`<button type="button" class="term" data-term="${esc(a)}">${b||a}</button>`);
+const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let level='sek';try{level=localStorage.getItem('mitoseLevelB')||'sek';}catch(e){}
+let T=3,playing=!reduced,speed=1,time=0,labels=true,fluo=false,colors=readColors(),lastS=null,lastPhase=null,lastLevel=null,dragging=false;
+
+/* ---------- Canvas ---------- */
+const cv=$('#cv'),ctx=cv.getContext('2d'),dpr=Math.min(2,window.devicePixelRatio||1);
+cv.width=W*dpr;cv.height=H*dpr;
+const fontSize=()=>Math.min(22,12.5*Math.max(1,600/(cv.clientWidth||720)));
+
+/* ---------- Zeitleiste ---------- */
+const tlBar=$('#tlBar');
+PHASES.forEach((p,i)=>{const b=document.createElement('button');b.type='button';b.textContent=p.short;b.title=p.name;
+ b.style.flex=p.dur;if(p.group==='Interphase')b.classList.add('inter');b.addEventListener('click',()=>goPhase(i));tlBar.appendChild(b);});
+const cursor=document.createElement('div');cursor.className='cursor';tlBar.appendChild(cursor);
+const tlBtns=[...tlBar.querySelectorAll('button')];
+
+
+/* ---------- Zellzyklus-Rad (echte Zeitanteile) ---------- */
+const REAL=[['G1',11,'g1'],['S',8,'s'],['G2',4,'g2'],['M',1,'pro']];
+const wheel=$('#wheel'),WC=150,RO=118,RI=76;
+const pt=(a,r)=>[WC+Math.cos(a)*r,WC+Math.sin(a)*r];
+const ang=h=>-Math.PI/2+h/24*2*Math.PI;
+let wg='',h0=0;
+REAL.forEach(([n,h,id],i)=>{
+ const a0=ang(h0),a1=ang(h0+h),lg=h>12?1:0,[x0,y0]=pt(a0,RO),[x1,y1]=pt(a1,RO),[x2,y2]=pt(a1,RI),[x3,y3]=pt(a0,RI);
+ const fill=n==='M'?'var(--accent-2)':'var(--accent)',op=[.28,.5,.75,1][i];
+ wg+=`<path class="seg-path" data-id="${id}" d="M${x0},${y0} A${RO},${RO} 0 ${lg} 1 ${x1},${y1} L${x2},${y2} A${RI},${RI} 0 ${lg} 0 ${x3},${y3}Z" fill="${fill}" fill-opacity="${op}" stroke="var(--surface)" stroke-width="2"><title>${n}-Phase: etwa ${h} h</title></path>`;
+ const am=ang(h0+h/2);
+ if(n!=='M'){const [lx,ly]=pt(am,(RO+RI)/2);wg+=`<text x="${lx}" y="${ly-3}" text-anchor="middle" font-family="var(--f-display)" font-weight="700" font-size="17" fill="var(--ink)" pointer-events="none">${n}</text><text x="${lx}" y="${ly+13}" text-anchor="middle" font-family="var(--f-mono)" font-size="10.5" fill="var(--ink)" pointer-events="none">${h} h</text>`;}
+ else{const [a1x,a1y]=pt(am,RO+2),[a2x,a2y]=pt(am-.25,RO+20);wg+=`<line x1="${a1x}" y1="${a1y}" x2="${a2x}" y2="${a2y}" stroke="var(--accent-2)"/><text x="${a2x-4}" y="${a2y-4}" text-anchor="end" font-family="var(--f-display)" font-weight="700" font-size="14" fill="var(--accent-2)">M ≈ 1 h</text>`;}
+ h0+=h;
+});
+{const [gx,gy]=pt(ang(2.5),RO+4),[hx,hy]=pt(ang(2.5),RO+24);
+ wg+=`<line x1="${gx}" y1="${gy}" x2="${hx}" y2="${hy}" stroke="var(--muted)" stroke-dasharray="3 3"/><g id="g0btn" style="cursor:pointer"><circle cx="${hx+9}" cy="${hy}" r="13" fill="var(--surface-2)" stroke="var(--muted)"/><text x="${hx+9}" y="${hy+4}" text-anchor="middle" font-family="var(--f-mono)" font-size="11" fill="var(--ink)">G0</text><title>G0-Phase anzeigen</title></g>`;}
+wg+=`<line id="wMark" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/><circle id="wDot" r="6" fill="var(--ink)"/>`;
+wg+=`<text id="wTxt" x="${WC}" y="${WC-2}" text-anchor="middle" font-family="var(--f-display)" font-weight="700" font-size="19" fill="var(--ink)"></text><text x="${WC}" y="${WC+18}" text-anchor="middle" font-family="var(--f-mono)" font-size="11" fill="var(--muted)">Zyklus ≈ 24 h</text>`;
+wheel.innerHTML=wg;
+wheel.querySelectorAll('.seg-path').forEach(el=>el.addEventListener('click',()=>goPhase(PHASES.findIndex(p=>p.id===el.dataset.id))));
+$('#g0btn').addEventListener('click',()=>showStructHTML('G0-Phase','Zellen, die sich nicht mehr teilen, verlassen den Zyklus nach der G1-Phase und gehen in die G0-Phase. Sie sind voll stoffwechselaktiv. Beispiele: die meisten Nervenzellen und Herzmuskelzellen. Manche Zellen, z. B. Leberzellen, können nach einer Verletzung aus G0 in den Zyklus zurückkehren.'));
+const wMark=$('#wMark'),wDot=$('#wDot'),wTxt=$('#wTxt');
+const proStart=PHASES.find(p=>p.id==='pro').start;
+function realHour(T){const {p,u}=phaseAt(T);if(p.id==='g1')return 11*u;if(p.id==='s')return 11+8*u;if(p.id==='g2')return 19+4*u;return 23+(T-proStart)/(TOTAL-proStart);}
+
+/* ---------- Infopanel ---------- */
+let refocus=null;
+function renderInfo(p){
+ const ci=PHASES.indexOf(p);let h='<ol class="plist">',grp='';
+ PHASES.forEach((q,i)=>{
+  if(q.group!==grp){grp=q.group;h+=`<li class="pgroup" aria-hidden="true">${grp}</li>`;}
+  const I=PINFO[q.id],cur=i===ci;
+  h+=`<li class="pitem${cur?' cur':''}"><button type="button" class="phead" data-pi="${i}" aria-expanded="${cur}"><span>${q.name}</span>${cur?'<span class="now">aktuell</span>':''}</button>`;
+  if(cur){
+   h+=`<div class="pbody"><ul>${I.sek.map(b=>`<li>${terms(b)}</li>`).join('')}</ul>`;
+   if(level==='ober')h+=`<div class="ober"><span class="tag">Oberstufe</span><ul>${I.ober.map(b=>`<li>${terms(b)}</li>`).join('')}</ul></div>`;
+   h+=`<details class="warn"><summary>Typischer Fehler</summary><p>${terms(I.fehler)}</p></details></div>`;
+  }
+  h+='</li>';
+ });
+ const box=$('#phaseInfo');box.innerHTML=h+'</ol>';
+ box.querySelectorAll('.phead').forEach(b=>b.addEventListener('click',()=>{refocus=+b.dataset.pi;goPhase(refocus);}));
+ if(refocus!==null){const f=box.querySelector(`.phead[data-pi="${refocus}"]`);if(f)f.focus({preventScroll:true});refocus=null;}
+}
+const structBox=$('#structBox');
+function showStructHTML(t,d){structBox.innerHTML=`<button type="button" class="close-x" aria-label="Schließen">Schließen ✕</button><h4>${t}</h4><p>${terms(d)}</p>`;structBox.classList.add('show');
+ structBox.querySelector('.close-x').addEventListener('click',()=>structBox.classList.remove('show'));}
+
+/* ---------- Zähler ---------- */
+const cChr=$('#cChr'),cCtd=$('#cCtd'),cTot=$('#cTot'),cNote=$('#cNote');
+const setT=(el,v)=>{if(el.textContent!==v)el.textContent=v;};
+function counters(S){
+ const id=S.id;let a,b,c,n;
+ if(id==='g1'){a='4';b='1';c='4';n='Jedes Chromosom besteht aus einer Chromatide.';}
+ else if(id==='s'){const k=S.rep;a='4';b=k<1?'1 → 2':'2';c=k<1?'4 → 8':'8';n='Die DNA wird repliziert. Die Zahl der Chromosomen bleibt 4.';}
+ else if(['g2','pro','prometa','meta'].includes(id)){a='4';b='2';c='8';n='Jedes Chromosom besteht aus zwei Schwesterchromatiden.';}
+ else if(id==='ana'||id==='telo'||(id==='zyto'&&S.u<.35)){a='8';b='1';c='8';n='Jede getrennte Chromatide zählt jetzt als eigenes Chromosom. Alle 8 liegen noch in einer Zelle.';}
+ else{a='4';b='1';c='4';n='Werte pro Tochterzelle: Jede hat denselben Chromosomensatz wie die Ausgangszelle.';}
+ setT(cChr,a);setT(cCtd,b);setT(cTot,c);setT(cNote,n);
+}
+
+/* ---------- Steuerung ---------- */
+const bPlay=$('#bPlay');
+function setPlaying(v){playing=v;bPlay.textContent=v?'Pause':'Abspielen';}
+setPlaying(playing);
+bPlay.addEventListener('click',()=>setPlaying(!playing));
+function curIdx(){return PHASES.indexOf(phaseAt(T).p);}
+function goPhase(i){i=(i+PHASES.length)%PHASES.length;T=PHASES[i].start+PHASES[i].dur*.55;setPlaying(false);}
+$('#bPrev').addEventListener('click',()=>goPhase(curIdx()-1));
+$('#bNext').addEventListener('click',()=>goPhase(curIdx()+1));
+$('#speed').addEventListener('input',e=>{speed=+e.target.value;$('#speedOut').textContent=String(speed).replace('.',',')+'×';});
+const scrub=$('#scrub');
+scrub.addEventListener('input',()=>{T=scrub.value/1000*TOTAL*.9999;setPlaying(false);});
+scrub.addEventListener('pointerdown',()=>dragging=true);window.addEventListener('pointerup',()=>dragging=false);
+const tLab=$('#tLabels'),tFluo=$('#tFluo');
+tLab.addEventListener('click',()=>{labels=!labels;tLab.setAttribute('aria-pressed',labels);});
+const legend=$('#legend'),legModel=legend.innerHTML;
+tFluo.addEventListener('click',()=>{fluo=!fluo;tFluo.setAttribute('aria-pressed',fluo);
+ legend.innerHTML=fluo?'<span><i style="background:#7aa3ff"></i>DNA (Farbstoff DAPI, blau)</span><span><i style="background:#43e383"></i>Mikrotubuli (markiertes Tubulin, grün)</span><span><i style="background:#ff5aa8"></i>Centrosom (magenta)</span><span>So sehen Zellen im Fluoreszenzmikroskop aus. Mütterliche und väterliche Chromosomen lassen sich hier nicht unterscheiden.</span>':legModel;});
+
+/* ---------- Klick in die Zelle ---------- */
+function hit(S,x,y){
+ if(!S)return null;const D=(ax,ay)=>Math.hypot(x-ax,y-ay);
+ for(const k of S.chr)if(k.a>.4&&D(k.x,k.y)<15)return{type:'chromo',k};
+ for(const p of S.poles)if(D(p[0],p[1])<15)return{type:'centro'};
+ if(S.nucleolus>.3){if(!S.split&&D(S.rn*.35,-S.rn*.3)<S.rn*.17+5)return{type:'nucleolus'};
+  if(S.split)for(const p of S.dn)if(D(p[0]+(p[0]<0?-1:1)*S.dnr*.35,-S.dnr*.4)<S.dnr*.2+5)return{type:'nucleolus'};}
+ if(!S.split&&S.env>.3&&Math.abs(D(0,0)-S.rn)<8)return{type:'env'};
+ if(S.split&&S.env>.3)for(const p of S.dn)if(Math.abs(D(p[0],p[1])-S.dnr)<8)return{type:'env'};
+ if((S.id==='telo'||S.id==='zyto')&&Math.abs(x)<16&&Math.abs(Math.abs(y)-Math.max(S.h,0))<16)return{type:'furrow'};
+ if((S.id==='meta'||S.id==='prometa')&&Math.abs(x)<7&&Math.abs(y)<S.r*.8)return{type:'equator'};
+ if(S.spindle>.5&&S.poles.length===2&&Math.abs(y-(S.poles[0][1]+S.poles[1][1])/2)<45&&x>Math.min(S.poles[0][0],S.poles[1][0])&&x<Math.max(S.poles[0][0],S.poles[1][0]))return{type:'spindle'};
+ const cs=S.d>0?[[-S.d,0],[S.d,0]]:[[0,0]];
+ for(const c of cs)if(Math.abs(D(c[0],c[1])-S.r)<8)return{type:'membrane'};
+ for(const c of cs)if(D(c[0],c[1])<S.r)return{type:'cyto'};
+ return null;
+}
+function chromoText(k,S){
+ const ch=k.ch,par=ch.par==='mat'?'von der Mutter':'vom Vater',col=ch.par==='mat'?'orange':'blau',size=ch.len==='L'?'lange':'kurze';
+ const hom=ch.par==='mat'?'vom Vater (blau)':'von der Mutter (orange)';
+ let st;
+ if(S.split)st='Diese Chromatide wurde von ihrer Schwesterchromatide getrennt. Sie ist jetzt ein eigenes Chromosom aus einer Chromatide.';
+ else if(S.id==='g1')st='Es besteht aus einer Chromatide.';
+ else if(S.id==='s'&&S.rep<1)st='Die DNA dieses Chromosoms wird gerade repliziert.';
+ else st='Es besteht aus zwei identischen [[Schwesterchromatiden]], die am [[Centromer]] verbunden sind.';
+ st+=S.c<.3?' Es liegt locker als [[Chromatin]] vor und ist im Lichtmikroskop nicht einzeln zu erkennen.':' Es ist kondensiert und deshalb im Lichtmikroskop sichtbar.';
+ return `Das ${size} Chromosom ${par} (im Modell ${col}). ${st} Das [[homologe Chromosomen|homologe Chromosom]] ist das ${size} Chromosom ${hom}. Homologe Chromosomen tragen dieselben Gene, können aber verschiedene Allele haben.`;
+}
+function toLocal(ev){const r=cv.getBoundingClientRect();return[(ev.clientX-r.left)*W/r.width-CX,(ev.clientY-r.top)*H/r.height-CY];}
+cv.addEventListener('click',ev=>{const [x,y]=toLocal(ev),h=hit(lastS,x,y);if(!h)return;
+ if(h.type==='chromo')showStructHTML('Chromosom',chromoText(h.k,lastS));else showStructHTML(STRUCT[h.type].t,STRUCT[h.type].d);
+ if(window.innerWidth<980)structBox.scrollIntoView({block:'nearest',behavior:reduced?'auto':'smooth'});});
+cv.addEventListener('mousemove',ev=>{const [x,y]=toLocal(ev);cv.style.cursor=hit(lastS,x,y)?'pointer':'default';});
+
+/* ---------- Begriffe ---------- */
+const pop=$('#termPop');
+document.addEventListener('click',ev=>{
+ const b=ev.target.closest('.term');
+ if(b){ev.stopPropagation();const e=GLOSS.find(x=>x[0]===b.dataset.term);if(!e)return;
+  pop.innerHTML=`<h4 style="margin:0 0 2px;font-family:var(--f-display)">${e[0]}</h4><div class="gr">${e[1]} · ${e[2]} · engl. ${e[3]}</div><p>${e[4]}</p><p style="margin-top:8px"><button type="button" class="btn" data-goto="${esc(e[0])}">Im Glossar zeigen</button></p>`;
+  pop.hidden=false;const r=b.getBoundingClientRect(),pw=pop.offsetWidth,ph=pop.offsetHeight;
+  let left=Math.min(Math.max(16,r.left),window.innerWidth-pw-16),top=r.bottom+8;if(top+ph>window.innerHeight-10)top=Math.max(10,r.top-ph-8);
+  pop.style.left=left+'px';pop.style.top=top+'px';return;}
+ const go=ev.target.closest('[data-goto]');
+ if(go){pop.hidden=true;$('#glSearch').value='';renderGloss('');const card=document.getElementById('gl-'+slug(go.dataset.goto));
+  if(card){card.scrollIntoView({block:'center',behavior:reduced?'auto':'smooth'});card.classList.add('flash');setTimeout(()=>card.classList.remove('flash'),1800);}return;}
+ if(!pop.contains(ev.target))pop.hidden=true;
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')pop.hidden=true;});
+
+/* ---------- Glossar ---------- */
+const slug=s=>s.toLowerCase().replace(/[^a-z0-9äöüß]+/g,'-');
+function renderGloss(q){q=q.trim().toLowerCase();
+ $('#gloss').innerHTML=[...GLOSS].sort((a,b)=>a[0].localeCompare(b[0],'de')).filter(e=>!q||e.join(' ').toLowerCase().includes(q))
+  .map(e=>`<div class="card gl" id="gl-${slug(e[0])}"><h4>${e[0]}</h4><div class="gr">${e[1]} · ${e[2]} · engl. ${e[3]}</div><p>${e[4]}</p></div>`).join('')||'<p class="muted">Kein Begriff gefunden.</p>';}
+$('#glSearch').addEventListener('input',e=>renderGloss(e.target.value));
+renderGloss('');
+
+/* ---------- Arbeitsaufträge ---------- */
+function renderTasks(){
+ $('#taskStages').innerHTML=TASKS.map(st=>{
+  const ts=st.tasks.filter(t=>t.lvl==='all'||level==='ober');if(!ts.length)return'';
+  return `<div class="stage-block"><h3><span class="n">${st.n}</span>${st.title}</h3><div class="tasks">${ts.map(t=>`
+   <div class="card task"><div class="task-top"><span class="nr">Aufgabe ${t.nr}</span><span class="afb${t.lvl==='ober'?' o':''}">${t.lvl==='ober'?'Oberstufe · ':''}${t.afb}</span></div>
+   <div>${t.text}</div>
+   <div class="helps">${t.helps.map((h,j)=>`<button type="button" aria-expanded="false" data-h="${t.nr}-${j}">${h.l}</button>`).join('')}</div>
+   ${t.helps.map((h,j)=>`<div class="helpbox" id="h-${t.nr}-${j}" hidden>${h.w?`<div class="wordbank">${h.w.map(w=>`<span>${w}</span>`).join('')}</div>`:h.h}</div>`).join('')}
+   </div>`).join('')}</div></div>`;}).join('');
+ document.querySelectorAll('.helps button').forEach(b=>b.addEventListener('click',()=>{const box=document.getElementById('h-'+b.dataset.h),o=b.getAttribute('aria-expanded')==='true';b.setAttribute('aria-expanded',!o);box.hidden=o;}));
+}
+
+/* ---------- Test ---------- */
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+let orderState={};
+function drawQ(c,q){const x=c.getContext('2d');x.setTransform(2,0,0,2,0,0);const p=PHASES.find(p=>p.id===q.at);
+ drawScene(x,computeState(p.start+p.dur*q.u,2),{labels:false,fluo:false,colors,time:2});}
+function renderQuiz(){
+ const qs=QUESTIONS.filter(q=>q.lvl==='all'||level==='ober');orderState={};
+ $('#quiz').innerHTML=qs.map((q,n)=>{
+  let body='';
+  if(q.type==='mc'||q.type==='img'){
+   if(q.type==='img')body+=`<canvas class="qcanvas" width="1440" height="880" data-q="${q.id}" aria-label="Bild einer Zelle in einer Phase"></canvas>`;
+   body+=`<div class="opts">${q.o.map((o,i)=>`<label><input type="radio" name="${q.id}" value="${i}"><span>${o}</span></label>`).join('')}</div>`;}
+  else if(q.type==='num')body=`<label>Antwort: <input class="numin" type="number" inputmode="numeric" id="in-${q.id}"></label>`;
+  else{const items=level==='ober'?q.itemsOber:q.items;let s=shuffle(items);while(s.join()===items.join())s=shuffle(items);orderState[q.id]=s;body=`<ol class="order-list" id="ol-${q.id}"></ol>`;}
+  return `<div class="card q" id="box-${q.id}"><div class="qhead"><span class="qtext">${n+1}. ${q.q}</span><span class="afb${q.lvl==='ober'?' o':''}">${q.lvl==='ober'?'Oberstufe':'Basis'}</span></div>${body}<div class="fb" id="fb-${q.id}"></div></div>`;}).join('');
+ Object.keys(orderState).forEach(renderOrder);
+ document.querySelectorAll('.qcanvas').forEach(c=>drawQ(c,QUESTIONS.find(q=>q.id===c.dataset.q)));
+ $('#qScore').textContent='';
+}
+function renderOrder(id){
+ const s=orderState[id],ol=document.getElementById('ol-'+id);
+ ol.innerHTML=s.map((it,i)=>`<li><span class="pos">${i+1}.</span><span class="lbl">${it}</span><button type="button" aria-label="${it} nach oben" data-mv="-1" data-i="${i}" ${i===0?'disabled':''}>▲</button><button type="button" aria-label="${it} nach unten" data-mv="1" data-i="${i}" ${i===s.length-1?'disabled':''}>▼</button></li>`).join('');
+ ol.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.i,j=i+ +b.dataset.mv;[s[i],s[j]]=[s[j],s[i]];renderOrder(id);
+  const nb=document.getElementById('ol-'+id).querySelectorAll('li')[j]?.querySelector(`button[data-mv="${b.dataset.mv}"]`);if(nb&&!nb.disabled)nb.focus();}));
+}
+$('#qEval').addEventListener('click',()=>{
+ const qs=QUESTIONS.filter(q=>q.lvl==='all'||level==='ober');let ok=0;
+ qs.forEach(q=>{let right=false,sol='';
+  if(q.type==='mc'||q.type==='img'){const v=document.querySelector(`input[name="${q.id}"]:checked`);right=!!v&&+v.value===q.a;sol=q.o[q.a];}
+  else if(q.type==='num'){const v=document.getElementById('in-'+q.id).value;right=v!==''&&+v===q.a;sol=String(q.a);}
+  else{const items=level==='ober'?q.itemsOber:q.items;right=orderState[q.id].join()===items.join();sol=items.join(' – ');}
+  if(right)ok++;
+  const fb=document.getElementById('fb-'+q.id);fb.className='fb show '+(right?'ok':'no');
+  fb.innerHTML=right?`<strong>Richtig.</strong> ${q.ex}`:`<strong>Falsch.</strong> Richtig ist: ${sol}. ${q.ex}`;});
+ $('#qScore').textContent=`${ok} von ${qs.length} richtig`;
+});
+$('#qReset').addEventListener('click',renderQuiz);
+
+/* ---------- Niveau ---------- */
+function setLevel(l){level=l;try{localStorage.setItem('mitoseLevelB',l);}catch(e){}
+ $('#lvlSek').setAttribute('aria-pressed',l==='sek');$('#lvlOber').setAttribute('aria-pressed',l==='ober');
+ renderTasks();renderQuiz();lastPhase=null;}
+$('#lvlSek').addEventListener('click',()=>setLevel('sek'));$('#lvlOber').addEventListener('click',()=>setLevel('ober'));
+$('#teachBody').innerHTML=TEACH;
+setLevel(level);
+
+/* ---------- Farbschema ---------- */
+function refreshColors(){colors=readColors();document.querySelectorAll('.qcanvas').forEach(c=>drawQ(c,QUESTIONS.find(q=>q.id===c.dataset.q)));}
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',refreshColors);
+new MutationObserver(refreshColors).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','class']});
+
+/* ---------- Schleife ---------- */
+let last=performance.now();
+function frame(now){
+ const dt=Math.min(.05,(now-last)/1000);last=now;
+ if(playing){T=(T+dt*speed*TOTAL/36)%TOTAL;time+=dt;}
+ const S=computeState(T,time);lastS=S;
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+ drawScene(ctx,S,{labels,fluo,colors,time,fs:fontSize()});
+ if(S.p!==lastPhase){lastPhase=S.p;const i=PHASES.indexOf(S.p);
+  $('#phaseNow').innerHTML=`${S.p.name} <small>${S.p.group}</small>`;renderInfo(S.p);
+  tlBtns.forEach((b,j)=>b.classList.toggle('cur',j===i));wTxt.textContent=S.p.short==='Prometa'?'Prometa.':S.p.short;}
+ counters(S);
+ const f=T/TOTAL;cursor.style.left=`calc(${(f*100).toFixed(2)}% - 1px)`;
+ if(!dragging)scrub.value=Math.round(f*1000);
+ setT($('#tlPct'),Math.round(f*100)+' %');
+ const a=ang(realHour(T)),[m1x,m1y]=pt(a,RI-6),[m2x,m2y]=pt(a,RO+6);
+ wMark.setAttribute('x1',m1x);wMark.setAttribute('y1',m1y);wMark.setAttribute('x2',m2x);wMark.setAttribute('y2',m2y);wDot.setAttribute('cx',m2x);wDot.setAttribute('cy',m2y);
+ requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+</script>
+
+</body></html>
