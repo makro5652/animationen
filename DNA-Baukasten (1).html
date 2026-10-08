@@ -1,0 +1,1930 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>DNA-Baukasten</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Lexend:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: Werkbank – links Auftrag und Theorie, rechts die Arbeitsfläche; zwei Niveaus (Klasse 10 / Oberstufe) mit je sechs Stationen */
+:root{
+  --bg:#E8EDF0; --surface:#F7F9FA; --surface-2:#DEE5E9; --ink:#14232D; --muted:#53646E; --line:#C2CDD4;
+  --accent:#0D6772; --accent-ink:#FFFFFF; --accent-soft:#D2E6E8;
+  --accent2:#4A4EA6; --accent2-ink:#FFFFFF; --accent2-soft:#DEE0F3;
+  --ok:#1C7243; --ok-soft:#DAEEE1; --bad:#AE2A20; --bad-soft:#F6DFDB; --warn:#8A5A00; --warn-soft:#F7EACB;
+  --A:#D2553D; --T:#E2A623; --G:#2E8956; --C:#3767B6;
+  --A-ink:#FFFFFF; --T-ink:#2A1D00; --G-ink:#FFFFFF; --C-ink:#FFFFFF;
+  --sugar:#8461BE; --phos:#3F4F62; --rail:#9AA8B1; --part-ink:#FFFFFF;
+  --elN:#2D5DB0; --elO:#BE3A2C; --elP:#A9670E;
+  --aa-np:#EEE3C4; --aa-p:#D4EADB; --aa-ac:#F4D2CA; --aa-ba:#D2DEF3; --aa-stop:#38434D; --aa-stop-ink:#FFFFFF;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Lexend","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E171C; --surface:#152229; --surface-2:#1D2E37; --ink:#E3EBEE; --muted:#97A8B1; --line:#2D404A;
+    --accent:#5BBAC4; --accent-ink:#06262A; --accent-soft:#163B41;
+    --accent2:#A3A7F2; --accent2-ink:#15173B; --accent2-soft:#272A52;
+    --ok:#62C690; --ok-soft:#163626; --bad:#F18C80; --bad-soft:#40201C; --warn:#E9B95A; --warn-soft:#3B2E12;
+    --A:#E6705A; --T:#EDB947; --G:#47A874; --C:#5A8BD8;
+    --A-ink:#FFFFFF; --T-ink:#2A1D00; --G-ink:#06170D; --C-ink:#FFFFFF;
+    --sugar:#9C7FD6; --phos:#71849A; --rail:#4D606B; --part-ink:#FFFFFF;
+    --elN:#86AAF0; --elO:#F2907F; --elP:#E7A74E;
+    --aa-np:#4A402A; --aa-p:#22402E; --aa-ac:#4D2A24; --aa-ba:#263652; --aa-stop:#C9D3D9; --aa-stop-ink:#14232D;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E171C; --surface:#152229; --surface-2:#1D2E37; --ink:#E3EBEE; --muted:#97A8B1; --line:#2D404A;
+  --accent:#5BBAC4; --accent-ink:#06262A; --accent-soft:#163B41;
+  --accent2:#A3A7F2; --accent2-ink:#15173B; --accent2-soft:#272A52;
+  --ok:#62C690; --ok-soft:#163626; --bad:#F18C80; --bad-soft:#40201C; --warn:#E9B95A; --warn-soft:#3B2E12;
+  --A:#E6705A; --T:#EDB947; --G:#47A874; --C:#5A8BD8;
+  --A-ink:#FFFFFF; --T-ink:#2A1D00; --G-ink:#06170D; --C-ink:#FFFFFF;
+  --sugar:#9C7FD6; --phos:#71849A; --rail:#4D606B; --part-ink:#FFFFFF;
+  --elN:#86AAF0; --elO:#F2907F; --elP:#E7A74E;
+  --aa-np:#4A402A; --aa-p:#22402E; --aa-ac:#4D2A24; --aa-ba:#263652; --aa-stop:#C9D3D9; --aa-stop-ink:#14232D;
+  color-scheme:dark;
+}
+body.lvl2{--accent:var(--accent2);--accent-ink:var(--accent2-ink);--accent-soft:var(--accent2-soft)}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1140px;margin:0 auto;display:grid;gap:20px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(28px,5vw,40px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:clamp(22px,3.4vw,28px);font-weight:800}
+h3{font-size:17px;font-weight:600}
+p{margin:0}
+sub{line-height:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+header{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:flex-end;justify-content:space-between}
+.sub{color:var(--muted);font-size:14px;margin-top:4px}
+.seqmark{font-family:var(--f-mono);font-weight:700;letter-spacing:.18em;font-size:13px;display:flex;gap:2px;margin-bottom:6px}
+.seqmark span{padding:1px 4px;border-radius:3px}
+.hint{font-size:14px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.hdr-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+
+.level{display:inline-flex;align-items:center;gap:0;border:1px solid var(--line);border-radius:999px;background:var(--surface);padding:4px}
+.level button{border:0;background:transparent;border-radius:999px;padding:8px 16px;cursor:pointer;font-weight:600;font-size:14px;color:var(--muted);display:grid;line-height:1.15;text-align:left}
+.level button small{font-weight:400;font-size:11px}
+.level button[aria-checked="true"]{background:var(--accent);color:var(--accent-ink)}
+
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 14px;cursor:pointer;font-weight:500;font-size:15px}
+.btn:hover{border-color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.small{font-size:14px;padding:6px 11px}
+.btn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;border-right:1px solid var(--line);background:transparent;padding:6px 12px;cursor:pointer;font-size:14px;font-weight:500}
+.seg button:last-child{border-right:0}
+.seg button[aria-checked="true"]{background:var(--accent);color:var(--accent-ink)}
+.seg-lbl{font-size:12px;color:var(--muted);margin-right:4px}
+
+nav.steps{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+nav.steps button{flex:0 0 auto;display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px 6px 6px;cursor:pointer;font-size:14px}
+nav.steps .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);font-weight:600;font-variant-numeric:tabular-nums}
+nav.steps button[aria-current="step"]{border-color:var(--accent);background:var(--accent-soft)}
+nav.steps button[aria-current="step"] .n{background:var(--accent);color:var(--accent-ink)}
+nav.steps button.done .n{background:var(--ok);color:var(--surface)}
+
+.station{display:grid;grid-template-columns:minmax(0,370px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.station{grid-template-columns:minmax(0,1fr)}}
+.brief{display:grid;gap:14px;min-width:0}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:600}
+.say{display:grid;gap:6px;font-size:17px}
+.txt{display:grid;gap:8px;font-size:15.5px}
+.task{border-top:1px solid var(--line);padding-top:12px;display:grid;gap:6px}
+.task ol{margin:0;padding-left:22px;display:grid;gap:4px}
+.plan{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:4px}
+.plan b{font-weight:600}
+.merke{border:2px solid var(--ok);background:var(--ok-soft);border-radius:12px;padding:12px 14px;display:grid;gap:6px}
+.merke h3{color:var(--ok)}
+.merke ul{margin:0;padding-left:20px;display:grid;gap:3px}
+.callout{border-left:4px solid var(--warn);background:var(--warn-soft);border-radius:0 10px 10px 0;padding:10px 14px;font-size:15px;display:grid;gap:4px}
+.note{font-size:14px;color:var(--muted)}
+details.pro{border:1px dashed var(--line);border-radius:12px;padding:10px 14px;font-size:15px}
+details.pro summary{cursor:pointer;font-weight:600}
+details.pro p{margin-top:6px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tools{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+
+.work{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:14px;min-width:0}
+.lbl{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:600}
+.tray{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;min-height:40px}
+.tray-empty{font-size:14px;color:var(--muted)}
+.piece{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:8px 10px 6px;cursor:grab;display:grid;justify-items:center;gap:2px;touch-action:none;user-select:none;-webkit-user-select:none}
+.piece:hover{border-color:var(--accent)}
+.piece.sel{outline:3px solid var(--accent);outline-offset:1px;background:var(--accent-soft)}
+.piece svg{display:block;pointer-events:none}
+.piece .pl{font-size:13px;color:var(--muted);pointer-events:none}
+.ghost{position:fixed;z-index:50;pointer-events:none;margin:0;cursor:grabbing;box-shadow:0 10px 26px rgba(0,0,0,.25);background:var(--surface)}
+.info{font-size:15px;background:var(--surface-2);border-radius:10px;padding:8px 12px}
+.info:empty{display:none}
+.stage{display:flex;justify-content:center;overflow-x:auto;padding:6px 0}
+.board{position:relative;flex:0 0 auto}
+.board > svg{display:block}
+.slot{position:absolute;border:2px dashed var(--muted);border-radius:8px;background:transparent;cursor:pointer;display:grid;place-items:center;font-size:12px;color:var(--muted);padding:0}
+.slot:hover,.slot.over{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.slot.shake{animation:shake .35s;border-color:var(--bad)}
+@keyframes shake{25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+.fb{font-size:15px;border-radius:10px;padding:8px 12px}
+.fb:empty{display:none}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.bad{background:var(--bad-soft);color:var(--bad)}
+.fb b{font-weight:600}
+.actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between}
+
+/* Modell-Bauteile (SVG) */
+.bA{fill:var(--A)} .bT{fill:var(--T)} .bG{fill:var(--G)} .bC{fill:var(--C)} .bU{fill:var(--T)}
+.tA{fill:var(--A-ink)} .tT{fill:var(--T-ink)} .tG{fill:var(--G-ink)} .tC{fill:var(--C-ink)}
+.fP{fill:var(--phos)} .fZ{fill:var(--sugar)} .tPart{fill:var(--part-ink)}
+.lt{font-family:var(--f-body);font-weight:600;text-anchor:middle;dominant-baseline:central;font-size:15px}
+.lab{font-family:var(--f-body);font-size:8px;fill:var(--muted)}
+.bond{stroke:var(--ink);stroke-width:2.4;opacity:.65;stroke-linecap:round}
+.base{transition:opacity .25s}
+.rail-label{font-family:var(--f-body);font-size:9px;font-weight:600;fill:var(--accent);text-anchor:middle;opacity:0;transition:opacity .25s}
+.show-rail .base{opacity:.18}
+.show-rail .rail-label{opacity:1}
+.show-rail .part{filter:drop-shadow(0 0 3px var(--accent))}
+.pop{animation:pop .35s ease-out}
+@keyframes pop{from{opacity:.2}to{opacity:1}}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-family:var(--f-mono);font-weight:700;min-width:44px;text-align:center;border-radius:8px;padding:4px 6px;display:grid;line-height:1.2}
+.chip small{font-family:var(--f-body);font-weight:400;font-size:11px;opacity:.85}
+.cA{background:var(--A);color:var(--A-ink)} .cT,.cU{background:var(--T);color:var(--T-ink)} .cG{background:var(--G);color:var(--G-ink)} .cC{background:var(--C);color:var(--C-ink)}
+
+.check{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 14px;cursor:pointer;font-size:16px}
+.opt:hover{border-color:var(--accent)}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.opt[disabled]{cursor:default}
+
+/* Helix */
+.helixbox{display:grid;gap:10px}
+canvas.helix{width:100%;height:440px;display:block;touch-action:pan-y;cursor:grab;background:var(--bg);border-radius:12px}
+.range{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;font-size:14px;color:var(--muted)}
+.range input{width:100%;accent-color:var(--accent)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;border-radius:3px;display:inline-block}
+.facts{display:grid;gap:4px;font-size:15px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.facts .num,.num{font-variant-numeric:tabular-nums;font-weight:600}
+.facts table{border-collapse:collapse;font-size:14px}
+.facts td{padding:3px 8px 3px 0;vertical-align:top}
+
+/* Strukturformeln */
+.fmhost{background:var(--bg);border-radius:12px;padding:8px;display:flex;justify-content:center;overflow-x:auto;min-height:120px}
+svg.fm{width:100%;height:auto;display:block}
+.fm .bl{stroke:var(--ink);stroke-width:2.1;stroke-linecap:round}
+.fm .fa{font-family:var(--f-body);font-weight:600;font-size:16px;text-anchor:middle;dominant-baseline:central}
+.fm .eN{fill:var(--elN)} .fm .eO{fill:var(--elO)} .fm .eH{fill:var(--muted)} .fm .eP{fill:var(--elP)} .fm .eC,.fm .eMe{fill:var(--ink)}
+.fm .eR{fill:var(--muted);font-size:12px;font-weight:500}
+.fm .chg{font-family:var(--f-body);font-size:13px;fill:var(--elO);font-weight:600;text-anchor:middle;dominant-baseline:central}
+.fm .num{font-family:var(--f-body);font-size:10.5px;fill:var(--muted);text-anchor:middle;dominant-baseline:central;font-weight:500}
+.fm .hb{stroke:var(--accent);stroke-width:2.8;stroke-dasharray:3 4;stroke-linecap:round}
+.fm .clash{stroke:var(--bad);stroke-width:2.2;stroke-dasharray:2 4}
+.fm .x{fill:var(--bad);font-weight:700;font-size:18px;text-anchor:middle;dominant-baseline:central;font-family:var(--f-body)}
+.fm .dl{font-family:var(--f-body);font-size:12.5px;font-weight:600;text-anchor:middle;dominant-baseline:central}
+.fm .dm{fill:var(--elO)} .fm .dp{fill:var(--elN)}
+.fm .tag{font-family:var(--f-body);font-size:10px;font-weight:700;text-anchor:middle;dominant-baseline:central;fill:var(--accent)}
+.fm .hot{fill:var(--accent);fill-opacity:0;stroke:var(--accent);stroke-width:1.8;stroke-dasharray:4 3;cursor:pointer}
+.fm .hot:hover,.fm .hot:focus-visible{fill-opacity:.16;outline:none}
+.fm .hot.found{stroke:var(--ok);stroke-dasharray:none;fill:var(--ok);fill-opacity:.14}
+.fm .hot.on{fill-opacity:.22;stroke-width:2.6}
+.fm .cap{font-family:var(--f-body);font-size:11px;fill:var(--muted);text-anchor:middle}
+.pairhead{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;justify-content:space-between}
+.pairhead b{font-family:var(--f-display);font-size:20px}
+.badge{font-size:13px;font-weight:600;border-radius:999px;padding:3px 10px}
+.badge.ok{background:var(--ok-soft);color:var(--ok)} .badge.bad{background:var(--bad-soft);color:var(--bad)} .badge.warn{background:var(--warn-soft);color:var(--warn)}
+.tm{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.tmtrack{height:12px;border-radius:6px;background:linear-gradient(90deg,var(--C),var(--A));opacity:.9;position:relative}
+.tmtrack span{position:absolute;top:-5px;width:4px;height:22px;border-radius:2px;background:var(--ink);transform:translateX(-2px)}
+.tmscale{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* Codesonne */
+.sunhost{display:flex;justify-content:center}
+svg.sun{width:100%;max-width:440px;height:auto;display:block}
+.sun .sf{stroke:var(--surface);stroke-width:1}
+.sun .r1 .sf,.sun .r2 .sf,.sun .r3 .sf{fill-opacity:.3}
+.sun .sc{fill:var(--surface-2)}
+.sun text{font-family:var(--f-mono);font-weight:700;text-anchor:middle;dominant-baseline:central;fill:var(--ink);pointer-events:none}
+.sun .l0{font-size:10px;font-family:var(--f-body);fill:var(--muted)}
+.sun .l1{font-size:17px} .sun .l2{font-size:12px} .sun .l3{font-size:7.5px}
+.sun .la{font-family:var(--f-body);font-size:9.5px;font-weight:600}
+.sun .r3,.sun .ag{cursor:pointer}
+.sun .aa-np .sf{fill:var(--aa-np)} .sun .aa-p .sf{fill:var(--aa-p)} .sun .aa-ac .sf{fill:var(--aa-ac)} .sun .aa-ba .sf{fill:var(--aa-ba)} .sun .aa-stop .sf{fill:var(--aa-stop)}
+.sun .aa-stop text{fill:var(--aa-stop-ink)}
+.sun .ag:hover .sf,.sun .ag:focus-visible .sf,.sun .r3:hover .sf{stroke:var(--accent);stroke-width:2}
+.sun .ag:focus-visible{outline:none}
+.sun .hl .sf{fill:var(--accent)!important;fill-opacity:1!important}
+.sun .hl text{fill:var(--accent-ink)}
+.aal{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:13px;color:var(--muted)}
+.aal span{display:flex;align-items:center;gap:6px}
+.aal i{width:14px;height:14px;border-radius:3px;display:inline-block;border:1px solid var(--line)}
+
+/* Genexpression */
+.strands{overflow-x:auto;display:grid;gap:10px;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.srow{display:flex;align-items:center;gap:6px;white-space:nowrap;min-width:max-content}
+.slab{font-size:12px;color:var(--muted);width:128px;flex:0 0 128px;position:sticky;left:-10px;background:var(--bg);padding-left:2px;white-space:normal;line-height:1.2}
+.trip{display:inline-flex;gap:1px;margin-right:7px;border-radius:6px;padding:1px 2px}
+.trip.cc{background:var(--accent-soft);outline:2px solid var(--accent)}
+.nt{width:17px;text-align:center;font-family:var(--f-mono);font-weight:700;font-size:15px;border-radius:4px}
+.nt.cur{background:var(--accent);color:var(--accent-ink)}
+.nt.ph{color:var(--line)}
+.nt.dim{color:var(--muted);font-weight:500}
+.end{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.keys{display:flex;gap:8px;flex-wrap:wrap}
+.key{width:52px;height:46px;border-radius:10px;border:0;font-family:var(--f-mono);font-weight:700;font-size:19px;cursor:pointer}
+.key.plain{background:var(--surface-2);color:var(--ink)}
+.pep{display:flex;flex-wrap:wrap;gap:4px;align-items:center;min-height:30px}
+.aa{font-family:var(--f-mono);font-size:13px;font-weight:700;border-radius:6px;padding:3px 6px;color:var(--ink)}
+.aa-np{background:var(--aa-np)} .aa-p{background:var(--aa-p)} .aa-ac{background:var(--aa-ac)} .aa-ba{background:var(--aa-ba)} .aa-stop{background:var(--aa-stop);color:var(--aa-stop-ink)}
+.aa.diff{outline:2px solid var(--bad);outline-offset:1px}
+.aa.off{color:var(--muted);background:transparent}
+.cdn{font-family:var(--f-mono);font-weight:700}
+
+/* Mutationslabor */
+.labwrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.labgrid{display:grid;min-width:max-content}
+.labgrid > div{border-bottom:1px solid var(--line)}
+.labgrid .rl{position:sticky;left:0;z-index:1;background:var(--surface);font-size:12px;color:var(--muted);padding:6px 10px;border-right:1px solid var(--line);display:flex;align-items:center;line-height:1.2;max-width:150px}
+.labgrid .cc{padding:6px 6px;display:flex;justify-content:center;align-items:center;gap:2px;font-family:var(--f-mono);border-left:1px dashed var(--line);font-weight:600}
+.labgrid .cc.n{font-family:var(--f-body);font-size:12px;color:var(--muted);font-weight:500}
+.labgrid .cc.dim{color:var(--muted);font-weight:500}
+.lb{width:24px;height:30px;border:1px solid var(--line);border-radius:6px;background:var(--surface);font-family:var(--f-mono);font-weight:700;cursor:pointer;padding:0;font-size:14px}
+.lb:hover{border-color:var(--accent)}
+.lb.mut{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.lb.sel{outline:3px solid var(--accent);outline-offset:1px}
+.labtools{display:grid;gap:8px;background:var(--surface-2);border-radius:12px;padding:10px 12px}
+.result{border-radius:12px;padding:12px 14px;display:grid;gap:6px;border:2px solid var(--line)}
+.result.ok{border-color:var(--ok);background:var(--ok-soft)}
+.result.bad{border-color:var(--bad);background:var(--bad-soft)}
+.result.warn{border-color:var(--warn);background:var(--warn-soft)}
+.result h3{font-size:18px}
+.tasklist{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.tasklist li{display:flex;gap:10px;align-items:flex-start;font-size:15px}
+.tasklist .st{flex:0 0 22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:12px;font-weight:700}
+.tasklist li.ok .st{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+
+/* Quiz */
+.quiz{display:grid;gap:14px}
+.qmeta{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.qbar{height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden}
+.qbar span{display:block;height:100%;background:var(--accent);transition:width .3s}
+.qq{font-family:var(--f-body);font-weight:500;font-size:19px}
+.seqrow{display:flex;gap:6px;flex-wrap:wrap}
+.cell{width:42px;height:44px;border-radius:8px;display:grid;place-items:center;font-family:var(--f-mono);font-weight:700;font-size:18px;border:2px dashed var(--line)}
+.cell.f{border-style:solid;border-color:transparent}
+.cell.gap{margin-right:10px}
+.cell.ok{outline:3px solid var(--ok);outline-offset:1px}
+.cell.bad{outline:3px solid var(--bad);outline-offset:1px}
+.score{font-family:var(--f-display);font-size:44px;font-weight:800;font-variant-numeric:tabular-nums}
+
+/* Wortspeicher */
+.panel{position:fixed;inset:0;z-index:60;background:rgba(10,20,26,.45);display:grid;place-items:center;padding:16px}
+.panel-in{background:var(--surface);color:var(--ink);border-radius:16px;max-width:620px;width:100%;max-height:85vh;overflow:auto;padding:18px;display:grid;gap:12px}
+.words{width:100%;border-collapse:collapse;font-size:15px}
+.words td,.words th{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.words th{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.words td:first-child{white-space:nowrap}
+.tablewrap{overflow-x:auto}
+
+details.teacher{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 18px;font-size:15px}
+details.teacher summary{cursor:pointer;font-family:var(--f-display);font-weight:600;font-size:17px}
+details.teacher h4{margin:14px 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+details.teacher ul{margin:0;padding-left:20px;display:grid;gap:4px;max-width:78ch}
+
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="seqmark" aria-hidden="true"><span class="cG">G</span><span class="cA">A</span><span class="cC">C</span><span class="cT">T</span><span class="cA">A</span></div>
+      <h1>DNA-Baukasten</h1>
+      <p class="sub" id="sub">Biologie Klasse 10 · Der Aufbau der DNA in fünf Schritten und ein Quiz</p>
+    </div>
+    <div class="hdr-tools">
+      <div class="level" role="radiogroup" aria-label="Niveau" id="levelSw">
+        <button type="button" role="radio" data-l="sek1" aria-checked="true">Sekundarstufe I<small>Klasse 10</small></button>
+        <button type="button" role="radio" data-l="sek2" aria-checked="false">Oberstufe<small>Sek II</small></button>
+      </div>
+      <button class="btn" id="openWords" type="button">Wortspeicher</button>
+    </div>
+  </header>
+
+  <p class="hint" id="hint"></p>
+
+  <nav class="steps" id="steps" aria-label="Stationen"></nav>
+
+  <main>
+  <!-- ===================== SEKUNDARSTUFE I ===================== -->
+  <section class="station" data-level="sek1" data-i="0">
+    <div class="brief">
+      <p class="eyebrow">Station 1 von 6</p>
+      <h2>Die drei Teile</h2>
+      <div class="say">
+        <p>In jeder Zelle gibt es DNA.</p>
+        <p>Die DNA enthält die Erbinformation.</p>
+        <p>Sie ist aus vielen kleinen Bausteinen gebaut.</p>
+        <p>Jeder Baustein hat drei Teile.</p>
+      </div>
+      <div class="task">
+        <h3>Auftrag</h3>
+        <ol>
+          <li>Tippe auf ein Teil. Lies, wie es heißt.</li>
+          <li>Lies den Bauplan.</li>
+          <li>Ziehe jedes Teil in das richtige Feld.</li>
+        </ol>
+      </div>
+      <div class="plan">
+        <b>Bauplan</b>
+        <p>Der Zucker liegt in der Mitte.</p>
+        <p>Das Phosphat hängt oben am Zucker.</p>
+        <p>Die Base hängt rechts am Zucker.</p>
+      </div>
+      <div class="row"><button class="btn small speak" type="button">Vorlesen</button></div>
+      <div class="merke" hidden>
+        <h3>Merke</h3>
+        <p>Ein Baustein der DNA besteht aus Phosphat, Zucker und Base.</p>
+        <p>Das Fachwort für den Baustein ist <b>Nukleotid</b>.</p>
+      </div>
+    </div>
+    <div class="work">
+      <div class="lbl">Teile</div>
+      <div class="tray" id="tray0"></div>
+      <div class="info" id="info0"></div>
+      <div class="lbl">Bauplatz</div>
+      <div class="stage"><div class="board" id="board0"></div></div>
+      <p class="fb" id="fb0" role="status" aria-live="polite"></p>
+      <div class="actions"><button class="btn small reset" type="button">Neu anfangen</button><button class="btn primary next" type="button">Weiter zu Station 2</button></div>
+    </div>
+  </section>
+
+  <section class="station" data-level="sek1" data-i="1" hidden>
+    <div class="brief">
+      <p class="eyebrow">Station 2 von 6</p>
+      <h2>Vier Basen</h2>
+      <div class="say">
+        <p>Es gibt vier verschiedene Basen.</p>
+        <p>Man schreibt sie mit Buchstaben: A, T, G und C.</p>
+        <p>A und G sind lang. Sie haben Zacken.</p>
+        <p>T und C sind kurz. Sie haben Lücken.</p>
+      </div>
+      <div class="task">
+        <h3>Auftrag</h3>
+        <ol>
+          <li>Zähle die Zacken und die Lücken.</li>
+          <li>Ziehe jede Base in ein freies Feld.</li>
+          <li>Die Teile müssen genau ineinander passen.</li>
+        </ol>
+      </div>
+      <div class="row"><button class="btn small speak" type="button">Vorlesen</button></div>
+      <div class="merke" hidden>
+        <h3>Merke</h3>
+        <p><b>A passt nur zu T. G passt nur zu C.</b></p>
+        <p>Zwei passende Basen bilden ein <b>Basenpaar</b>.</p>
+        <p>Eine lange und eine kurze Base ergeben immer ein gleich langes Paar.</p>
+        <p class="note">Im Modell sind es Zacken. In echt halten schwache Anziehungskräfte die Basen zusammen: bei A und T zwei, bei G und C drei.</p>
+      </div>
+    </div>
+    <div class="work">
+      <div class="lbl">Basen</div>
+      <div class="tray" id="tray1"></div>
+      <div class="info" id="info1"></div>
+      <div class="lbl">Basenpaare</div>
+      <div class="stage"><div class="board" id="board1"></div></div>
+      <p class="fb" id="fb1" role="status" aria-live="polite"></p>
+      <div class="actions"><button class="btn small reset" type="button">Neu anfangen</button><button class="btn primary next" type="button">Weiter zu Station 3</button></div>
+    </div>
+  </section>
+
+  <section class="station" data-level="sek1" data-i="2" hidden>
+    <div class="brief">
+      <p class="eyebrow">Station 3 von 6</p>
+      <h2>Ein Strang</h2>
+      <div class="say">
+        <p>Viele Bausteine hängen untereinander.</p>
+        <p>So entsteht ein Strang.</p>
+        <p>Ein Phosphat verbindet immer zwei Zucker.</p>
+      </div>
+      <div class="task">
+        <h3>Auftrag</h3>
+        <ol>
+          <li>Lies den Bauplan von oben nach unten.</li>
+          <li>Ziehe die passenden Bausteine auf Platz 1 bis 5.</li>
+          <li>Beantworte dann die Frage.</li>
+        </ol>
+      </div>
+      <div class="plan">
+        <b>Bauplan (von oben nach unten)</b>
+        <div class="chips" id="plan3"></div>
+      </div>
+      <div class="row"><button class="btn small speak" type="button">Vorlesen</button></div>
+      <div class="merke" hidden>
+        <h3>Merke</h3>
+        <p>Zucker und Phosphat bilden die Seite des Strangs. Man nennt sie <b>Rückgrat</b>.</p>
+        <p>Nur die Basen sind verschieden.</p>
+        <p>Die <b>Reihenfolge der Basen</b> ist die Information. Sie ist wie eine Schrift mit vier Buchstaben.</p>
+      </div>
+    </div>
+    <div class="work">
+      <div class="lbl">Bausteine (unbegrenzt)</div>
+      <div class="tray" id="tray2"></div>
+      <div class="row" style="justify-content:space-between"><span class="lbl">Dein Strang</span><button class="btn small" id="railBtn" type="button" aria-pressed="false" hidden>Rückgrat zeigen</button></div>
+      <div class="stage"><div class="board" id="board2"></div></div>
+      <p class="fb" id="fb2" role="status" aria-live="polite"></p>
+      <div class="check" id="check2" hidden>
+        <h3>Frage: Vergleiche die fünf Bausteine. Was ist bei allen gleich?</h3>
+        <div class="opts" id="opts2"></div>
+      </div>
+      <div class="actions"><button class="btn small reset" type="button">Neu anfangen</button><button class="btn primary next" type="button">Weiter zu Station 4</button></div>
+    </div>
+  </section>
+
+  <section class="station" data-level="sek1" data-i="3" hidden>
+    <div class="brief">
+      <p class="eyebrow">Station 4 von 6</p>
+      <h2>Zwei Stränge</h2>
+      <div class="say">
+        <p>Die DNA hat zwei Stränge.</p>
+        <p>Die Stränge liegen sich gegenüber.</p>
+        <p>In der Mitte bilden die Basen Paare.</p>
+      </div>
+      <div class="task">
+        <h3>Auftrag</h3>
+        <ol>
+          <li>Links ist dein Strang aus Station 3.</li>
+          <li>Baue rechts den zweiten Strang.</li>
+          <li>Achte auf die Paare: A mit T, G mit C.</li>
+        </ol>
+      </div>
+      <div class="plan">
+        <b>Achtung</b>
+        <p>Der zweite Strang steht auf dem Kopf.</p>
+        <p>Sein Phosphat ist unten am Zucker.</p>
+      </div>
+      <div class="row"><button class="btn small speak" type="button">Vorlesen</button></div>
+      <div class="merke" hidden>
+        <h3>Merke</h3>
+        <p>Die zwei Stränge passen genau zusammen.</p>
+        <p>Kennt man einen Strang, kennt man auch den anderen.</p>
+        <p>Das Fachwort dafür ist <b>komplementär</b>.</p>
+      </div>
+      <details class="pro">
+        <summary>Für Profis</summary>
+        <p>Die zwei Stränge laufen in entgegengesetzte Richtungen. Das Fachwort ist <b>antiparallel</b>. Im Modell erkennst du es am Phosphat: links oben am Zucker, rechts unten.</p>
+        <p>Die Basenpaare werden durch <b>Wasserstoffbrücken</b> zusammengehalten: A und T durch zwei, G und C durch drei.</p>
+      </details>
+    </div>
+    <div class="work">
+      <div class="lbl">Bausteine für den zweiten Strang (unbegrenzt)</div>
+      <div class="tray" id="tray3"></div>
+      <div class="lbl">Doppelstrang</div>
+      <div class="stage"><div class="board" id="board3"></div></div>
+      <p class="fb" id="fb3" role="status" aria-live="polite"></p>
+      <div class="actions"><button class="btn small reset" type="button">Neu anfangen</button><button class="btn primary next" type="button">Weiter zu Station 5</button></div>
+    </div>
+  </section>
+
+  <section class="station" data-level="sek1" data-i="4" hidden>
+    <div class="brief">
+      <p class="eyebrow">Station 5 von 6</p>
+      <h2>Die Doppelhelix</h2>
+      <div class="say">
+        <p>Zwei Stränge sehen aus wie eine Leiter.</p>
+        <p>Die Seiten der Leiter sind Zucker und Phosphat.</p>
+        <p>Die Sprossen sind die Basenpaare.</p>
+        <p>In der Zelle ist die Leiter verdreht.</p>
+        <p>Diese Form heißt Doppelhelix.</p>
+      </div>
+      <div class="task">
+        <h3>Auftrag</h3>
+        <ol>
+          <li>Ziehe den Regler nach rechts.</li>
+          <li>Drehe das Modell mit dem Finger oder mit der Maus.</li>
+          <li>Beantworte die Frage.</li>
+        </ol>
+      </div>
+      <div class="row"><button class="btn small speak" type="button">Vorlesen</button></div>
+      <div class="facts">
+        <b>Zahlen zur DNA</b>
+        <p>Die Doppelhelix ist etwa <span class="num">2</span> Nanometer dick.</p>
+        <p>Ein Haar ist etwa <span class="num">40 000</span>-mal dicker.</p>
+        <p>Die DNA aus einer Körperzelle ist ausgestreckt etwa <span class="num">2</span> Meter lang.</p>
+      </div>
+      <div class="merke" hidden>
+        <h3>Merke</h3>
+        <p>Die DNA ist eine verdrehte Leiter. Diese Form heißt <b>Doppelhelix</b>.</p>
+        <p>Nach etwa 10 Basenpaaren hat sie sich einmal ganz gedreht.</p>
+      </div>
+    </div>
+    <div class="work">
+      <div class="helixbox">
+        <canvas class="helix" id="helix1" aria-label="Modell der DNA. Mit dem Regler wird die Leiter verdreht."></canvas>
+        <div class="range"><span>Leiter</span><input type="range" id="twist1" min="0" max="100" value="0" aria-label="Leiter verdrehen"><span>Doppelhelix</span></div>
+        <div class="row" style="justify-content:space-between">
+          <div class="legend">
+            <span><i class="sw" style="background:var(--sugar)"></i>Zucker</span>
+            <span><i class="sw" style="background:var(--phos)"></i>Phosphat</span>
+            <span><i class="sw" style="background:var(--A)"></i>A</span>
+            <span><i class="sw" style="background:var(--T)"></i>T</span>
+            <span><i class="sw" style="background:var(--G)"></i>G</span>
+            <span><i class="sw" style="background:var(--C)"></i>C</span>
+          </div>
+          <button class="btn small" id="spin1" type="button" aria-pressed="false">Drehen</button>
+        </div>
+      </div>
+      <div class="check">
+        <h3>Frage: Wie viele Basenpaare braucht die Leiter für eine ganze Drehung?</h3>
+        <p class="note">Tipp: Verfolge einen Strang. Wann ist er wieder an der gleichen Stelle? Die Zahlen links helfen beim Zählen.</p>
+        <div class="opts" id="opts4"></div>
+      </div>
+      <p class="fb" id="fb4" role="status" aria-live="polite"></p>
+      <div class="actions"><span></span><button class="btn primary next" type="button">Weiter zum Quiz</button></div>
+    </div>
+  </section>
+
+  <section class="station" data-level="sek1" data-i="5" hidden>
+    <div class="brief">
+      <p class="eyebrow">Station 6 von 6</p>
+      <h2>Quiz</h2>
+      <div class="say">
+        <p>Teste dein Wissen.</p>
+        <p>Es gibt zehn Fragen.</p>
+        <p>Nach jeder Frage siehst du, ob deine Antwort richtig ist.</p>
+      </div>
+      <div class="row"><button class="btn small speak" type="button">Vorlesen</button></div>
+    </div>
+    <div class="work"><div class="quiz" id="quiz1"></div></div>
+  </section>
+
+  <!-- ===================== OBERSTUFE ===================== -->
+  <section class="station" data-level="sek2" data-i="0" hidden>
+    <div class="brief">
+      <p class="eyebrow">Station 1 von 6 · Oberstufe</p>
+      <h2>Das Nukleotid</h2>
+      <div class="txt">
+        <p>Nukleotide sind die Monomere der Nukleinsäuren. Ein Desoxyribonukleotid besteht aus einer heterocyclischen Stickstoffbase, der Pentose 2′-Desoxyribose und einem Phosphatrest.</p>
+        <p>Die C-Atome des Zuckers werden mit Strich nummeriert (1′ bis 5′), um sie von den Ringatomen der Base zu unterscheiden. Purine (A, G) besitzen ein bicyclisches Ringsystem, Pyrimidine (T, C) einen Sechsring.</p>
+      </div>
+      <div class="task">
+        <h3>Arbeitsauftrag</h3>
+        <ol>
+          <li>Vergleiche die Modelldarstellung mit der Strukturformel.</li>
+          <li>Wähle nacheinander alle vier Basen und ordne sie den Purinen bzw. Pyrimidinen zu.</li>
+          <li>Suche in der Strukturformel die genannten Strukturmerkmale und tippe die markierte Stelle an.</li>
+        </ol>
+      </div>
+      <div class="plan" id="o1Task"></div>
+      <div class="merke" hidden>
+        <h3>Merke</h3>
+        <p>Base + Desoxyribose = Nukleosid (N-glykosidische Bindung zwischen C1′ und N9 der Purine bzw. N1 der Pyrimidine).</p>
+        <p>Nukleosid + Phosphat = Nukleotid (Phosphorsäureesterbindung an C5′).</p>
+        <p>Im Strang verknüpft das Phosphat die 3′-OH-Gruppe eines Nukleotids mit der 5′-Position des nächsten (3′,5′-Phosphodiesterbindung). Daraus folgt die Polarität jedes Strangs: 5′-Ende mit Phosphat, 3′-Ende mit freier OH-Gruppe.</p>
+      </div>
+    </div>
+    <div class="work">
+      <div class="tools">
+        <div><span class="seg-lbl">Darstellung</span><span class="seg" role="radiogroup" aria-label="Darstellung" id="o1View"><button type="button" role="radio" data-v="model">Modell</button><button type="button" role="radio" data-v="formula">Strukturformel</button></span></div>
+        <div><span class="seg-lbl">Base</span><span class="seg" role="radiogroup" aria-label="Base" id="o1Base"><button type="button" role="radio" data-v="A">A</button><button type="button" role="radio" data-v="G">G</button><button type="button" role="radio" data-v="T">T</button><button type="button" role="radio" data-v="C">C</button></span></div>
+        <button class="btn small" id="o1Num" type="button" aria-pressed="false">Atome nummerieren</button>
+      </div>
+      <div class="fmhost" id="o1Board"></div>
+      <div class="info" id="infoO1"></div>
+      <p class="fb" id="fbO1" role="status" aria-live="polite"></p>
+      <div class="actions"><button class="btn small reset" type="button">Neu anfangen</button><button class="btn primary next" type="button">Weiter zu Station 2</button></div>
+    </div>
+  </section>
+
+  <section class="station" data-level="sek2" data-i="1" hidden>
+    <div class="brief">
+      <p class="eyebrow">Station 2 von 6 · Oberstufe</p>
+      <h2>Wasserstoffbrücken</h2>
+      <div class="txt">
+        <p>Die komplementären Basen beider Stränge sind über Wasserstoffbrücken verbunden.</p>
+        <p>Eine Wasserstoffbrücke ist eine gerichtete, überwiegend elektrostatische Wechselwirkung: Ein H-Atom, das kovalent an ein stark elektronegatives Atom gebunden ist (<b>Donor</b>, hier N–H), tritt mit einem freien Elektronenpaar eines anderen elektronegativen Atoms (<b>Akzeptor</b>, hier N oder O) in Wechselwirkung. Die Polarität der N–H-Bindung erzeugt am H-Atom eine positive Partialladung (δ+).</p>
+        <p class="note">Elektronegativität nach Pauling: O 3,44 · N 3,04 · C 2,55 · H 2,20</p>
+        <p>Mit etwa 5–30 kJ/mol ist eine Wasserstoffbrücke rund eine Größenordnung schwächer als eine kovalente Bindung (C–N ca. 300 kJ/mol). Der Donor-Akzeptor-Abstand in Basenpaaren beträgt etwa 0,28–0,30 nm.</p>
+      </div>
+      <div class="task">
+        <h3>Arbeitsauftrag</h3>
+        <ol>
+          <li>Vergleiche A–T und G–C. Tippe auf die markierten Positionen zwischen den Basen.</li>
+          <li>Blende Partialladungen sowie Donoren und Akzeptoren ein.</li>
+          <li>Teste die Fehlpaarungen A–C und G–T und begründe, warum sie nicht stabil sind.</li>
+          <li>Untersuche den Zusammenhang zwischen GC-Gehalt und Schmelztemperatur.</li>
+        </ol>
+      </div>
+      <div class="callout">
+        <b>Wichtig für die Bewertung</b>
+        <p>Für die Stabilität der Doppelhelix sind die Stapelwechselwirkungen zwischen benachbarten Basenpaaren mindestens ebenso bedeutsam wie die Wasserstoffbrücken. Die Wasserstoffbrücken bestimmen vor allem die <b>Spezifität</b> der Paarung. Auch die höhere Schmelztemperatur GC-reicher DNA geht zu einem erheblichen Teil auf die stärkere Stapelung zurück, nicht allein auf die dritte Wasserstoffbrücke.</p>
+      </div>
+      <div class="merke" hidden>
+        <h3>Merke</h3>
+        <p>A–T: zwei, G–C: drei Wasserstoffbrücken.</p>
+        <p>Die Komplementarität beruht auf passenden Donor-Akzeptor-Mustern und auf der Geometrie: Purin + Pyrimidin ergibt stets dieselbe Paarbreite.</p>
+        <p>Einzeln schwache Wasserstoffbrücken sind reversibel lösbar. Das ist die Voraussetzung für das Öffnen des Doppelstrangs bei Replikation und Transkription.</p>
+      </div>
+    </div>
+    <div class="work">
+      <div class="tools">
+        <div><span class="seg-lbl">Darstellung</span><span class="seg" role="radiogroup" aria-label="Darstellung" id="o2View"><button type="button" role="radio" data-v="model">Modell</button><button type="button" role="radio" data-v="formula">Strukturformel</button></span></div>
+        <div><span class="seg-lbl">Purin</span><span class="seg" role="radiogroup" aria-label="Purinbase" id="o2Pu"><button type="button" role="radio" data-v="A">A</button><button type="button" role="radio" data-v="G">G</button></span></div>
+        <div><span class="seg-lbl">Pyrimidin</span><span class="seg" role="radiogroup" aria-label="Pyrimidinbase" id="o2Py"><button type="button" role="radio" data-v="T">T</button><button type="button" role="radio" data-v="C">C</button></span></div>
+      </div>
+      <div class="tools">
+        <button class="btn small" id="o2Delta" type="button" aria-pressed="false">Partialladungen δ+ / δ−</button>
+        <button class="btn small" id="o2DA" type="button" aria-pressed="false">Donor / Akzeptor</button>
+      </div>
+      <div class="pairhead" id="o2Head"></div>
+      <div class="fmhost" id="o2Board"></div>
+      <div class="info" id="infoO2"></div>
+      <div class="tm">
+        <h3>GC-Gehalt und Schmelztemperatur</h3>
+        <div class="range"><span>20 %</span><input type="range" id="gc" min="20" max="80" value="50" aria-label="GC-Gehalt in Prozent"><span>80 %</span></div>
+        <p>GC-Gehalt <b class="num" id="gcV">50 %</b> → T<sub>m</sub> ≈ <b class="num" id="tmV">89,8 °C</b></p>
+        <div class="tmtrack" aria-hidden="true"><span id="tmBar"></span></div>
+        <div class="tmscale" aria-hidden="true"><span>75 °C</span><span>85 °C</span><span>95 °C</span><span>105 °C</span></div>
+        <div class="row"><button class="btn small" type="button" data-gc="41">Mensch (≈ 41 % GC)</button><button class="btn small" type="button" data-gc="51"><i>E. coli</i> (≈ 51 % GC)</button></div>
+        <p class="note">Näherung nach Marmur und Doty für lange, doppelsträngige DNA in Standard-Salzlösung: T<sub>m</sub> ≈ 69,3 °C + 0,41 · GC-Gehalt (in %).</p>
+      </div>
+      <div class="check">
+        <h3>Frage: Warum bilden A und C kein stabiles Basenpaar?</h3>
+        <div class="opts" id="o2Opts"></div>
+      </div>
+      <p class="fb" id="fbO2" role="status" aria-live="polite"></p>
+      <div class="actions"><button class="btn small reset" type="button">Neu anfangen</button><button class="btn primary next" type="button">Weiter zu Station 3</button></div>
+    </div>
+  </section>
+
+  <section class="station" data-level="sek2" data-i="2" hidden>
+    <div class="brief">
+      <p class="eyebrow">Station 3 von 6 · Oberstufe</p>
+      <h2>Die Doppelhelix</h2>
+      <div class="txt">
+        <p>In der physiologisch vorherrschenden B-Form winden sich zwei antiparallele Polynukleotidstränge rechtsgängig um eine gemeinsame Achse.</p>
+        <p>Die Basenpaare liegen nahezu senkrecht zur Achse im Inneren; das negativ geladene Zucker-Phosphat-Rückgrat liegt außen. Weil die glykosidischen Bindungen eines Basenpaars nicht genau gegenüberliegen, entstehen eine große und eine kleine Furche.</p>
+      </div>
+      <div class="task">
+        <h3>Arbeitsauftrag</h3>
+        <ol>
+          <li>Verdrehe die Leiter und markiere die 5′- und 3′-Enden.</li>
+          <li>Blende die Furchen ein und vergleiche ihre Breite.</li>
+          <li>Bestimme die Anzahl der Basenpaare pro Windung (21 Basenpaare sind dargestellt).</li>
+        </ol>
+      </div>
+      <div class="facts">
+        <b>Kenngrößen der B-DNA</b>
+        <table>
+          <tr><td>Durchmesser</td><td class="num">≈ 2 nm</td></tr>
+          <tr><td>Anstieg pro Basenpaar</td><td class="num">≈ 0,34 nm</td></tr>
+          <tr><td>Basenpaare pro Windung</td><td class="num">≈ 10,5</td></tr>
+          <tr><td>Ganghöhe</td><td class="num">≈ 3,4–3,6 nm</td></tr>
+          <tr><td>Breite große / kleine Furche</td><td class="num">≈ 2,2 nm / 1,2 nm</td></tr>
+        </table>
+        <p class="note">Sequenzspezifische Proteine wie Transkriptionsfaktoren erkennen die Basenfolge überwiegend über die große Furche, in der die Basenränder besser zugänglich sind.</p>
+      </div>
+      <div class="merke" hidden>
+        <h3>Merke</h3>
+        <p>B-DNA: rechtsgängige Doppelhelix aus zwei antiparallelen, komplementären Strängen; Basenpaare innen, Zucker-Phosphat-Rückgrat außen; große und kleine Furche.</p>
+      </div>
+    </div>
+    <div class="work">
+      <div class="helixbox">
+        <canvas class="helix" id="helix2" aria-label="Modell der B-DNA mit 21 Basenpaaren"></canvas>
+        <div class="range"><span>Leiter</span><input type="range" id="twist2" min="0" max="100" value="0" aria-label="Leiter verdrehen"><span>Doppelhelix</span></div>
+        <div class="row" style="justify-content:space-between">
+          <div class="row">
+            <button class="btn small" id="ends2" type="button" aria-pressed="true">5′/3′-Enden</button>
+            <button class="btn small" id="groove2" type="button" aria-pressed="false">Furchen</button>
+          </div>
+          <button class="btn small" id="spin2" type="button" aria-pressed="false">Drehen</button>
+        </div>
+        <div class="legend">
+          <span><i class="sw" style="background:var(--sugar)"></i>Desoxyribose</span>
+          <span><i class="sw" style="background:var(--phos)"></i>Phosphat</span>
+          <span><i class="sw" style="background:var(--A)"></i>A</span>
+          <span><i class="sw" style="background:var(--T)"></i>T</span>
+          <span><i class="sw" style="background:var(--G)"></i>G</span>
+          <span><i class="sw" style="background:var(--C)"></i>C</span>
+        </div>
+      </div>
+      <div class="check">
+        <h3>Frage: Warum liegen die Basen im Inneren, das Zucker-Phosphat-Rückgrat außen?</h3>
+        <div class="opts" id="o3Opts"></div>
+      </div>
+      <p class="fb" id="fbO3" role="status" aria-live="polite"></p>
+      <div class="actions"><span></span><button class="btn primary next" type="button">Weiter zu Station 4</button></div>
+    </div>
+  </section>
+
+  <section class="station" data-level="sek2" data-i="3" hidden>
+    <div class="brief">
+      <p class="eyebrow">Station 4 von 6 · Oberstufe</p>
+      <h2>Den genetischen Code ablesen</h2>
+      <div class="txt">
+        <p><b>Transkription:</b> Die RNA-Polymerase liest den codogenen Strang (Matrizenstrang) in 3′→5′-Richtung. Die mRNA wird komplementär in 5′→3′-Richtung synthetisiert, mit Uracil anstelle von Thymin. Ihre Sequenz entspricht damit der des codierenden Strangs.</p>
+        <p><b>Translation:</b> Das Ribosom liest die mRNA ab dem Startcodon in nicht überlappenden Tripletts (Codons). tRNA-Moleküle mit komplementärem Anticodon liefern die passenden Aminosäuren.</p>
+      </div>
+      <div class="task">
+        <h3>Arbeitsauftrag</h3>
+        <ol>
+          <li>Transkribiere den codogenen Strang: Wähle für jede markierte Position das passende Ribonukleotid.</li>
+          <li>Übersetze die mRNA mithilfe der Codesonne: Tippe für jedes Codon auf die Aminosäure. Lies von innen (5′) nach außen (3′).</li>
+        </ol>
+      </div>
+      <div class="plan">
+        <b>Sequenz</b>
+        <p>Beginn des menschlichen β-Globin-Gens (<i>HBB</i>), Codons 1–12. Der Ausschnitt liegt in Exon 1; Promotor und regulatorische Sequenzen sind nicht dargestellt.</p>
+      </div>
+      <div class="merke" hidden>
+        <h3>Merke: Eigenschaften des genetischen Codes</h3>
+        <ul>
+          <li>Triplett-Code: drei Basen codieren eine Aminosäure.</li>
+          <li>Degeneriert (redundant): Viele Aminosäuren werden von mehreren Codons codiert.</li>
+          <li>Eindeutig: Jedes Codon steht für genau eine Aminosäure.</li>
+          <li>Kommafrei und nicht überlappend.</li>
+          <li>Nahezu universell.</li>
+          <li>AUG ist Startcodon (Methionin); UAA, UAG und UGA sind Stoppcodons.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="work">
+      <div class="row" style="justify-content:space-between"><span class="lbl" id="gePhase">Phase 1: Transkription</span><span class="note" id="geProg"></span></div>
+      <div class="strands" id="geStrands"></div>
+      <div id="geTx" class="row">
+        <div class="keys" id="geKeys"></div>
+        <button class="btn small" id="geAutoTx" type="button">Rest automatisch transkribieren</button>
+      </div>
+      <div id="geTl" hidden>
+        <div class="row" style="justify-content:space-between">
+          <p id="geCodon"></p>
+          <div class="row"><button class="btn small" id="gePath" type="button" aria-pressed="false">Leseweg zeigen</button><button class="btn small" id="geAutoTl" type="button">Rest automatisch übersetzen</button></div>
+        </div>
+        <div class="lbl" style="margin-top:8px">Polypeptid (N-Terminus links)</div>
+        <div class="pep" id="gePep"></div>
+      </div>
+      <p class="fb" id="fbO4" role="status" aria-live="polite"></p>
+      <div class="info" id="infoO4"></div>
+      <div class="sunhost" id="sun1"></div>
+      <div class="aal" aria-label="Legende Aminosäureeigenschaften">
+        <span><i style="background:var(--aa-np)"></i>unpolar</span><span><i style="background:var(--aa-p)"></i>polar, ungeladen</span><span><i style="background:var(--aa-ac)"></i>sauer</span><span><i style="background:var(--aa-ba)"></i>basisch</span><span><i style="background:var(--aa-stop)"></i>Stopp</span>
+      </div>
+      <div class="actions"><button class="btn small reset" type="button">Neu anfangen</button><button class="btn primary next" type="button">Weiter zu Station 5</button></div>
+    </div>
+  </section>
+
+  <section class="station" data-level="sek2" data-i="4" hidden>
+    <div class="brief">
+      <p class="eyebrow">Station 5 von 6 · Oberstufe</p>
+      <h2>Mutationslabor</h2>
+      <div class="txt">
+        <p>Genmutationen verändern die Basensequenz der DNA. Ob und wie sich das Genprodukt verändert, hängt vom Mutationstyp, von der Degeneriertheit des Codes und von den Eigenschaften der betroffenen Aminosäuren ab.</p>
+        <p>Bearbeite den codierenden Strang des <i>HBB</i>-Ausschnitts. mRNA, Aminosäuresequenz und Einordnung werden sofort aktualisiert.</p>
+      </div>
+      <div class="task">
+        <h3>Aufträge (werden automatisch geprüft)</h3>
+        <ul class="tasklist" id="labTasks"></ul>
+        <p class="note">Jeder Auftrag geht vom Wildtyp aus. Beschreibe die Folgen jeweils schriftlich.</p>
+      </div>
+      <div class="merke" hidden>
+        <h3>Merke</h3>
+        <ul>
+          <li><b>Substitution</b>: stumm (gleiche Aminosäure), Missense (andere Aminosäure) oder Nonsense (Stoppcodon).</li>
+          <li><b>Insertion/Deletion</b> von 3n Nukleotiden: Aminosäuren kommen hinzu oder fallen weg; das Leseraster bleibt erhalten.</li>
+          <li><b>Rastermutation</b>: Insertion/Deletion, deren Länge kein Vielfaches von drei ist. Alle folgenden Codons werden verändert gelesen, häufig mit vorzeitigem Stopp.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="work">
+      <div class="lbl">Beispiele laden</div>
+      <div class="row" id="labPresets"></div>
+      <div class="labwrap"><div class="labgrid" id="labGrid"></div></div>
+      <div class="labtools" id="labTools"></div>
+      <div class="result" id="labResult"></div>
+      <div class="row"><button class="btn small" id="labSunBtn" type="button" aria-pressed="false">Codesonne einblenden</button></div>
+      <div id="labSunWrap" hidden>
+        <div class="sunhost" id="sun2"></div>
+        <div class="info" id="infoO5"></div>
+      </div>
+      <p class="fb" id="fbO5" role="status" aria-live="polite"></p>
+      <div class="actions"><button class="btn small reset" type="button">Alles zurücksetzen</button><button class="btn primary next" type="button">Weiter zum Quiz</button></div>
+    </div>
+  </section>
+
+  <section class="station" data-level="sek2" data-i="5" hidden>
+    <div class="brief">
+      <p class="eyebrow">Station 6 von 6 · Oberstufe</p>
+      <h2>Quiz</h2>
+      <div class="txt">
+        <p>Elf Fragen zu Struktur der DNA, Wasserstoffbrücken, Proteinbiosynthese und Mutationen.</p>
+        <p>Bei falschen Antworten wird auf die passende Station verwiesen.</p>
+      </div>
+    </div>
+    <div class="work"><div class="quiz" id="quiz2"></div></div>
+  </section>
+  </main>
+
+  <details class="teacher" data-level="sek1">
+    <summary>Hinweise für Lehrkräfte (Klasse 10)</summary>
+    <h4>Lernziele</h4>
+    <ul>
+      <li>Die Schüler:innen beschreiben den Bau eines Nukleotids aus Phosphat, Desoxyribose und Base.</li>
+      <li>Sie wenden die komplementäre Basenpaarung (A–T, G–C) an und begründen sie im Modell über Form und Anzahl der Bindungsstellen.</li>
+      <li>Sie unterscheiden das Zucker-Phosphat-Rückgrat von der Basensequenz als Träger der Information.</li>
+      <li>Sie beschreiben die Doppelhelix als räumliche Struktur des Doppelstrangs.</li>
+    </ul>
+    <h4>Ablauf</h4>
+    <ul>
+      <li>Etwa 30 bis 35 Minuten, Einzel- oder Partnerarbeit. Der Strang aus Station 3 ist der Ausgangsstrang in Station 4.</li>
+      <li>Fehler werden als „Falsch“ markiert und mit einem Hinweis auf das Merkmal erklärt. Im Quiz verweist jede falsche Antwort auf die passende Station.</li>
+    </ul>
+    <h4>Sprachsensible Gestaltung (DaF/DaZ)</h4>
+    <ul>
+      <li>Kurze Hauptsätze, wiederkehrende Satzmuster („X passt zu Y“, „hängt oben/rechts am Zucker“); Lokaladverbien werden im Bauplan handlungsbezogen geübt.</li>
+      <li>Fachwörter erscheinen erst nach der Handlung in der Merke-Box. Der Wortspeicher nennt Artikel und Plural.</li>
+      <li>Die Vorlesefunktion nutzt die Sprachausgabe des Geräts und funktioniert nur, wenn dort eine deutsche Stimme installiert ist.</li>
+    </ul>
+    <h4>Modellgrenzen (Impulse für eine Modellkritik)</h4>
+    <ul>
+      <li>Zacken und Lücken stehen symbolisch für Wasserstoffbrücken (A–T: 2, G–C: 3).</li>
+      <li>Der Größenunterschied zwischen Purinen und Pyrimidinen ist über die Länge der Bausteine dargestellt.</li>
+      <li>Die Antiparallelität ist nur über die Lage des Phosphats angedeutet.</li>
+      <li>Die Helix zeigt 10 Basenpaare pro Windung (B-DNA: ca. 10,5) und keine Furchen. Die Oberstufenversion stellt beides differenzierter dar.</li>
+    </ul>
+  </details>
+
+  <details class="teacher" data-level="sek2" hidden>
+    <summary>Hinweise für Lehrkräfte (Oberstufe)</summary>
+    <h4>Lernziele</h4>
+    <ul>
+      <li>Strukturformel eines Desoxyribonukleotids erläutern (N-glykosidische Bindung, Phosphorsäureester, 2′-Desoxy-Position, 3′-OH) und die Polarität des Strangs ableiten.</li>
+      <li>Wasserstoffbrücken über Donor-Akzeptor-Muster und Partialladungen erklären; Fehlpaarungen begründet ausschließen; GC-Gehalt und Schmelztemperatur in Beziehung setzen.</li>
+      <li>Strukturmerkmale der B-DNA (rechtsgängig, antiparallel, Furchen, Kenngrößen) beschreiben.</li>
+      <li>Transkription und Translation an einer realen Gensequenz durchführen; die Codesonne sicher anwenden; Codon-Anticodon-Paarung angeben.</li>
+      <li>Genmutationen klassifizieren und ihre Folgen auf Proteinebene begründen, u. a. am Beispiel der Sichelzellanämie.</li>
+    </ul>
+    <h4>Einsatz</h4>
+    <ul>
+      <li>Als Lernpfad (ca. 2 Doppelstunden) oder stationsweise, etwa das Mutationslabor als Übungs- und Transferphase. Die Laboraufträge werden automatisch geprüft, die schriftliche Beschreibung der Folgen jedoch nicht.</li>
+    </ul>
+    <h4>Modellgrenzen und Hinweise</h4>
+    <ul>
+      <li>Strukturformeln mit idealisierter Geometrie (regelmäßige Fünf- und Sechsringe); Bindungslängen, -winkel und der C1′–C1′-Abstand im Basenpaar sind nicht maßstäblich. C–H-Bindungen sind in der Skelettschreibweise weggelassen; nur C2–H des Adenins ist im Basenpaar gezeigt, weil es die fehlende dritte Brücke erklärt.</li>
+      <li>Das freie Nukleotid ist als Monophosphat mit zwei negativen Ladungen gezeichnet (pH 7); im Strang trägt jede Phosphodiestergruppe eine negative Ladung.</li>
+      <li>Die Anordnung der Codesonne (U, C, A, G im Uhrzeigersinn) kann von der Abbildung im eingeführten Schulbuch abweichen.</li>
+      <li>Die Transkription ist ohne Promotor, Initiation, Introns und mRNA-Prozessierung (5′-Cap, Poly-A-Schwanz, Spleißen) dargestellt.</li>
+      <li>Die Helix ist mit 10,5 Basenpaaren pro Windung gezeichnet; die Furchen entstehen schematisch durch einen Phasenversatz der Stränge.</li>
+      <li>Die T<sub>m</sub>-Formel ist eine empirische Näherung für lange DNA unter Standardsalzbedingungen.</li>
+    </ul>
+    <h4>Mögliche Anschlüsse</h4>
+    <ul>
+      <li>Replikation und Fehlpaarungsreparatur (G·T-Wobble), Mutagene und Reparatursysteme, Genregulation über Proteinbindung in der großen Furche.</li>
+    </ul>
+  </details>
+</div>
+
+<div class="panel" id="words" hidden>
+  <div class="panel-in" role="dialog" aria-modal="true" aria-labelledby="wordsTitle">
+    <div class="row" style="justify-content:space-between">
+      <h2 id="wordsTitle">Wortspeicher</h2>
+      <button class="btn small" id="closeWords" type="button">Schließen</button>
+    </div>
+    <div class="tablewrap">
+      <table class="words">
+        <thead><tr><th>Wort</th><th>Mehrzahl</th><th>Bedeutung</th></tr></thead>
+        <tbody>
+          <tr><td><b>die</b> DNA</td><td>–</td><td>Sie enthält die Erbinformation. Auf Deutsch auch: DNS.</td></tr>
+          <tr><td><b>der</b> Baustein</td><td>die Bausteine</td><td>ein kleines Teil der DNA. Fachwort: das Nukleotid.</td></tr>
+          <tr><td><b>das</b> Phosphat</td><td>die Phosphate</td><td>Teil des Bausteins. Es verbindet zwei Zucker.</td></tr>
+          <tr><td><b>der</b> Zucker</td><td>die Zucker</td><td>Teil des Bausteins. Er liegt in der Mitte.</td></tr>
+          <tr><td><b>die</b> Base</td><td>die Basen</td><td>Teil des Bausteins. Es gibt vier: A, T, G, C.</td></tr>
+          <tr><td><b>das</b> Basenpaar</td><td>die Basenpaare</td><td>zwei passende Basen: A mit T oder G mit C.</td></tr>
+          <tr><td><b>der</b> Strang</td><td>die Stränge</td><td>eine lange Kette aus Bausteinen.</td></tr>
+          <tr><td><b>das</b> Rückgrat</td><td>–</td><td>die Seite des Strangs aus Zucker und Phosphat.</td></tr>
+          <tr><td><b>die</b> Reihenfolge</td><td>die Reihenfolgen</td><td>Was kommt zuerst, was danach?</td></tr>
+          <tr><td><b>die</b> Doppelhelix</td><td>–</td><td>die verdrehte Leiter aus zwei Strängen.</td></tr>
+          <tr><td>komplementär</td><td>–</td><td>genau passend. Ein Teil ergänzt das andere.</td></tr>
+          <tr><td>passen zu</td><td>–</td><td>A passt zu T. G passt zu C.</td></tr>
+          <tr><td><b>die</b> Wasserstoffbrücke</td><td>die Wasserstoffbrücken</td><td>schwache Anziehung zwischen den Basen eines Paars.</td></tr>
+          <tr><td><b>das</b> Codon</td><td>die Codons</td><td>drei Basen der mRNA. Sie stehen für eine Aminosäure.</td></tr>
+          <tr><td><b>die</b> Mutation</td><td>die Mutationen</td><td>eine Veränderung der Basenfolge.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const D=Math.PI/180;
+const PAIR={A:'T',T:'A',G:'C',C:'G'}, PUR={A:true,G:true,T:false,C:false,U:false}, TABS={A:2,T:2,G:3,C:3};
+const NAME={A:'Adenin',T:'Thymin',G:'Guanin',C:'Cytosin',U:'Uracil'};
+const COMP={A:'T',T:'A',G:'C',C:'G'};
+const SEQ=['G','A','C','T','A'];
+const WT='ATGGTGCATCTGACTCCTGAGGAGAAGTCTGCCGTT';
+const BW=62, PW=54, BH=30;
+const scale=()=>window.innerWidth>=760?1.25:1;
+const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const de1=v=>v.toFixed(1).replace('.',',');
+
+const LV={
+  sek1:{names:['Die drei Teile','Vier Basen','Ein Strang','Zwei Stränge','Doppelhelix','Quiz'],
+    sub:'Biologie Klasse 10 · Der Aufbau der DNA in fünf Schritten und ein Quiz',
+    hint:'<b>So geht es:</b> Halte ein Teil fest und ziehe es in ein Feld. Oder: Tippe zuerst auf ein Teil und dann auf ein Feld.'},
+  sek2:{names:['Nukleotid','Wasserstoffbrücken','Doppelhelix','Genetischer Code','Mutationslabor','Quiz'],
+    sub:'Biologie Oberstufe · Molekularer Bau der DNA, Proteinbiosynthese und Genmutationen',
+    hint:'<b>Arbeitsweise:</b> Gestrichelt markierte Stellen in den Strukturformeln, die Codesonne und die Basen im Mutationslabor sind antippbar. Umschalter blenden Modell, Strukturformel und Zusatzinformationen ein.'}
+};
+const state={level:'sek1', cur:{sek1:0,sek2:0}, done:{sek1:Array(6).fill(false),sek2:Array(6).fill(false)},
+  s1:{P:false,Z:false,B:false}, s2:[null,null,null,null], s3:Array(5).fill(null), s4:Array(5).fill(null), last:null,
+  o1:{view:'formula',base:'A',num:false,task:0,found:{}},
+  o2:{view:'formula',pu:'A',py:'T',delta:false,da:false,site:null},
+  ge:{mrna:'',pep:[],path:false},
+  lab:{seq:WT,sel:null,tasks:{},manual:false,sun:false}};
+let selected=null;
+
+function setFb(id,type,html){ const f=$('#fb'+id); if(!f) return; f.className='fb '+(type==='ok'?'ok':type==='bad'?'bad':''); f.innerHTML=html; }
+function setInfo(id,html){ const i=$('#info'+id); if(i) i.innerHTML=html; }
+const secs=l=>$$(`.station[data-level="${l}"]`);
+function completeS(l,i,fbId,msg){
+  state.done[l][i]=true; const m=$('.merke',secs(l)[i]); if(m) m.hidden=false;
+  if(msg!=null) setFb(fbId,'ok',msg); renderNav();
+}
+function segBind(id,get,set){
+  const box=$('#'+id);
+  const paint=()=>$$('button',box).forEach(b=>b.setAttribute('aria-checked',String(b.dataset.v===get())));
+  $$('button',box).forEach(b=>b.addEventListener('click',()=>{ set(b.dataset.v); paint(); }));
+  paint(); return paint;
+}
+function togBind(id,get,set){
+  const b=$('#'+id); const paint=()=>b.setAttribute('aria-pressed',String(!!get()));
+  b.addEventListener('click',()=>{ set(!get()); paint(); }); paint(); return paint;
+}
+function miniMC(box,items,fbId,onOk){
+  box.innerHTML='';
+  items.forEach(it=>{
+    const b=document.createElement('button'); b.type='button'; b.className='opt'; b.textContent=it.t;
+    b.addEventListener('click',()=>{
+      if(it.pre && !it.pre()) return;
+      $$('.opt',box).forEach(o=>o.classList.remove('ok','bad'));
+      if(it.ok){ b.classList.add('ok'); onOk(); } else { b.classList.add('bad'); setFb(fbId,'bad','<b>Falsch.</b> '+it.msg); }
+    });
+    box.appendChild(b);
+  });
+}
+
+/* =========================================================
+   Modell-Bauteile (Sekundarstufe I)
+   ========================================================= */
+function basePath(b){
+  const n=TABS[b], r=n===2?4.4:3.4, ys=n===2?[10,20]:[6.5,15,23.5], pur=PUR[b], w=pur?BW:PW;
+  let d=`M0,0 H${w}`;
+  ys.forEach(y=>{ d+=` V${y-r} A${r} ${r} 0 0 ${pur?1:0} ${w} ${y+r}`; });
+  return {d:d+` V${BH} H0 Z`, w, r};
+}
+function baseG(b,x,y,facing,cls){
+  const {d,w,r}=basePath(b);
+  const half=PUR[b]?w/2:(w-r)/2;
+  const tx=facing==='r'?x+half:x-half;
+  const tr=facing==='r'?`translate(${x} ${y})`:`translate(${x} ${y}) scale(-1 1)`;
+  return `<g class="base ${cls||''}"><path d="${d}" transform="${tr}" class="b${b}"/><text x="${tx}" y="${y+BH/2}" class="lt t${b}">${b}</text></g>`;
+}
+function pent(cx,cy,r,up){
+  const p=[];for(let i=0;i<5;i++){const a=((up?-90:90)+i*72)*D;p.push((cx+r*Math.cos(a)).toFixed(1)+','+(cy+r*Math.sin(a)).toFixed(1));}
+  return p.join(' ');
+}
+const phosG=(cx,cy)=>`<g class="part"><circle cx="${cx}" cy="${cy}" r="10" class="fP"/><text x="${cx}" y="${cy+.5}" class="lt tPart" style="font-size:10px">P</text></g>`;
+const sugarG=(cx,cy,up)=>`<g class="part"><polygon points="${pent(cx,cy,12,up)}" class="fZ"/><text x="${cx}" y="${cy+(up?1.5:-1.5)}" class="lt tPart" style="font-size:10px">Z</text></g>`;
+function nucParts(b,sx,sy,side){
+  if(side==='L') return `<line class="bond" x1="${sx}" y1="${sy-22}" x2="${sx}" y2="${sy-11}"/><line class="bond" x1="${sx+8}" y1="${sy}" x2="${sx+16}" y2="${sy}"/>`+phosG(sx,sy-32)+sugarG(sx,sy,true)+baseG(b,sx+16,sy-15,'r');
+  return `<line class="bond" x1="${sx}" y1="${sy+11}" x2="${sx}" y2="${sy+22}"/><line class="bond" x1="${sx-8}" y1="${sy}" x2="${sx-16}" y2="${sy}"/>`+phosG(sx,sy+32)+sugarG(sx,sy,false)+baseG(b,sx-16,sy-15,'l');
+}
+const svg=(w,h,z,inner,cls)=>`<svg viewBox="0 0 ${w} ${h}" width="${(w*z).toFixed(0)}" height="${(h*z).toFixed(0)}" class="${cls||''}" aria-hidden="true">${inner}</svg>`;
+
+/* ---------- Ziehen und Ablegen ---------- */
+function clearSel(){ if(selected){selected.el.classList.remove('sel');} selected=null; }
+function bindPiece(el,data,st,onSelect){
+  el.addEventListener('pointerdown',e=>{
+    if(e.button>0) return;
+    const sx=e.clientX, sy=e.clientY, rect=el.getBoundingClientRect();
+    let ghost=null, over=null;
+    try{el.setPointerCapture(e.pointerId);}catch(_){}
+    const move=ev=>{
+      const dx=ev.clientX-sx, dy=ev.clientY-sy;
+      if(!ghost && Math.hypot(dx,dy)>6){
+        ghost=el.cloneNode(true); ghost.classList.add('ghost'); ghost.classList.remove('sel');
+        Object.assign(ghost.style,{left:rect.left+'px',top:rect.top+'px',width:rect.width+'px'});
+        document.body.appendChild(ghost); el.style.opacity='.35';
+      }
+      if(ghost){
+        ghost.style.transform=`translate(${dx}px,${dy}px)`;
+        const t=document.elementFromPoint(ev.clientX,ev.clientY);
+        const s=t&&t.closest(`.slot[data-st="${st}"]`);
+        if(s!==over){ if(over) over.classList.remove('over'); over=s; if(over) over.classList.add('over'); }
+      }
+    };
+    const up=()=>{
+      el.removeEventListener('pointermove',move); el.removeEventListener('pointerup',up); el.removeEventListener('pointercancel',up);
+      if(!ghost) return;
+      el._dragged=true; el.style.opacity='';
+      if(over) over.classList.remove('over');
+      const ok=over?attempt(over,data):false;
+      if(ok||reduce){ ghost.remove(); }
+      else{ ghost.style.transition='transform .22s ease'; ghost.style.transform='translate(0,0)'; setTimeout(()=>ghost.remove(),240); }
+    };
+    el.addEventListener('pointermove',move); el.addEventListener('pointerup',up); el.addEventListener('pointercancel',up);
+  });
+  el.addEventListener('click',()=>{
+    if(el._dragged){el._dragged=false;return;}
+    const was=selected&&selected.el===el; clearSel();
+    if(!was){ selected={el,data,st}; el.classList.add('sel'); }
+    if(onSelect) onSelect(data);
+  });
+}
+function makeSlot(board,st,rect,z,label,accept){
+  const b=document.createElement('button');
+  b.type='button'; b.className='slot'; b.dataset.st=st; b.textContent=label||'';
+  b.setAttribute('aria-label','Feld '+(label||''));
+  Object.assign(b.style,{left:rect.x*z+'px',top:rect.y*z+'px',width:rect.w*z+'px',height:rect.h*z+'px'});
+  b._accept=accept;
+  b.addEventListener('click',()=>{ if(selected&&selected.st===st){ const d=selected.data; clearSel(); attempt(b,d); } else setFb(st,'info','Tippe zuerst auf ein Teil.'); });
+  board.appendChild(b);
+}
+function attempt(slot,data){
+  const r=slot._accept(data);
+  if(r.ok) return true;
+  setFb(slot.dataset.st,'bad',r.msg);
+  slot.classList.remove('shake'); void slot.offsetWidth; slot.classList.add('shake');
+  return false;
+}
+function pieceBtn(inner,label,aria){
+  const b=document.createElement('button'); b.type='button'; b.className='piece';
+  b.innerHTML=inner+(label?`<span class="pl">${label}</span>`:''); b.setAttribute('aria-label',aria||label);
+  return b;
+}
+function pairMsg(x,y){
+  if(PAIR[x]===y) return '';
+  if(PUR[x]&&PUR[y]) return `<b>Falsch.</b> ${x} und ${y} sind beide lang. Beide haben Zacken. Das passt nicht.`;
+  if(!PUR[x]&&!PUR[y]) return `<b>Falsch.</b> ${x} und ${y} sind beide kurz. Beide haben Lücken. Das passt nicht.`;
+  const p=PUR[x]?x:y, q=PUR[x]?y:x;
+  return `<b>Falsch.</b> ${p} hat ${TABS[p]} Zacken. ${q} hat ${TABS[q]} Lücken. Das passt nicht.`;
+}
+const complete1=(i,msg)=>completeS('sek1',i,i,msg);
+
+/* ---------- Station 1 (Sek I) ---------- */
+const S1_INFO={P:'<b>das Phosphat</b> – Es enthält das Element Phosphor. Im Strang verbindet es zwei Zucker.',
+  Z:'<b>der Zucker</b> – Er heißt Desoxyribose. Er ist ein Ring mit fünf Ecken.',
+  B:'<b>die Base</b> – Es gibt vier verschiedene Basen. Hier siehst du die Base G.'};
+const S1_WRONG={P:'<b>Falsch.</b> Oben am Zucker hängt das Phosphat.',Z:'<b>Falsch.</b> In der Mitte liegt der Zucker.',B:'<b>Falsch.</b> Rechts am Zucker hängt die Base.'};
+const S1_LABEL={P:'das Phosphat',Z:'der Zucker',B:'die Base'};
+function renderS1(){
+  const z=2*scale(), s=state.s1, board=$('#board0'), tray=$('#tray0');
+  let g='';
+  if(s.P&&s.Z) g+=`<line class="bond" x1="30" y1="38" x2="30" y2="50"/>`;
+  if(s.Z&&s.B) g+=`<line class="bond" x1="38" y1="62" x2="46" y2="62"/>`;
+  if(s.P) g+=`<g class="${state.last==='P'?'pop':''}">${phosG(30,28)}<text class="lab" x="44" y="30">Phosphat</text></g>`;
+  if(s.Z) g+=`<g class="${state.last==='Z'?'pop':''}">${sugarG(30,62,true)}<text class="lab" x="30" y="88" text-anchor="middle">Zucker</text></g>`;
+  if(s.B) g+=`<g class="${state.last==='B'?'pop':''}">${baseG('G',46,47,'r')}<text class="lab" x="77" y="88" text-anchor="middle">Base</text></g>`;
+  board.innerHTML=svg(132,94,z,g); board.style.width=132*z+'px';
+  const slots={P:{x:13,y:11,w:34,h:34},Z:{x:13,y:45,w:34,h:34},B:{x:46,y:44,w:74,h:36}};
+  Object.keys(slots).forEach(k=>{ if(!s[k]) makeSlot(board,0,slots[k],z,'?',d=>{
+    if(d.part!==k) return {ok:false,msg:S1_WRONG[k]};
+    s[k]=true; state.last=k; renderS1();
+    if(s.P&&s.Z&&s.B) complete1(0,'<b>Richtig.</b> Der Baustein ist fertig.'); else setFb(0,'ok','<b>Richtig.</b>');
+    return {ok:true};
+  }); });
+  tray.innerHTML='';
+  const art={P:svg(28,28,z,phosG(14,14)),Z:svg(28,28,z,sugarG(14,15,true)),B:svg(72,32,z,baseG('G',1,1,'r'))};
+  ['B','P','Z'].forEach(k=>{ if(s[k]) return; const b=pieceBtn(art[k],S1_LABEL[k]); bindPiece(b,{part:k},0,()=>setInfo(0,S1_INFO[k])); tray.appendChild(b); });
+  if(!tray.children.length) tray.innerHTML='<span class="tray-empty">Alle Teile sind eingebaut.</span>';
+}
+
+/* ---------- Station 2 (Sek I) ---------- */
+const S2_ROWS=[{f:'T',side:'R'},{f:'A',side:'L'},{f:'C',side:'R'},{f:'G',side:'L'}];
+function renderS2(){
+  const z=1.7*scale(), board=$('#board1'), tray=$('#tray1'), X0=10, rowH=46;
+  let g='';
+  S2_ROWS.forEach((r,i)=>{
+    const y=8+i*rowH;
+    if(r.side==='R'){ g+=baseG(r.f,X0+116,y,'l'); if(state.s2[i]) g+=baseG(state.s2[i],X0,y,'r',state.last==='2-'+i?'pop':''); }
+    else { g+=baseG(r.f,X0,y,'r'); if(state.s2[i]) g+=baseG(state.s2[i],X0+116,y,'l',state.last==='2-'+i?'pop':''); }
+  });
+  board.innerHTML=svg(136,8+4*rowH,z,g); board.style.width=136*z+'px';
+  S2_ROWS.forEach((r,i)=>{
+    if(state.s2[i]) return; const y=8+i*rowH;
+    const rect=r.side==='R'?{x:X0-3,y:y-4,w:68,h:38}:{x:X0+60,y:y-4,w:60,h:38};
+    makeSlot(board,1,rect,z,'?',d=>{
+      const m=pairMsg(d.b,r.f); if(m) return {ok:false,msg:m};
+      state.s2[i]=d.b; state.last='2-'+i; renderS2();
+      if(state.s2.every(Boolean)) complete1(1,'<b>Richtig.</b> Alle Paare passen.');
+      else setFb(1,'ok',`<b>Richtig.</b> ${d.b} passt zu ${r.f}.`);
+      return {ok:true};
+    });
+  });
+  tray.innerHTML='';
+  const used=new Set(state.s2.filter(Boolean));
+  ['G','T','A','C'].forEach(b=>{
+    if(used.has(b)) return;
+    const art=PUR[b]?svg(70,32,z,baseG(b,1,1,'r')):svg(58,32,z,baseG(b,57,1,'l'));
+    const p=pieceBtn(art,NAME[b],`Base ${b}, ${NAME[b]}`);
+    bindPiece(p,{b},1,()=>setInfo(1,`<b>${NAME[b]}</b> – kurz ${b}. ${PUR[b]?'Eine lange Base':'Eine kurze Base'} mit ${TABS[b]} ${PUR[b]?'Zacken':'Lücken'}.`));
+    tray.appendChild(p);
+  });
+  if(!tray.children.length) tray.innerHTML='<span class="tray-empty">Alle Basen sind eingebaut.</span>';
+}
+
+/* ---------- Station 3 (Sek I) ---------- */
+const LX=24, RX=172, SY0=46, RH=64;
+const nucArt=(b,side,z)=>side==='L'?svg(100,64,z,nucParts(b,14,46,'L')):svg(100,64,z,nucParts(b,86,18,'R'));
+function renderS3(){
+  const z=1.1*scale(), board=$('#board2'), tray=$('#tray2'), n=5, H=SY0+(n-1)*RH+24;
+  let g=`<text class="rail-label" transform="translate(6 ${H/2}) rotate(-90)">Rückgrat</text>`;
+  for(let i=0;i<n;i++){
+    const sy=SY0+i*RH;
+    if(state.s3[i]&&i<n-1&&state.s3[i+1]) g+=`<line class="bond" x1="${LX}" y1="${sy+10}" x2="${LX}" y2="${sy+22}"/>`;
+    if(state.s3[i]) g+=`<g class="${state.last==='3-'+i?'pop':''}">${nucParts(state.s3[i],LX,sy,'L')}</g>`;
+  }
+  board.innerHTML=svg(124,H,z,g); board.style.width=124*z+'px';
+  if($('#railBtn').getAttribute('aria-pressed')==='true') board.firstChild.classList.add('show-rail');
+  for(let i=0;i<n;i++){
+    if(state.s3[i]) continue; const sy=SY0+i*RH;
+    makeSlot(board,2,{x:4,y:sy-46,w:116,h:62},z,'Platz '+(i+1),d=>{
+      if(d.b!==SEQ[i]) return {ok:false,msg:`<b>Falsch.</b> Auf Platz ${i+1} gehört eine andere Base. Schau auf den Bauplan.`};
+      state.s3[i]=d.b; state.last='3-'+i; renderS3();
+      if(state.s3.every(Boolean)){ setFb(2,'ok','<b>Richtig.</b> Der Strang ist fertig. Beantworte jetzt die Frage.'); $('#check2').hidden=false; $('#railBtn').hidden=false; }
+      else setFb(2,'ok','<b>Richtig.</b>');
+      return {ok:true};
+    });
+  }
+  tray.innerHTML='';
+  ['A','T','G','C'].forEach(b=>{ const p=pieceBtn(nucArt(b,'L',.9*scale()),'Baustein '+b,'Baustein mit Base '+b); bindPiece(p,{b},2,null); tray.appendChild(p); });
+}
+function renderCheck2(){
+  miniMC($('#opts2'),[
+    {t:'Zucker und Phosphat',ok:true},
+    {t:'die Base',ok:false,msg:'Vergleiche die Basen: G, A, C, T, A. Sie sind verschieden. Was ist immer gleich?'}
+  ],2,()=>complete1(2,'<b>Richtig.</b> Zucker und Phosphat sind in jedem Baustein gleich. Nur die Base ist verschieden.'));
+}
+
+/* ---------- Station 4 (Sek I) ---------- */
+function renderS4(){
+  const z=1.1*scale(), board=$('#board3'), tray=$('#tray3'), n=5, H=SY0+(n-1)*RH+50;
+  let g='';
+  for(let i=0;i<n;i++){
+    const sy=SY0+i*RH;
+    if(i<n-1) g+=`<line class="bond" x1="${LX}" y1="${sy+10}" x2="${LX}" y2="${sy+22}"/>`;
+    if(state.s4[i]&&i<n-1&&state.s4[i+1]) g+=`<line class="bond" x1="${RX}" y1="${sy+42}" x2="${RX}" y2="${sy+54}"/>`;
+    g+=nucParts(SEQ[i],LX,sy,'L');
+    if(state.s4[i]) g+=`<g class="${state.last==='4-'+i?'pop':''}">${nucParts(state.s4[i],RX,sy,'R')}</g>`;
+  }
+  board.innerHTML=svg(196,H,z,g); board.style.width=196*z+'px';
+  for(let i=0;i<n;i++){
+    if(state.s4[i]) continue; const sy=SY0+i*RH;
+    makeSlot(board,3,{x:108,y:sy-22,w:86,h:62},z,'?',d=>{
+      const m=pairMsg(d.b,SEQ[i]); if(m) return {ok:false,msg:m};
+      state.s4[i]=d.b; state.last='4-'+i; renderS4();
+      if(state.s4.every(Boolean)) complete1(3,'<b>Richtig.</b> Der Doppelstrang ist fertig.');
+      else setFb(3,'ok',`<b>Richtig.</b> ${d.b} passt zu ${SEQ[i]}.`);
+      return {ok:true};
+    });
+  }
+  tray.innerHTML='';
+  ['C','A','T','G'].forEach(b=>{ const p=pieceBtn(nucArt(b,'R',.9*scale()),'Baustein '+b,'Baustein mit Base '+b+', auf dem Kopf'); bindPiece(p,{b},3,null); tray.appendChild(p); });
+}
+
+/* =========================================================
+   Helix (beide Niveaus)
+   ========================================================= */
+const H1={cv:$('#helix1'), st:{t:0,p:0,spin:false,groove:false,ends:false}, o:{bpt:10,seq:'GACTAGCTTACGGATCATGC'.split(''),lvl:'sek1',i:4}};
+const H2={cv:$('#helix2'), st:{t:0,p:0,spin:false,groove:false,ends:true}, o:{bpt:10.5,seq:'ATGGTGCATCTGACTCCTGAG'.split(''),lvl:'sek2',i:2}};
+const cssv=n=>getComputedStyle(document.body).getPropertyValue(n).trim();
+function drawHelix(h){
+  const cv=h.cv, w=cv.clientWidth, hh=cv.clientHeight; if(!w) return;
+  const dpr=window.devicePixelRatio||1;
+  if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(hh*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(hh*dpr);}
+  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,w,hh);
+  const c={A:cssv('--A'),T:cssv('--T'),G:cssv('--G'),C:cssv('--C'),Ai:cssv('--A-ink'),Ti:cssv('--T-ink'),Gi:cssv('--G-ink'),Ci:cssv('--C-ink'),Z:cssv('--sugar'),P:cssv('--phos'),rail:cssv('--rail'),mut:cssv('--muted'),ink:cssv('--ink'),acc:cssv('--accent')};
+  const seq=h.o.seq, n=seq.length, top=26, dy=(hh-52)/(n-1), R=Math.min(90,(w-90)*0.32), cx=(w+30)/2;
+  const t=h.st.t, p=h.st.p, g=h.st.groove?0.75*t:0;
+  const base=s=>p+t*s*2*Math.PI/h.o.bpt;
+  const ang=[s=>base(s)+Math.PI, s=>base(s)+g];
+  const P3=(k,s)=>{const a=ang[k](s);return {x:cx+R*Math.cos(a),y:top+s*dy,z:Math.sin(a)};};
+  const sh=z=>0.3+0.7*(z+1)/2;
+  const items=[];
+  [0,1].forEach(k=>{
+    let prev=null;
+    for(let j=0;j<=(n-1)*8;j++){
+      const pt=P3(k,j/8);
+      if(prev){ const a0=prev, zm=(a0.z+pt.z)/2; items.push({z:zm-0.02,f:()=>{ctx.globalAlpha=sh(zm);ctx.strokeStyle=c.rail;ctx.lineWidth=6;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(a0.x,a0.y);ctx.lineTo(pt.x,pt.y);ctx.stroke();}}); }
+      prev=pt;
+    }
+    for(let i=0;i<n;i++){ const q=P3(k,i); items.push({z:q.z,f:()=>{ctx.globalAlpha=sh(q.z);ctx.fillStyle=c.Z;ctx.beginPath();ctx.arc(q.x,q.y,6.5,0,7);ctx.fill();}}); }
+    for(let i=0;i<n-1;i++){ const q=P3(k,i+.5); items.push({z:q.z,f:()=>{ctx.globalAlpha=sh(q.z);ctx.fillStyle=c.P;ctx.beginPath();ctx.arc(q.x,q.y,4.6,0,7);ctx.fill();}}); }
+  });
+  for(let i=0;i<n;i++){
+    const a=P3(0,i), b=P3(1,i), L=seq[i], Rb=PAIR[L], f=PUR[L]?62/116:54/116;
+    const xm=a.x+(b.x-a.x)*f, zz=(a.z+b.z)/2;
+    items.push({z:zz*0.5,f:()=>{
+      ctx.globalAlpha=0.95; ctx.lineCap='butt'; ctx.lineWidth=9;
+      ctx.strokeStyle=c[L]; ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(xm,a.y); ctx.stroke();
+      ctx.strokeStyle=c[Rb]; ctx.beginPath(); ctx.moveTo(xm,a.y); ctx.lineTo(b.x,a.y); ctx.stroke();
+      if(Math.abs(b.x-a.x)>70){ ctx.font='600 10px Lexend, system-ui, sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillStyle=c[L+'i']; ctx.fillText(L,(a.x+xm)/2,a.y+.5); ctx.fillStyle=c[Rb+'i']; ctx.fillText(Rb,(xm+b.x)/2,a.y+.5); }
+    }});
+  }
+  items.sort((x,y)=>x.z-y.z).forEach(it=>it.f());
+  ctx.globalAlpha=1; ctx.fillStyle=c.mut; ctx.font='500 11px Lexend, system-ui, sans-serif'; ctx.textAlign='right'; ctx.textBaseline='middle';
+  for(let i=0;i<n;i++) ctx.fillText(String(i+1),24,top+i*dy);
+  if(h.st.ends){
+    ctx.font='700 13px "JetBrains Mono", monospace'; ctx.textAlign='center'; ctx.fillStyle=c.acc;
+    const lab=(k,s,txt,dyy)=>{const q=P3(k,s); ctx.fillText(txt,q.x,q.y+dyy);};
+    lab(0,0,'5′',-15); lab(1,0,'3′',-15); lab(0,n-1,'3′',16); lab(1,n-1,'5′',16);
+  }
+}
+let raf=null;
+const visibleH=h=>state.level===h.o.lvl && state.cur[h.o.lvl]===h.o.i;
+function loop(){ raf=null; let any=false; [H1,H2].forEach(h=>{ if(h.st.spin&&visibleH(h)){ h.st.p+=0.018; drawHelix(h); any=true; } }); if(any) raf=requestAnimationFrame(loop); }
+const kick=()=>{ if(!raf) raf=requestAnimationFrame(loop); };
+function bindHelix(h,twistId,spinId){
+  $('#'+twistId).addEventListener('input',e=>{ h.st.t=e.target.value/100; e.target.setAttribute('aria-valuetext',e.target.value+' Prozent verdreht'); drawHelix(h); });
+  let down=null;
+  h.cv.addEventListener('pointerdown',e=>{ down={x:e.clientX,p:h.st.p}; try{h.cv.setPointerCapture(e.pointerId);}catch(_){} });
+  h.cv.addEventListener('pointermove',e=>{ if(!down) return; h.st.p=down.p+(e.clientX-down.x)*0.012; drawHelix(h); });
+  const end=()=>{down=null;}; h.cv.addEventListener('pointerup',end); h.cv.addEventListener('pointercancel',end);
+  $('#'+spinId).addEventListener('click',e=>{ h.st.spin=!h.st.spin; e.currentTarget.setAttribute('aria-pressed',String(h.st.spin)); e.currentTarget.textContent=h.st.spin?'Anhalten':'Drehen'; if(h.st.spin) kick(); });
+}
+bindHelix(H1,'twist1','spin1'); bindHelix(H2,'twist2','spin2');
+togBind('ends2',()=>H2.st.ends,v=>{H2.st.ends=v;drawHelix(H2);});
+togBind('groove2',()=>H2.st.groove,v=>{H2.st.groove=v;drawHelix(H2); if(v) setInfo('O3','');});
+function renderCheck4(){
+  miniMC($('#opts4'),['5','10','20'].map(t=>({t:t+' Basenpaare',ok:t==='10',
+    pre:()=>{ if(H1.st.t<0.5){ setFb(4,'info','Ziehe zuerst den Regler ganz nach rechts. Dann kannst du zählen.'); return false;} return true; },
+    msg:'Verfolge einen Strang mit dem Finger. Zähle die Sprossen, bis er wieder an der gleichen Stelle ist.'})),
+    4,()=>complete1(4,'<b>Richtig.</b> Nach etwa 10 Basenpaaren hat sich die Leiter einmal ganz gedreht.'));
+}
+miniMC($('#o3Opts'),[
+  {t:'Die planaren, wenig polaren Basen sind im Inneren durch Stapelwechselwirkungen stabilisiert; das negativ geladene Zucker-Phosphat-Rückgrat ist dem Wasser zugewandt.',ok:true},
+  {t:'Die Basen sind negativ geladen und werden vom Wasser abgestoßen.',ok:false,msg:'Die negativen Ladungen trägt das Phosphat-Rückgrat, nicht die Basen.'},
+  {t:'Das Zucker-Phosphat-Rückgrat ist unpolar und meidet das Wasser.',ok:false,msg:'Durch die Phosphatgruppen ist das Rückgrat stark polar und negativ geladen.'}
+],'O3',()=>completeS('sek2',2,'O3','<b>Richtig.</b> Hydrophobe Effekte und Basenstapelung stabilisieren das Innere; die geladenen Phosphatgruppen sind hydratisiert und werden durch Kationen (z. B. Mg²⁺) abgeschirmt.'));
+
+/* =========================================================
+   Strukturformel-Engine (Oberstufe)
+   ========================================================= */
+const U=34;
+const X=x=>(x*U).toFixed(1), Y=y=>(-y*U).toFixed(1);
+const pol=(c,r,deg)=>({x:c.x+r*Math.cos(deg*D),y:c.y+r*Math.sin(deg*D)});
+const mid=(p,q)=>({x:(p.x+q.x)/2,y:(p.y+q.y)/2});
+const Mol=()=>({at:{},bd:[]});
+function Aa(m,id,p,lbl,el){ m.at[id]={id,x:p.x,y:p.y,lbl:lbl||null,el:el||'C'}; return m.at[id]; }
+const Bd=(m,a,b,o,rc)=>m.bd.push({a,b,o:o||1,rc:rc||null});
+const merge=(d,s)=>{ Object.assign(d.at,s.at); d.bd.push(...s.bd); };
+const shr=a=>!a.lbl?0:a.el==='H'?0.25:(a.lbl.length>1?0.46:0.3);
+const ln=(p,q,cls)=>`<line class="${cls||'bl'}" x1="${X(p.x)}" y1="${Y(p.y)}" x2="${X(q.x)}" y2="${Y(q.y)}"/>`;
+function bondSVG(a,c,b){
+  const dx=c.x-a.x, dy=c.y-a.y, L=Math.hypot(dx,dy), ux=dx/L, uy=dy/L, nx=-uy, ny=ux;
+  const s1=shr(a), s2=shr(c);
+  const off=(p,o)=>({x:p.x+nx*o,y:p.y+ny*o});
+  const p={x:a.x+ux*s1,y:a.y+uy*s1}, q={x:c.x-ux*s2,y:c.y-uy*s2};
+  if(b.o===2&&!b.rc) return ln(off(p,.075),off(q,.075))+ln(off(p,-.075),off(q,-.075));
+  let s=ln(p,q);
+  if(b.o===2){
+    const m=mid(a,c), sg=((b.rc.x-m.x)*nx+(b.rc.y-m.y)*ny)>0?1:-1, t1=Math.max(s1,.22), t2=Math.max(s2,.22);
+    s+=ln(off({x:a.x+ux*t1,y:a.y+uy*t1},.17*sg),off({x:c.x-ux*t2,y:c.y-uy*t2},.17*sg));
+  }
+  return s;
+}
+function molSVG(m,over,opt){
+  opt=opt||{};
+  const at=Object.values(m.at), pad=opt.pad||0.75;
+  let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+  at.forEach(a=>{x0=Math.min(x0,a.x);x1=Math.max(x1,a.x);y0=Math.min(y0,a.y);y1=Math.max(y1,a.y);});
+  x0-=pad;x1+=pad;y0-=pad;y1+=pad+(opt.padTop||0);
+  let s='';
+  m.bd.forEach(b=>{ s+=bondSVG(m.at[b.a],m.at[b.b],b); });
+  at.forEach(a=>{ if(!a.lbl) return; s+=`<text class="fa e${a.el}" x="${X(a.x)}" y="${Y(a.y)}">${a.lbl}</text>`; if(a.chg) s+=`<text class="chg" x="${X(a.x+0.3)}" y="${Y(a.y+0.3)}">${a.chg}</text>`; });
+  if(opt.num) at.forEach(a=>{
+    if(!a.num) return;
+    let p;
+    if(a.numAt) p=a.numAt;
+    else if(a.cen){ const dx=a.cen.x-a.x, dy=a.cen.y-a.y, L=Math.hypot(dx,dy); p={x:a.x+dx/L*(a.lbl?0.44:0.36),y:a.y+dy/L*(a.lbl?0.44:0.36)}; }
+    if(p) s+=`<text class="num" x="${X(p.x)}" y="${Y(p.y)}">${a.num}</text>`;
+  });
+  s+=over||'';
+  const W=(x1-x0)*U, Hh=(y1-y0)*U;
+  return `<svg class="fm" viewBox="${(x0*U).toFixed(1)} ${(-y1*U).toFixed(1)} ${W.toFixed(1)} ${Hh.toFixed(1)}" style="max-width:${(W*(opt.zoom||1.25)).toFixed(0)}px" role="img" aria-label="${opt.label||'Strukturformel'}">${s}</svg>`;
+}
+function xform(mol,pivot,deg,target){
+  const c=Math.cos(deg*D), s=Math.sin(deg*D), pv={x:pivot.x,y:pivot.y}, cache=new Map();
+  const tp=p=>{const x=p.x-pv.x,y=p.y-pv.y;return {x:target.x+x*c-y*s,y:target.y+x*s+y*c};};
+  const tc=p=>{ if(!p) return p; if(!cache.has(p)) cache.set(p,tp(p)); return cache.get(p); };
+  Object.values(mol.at).forEach(a=>{ const r=tp(a); a.x=r.x; a.y=r.y; if(a.cen) a.cen=tc(a.cen); if(a.numAt) a.numAt=tc(a.numAt); });
+  mol.bd.forEach(b=>{ if(b.rc) b.rc=tc(b.rc); });
+}
+function purine(b,cx,cy,pre,c2h){
+  const m=Mol(), c={x:cx,y:cy}, id=s=>pre+s;
+  const ang={N1:0,C6:60,C5:120,C4:180,N3:240,C2:300};
+  for(const k in ang){ const isN=k[0]==='N'; const at=Aa(m,id(k),pol(c,1,ang[k]),isN?'N':null,isN?'N':'C'); at.num=k.slice(1); at.cen=c; }
+  const C4=m.at[id('C4')], C5=m.at[id('C5')];
+  const M=mid(C4,C5); let nx=M.x-cx, ny=M.y-cy; const nl=Math.hypot(nx,ny); nx/=nl; ny/=nl;
+  const pc={x:M.x+nx*0.6882,y:M.y+ny*0.6882}, R5=0.8507;
+  const a5=Math.atan2(C5.y-pc.y,C5.x-pc.x)/D, a4=Math.atan2(C4.y-pc.y,C4.x-pc.x)/D;
+  const st=((((a5-a4)%360)+360)%360)<180?72:-72;
+  [['N7','N',1],['C8',null,2],['N9','N',3]].forEach(([k,l,i])=>{ const at=Aa(m,id(k),pol(pc,R5,a5+st*i),l,l?'N':'C'); at.num=k.slice(1); at.cen=pc; });
+  const B=(x,y,o,rc)=>Bd(m,id(x),id(y),o,rc);
+  if(b==='A'){ B('N1','C6',2,c); B('C6','C5'); B('C5','C4',2,c); B('C4','N3'); B('N3','C2',2,c); B('C2','N1'); }
+  else { B('N1','C6'); B('C6','C5'); B('C5','C4',2,c); B('C4','N3'); B('N3','C2',2,c); B('C2','N1'); }
+  B('C5','N7'); B('N7','C8',2,pc); B('C8','N9'); B('N9','C4');
+  const C6=m.at[id('C6')], C2=m.at[id('C2')], N1=m.at[id('N1')];
+  let sites;
+  if(b==='A'){
+    const N6=Aa(m,id('N6'),pol(C6,1,60),'N','N'); B('C6','N6');
+    Aa(m,id('H6a'),pol(N6,.85,0),'H','H'); B('N6','H6a');
+    Aa(m,id('H6b'),pol(N6,.85,120),'H','H'); B('N6','H6b');
+    if(c2h){ Aa(m,id('H2'),pol(C2,.85,300),'H','H'); B('C2','H2'); }
+    sites=[{t:'D',id:id('H6a'),don:id('N6'),name:'N6–H (Aminogruppe des Adenins)'},{t:'A',id:id('N1'),name:'N1 des Adenins (freies Elektronenpaar)'},{t:'0',id:id('H2'),name:'C2–H des Adenins'}];
+  } else {
+    Aa(m,id('O6'),pol(C6,1,60),'O','O'); B('C6','O6',2);
+    Aa(m,id('H1'),pol(N1,.85,0),'H','H'); B('N1','H1');
+    const N2=Aa(m,id('N2'),pol(C2,1,300),'N','N'); B('C2','N2');
+    Aa(m,id('H2a'),pol(N2,.85,0),'H','H'); B('N2','H2a');
+    Aa(m,id('H2b'),pol(N2,.85,240),'H','H'); B('N2','H2b');
+    sites=[{t:'A',id:id('O6'),name:'O6 des Guanins (Carbonyl-O)'},{t:'D',id:id('H1'),don:id('N1'),name:'N1–H des Guanins'},{t:'D',id:id('H2a'),don:id('N2'),name:'N2–H (Aminogruppe des Guanins)'}];
+  }
+  return {m,gly:{id:id('N9'),deg:a5+st*3},sites};
+}
+function pyrimidine(b,cx,cy,pre){
+  const m=Mol(), c={x:cx,y:cy}, id=s=>pre+s;
+  const ang={N3:180,C4:120,C5:60,C6:0,N1:300,C2:240};
+  for(const k in ang){ const isN=k[0]==='N'; const at=Aa(m,id(k),pol(c,1,ang[k]),isN?'N':null,isN?'N':'C'); at.num=k.slice(1); at.cen=c; }
+  const B=(x,y,o,rc)=>Bd(m,id(x),id(y),o,rc);
+  B('N1','C2'); B('C2','N3');
+  const C2=m.at[id('C2')], C4=m.at[id('C4')], C5=m.at[id('C5')], N3=m.at[id('N3')];
+  Aa(m,id('O2'),pol(C2,1,240),'O','O'); B('C2','O2',2);
+  let sites;
+  if(b==='T'){
+    B('N3','C4'); B('C4','C5'); B('C5','C6',2,c); B('C6','N1');
+    Aa(m,id('O4'),pol(C4,1,120),'O','O'); B('C4','O4',2);
+    Aa(m,id('H3'),pol(N3,.85,180),'H','H'); B('N3','H3');
+    Aa(m,id('Me'),pol(C5,1,60),'CH₃','Me'); B('C5','Me');
+    sites=[{t:'A',id:id('O4'),name:'O4 des Thymins (Carbonyl-O)'},{t:'D',id:id('H3'),don:id('N3'),name:'N3–H des Thymins'},{t:'A',id:id('O2'),name:'O2 des Thymins (Carbonyl-O)'}];
+  } else {
+    B('N3','C4',2,c); B('C4','C5'); B('C5','C6',2,c); B('C6','N1');
+    const N4=Aa(m,id('N4'),pol(C4,1,120),'N','N'); B('C4','N4');
+    Aa(m,id('H4a'),pol(N4,.85,180),'H','H'); B('N4','H4a');
+    Aa(m,id('H4b'),pol(N4,.85,60),'H','H'); B('N4','H4b');
+    sites=[{t:'D',id:id('H4a'),don:id('N4'),name:'N4–H (Aminogruppe des Cytosins)'},{t:'A',id:id('N3'),name:'N3 des Cytosins (freies Elektronenpaar)'},{t:'A',id:id('O2'),name:'O2 des Cytosins (Carbonyl-O)'}];
+  }
+  return {m,gly:{id:id('N1'),deg:300},sites};
+}
+
+/* ---------- O1 Nukleotid ---------- */
+function nucMol(b){
+  const m=Mol(), S={x:0,y:0}, R5=0.8507;
+  [['O4','O',90],['C1',null,18],['C2',null,-54],['C3',null,-126],['C4',null,162]].forEach(([k,l,a])=>{
+    const at=Aa(m,k,pol(S,R5,a),l,l?'O':'C'); at.cen=S; if(k!=='O4') at.num=k[1]+'′';
+  });
+  Bd(m,'O4','C1');Bd(m,'C1','C2');Bd(m,'C2','C3');Bd(m,'C3','C4');Bd(m,'C4','O4');
+  const C5=Aa(m,'C5',pol(m.at.C4,1,120)); C5.num='5′'; C5.numAt=pol(C5,0.4,60); Bd(m,'C4','C5');
+  const O5=Aa(m,'O5',pol(C5,1,180),'O','O'); Bd(m,'C5','O5');
+  const Pp=Aa(m,'P',pol(O5,1,120),'P','P'); Bd(m,'O5','P');
+  Aa(m,'OP1',pol(Pp,1,30),'O','O'); Bd(m,'P','OP1',2);
+  Aa(m,'OP2',pol(Pp,1,120),'O','O').chg='−'; Bd(m,'P','OP2');
+  Aa(m,'OP3',pol(Pp,1,210),'O','O').chg='−'; Bd(m,'P','OP3');
+  const O3=Aa(m,'O3',pol(m.at.C3,1,234),'OH','O'); Bd(m,'C3','O3');
+  Aa(m,'H2x',pol(m.at.C2,.85,-54),'H','H'); Bd(m,'C2','H2x');
+  const base=PUR[b]?purine(b,0,0,'b',false):pyrimidine(b,0,0,'b');
+  const g=base.m.at[base.gly.id];
+  xform(base.m,g,198-base.gly.deg,pol(m.at.C1,1,18));
+  merge(m,base.m); Bd(m,'C1',base.gly.id);
+  return {m,hot:{gly:mid(m.at.C1,g),c2:{x:m.at.C2.x+.25,y:m.at.C2.y-.3},oh3:O3,ester5:mid(O5,Pp),base:base.m.at.bN1.cen}};
+}
+const O1_TASKS=[['gly','die N-glykosidische Bindung'],['c2','die Position, an der sich Desoxyribose und Ribose unterscheiden'],['oh3','die Stelle, an die im Strang das nächste Nukleotid geknüpft wird'],['ester5','die Phosphorsäureesterbindung']];
+const O1_NAME={gly:'die N-glykosidische Bindung',c2:'die 2′-Position',oh3:'die 3′-OH-Gruppe',ester5:'die Phosphorsäureesterbindung an C5′',base:'die Base'};
+function o1Info(k){
+  const b=state.o1.base, pur=PUR[b];
+  return ({
+    gly:`<b>N-glykosidische Bindung</b> – verbindet C1′ der Desoxyribose mit ${pur?'N9':'N1'} der Base (${pur?'Purine: N9':'Pyrimidine: N1'}). Sie entsteht formal durch Kondensation unter Abspaltung von Wasser.`,
+    c2:'<b>2′-Position</b> – Die Desoxyribose trägt an C2′ nur H-Atome; die Ribose der RNA besitzt hier eine OH-Gruppe. Ohne 2′-OH ist kein intramolekularer Angriff auf die benachbarte Phosphodiesterbindung möglich – DNA ist daher hydrolysestabiler als RNA.',
+    oh3:'<b>3′-OH-Gruppe</b> – Verknüpfungsstelle zum nächsten Nukleotid. DNA-Polymerasen binden das 5′-Phosphat eines neuen Nukleotids an diese Gruppe. Deshalb verläuft jede Strangsynthese in 5′→3′-Richtung.',
+    ester5:'<b>Phosphorsäureesterbindung an C5′</b> – Das Phosphat ist über O5′ mit dem Zucker verestert. Im Strang bildet es zusätzlich mit der 3′-OH-Gruppe des vorherigen Nukleotids eine 3′,5′-Phosphodiesterbindung. Bei pH 7 ist das Phosphat deprotoniert; das Rückgrat ist negativ geladen.',
+    base:`<b>${NAME[b]}</b> – ein ${pur?'Purin: bicyclisches Ringsystem aus Sechs- und Fünfring':'Pyrimidin: heterocyclischer Sechsring'}. ${b==='T'?'Die Methylgruppe an C5 unterscheidet Thymin vom Uracil der RNA.':''}`
+  })[k];
+}
+function renderO1(){
+  const o=state.o1, host=$('#o1Board');
+  $('#o1Num').hidden=o.view!=='formula';
+  if(o.view==='model'){
+    const z=2.1;
+    const g=nucParts(o.base,40,72,'L')+
+      `<text class="lab" x="54" y="43">Phosphat (an C5′)</text><text class="lab" x="22" y="58" text-anchor="end">5′</text>`+
+      `<text class="lab" x="40" y="96" text-anchor="middle">Desoxyribose</text><text class="lab" x="22" y="86" text-anchor="end">3′</text>`+
+      `<text class="lab" x="${PUR[o.base]?91:83}" y="98" text-anchor="middle">${NAME[o.base]}</text>`;
+    host.innerHTML=`<svg viewBox="0 0 130 104" style="width:100%;max-width:${130*z}px" role="img" aria-label="Modell eines Nukleotids">${g}</svg>`;
+  } else {
+    const {m,hot}=nucMol(o.base);
+    let ov='';
+    Object.keys(hot).forEach(k=>{
+      const p=hot[k], r=k==='base'?0.7:0.42;
+      ov+=`<circle class="hot ${o.found[k]?'found':''}" data-k="${k}" cx="${X(p.x)}" cy="${Y(p.y)}" r="${(r*U).toFixed(1)}" tabindex="0" role="button" aria-label="Strukturmerkmal ${O1_NAME[k]}"/>`;
+    });
+    host.innerHTML=molSVG(m,ov,{num:o.num,label:'Strukturformel des Nukleotids'});
+  }
+  const t=$('#o1Task');
+  if(o.task<O1_TASKS.length) t.innerHTML=`<b>Gesucht (${o.task+1} von ${O1_TASKS.length})</b><p>Tippe auf ${O1_TASKS[o.task][1]}.</p>${o.view==='model'?'<p class="note">Wechsle dazu zur Strukturformel.</p>':''}`;
+  else t.innerHTML='<b>Alle Strukturmerkmale gefunden.</b><p>Tippe weiter auf markierte Stellen, um die Erklärungen zu lesen.</p>';
+}
+function o1Hot(k){
+  const o=state.o1; setInfo('O1',o1Info(k));
+  $$('#o1Board .hot').forEach(h=>h.classList.toggle('on',h.dataset.k===k));
+  if(o.task>=O1_TASKS.length) return;
+  const [want,txt]=O1_TASKS[o.task];
+  if(k===want){
+    o.found[k]=true; o.task++;
+    if(o.task>=O1_TASKS.length){ renderO1(); completeS('sek2',0,'O1','<b>Richtig.</b> Alle vier Strukturmerkmale sind gefunden.'); }
+    else { renderO1(); setFb('O1','ok','<b>Richtig.</b> Weiter mit dem nächsten Merkmal.'); }
+    $$('#o1Board .hot').forEach(h=>h.classList.toggle('on',h.dataset.k===k));
+  } else if(k!=='base' || want!=='base'){
+    setFb('O1','bad',`<b>Falsch.</b> Das ist ${O1_NAME[k]}. Gesucht ist ${txt}.`);
+  }
+}
+$('#o1Board').addEventListener('click',e=>{ const h=e.target.closest('.hot'); if(h) o1Hot(h.dataset.k); });
+$('#o1Board').addEventListener('keydown',e=>{ const h=e.target.closest('.hot'); if(h&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); o1Hot(h.dataset.k); } });
+segBind('o1View',()=>state.o1.view,v=>{state.o1.view=v;renderO1();});
+segBind('o1Base',()=>state.o1.base,v=>{state.o1.base=v;setInfo('O1',`${NAME[v]} ist ein <b>${PUR[v]?'Purin':'Pyrimidin'}</b>.`);renderO1();});
+togBind('o1Num',()=>state.o1.num,v=>{state.o1.num=v;renderO1();});
+
+/* ---------- O2 Wasserstoffbrücken ---------- */
+const SITE_Y=[1.732,0,-1.732];
+function siteKind(s1,s2){
+  if((s1.t==='D'&&s2.t==='A')||(s1.t==='A'&&s2.t==='D')) return 'hb';
+  if(s1.t==='D'&&s2.t==='D') return 'dd';
+  if(s1.t==='A'&&s2.t==='A') return 'aa';
+  return 'none';
+}
+function siteInfo(s1,s2){
+  const k=siteKind(s1,s2);
+  if(k==='hb'){ const d=s1.t==='D'?s1:s2, a=s1.t==='D'?s2:s1;
+    return `<b>Wasserstoffbrücke</b> – Donor: ${d.name}. Das H-Atom ist an das elektronegative N gebunden und trägt eine positive Partialladung (δ+). Akzeptor: ${a.name} mit freiem Elektronenpaar (δ−). Donor-Akzeptor-Abstand ca. 0,28–0,30 nm.`; }
+  if(k==='dd') return `<b>Keine Wasserstoffbrücke: Donor gegenüber Donor</b> – ${s1.name} und ${s2.name}. Beide H-Atome sind positiv polarisiert (δ+); sie stoßen sich elektrostatisch und sterisch ab.`;
+  if(k==='aa') return `<b>Keine Wasserstoffbrücke: Akzeptor gegenüber Akzeptor</b> – ${s1.name} und ${s2.name}. Die freien Elektronenpaare (δ−) stoßen sich ab; es fehlt ein H-Atom als Brücke.`;
+  return `<b>Keine Wasserstoffbrücke</b> – ${s1.name}: Die C–H-Bindung ist kaum polar (EN C 2,55 / H 2,20). Sie ist kein geeigneter Donor. Deshalb bildet A–T nur zwei Wasserstoffbrücken.`;
+}
+function renderO2(){
+  const o=state.o2, host=$('#o2Board'), pu=o.pu, py=o.py, comp=PAIR[pu]===py;
+  const a=purine(pu,0,0,'a',true), b=pyrimidine(py,4,0,'b');
+  let hbs=0; const kinds=[0,1,2].map(i=>{ const k=siteKind(a.sites[i],b.sites[i]); if(k==='hb') hbs++; return k; });
+  const head=$('#o2Head');
+  const extra=(pu==='G'&&py==='T')?' In Wirklichkeit kann G·T durch seitliche Verschiebung eine „Wobble“-Paarung mit zwei Wasserstoffbrücken bilden; Reparatursysteme erkennen diese Fehlpaarung an ihrer abweichenden Geometrie.':'';
+  head.innerHTML=`<b>${pu}–${py}</b><span class="badge ${comp?'ok':'bad'}">${comp?'komplementär':'Fehlpaarung'} · ${hbs} Wasserstoffbrücke${hbs===1?'':'n'}</span>`;
+  if(!comp && !o.site) setInfo('O2','Tippe auf die markierten Positionen zwischen den Basen.'+extra);
+  if(o.view==='model'){
+    const z=2.4;
+    host.innerHTML=`<svg viewBox="0 0 136 40" style="width:100%;max-width:${136*z}px" role="img" aria-label="Modell des Basenpaars">${baseG(pu,10,5,'r')+baseG(py,126,5,'l')}</svg>`;
+    return;
+  }
+  const m=Mol(); merge(m,a.m); merge(m,b.m);
+  const g1=m.at[a.gly.id], g2=m.at[b.gly.id];
+  Aa(m,'aR',pol(g1,1,a.gly.deg),'C1′','R'); Bd(m,a.gly.id,'aR');
+  Aa(m,'bR',pol(g2,1,b.gly.deg),'C1′','R'); Bd(m,b.gly.id,'bR');
+  let ov='';
+  [0,1,2].forEach(i=>{
+    const s1=a.sites[i], s2=b.sites[i], p=m.at[s1.id], q=m.at[s2.id], k=kinds[i];
+    if(k==='hb'){ const dx=q.x-p.x, L=Math.abs(dx); const p2={x:p.x+(shr(p)+.06),y:p.y}, q2={x:q.x-(shr(q)+.06),y:q.y}; if(L>0.6) ov+=ln(p2,q2,'hb'); }
+    else if(k==='dd'||k==='aa'){ if(Math.abs(q.x-p.x)>1) ov+=ln({x:p.x+shr(p)+.06,y:p.y},{x:q.x-shr(q)-.06,y:q.y},'clash'); ov+=`<text class="x" x="${X(2)}" y="${Y(SITE_Y[i]+0.42)}">×</text>`; }
+    if(o.delta){
+      const up=i<2?0.42:-0.42;
+      [[s1,p],[s2,q]].forEach(([s,at])=>{
+        if(s.t==='D'){ ov+=`<text class="dl dp" x="${X(at.x)}" y="${Y(at.y+up)}">δ+</text>`; const dn=m.at[s.don]; ov+=`<text class="dl dm" x="${X(dn.x+(dn.x<2?-.38:.38))}" y="${Y(dn.y+up)}">δ−</text>`; }
+        else if(s.t==='A'){ ov+=`<text class="dl dm" x="${X(at.x+(at.x<2?.05:-.05))}" y="${Y(at.y+up)}">δ−</text>`; }
+      });
+    }
+    if(o.da){
+      const dn=i<2?-0.42:0.42;
+      [[s1,p,1],[s2,q,-1]].forEach(([s,at,side])=>{ if(s.t==='0') return; ov+=`<text class="tag" x="${X(at.x+side*0.3)}" y="${Y(at.y+dn)}">${s.t==='D'?'D':'A'}</text>`; });
+    }
+    ov+=`<circle class="hot ${o.site===i?'on':''}" data-s="${i}" cx="${X(2)}" cy="${Y(SITE_Y[i])}" r="${(0.42*U).toFixed(1)}" tabindex="0" role="button" aria-label="Position ${i+1} zwischen den Basen"/>`;
+  });
+  ov+=`<text class="cap" x="${X(-0.6)}" y="${Y(-3.3)}">${PUR[pu]?'Purin':''}</text><text class="cap" x="${X(4.6)}" y="${Y(-3.3)}">Pyrimidin</text>`;
+  host.innerHTML=molSVG(m,ov,{pad:0.7,zoom:1.35,label:`Strukturformel des Basenpaars ${pu}–${py}`});
+  if(o.site!=null) setInfo('O2',siteInfo(a.sites[o.site],b.sites[o.site])+(comp?'':extra));
+}
+function o2Site(i){
+  state.o2.site=i; renderO2();
+}
+$('#o2Board').addEventListener('click',e=>{ const h=e.target.closest('.hot'); if(h) o2Site(+h.dataset.s); });
+$('#o2Board').addEventListener('keydown',e=>{ const h=e.target.closest('.hot'); if(h&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); o2Site(+h.dataset.s); } });
+segBind('o2View',()=>state.o2.view,v=>{state.o2.view=v;renderO2();});
+segBind('o2Pu',()=>state.o2.pu,v=>{state.o2.pu=v;state.o2.site=null;setInfo('O2','');renderO2();});
+segBind('o2Py',()=>state.o2.py,v=>{state.o2.py=v;state.o2.site=null;setInfo('O2','');renderO2();});
+togBind('o2Delta',()=>state.o2.delta,v=>{state.o2.delta=v;if(v&&state.o2.view!=='formula'){$('#o2View [data-v="formula"]').click();}renderO2();});
+togBind('o2DA',()=>state.o2.da,v=>{state.o2.da=v;if(v&&state.o2.view!=='formula'){$('#o2View [data-v="formula"]').click();}renderO2();});
+function setGC(v){
+  const gc=$('#gc'); gc.value=v; const tm=69.3+0.41*v;
+  $('#gcV').textContent=v+' %'; $('#tmV').textContent=de1(tm)+' °C';
+  $('#tmBar').style.left=Math.max(0,Math.min(100,(tm-75)/30*100))+'%';
+  gc.setAttribute('aria-valuetext',`${v} Prozent GC, Schmelztemperatur etwa ${de1(tm)} Grad Celsius`);
+}
+$('#gc').addEventListener('input',e=>setGC(+e.target.value));
+$$('[data-gc]').forEach(b=>b.addEventListener('click',()=>setGC(+b.dataset.gc)));
+function renderO2Check(){
+  miniMC($('#o2Opts'),[
+    {t:'Donor steht Donor und Akzeptor steht Akzeptor gegenüber; es bildet sich keine Wasserstoffbrücke.',ok:true},
+    {t:'A und C sind beide Purine; das Paar wäre zu breit.',ok:false,msg:'Cytosin ist ein Pyrimidin; die Paarbreite stimmt. Entscheidend ist das Donor-Akzeptor-Muster. Teste A–C oben.'},
+    {t:'Cytosin besitzt keine Gruppe, die Wasserstoffbrücken bilden kann.',ok:false,msg:'Cytosin besitzt einen Donor (N4–H) und Akzeptoren (N3, O2). Entscheidend ist, was ihnen gegenübersteht.'}
+  ],'O2',()=>completeS('sek2',1,'O2','<b>Richtig.</b> Bei A–C stehen sich N6–H und N4–H (zwei Donoren) sowie N1 und N3 (zwei Akzeptoren) gegenüber.'));
+}
+
+/* =========================================================
+   Genetischer Code und Codesonne
+   ========================================================= */
+const B4=['U','C','A','G'];
+const CODE='FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG';
+const AA3={F:'Phe',L:'Leu',S:'Ser',Y:'Tyr','*':'Stopp',C:'Cys',W:'Trp',P:'Pro',H:'His',Q:'Gln',R:'Arg',I:'Ile',M:'Met',T:'Thr',N:'Asn',K:'Lys',V:'Val',A:'Ala',D:'Asp',E:'Glu',G:'Gly'};
+const AADE={F:'Phenylalanin',L:'Leucin',S:'Serin',Y:'Tyrosin','*':'Stoppcodon',C:'Cystein',W:'Tryptophan',P:'Prolin',H:'Histidin',Q:'Glutamin',R:'Arginin',I:'Isoleucin',M:'Methionin',T:'Threonin',N:'Asparagin',K:'Lysin',V:'Valin',A:'Alanin',D:'Asparaginsäure',E:'Glutaminsäure',G:'Glycin'};
+const AAP={F:'np',L:'np',I:'np',M:'np',V:'np',P:'np',A:'np',W:'np',G:'np',S:'p',T:'p',Y:'p',C:'p',N:'p',Q:'p',D:'ac',E:'ac',K:'ba',R:'ba',H:'ba','*':'stop'};
+const PROP={np:'unpolar',p:'polar, ungeladen',ac:'sauer (negativ geladen)',ba:'basisch (positiv geladen)',stop:'Stopp'};
+const toR=s=>s.replace(/T/g,'U');
+const NI={U:0,T:0,C:1,A:2,G:3};
+const codonIdx=c=>NI[c[0]]*16+NI[c[1]]*4+NI[c[2]];
+const aaOf=c=>CODE[codonIdx(c)];
+const codonStr=k=>B4[k>>4]+B4[(k>>2)&3]+B4[k&3];
+const ANTI={A:'U',U:'A',G:'C',C:'G'};
+const SR=[16,44,72,98,154];
+const spt=(r,a)=>{const t=(a-90)*D;return [r*Math.cos(t),r*Math.sin(t)];};
+function sect(r1,r2,a1,a2){
+  const f=v=>v.toFixed(2), [x1,y1]=spt(r2,a1),[x2,y2]=spt(r2,a2),[x3,y3]=spt(r1,a2),[x4,y4]=spt(r1,a1), lg=a2-a1>180?1:0;
+  return `M${f(x1)},${f(y1)}A${r2},${r2} 0 ${lg} 1 ${f(x2)},${f(y2)}L${f(x3)},${f(y3)}A${r1},${r1} 0 ${lg} 0 ${f(x4)},${f(y4)}Z`;
+}
+const SUN_GROUPS=(()=>{const g=[];let cur=null;for(let k=0;k<64;k++){ if(!cur||CODE[k]!==cur.aa){cur={aa:CODE[k],a:k,b:k};g.push(cur);} else cur.b=k; } return g;})();
+const GROUP_OF=(()=>{const m=[];SUN_GROUPS.forEach((g,gi)=>{for(let k=g.a;k<=g.b;k++)m[k]=gi;});return m;})();
+function buildSun(host,h){
+  const T=(x,y,cls,t)=>`<text class="${cls}" x="${x.toFixed(1)}" y="${y.toFixed(1)}">${t}</text>`;
+  let s=`<circle r="${SR[0]}" class="sc"/>${T(0,0,'l0','5′')}`;
+  for(let i=0;i<4;i++){ const a1=i*90,[x,y]=spt((SR[0]+SR[1])/2,a1+45); s+=`<g class="sg r1" data-r1="${i}"><path class="sf b${B4[i]}" d="${sect(SR[0],SR[1],a1,a1+90)}"/>${T(x,y,'l1',B4[i])}</g>`; }
+  for(let j=0;j<16;j++){ const a1=j*22.5,[x,y]=spt((SR[1]+SR[2])/2,a1+11.25); s+=`<g class="sg r2" data-r2="${j}"><path class="sf b${B4[j%4]}" d="${sect(SR[1],SR[2],a1,a1+22.5)}"/>${T(x,y,'l2',B4[j%4])}</g>`; }
+  for(let k=0;k<64;k++){ const a1=k*5.625,[x,y]=spt((SR[2]+SR[3])/2,a1+2.8125); s+=`<g class="sg r3" data-c="${k}"><path class="sf b${B4[k%4]}" d="${sect(SR[2],SR[3],a1,a1+5.625)}"/>${T(x,y,'l3',B4[k%4])}</g>`; }
+  SUN_GROUPS.forEach((g,gi)=>{
+    const a1=g.a*5.625, a2=(g.b+1)*5.625, am=(a1+a2)/2, [x,y]=spt((SR[3]+SR[4])/2,am), rot=am<=180?am-90:am+90;
+    const lab=g.aa==='*'?'Stopp':AA3[g.aa]+(g.aa==='M'?' · Start':'');
+    s+=`<g class="sg ag aa-${AAP[g.aa]}" data-g="${gi}" tabindex="0" role="button" aria-label="${AADE[g.aa]}"><path class="sf" d="${sect(SR[3],SR[4],a1,a2)}"/><text class="la" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${rot.toFixed(1)})">${lab}</text></g>`;
+  });
+  host.innerHTML=`<svg class="sun" viewBox="-157 -157 314 314" role="group" aria-label="Codesonne, von innen (5′) nach außen (3′) zu lesen">${s}</svg>`;
+  const el=host.firstChild;
+  const act=t=>{ const g=t.closest('[data-g]'); if(g){ h.aa(SUN_GROUPS[+g.dataset.g].aa); return; } const c=t.closest('[data-c]'); if(c) h.codon(+c.dataset.c); };
+  el.addEventListener('click',e=>act(e.target));
+  el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); act(e.target); } });
+  return {hl(c){ $$('.hl',el).forEach(x=>x.classList.remove('hl')); if(!c||c.length<3) return; const k=codonIdx(c);
+    [`[data-r1="${k>>4}"]`,`[data-r2="${k>>2}"]`,`[data-c="${k}"]`,`[data-g="${GROUP_OF[k]}"]`].forEach(q=>{ const n=$(q,el); if(n) n.classList.add('hl'); }); }};
+}
+
+/* ---------- O4 Transkription und Translation ---------- */
+const NC=WT.length/3;
+const TMPL=WT.split('').map(c=>COMP[c]).join('');
+const sun1=buildSun($('#sun1'),{
+  aa:aa=>geAa(aa),
+  codon:k=>setInfo('O4',`Codon <span class="cdn">${codonStr(k)}</span> → ${AADE[CODE[k]]}${CODE[k]!=='*'?' ('+AA3[CODE[k]]+')':''}`)
+});
+function renderGE(){
+  const g=state.ge, n=WT.length, pos=g.mrna.length, txDone=pos>=n, ci=g.pep.length, cur=txDone&&ci<NC?ci:-1;
+  const row=(label,l,r,str,cls)=>{
+    let h=`<div class="srow"><span class="slab">${label}</span><span class="end">${l}</span>`;
+    for(let j=0;j<n;j+=3){ h+=`<span class="trip${cls.trip&&cls.trip(j/3)?' cc':''}">`; for(let k=j;k<j+3;k++) h+=`<span class="nt ${cls.nt(k)}" ${cls.id&&cls.id(k)?'id="geCur"':''}>${str[k]||'·'}</span>`; h+='</span>'; }
+    return h+`<span class="end">${r}</span></div>`;
+  };
+  $('#geStrands').innerHTML=
+    row('codierender Strang','5′','3′',WT,{nt:()=> 'dim'})+
+    row('codogener Strang (Matrize)','3′','5′',TMPL,{nt:k=>(!txDone&&k===pos)?'cur':'',id:k=>!txDone&&k===pos})+
+    row('mRNA','5′','3′',g.mrna,{nt:k=>k<pos?'':'ph',trip:j=>j===cur,id:k=>cur>=0&&k===cur*3});
+  const c=$('#geCur'); if(c){ const box=$('#geStrands'); const r=c.getBoundingClientRect(), br=box.getBoundingClientRect(); if(r.left<br.left+140||r.right>br.right-20) box.scrollLeft+=(r.left-br.left)-br.width/2; }
+  $('#gePhase').textContent=!txDone?'Phase 1: Transkription':(ci<NC?'Phase 2: Translation':'Abgeschlossen');
+  $('#geProg').textContent=!txDone?`${pos} von ${n} Nukleotiden`:`${ci} von ${NC} Aminosäuren`;
+  $('#geTx').hidden=txDone; $('#geTl').hidden=!txDone;
+  if(txDone){
+    if(cur>=0){ const cod=g.mrna.substr(cur*3,3); $('#geCodon').innerHTML=`Codon ${cur+1}: <span class="cdn">5′-${cod}-3′</span> · Anticodon der tRNA: <span class="cdn">3′-${cod.split('').map(x=>ANTI[x]).join('')}-5′</span>`; }
+    else $('#geCodon').innerHTML='Alle Codons des Ausschnitts sind übersetzt. Im vollständigen Gen folgen 135 weitere Codons bis zum Stoppcodon.';
+    $('#gePep').innerHTML=(g.pep.length?'<span class="note">H₂N–</span>':'')+g.pep.map(a=>`<span class="aa aa-${AAP[a]}" title="${AADE[a]}">${AA3[a]}</span>`).join('<span class="note">–</span>')+(g.pep.length===NC?'<span class="note">–…</span>':'');
+  }
+  sun1.hl(g.path&&cur>=0?g.mrna.substr(cur*3,3):null);
+}
+function geKey(k){
+  const g=state.ge, pos=g.mrna.length; if(pos>=WT.length) return;
+  const exp=toR(WT[pos]);
+  if(k==='T'){ setFb('O4','bad','<b>Falsch.</b> RNA enthält kein Thymin. An seiner Stelle wird Uracil (U) eingebaut.'); return; }
+  if(k!==exp){ setFb('O4','bad',`<b>Falsch.</b> ${k} ist nicht komplementär zu ${TMPL[pos]} im codogenen Strang.`); return; }
+  g.mrna+=k;
+  setFb('O4','ok',g.mrna.length===WT.length?'<b>Richtig.</b> Die mRNA ist vollständig. Übersetze sie jetzt mit der Codesonne.':'<b>Richtig.</b>');
+  renderGE();
+}
+$('#geKeys').innerHTML=['A','U','G','C','T'].map(b=>`<button class="key c${b}" type="button" data-k="${b}" aria-label="Ribonukleotid ${b}">${b}</button>`).join('');
+$$('#geKeys .key').forEach(b=>b.addEventListener('click',()=>geKey(b.dataset.k)));
+$('#geAutoTx').addEventListener('click',()=>{ state.ge.mrna=toR(WT); setFb('O4','ok','Die mRNA wurde automatisch ergänzt. Übersetze sie jetzt mit der Codesonne.'); renderGE(); });
+function geAa(aa){
+  const g=state.ge;
+  if(g.mrna.length<WT.length||g.pep.length>=NC){ setInfo('O4',`${AADE[aa]}${aa!=='*'?' ('+AA3[aa]+')':''}: ${PROP[AAP[aa]]}.`); return; }
+  const ci=g.pep.length, cod=g.mrna.substr(ci*3,3), want=aaOf(cod);
+  if(aa===want){
+    g.pep.push(aa);
+    if(g.pep.length===NC){ renderGE(); completeS('sek2',3,'O4','<b>Richtig.</b> Das Peptid Met–Val–His–Leu–Thr–Pro–Glu–Glu–Lys–Ser–Ala–Val ist der Anfang des β-Globins.'); }
+    else { setFb('O4','ok',`<b>Richtig.</b> ${cod} codiert ${AADE[aa]}.`); renderGE(); }
+  } else setFb('O4','bad',`<b>Falsch.</b> ${cod} codiert nicht ${aa==='*'?'ein Stoppsignal':AA3[aa]}. Lies die Codesonne von innen nach außen: zuerst ${cod[0]}, dann ${cod[1]}, dann ${cod[2]}.`);
+}
+togBind('gePath',()=>state.ge.path,v=>{state.ge.path=v;renderGE();});
+$('#geAutoTl').addEventListener('click',()=>{ const g=state.ge; while(g.pep.length<NC) g.pep.push(aaOf(g.mrna.substr(g.pep.length*3,3))); renderGE(); completeS('sek2',3,'O4','Die Translation wurde automatisch ergänzt.'); });
+
+/* ---------- O5 Mutationslabor ---------- */
+const sun2=buildSun($('#sun2'),{
+  aa:aa=>setInfo('O5',`${AADE[aa]}${aa!=='*'?' ('+AA3[aa]+')':''}: ${PROP[AAP[aa]]}. Codons: ${SUN_GROUPS.filter(g=>g.aa===aa).flatMap(g=>{const r=[];for(let k=g.a;k<=g.b;k++)r.push(codonStr(k));return r;}).join(', ')}`),
+  codon:k=>setInfo('O5',`Codon <span class="cdn">${codonStr(k)}</span> → ${AADE[CODE[k]]}`)
+});
+function transl(s){ const out=[]; let stop=false; for(let i=0;i<s.length;i+=3){ const c=s.substr(i,3); if(stop){out.push(null);continue;} if(c.length<3){out.push('?');continue;} const a=aaOf(c); out.push(a); if(a==='*') stop=true; } return out; }
+const PWT=transl(WT);
+function classify(wt,mt){
+  const pw=transl(wt), pm=transl(mt), d=mt.length-wt.length, stopIdx=pm.indexOf('*');
+  const stopTxt=()=>stopIdx>=0?` In Codon ${stopIdx+1} entsteht ein vorzeitiges Stoppcodon (<span class="cdn">${toR(mt.substr(stopIdx*3,3))}</span>): Das Polypeptid bricht nach ${stopIdx} Aminosäuren ab.`:'';
+  if(mt===wt) return {type:'Wildtyp',cls:'',html:'Die Sequenz entspricht dem Wildtyp. Wähle eine Base im codierenden Strang aus und verändere sie.'};
+  if(mt.slice(0,3)!=='ATG') return {type:'Mutation im Startcodon',cls:'bad',html:'Das Startcodon AUG ist zerstört. Hier beginnt keine Translation; sie kann allenfalls an einem späteren AUG starten. Die Folge ist ein stark verändertes oder fehlendes Protein.'};
+  if(d%3!==0){
+    let k=0; while(k<pm.length&&pm[k]===pw[k]) k++;
+    return {type:'Rastermutation (Leserasterverschiebung)',cls:'bad',html:`${d>0?'Insertion':'Deletion'} von ${Math.abs(d)} Nukleotid${Math.abs(d)===1?'':'en'} – keine ganzzahlige Anzahl von Codons. Ab Codon ${k+1} wird in einem verschobenen Leseraster gelesen; alle folgenden Aminosäuren können sich ändern.`+(stopTxt()||' Im gezeigten Ausschnitt tritt (noch) kein Stoppcodon auf.')};
+  }
+  if(d!==0){
+    const n=Math.abs(d)/3;
+    return {type:d>0?'Insertion ohne Rasterverschiebung':'Deletion ohne Rasterverschiebung',cls:'warn',html:`${Math.abs(d)} Nukleotide (${n} Codon${n===1?'':'s'}) ${d>0?'eingefügt':'entfernt'}. Das Leseraster bleibt erhalten; das Polypeptid ist um ${n} Aminosäure${n===1?'':'n'} ${d>0?'länger':'kürzer'}. Liegen die Nukleotide nicht genau an einer Codongrenze, kann zusätzlich eine benachbarte Aminosäure verändert sein.`+stopTxt()+(d<0?' Bekanntes Beispiel: Die häufigste Mukoviszidose-Mutation (ΔF508 im <i>CFTR</i>-Gen) ist eine Deletion von drei Nukleotiden mit Verlust eines Phenylalanins.':'')};
+  }
+  const diffs=[]; for(let i=0;i<mt.length;i++) if(mt[i]!==wt[i]) diffs.push(i);
+  const subs='<p class="note">'+diffs.map(i=>`Position ${i+1} (Codon ${Math.floor(i/3)+1}, ${i%3+1}. Base): ${wt[i]}→${mt[i]}, ${PUR[wt[i]]===PUR[mt[i]]?'Transition':'Transversion'}`).join('<br>')+'</p>';
+  if(stopIdx>=0) return {type:'Nonsense-Mutation',cls:'bad',html:`Codon ${stopIdx+1} wird zum Stoppcodon (<span class="cdn">${toR(mt.substr(stopIdx*3,3))}</span>). Die Translation bricht vorzeitig ab; das verkürzte Polypeptid umfasst nur ${stopIdx} Aminosäuren und ist in der Regel funktionslos.`+subs};
+  const ch=[]; pm.forEach((a,j)=>{ if(a!==pw[j]) ch.push(j); });
+  if(!ch.length) return {type:'Stumme Mutation',cls:'ok',html:'Das veränderte Codon codiert dieselbe Aminosäure – eine Folge der Degeneriertheit des genetischen Codes. Die Aminosäuresequenz bleibt unverändert.'+(diffs.some(i=>i%3===2)?' Synonyme Austausche betreffen besonders häufig die dritte Base eines Codons.':'')+subs};
+  let html=ch.map(j=>`<span class="cdn">${AA3[pw[j]]}${j+1}${AA3[pm[j]]}</span>: ${PROP[AAP[pw[j]]]} → ${PROP[AAP[pm[j]]]}${AAP[pw[j]]===AAP[pm[j]]?' (konservativer Austausch: ähnliche Eigenschaften, Funktion oft wenig beeinträchtigt)':' (nicht-konservativer Austausch: Eigenschaftswechsel, Faltung und Funktion können verändert sein)'}`).join('<br>');
+  if(ch.length===1&&ch[0]===6&&pm[6]==='V') html+='<br><br><b>Sichelzellanämie:</b> Dies entspricht der HbS-Mutation. In der Literatur heißt sie „Glu6Val“, weil das Start-Methionin im fertigen β-Globin abgespalten wird. Das unpolare Valin an der Proteinoberfläche fördert im desoxygenierten Zustand die Aggregation der Hämoglobinmoleküle zu Fasern; die Erythrozyten verformen sich sichelförmig.';
+  return {type:'Missense-Mutation (Fehlsinnmutation)',cls:'warn',html:html+subs};
+}
+const PRESETS=[
+  ['Wildtyp',()=>WT],
+  ['Sichelzellanämie',()=>WT.slice(0,19)+'T'+WT.slice(20)],
+  ['Stumme Mutation',()=>WT.slice(0,11)+'C'+WT.slice(12)],
+  ['Nonsense',()=>WT.slice(0,24)+'T'+WT.slice(25)],
+  ['Insertion (1 nt)',()=>WT.slice(0,9)+'A'+WT.slice(9)],
+  ['Deletion (1 nt)',()=>WT.slice(0,13)+WT.slice(14)],
+  ['Deletion (1 Codon)',()=>WT.slice(0,21)+WT.slice(24)]
+];
+const LAB_TASKS=[
+  ['silent','Erzeuge mit einem einzigen Basenaustausch eine stumme Mutation.'],
+  ['hbs','Erzeuge mit einem einzigen Basenaustausch die Sichelzellmutation (Glu → Val in Codon 7).'],
+  ['nonsense','Erzeuge mit einem einzigen Basenaustausch eine Nonsense-Mutation.'],
+  ['frame','Füge eine einzelne Base ein und beschreibe die Folgen.'],
+  ['inframe','Entferne Nukleotide so, dass das Leseraster erhalten bleibt.']
+];
+function checkLab(){
+  const L=state.lab; if(!L.manual) return;
+  const s=L.seq, d=s.length-WT.length, pm=transl(s);
+  const diffs=[]; if(!d) for(let i=0;i<s.length;i++) if(s[i]!==WT[i]) diffs.push(i);
+  const one=!d&&diffs.length===1&&s.slice(0,3)==='ATG';
+  const hit=[];
+  if(one&&pm.join('')===PWT.join('')) hit.push('silent');
+  if(one&&pm[6]==='V'&&pm.every((a,j)=>j===6||a===PWT[j])) hit.push('hbs');
+  if(one&&pm.includes('*')) hit.push('nonsense');
+  if(d===1) hit.push('frame');
+  if(d<0&&d%3===0) hit.push('inframe');
+  hit.forEach(k=>{ if(!L.tasks[k]){ L.tasks[k]=true; setFb('O5','ok',`<b>Richtig.</b> Auftrag erfüllt: ${LAB_TASKS.find(t=>t[0]===k)[1]}`); } });
+  if(LAB_TASKS.every(t=>L.tasks[t[0]])&&!state.done.sek2[4]) completeS('sek2',4,'O5','<b>Richtig.</b> Alle Aufträge im Mutationslabor sind erfüllt.');
+}
+function renderLab(){
+  const L=state.lab, s=L.seq, pm=transl(s), nC=Math.max(Math.ceil(s.length/3),PWT.length);
+  const chunk=j=>s.substr(j*3,3);
+  const aaCell=(a,ref)=>a===undefined?'':a===null?'<span class="aa off">–</span>':a==='?'?'<span class="aa off">…</span>':`<span class="aa aa-${AAP[a]}${ref!==undefined&&a!==ref?' diff':''}" title="${AADE[a]}">${AA3[a]}</span>`;
+  let h='<div class="rl">Codon</div>'; for(let j=0;j<nC;j++) h+=`<div class="cc n">${j+1}</div>`;
+  h+='<div class="rl">codogener Strang 3′→5′</div>'; for(let j=0;j<nC;j++) h+=`<div class="cc dim">${chunk(j).split('').map(c=>COMP[c]).join('')}</div>`;
+  h+='<div class="rl">codierender Strang 5′→3′</div>';
+  for(let j=0;j<nC;j++){ h+='<div class="cc">'; for(let i=j*3;i<Math.min(j*3+3,s.length);i++) h+=`<button class="lb${s[i]!==WT[i]?' mut':''}${L.sel===i?' sel':''}" type="button" data-i="${i}" aria-label="Position ${i+1}: ${s[i]}">${s[i]}</button>`; h+='</div>'; }
+  h+='<div class="rl">mRNA 5′→3′</div>'; for(let j=0;j<nC;j++) h+=`<div class="cc">${toR(chunk(j))}</div>`;
+  h+='<div class="rl">Aminosäure Mutante</div>'; for(let j=0;j<nC;j++) h+=`<div class="cc">${aaCell(pm[j],PWT[j])}</div>`;
+  h+='<div class="rl">Aminosäure Wildtyp</div>'; for(let j=0;j<nC;j++) h+=`<div class="cc">${aaCell(PWT[j])}</div>`;
+  const grid=$('#labGrid'); grid.style.gridTemplateColumns=`auto repeat(${nC},auto)`; grid.innerHTML=h;
+  const tools=$('#labTools');
+  if(L.sel==null||L.sel>=s.length){ L.sel=null; tools.innerHTML='<p class="note">Tippe auf eine Base im codierenden Strang, um sie auszutauschen, dahinter eine Base einzufügen oder sie zu löschen.</p>'; }
+  else{
+    const i=L.sel, bt=(op,b,lab)=>`<button class="key c${b}" style="width:40px;height:36px;font-size:16px" type="button" data-op="${op}" data-b="${b}" ${op==='sub'&&s[i]===b?'disabled':''} aria-label="${lab} ${b}">${b}</button>`;
+    tools.innerHTML=`<p><b>Position ${i+1}</b> · Codon ${Math.floor(i/3)+1}, ${i%3+1}. Base · aktuell <span class="cdn">${s[i]}</span></p>
+      <div class="row"><span class="seg-lbl">Austauschen gegen</span>${['A','T','G','C'].map(b=>bt('sub',b,'Austauschen gegen')).join('')}</div>
+      <div class="row"><span class="seg-lbl">Dahinter einfügen</span>${['A','T','G','C'].map(b=>bt('ins',b,'Einfügen')).join('')}</div>
+      <div class="row"><button class="btn small" type="button" data-op="del">Base löschen</button><button class="btn small" type="button" data-op="none">Auswahl aufheben</button></div>`;
+  }
+  const r=classify(WT,s), res=$('#labResult');
+  res.className='result '+r.cls; res.innerHTML=`<span class="lbl">Einordnung</span><h3>${r.type}</h3><div>${r.html}</div>`;
+  $('#labTasks').innerHTML=LAB_TASKS.map(([k,t])=>`<li class="${L.tasks[k]?'ok':''}"><span class="st" aria-hidden="true">${L.tasks[k]?'✓':''}</span><span>${t}${L.tasks[k]?' <span class="note">(erfüllt)</span>':''}</span></li>`).join('');
+  sun2.hl(L.sun&&L.sel!=null?toR(s.substr(Math.floor(L.sel/3)*3,3)):null);
+}
+$('#labGrid').addEventListener('click',e=>{ const b=e.target.closest('.lb'); if(!b) return; const i=+b.dataset.i; state.lab.sel=state.lab.sel===i?null:i; renderLab(); });
+$('#labTools').addEventListener('click',e=>{
+  const b=e.target.closest('[data-op]'); if(!b) return; const L=state.lab, i=L.sel, s=L.seq, op=b.dataset.op;
+  if(op==='none'){ L.sel=null; renderLab(); return; }
+  if(op==='sub') L.seq=s.slice(0,i)+b.dataset.b+s.slice(i+1);
+  if(op==='ins'){ if(s.length>=60){ setFb('O5','bad','Die Sequenz ist auf 60 Nukleotide begrenzt.'); return; } L.seq=s.slice(0,i+1)+b.dataset.b+s.slice(i+1); L.sel=i+1; }
+  if(op==='del'){ if(s.length<=6){ setFb('O5','bad','Die Sequenz muss mindestens 6 Nukleotide lang bleiben.'); return; } L.seq=s.slice(0,i)+s.slice(i+1); L.sel=i<L.seq.length?i:L.seq.length-1; }
+  L.manual=true; setFb('O5','',''); checkLab(); renderLab();
+});
+$('#labPresets').innerHTML=PRESETS.map((p,k)=>`<button class="btn small" type="button" data-p="${k}">${p[0]}</button>`).join('');
+$('#labPresets').addEventListener('click',e=>{ const b=e.target.closest('[data-p]'); if(!b) return; const L=state.lab; L.seq=PRESETS[+b.dataset.p][1](); L.sel=null; L.manual=false; setFb('O5','',''); renderLab(); });
+togBind('labSunBtn',()=>state.lab.sun,v=>{ state.lab.sun=v; $('#labSunWrap').hidden=!v; $('#labSunBtn').textContent=v?'Codesonne ausblenden':'Codesonne einblenden'; renderLab(); });
+
+/* =========================================================
+   Quiz (beide Niveaus)
+   ========================================================= */
+const QUIZ1=[
+  {q:'Wie viele Teile hat ein Baustein der DNA?',o:['drei','zwei','vier','fünf'],ex:'Ein Baustein hat ein Phosphat, einen Zucker und eine Base.',st:1},
+  {q:'Welches Teil liegt in der Mitte eines Bausteins?',o:['der Zucker','das Phosphat','die Base'],ex:'Phosphat und Base hängen beide am Zucker.',st:1},
+  {q:'Welche Base passt zu A?',o:['T','G','C','A'],ex:'A und T bilden ein Paar. A hat zwei Zacken, T hat zwei Lücken.',st:2},
+  {q:'Welche Base passt zu C?',o:['G','A','T','C'],ex:'G und C bilden ein Paar. Drei Zacken passen zu drei Lücken.',st:2},
+  {q:'Woraus bestehen die Seiten der DNA-Leiter?',o:['aus Zucker und Phosphat','aus Basenpaaren','nur aus Basen'],ex:'Zucker und Phosphat wechseln sich ab. Sie bilden das Rückgrat.',st:3},
+  {q:'Wo steckt die Information der DNA?',o:['in der Reihenfolge der Basen','in der Anzahl der Zucker','in der Dicke des Strangs'],ex:'Die vier Basen sind wie Buchstaben. Ihre Reihenfolge ist die Information.',st:3},
+  {type:'seq',q:'Ein Strang hat diese Basen. Baue den passenden zweiten Strang.',given:'GATTC',gl:'Erster Strang',answer:'CTAAG',al:'Zweiter Strang',keys:['A','T','G','C'],ex:'Zu G passt C, zu A passt T, zu T passt A, zu C passt G.',st:4},
+  {q:'Was hält die zwei Stränge zusammen?',o:['die Basenpaare in der Mitte','die Phosphate außen','die Zucker außen'],ex:'Die Basen der beiden Stränge sind in der Mitte miteinander verbunden.',st:4},
+  {q:'In einem DNA-Doppelstrang gibt es 30-mal die Base A. Wie oft gibt es die Base T?',o:['30-mal','15-mal','60-mal','Das kann man nicht wissen.'],ex:'Jedes A hat genau ein T als Partner. Darum gibt es gleich viele A und T.',st:4},
+  {q:'Wie heißt die verdrehte Form der DNA?',o:['Doppelhelix','Doppelkreis','Basenpaar'],ex:'Die DNA ist eine verdrehte Leiter: eine Doppelhelix.',st:5}
+];
+const QUIZ2=[
+  {q:'Zwischen welchen Atomen liegt die N-glykosidische Bindung eines Desoxyribonukleotids?',o:['C1′ der Desoxyribose und N9 (Purine) bzw. N1 (Pyrimidine)','C5′ der Desoxyribose und dem Phosphat','C3′ der Desoxyribose und der Base'],ex:'Die Base ist an C1′ N-glykosidisch gebunden; das Phosphat ist an C5′ verestert.',st:1},
+  {q:'Worin unterscheidet sich die 2′-Desoxyribose von der Ribose?',o:['An C2′ fehlt die OH-Gruppe.','An C3′ fehlt die OH-Gruppe.','Sie besitzt ein zusätzliches C-Atom.'],ex:'Desoxyribose trägt an C2′ nur H-Atome. Die 3′-OH-Gruppe ist für die Verknüpfung im Strang unverzichtbar.',st:1},
+  {q:'Wie viele Wasserstoffbrücken bilden Guanin und Cytosin?',o:['drei','zwei','vier'],ex:'O6···H–N4, N1–H···N3 und N2–H···O2.',st:2},
+  {q:'Welche Aussage beschreibt eine Wasserstoffbrücke korrekt?',o:['Ein an N oder O gebundenes, positiv polarisiertes H-Atom wechselwirkt mit einem freien Elektronenpaar eines elektronegativen Atoms.','Zwei H-Atome teilen sich ein bindendes Elektronenpaar.','Ein Proton wird vollständig von der Base auf das Phosphat übertragen.'],ex:'Donor: polare N–H- oder O–H-Bindung; Akzeptor: elektronegatives Atom mit freiem Elektronenpaar.',st:2},
+  {q:'DNA-Probe 1 hat einen GC-Gehalt von 60 %, Probe 2 von 40 %. Welche Aussage trifft zu?',o:['Probe 1 hat die höhere Schmelztemperatur.','Probe 2 hat die höhere Schmelztemperatur.','Beide schmelzen bei derselben Temperatur.'],ex:'GC-Paare: drei Wasserstoffbrücken und stärkere Stapelwechselwirkungen. Näherung: Tm ≈ 69,3 °C + 0,41 · GC-Gehalt (in %).',st:2},
+  {q:'Was bedeutet „antiparallel“ für die beiden DNA-Stränge?',o:['Sie verlaufen in entgegengesetzter 5′→3′-Orientierung.','Sie sind nicht miteinander verbunden.','Sie sind um 90° gegeneinander verdreht.'],ex:'Dem 5′-Ende des einen Strangs liegt das 3′-Ende des anderen gegenüber.',st:3},
+  {type:'seq',q:'Gib die mRNA an, die von diesem codogenen Strang transkribiert wird.',given:'TACGGACTT',gl:'Codogener Strang 3′→5′',answer:'AUGCCUGAA',al:'mRNA 5′→3′',keys:['A','U','G','C'],group:3,ex:'Komplementär zum codogenen Strang, mit U statt T: 5′-AUG CCU GAA-3′.',st:4},
+  {q:'Welches Anticodon trägt die tRNA, die an das Codon 5′-AUG-3′ bindet?',o:['3′-UAC-5′','5′-UAC-3′','3′-TAC-5′'],ex:'Codon und Anticodon paaren antiparallel; tRNA enthält U statt T.',st:4},
+  {q:'Im codierenden Strang wird das Triplett GAG zu GAA verändert. Um welchen Mutationstyp handelt es sich?',o:['stumme Mutation','Missense-Mutation','Nonsense-Mutation','Rastermutation'],ex:'GAA und GAG codieren beide Glutaminsäure – eine Folge der Degeneriertheit des Codes.',st:5},
+  {q:'Warum hat die Deletion eines einzelnen Nukleotids meist schwerere Folgen als eine Substitution?',o:['Das Leseraster verschiebt sich; alle folgenden Codons werden verändert gelesen.','Die Doppelhelix wird an dieser Stelle aufgetrennt.','Deletionen betreffen immer das Startcodon.'],ex:'Rastermutationen verändern die gesamte folgende Aminosäuresequenz und führen häufig zu einem vorzeitigen Stoppcodon.',st:5},
+  {q:'Bei der Sichelzellanämie ist im codierenden Strang GAG zu GTG verändert. Wie ist die Mutation einzuordnen?',o:['Missense-Mutation: Glu → Val','Nonsense-Mutation: Glu → Stopp','stumme Mutation','Rastermutation'],ex:'Die saure, negativ geladene Glutaminsäure wird durch das unpolare Valin ersetzt (Transversion A→T).',st:5}
+];
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function makeQuiz(box,QS,lvl){
+  let qz;
+  const reset=()=>{ qz={i:0,score:0,answered:false,wrong:[],order:null,buf:[]}; render(); };
+  function render(){
+    const N=QS.length, names=LV[lvl].names;
+    if(qz.i>=N){
+      state.done[lvl][5]=true; renderNav();
+      const st=[...new Set(qz.wrong)].sort();
+      const verdict=qz.score>=N-1?'Sehr gut.':qz.score>=Math.round(N*0.7)?'Gut.':'Wiederhole die Stationen und versuche es noch einmal.';
+      box.innerHTML=`<p class="qmeta">Ergebnis</p><div class="score">${qz.score} von ${N}</div><p>${verdict}</p>`+
+        (st.length?`<p>Diese Stationen helfen dir:</p><div class="row">${st.map(s=>`<button class="btn small goto" data-s="${s-1}" type="button">Station ${s}: ${names[s-1]}</button>`).join('')}</div>`:'')+
+        `<div class="row"><button class="btn primary qre" type="button">Quiz neu starten</button></div>`;
+      $$('.goto',box).forEach(b=>b.addEventListener('click',()=>go(+b.dataset.s)));
+      $('.qre',box).addEventListener('click',reset);
+      return;
+    }
+    const Q=QS[qz.i];
+    if(!qz.order&&Q.o) qz.order=shuffle(Q.o.map((_,k)=>k));
+    let h=`<p class="qmeta">Frage ${qz.i+1} von ${N}</p><div class="qbar"><span style="width:${qz.i/N*100}%"></span></div><h3 class="qq">${Q.q}</h3>`;
+    const gap=k=>Q.group&&(k+1)%Q.group===0?' gap':'';
+    if(Q.type==='seq'){
+      const len=Q.answer.length;
+      h+=`<div class="lbl">${Q.gl}</div><div class="seqrow">${Q.given.split('').map((b,k)=>`<div class="cell f c${b}${gap(k)}">${b}</div>`).join('')}</div>
+        <div class="lbl">${Q.al}</div><div class="seqrow ans">${Array.from({length:len},(_,k)=>{const b=qz.buf[k];return `<div class="cell${b?' f c'+b:''}${gap(k)}">${b||''}</div>`;}).join('')}</div>
+        <div class="keys">${Q.keys.map(b=>`<button class="key c${b}" data-k="${b}" type="button" aria-label="Base ${b}">${b}</button>`).join('')}<button class="btn small del" type="button">Löschen</button></div>
+        <div class="row"><button class="btn primary chk" type="button" ${qz.buf.length<len?'disabled':''}>Prüfen</button></div>`;
+    } else h+=`<div class="opts">${qz.order.map(k=>`<button class="opt" data-k="${k}" type="button">${Q.o[k]}</button>`).join('')}</div>`;
+    h+=`<p class="fb qfb" role="status" aria-live="polite"></p><div class="row"><button class="btn primary qnext" type="button" hidden>${qz.i===N-1?'Ergebnis zeigen':'Nächste Frage'}</button></div>`;
+    box.innerHTML=h;
+    const fb=$('.qfb',box), next=$('.qnext',box);
+    const answer=ok=>{
+      qz.answered=true; if(ok) qz.score++; else qz.wrong.push(Q.st);
+      fb.className='fb qfb '+(ok?'ok':'bad');
+      fb.innerHTML=(ok?'<b>Richtig.</b> ':'<b>Falsch.</b> ')+Q.ex+(Q.type==='seq'&&!ok?` Lösung: ${Q.answer.split('').join(' ')}.`:'')+(ok?'':` Wiederhole Station ${Q.st}.`);
+      next.hidden=false; next.focus();
+    };
+    next.addEventListener('click',()=>{ qz.i++; qz.answered=false; qz.order=null; qz.buf=[]; render(); });
+    if(Q.type==='seq'){
+      $$('.key',box).forEach(k=>k.addEventListener('click',()=>{ if(qz.buf.length<Q.answer.length){qz.buf.push(k.dataset.k); render();} }));
+      $('.del',box).addEventListener('click',()=>{ qz.buf.pop(); render(); });
+      $('.chk',box).addEventListener('click',()=>{
+        const cells=$$('.ans .cell',box); let all=true;
+        qz.buf.forEach((b,k)=>{ const ok=b===Q.answer[k]; if(!ok) all=false; cells[k].classList.add(ok?'ok':'bad'); });
+        $$('.key',box).forEach(k=>k.disabled=true); $('.del',box).disabled=true; $('.chk',box).disabled=true;
+        answer(all);
+      });
+    } else {
+      $$('.opt',box).forEach(o=>o.addEventListener('click',()=>{
+        if(qz.answered) return; const ok=+o.dataset.k===0;
+        $$('.opt',box).forEach(x=>{ x.disabled=true; if(+x.dataset.k===0) x.classList.add('ok'); });
+        if(!ok) o.classList.add('bad');
+        answer(ok);
+      }));
+    }
+  }
+  return {reset};
+}
+const quizzes={sek1:makeQuiz($('#quiz1'),QUIZ1,'sek1'),sek2:makeQuiz($('#quiz2'),QUIZ2,'sek2')};
+
+/* =========================================================
+   Navigation, Niveau, Vorlesen, Wortspeicher
+   ========================================================= */
+function renderNav(){
+  const nav=$('#steps'), l=state.level; nav.innerHTML='';
+  LV[l].names.forEach((nm,i)=>{
+    const b=document.createElement('button'); b.type='button';
+    if(state.done[l][i]) b.classList.add('done');
+    if(i===state.cur[l]) b.setAttribute('aria-current','step');
+    b.innerHTML=`<span class="n">${state.done[l][i]?'✓':i+1}</span>${nm}`;
+    b.setAttribute('aria-label',`Station ${i+1}: ${nm}${state.done[l][i]?', erledigt':''}`);
+    b.addEventListener('click',()=>go(i)); nav.appendChild(b);
+  });
+}
+function showStations(){
+  $$('.station').forEach(s=>{ s.hidden=!(s.dataset.level===state.level && +s.dataset.i===state.cur[state.level]); });
+}
+function afterShow(){
+  const l=state.level, i=state.cur[l];
+  if(l==='sek1'&&i===4) drawHelix(H1);
+  if(l==='sek2'&&i===2) drawHelix(H2);
+  if(H1.st.spin||H2.st.spin) kick();
+}
+function go(i){
+  clearSel(); state.cur[state.level]=i; showStations(); renderNav(); afterShow();
+  try{ window.speechSynthesis&&speechSynthesis.cancel(); }catch(_){}
+  const top=$('#steps').getBoundingClientRect().top+window.scrollY-12;
+  if(window.scrollY>top) window.scrollTo({top,behavior:reduce?'auto':'smooth'});
+}
+function setLevel(l){
+  state.level=l; clearSel();
+  document.body.classList.toggle('lvl2',l==='sek2');
+  $$('#levelSw button').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.l===l)));
+  $('#sub').textContent=LV[l].sub; $('#hint').innerHTML=LV[l].hint;
+  $$('details.teacher').forEach(d=>d.hidden=d.dataset.level!==l);
+  showStations(); renderNav(); afterShow();
+  try{ history.replaceState(null,'',l==='sek2'?'#oberstufe':'#sek1'); }catch(_){}
+}
+$$('#levelSw button').forEach(b=>b.addEventListener('click',()=>setLevel(b.dataset.l)));
+$$('.station').forEach(sec=>{
+  const l=sec.dataset.level, i=+sec.dataset.i;
+  const nx=$('.next',sec); if(nx) nx.addEventListener('click',()=>go(i+1));
+  const rs=$('.reset',sec); if(rs) rs.addEventListener('click',()=>resetStation(l,i));
+});
+function resetStation(l,i){
+  clearSel(); state.last=null; state.done[l][i]=false;
+  const sec=secs(l)[i], m=$('.merke',sec); if(m) m.hidden=true;
+  if(l==='sek1'){
+    setFb(i,'',''); setInfo(i,'');
+    if(i===0){ state.s1={P:false,Z:false,B:false}; renderS1(); }
+    if(i===1){ state.s2=[null,null,null,null]; renderS2(); }
+    if(i===2){ state.s3=Array(5).fill(null); $('#check2').hidden=true; const rb=$('#railBtn'); rb.hidden=true; rb.setAttribute('aria-pressed','false'); rb.textContent='Rückgrat zeigen'; renderS3(); renderCheck2(); }
+    if(i===3){ state.s4=Array(5).fill(null); renderS4(); }
+  } else {
+    const id='O'+(i+1); setFb(id,'',''); setInfo(id,'');
+    if(i===0){ state.o1.task=0; state.o1.found={}; renderO1(); }
+    if(i===1){ state.o2.site=null; renderO2(); renderO2Check(); }
+    if(i===3){ state.ge={mrna:'',pep:[],path:false}; $('#gePath').setAttribute('aria-pressed','false'); renderGE(); }
+    if(i===4){ state.lab={seq:WT,sel:null,tasks:{},manual:false,sun:state.lab.sun}; renderLab(); }
+  }
+  renderNav();
+}
+$('#railBtn').addEventListener('click',e=>{
+  const on=e.currentTarget.getAttribute('aria-pressed')!=='true';
+  e.currentTarget.setAttribute('aria-pressed',String(on)); e.currentTarget.textContent=on?'Rückgrat ausblenden':'Rückgrat zeigen';
+  const s=$('#board2 svg'); if(s) s.classList.toggle('show-rail',on);
+});
+const canSpeak='speechSynthesis' in window && typeof SpeechSynthesisUtterance!=='undefined';
+$$('.speak').forEach(b=>{
+  if(!canSpeak){ b.hidden=true; return; }
+  b.addEventListener('click',()=>{
+    const sec=b.closest('.brief');
+    const txt=$$('.say p, .task li, .plan p',sec).map(p=>p.textContent.replace(/–/g,',')).join(' ');
+    try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(txt); u.lang='de-DE'; u.rate=0.85; speechSynthesis.speak(u); }catch(_){}
+  });
+});
+const panel=$('#words');
+$('#openWords').addEventListener('click',()=>{ panel.hidden=false; $('#closeWords').focus(); });
+const closeP=()=>{ panel.hidden=true; $('#openWords').focus(); };
+$('#closeWords').addEventListener('click',closeP);
+panel.addEventListener('click',e=>{ if(e.target===panel) closeP(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(!panel.hidden) closeP(); else clearSel(); } });
+
+$('#plan3').innerHTML=SEQ.map((b,i)=>`<span class="chip c${b}">${b}<small>Platz ${i+1}</small></span>`).join('');
+
+function renderSek1(){ renderS1(); renderS2(); renderS3(); renderS4(); }
+let lastScale=scale();
+window.addEventListener('resize',()=>{ const s=scale(); if(s!==lastScale){ lastScale=s; clearSel(); renderSek1(); } drawHelix(H1); drawHelix(H2); });
+const redraw=()=>{ drawHelix(H1); drawHelix(H2); };
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',redraw);
+new MutationObserver(redraw).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+renderSek1(); renderCheck2(); renderCheck4();
+renderO1(); renderO2(); renderO2Check(); setGC(50); renderGE(); renderLab();
+quizzes.sek1.reset(); quizzes.sek2.reset();
+setLevel(/oberstufe/i.test(location.hash)?'sek2':'sek1');
+})();
+</script>
+
+</body></html>
