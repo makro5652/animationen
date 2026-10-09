@@ -163,7 +163,7 @@ details.auftrag li{margin:4px 0}
 @keyframes cy{0%,100%{opacity:.2;transform:scale(.6)}50%{opacity:1;transform:scale(1.25)}}
 
 /* Ablauf */
-.ab-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(300px,1fr);gap:16px;align-items:start}
+.ab-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(300px,1fr);gap:16px;align-items:start}
 @media (max-width:980px){.ab-grid{grid-template-columns:1fr}}
 .progress{display:grid;grid-template-columns:repeat(9,1fr);gap:4px;margin-bottom:12px}
 .progress button{appearance:none;border:0;height:10px;border-radius:5px;background:var(--c);opacity:.28;cursor:pointer;padding:0}
@@ -261,6 +261,79 @@ details.frage p{margin:8px 0 0}
 .rel{display:flex;flex-wrap:wrap;gap:6px}
 .sb li{margin:5px 0}
 
+/* HIV-Bereich */
+.hv-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(300px,1fr);gap:16px;align-items:start}
+@media (max-width:980px){.hv-grid{grid-template-columns:1fr}}
+.hv-sec{margin-top:24px}
+.hv-sec > h2{margin:0 0 4px;font-size:1.3rem}
+.hv-sec > p.sub{margin:0 0 12px;color:var(--muted);max-width:85ch}
+.hv-time{display:block;font-weight:700;margin:12px 0 4px}
+.hv-time output{color:var(--accent)}
+#hvS{width:100%;accent-color:var(--accent);margin-bottom:6px}
+.meter{margin:12px 0 4px}
+.meter > span{display:block;font-size:.9rem;color:var(--muted);margin-bottom:3px}
+.meter strong{display:block;margin-top:4px;font-size:.95rem}
+.bar{position:relative;height:12px;border-radius:6px;background:var(--surface2);border:1px solid var(--line)}
+.bar i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:var(--s);transition:width .35s}
+.bar.vl i{background:var(--e)}
+.bar b{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--text);opacity:.55}
+.bar em{position:absolute;top:14px;font-size:.72rem;font-style:normal;color:var(--muted);transform:translateX(-50%);white-space:nowrap}
+.dots{display:flex;gap:5px;margin:22px 0 2px;flex-wrap:wrap;align-items:center}
+.dots i{width:15px;height:15px;border-radius:50%;border:2px solid var(--s);background:var(--s);transition:background .3s,opacity .3s}
+.dots i.off{background:transparent;opacity:.45;border-style:dashed}
+.dots small{color:var(--muted);margin-left:6px;font-size:.78rem}
+.opplist{list-style:none;padding:0;margin:6px 0 0}
+.opplist li{display:flex;gap:10px;align-items:baseline;padding:6px 0;border-top:1px solid var(--line);font-size:.9rem;color:var(--muted)}
+.opplist li b{min-width:5.6em;font-size:.8rem;flex:none}
+.opplist li.on{color:var(--text)}
+.opplist li.on b{color:var(--bad)}
+.hv-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px}
+.hv-cards h3{margin:0 0 6px;font-size:1.08rem}
+.hv-cards p{margin:0 0 8px}
+.hv-cards ul{margin:0 0 8px;padding-left:1.2em}
+.hv-cards li{margin:4px 0}
+.src{font-size:.82rem;color:var(--muted);margin-top:10px}
+.mk ol{padding-left:1.3em;margin:8px 0 0;max-width:95ch}
+.mk li{margin:10px 0}
+.hivk{fill:var(--e)}
+.cap{fill:var(--surface);stroke:var(--e);stroke-width:1.6}
+.env{fill:var(--e-soft);stroke:var(--e);stroke-width:2}
+.rna{fill:none;stroke:var(--e);stroke-width:1.8}
+.dnav{fill:none;stroke:var(--s);stroke-width:1.8}
+.enz{fill:var(--h)}
+.opp{fill:var(--k-soft);stroke:var(--e);stroke-width:1.6}
+.lbl.sml{font-size:12.5px}
+#hivov .item{transition:opacity .5s}
+#hx-thv{transition:opacity .5s;pointer-events:none}
+#hx-thvir{transition:opacity .5s}
+.c-cd4{fill:none;stroke:var(--s);stroke-width:3.2;stroke-linejoin:round}
+.c-vl{fill:none;stroke:var(--e);stroke-width:2.8;stroke-linejoin:round}
+.c-hab{fill:none;stroke:var(--h);stroke-width:2.4;stroke-dasharray:2 5;stroke-linecap:round}
+.band{cursor:pointer}
+.band rect{opacity:.24}
+.band:hover rect{opacity:.4}
+.band text{font-size:12px;font-weight:700;fill:var(--text);text-anchor:middle;pointer-events:none}
+.cursor{stroke:var(--text);stroke-width:1.5}
+#hivchart{display:block;width:100%;height:auto;min-width:620px;cursor:crosshair}
+#cyc{display:block;width:100%;height:auto;min-width:640px}
+.cyc-out{fill:var(--surface2)} .cyc-in{fill:var(--tissue)}
+.memb{fill:none;stroke:var(--s);stroke-width:3}
+.nucl-r{fill:var(--s-soft);stroke:var(--s);stroke-width:2.5}
+.dna{fill:none;stroke:var(--s);stroke-width:2}
+.prov{fill:none;stroke:var(--e);stroke-width:5;stroke-linecap:round}
+.cd4r{fill:var(--s)} .cd4s{stroke:var(--s);stroke-width:3}
+.ccr{fill:none;stroke:var(--z);stroke-width:3;stroke-linejoin:round}
+.ribo{fill:var(--muted)}
+.clbl{font-size:13.5px;font-weight:700;fill:var(--text);paint-order:stroke;stroke:var(--halo);stroke-width:4px;stroke-linejoin:round}
+.clbl.m{text-anchor:middle} .clbl.e{text-anchor:end}
+.cline{stroke:var(--muted);stroke-width:1.2}
+.drugb rect{fill:var(--ok-soft);stroke:var(--ok);stroke-width:1.5}
+.drugb text{font-size:12.5px;font-weight:700;fill:var(--ok)}
+#cyc [data-st]{transition:opacity .6s;pointer-events:none}
+.cellbg{transition:opacity .6s}
+#cyc[data-step="0"] .cellbg{opacity:.12}
+#cyc[data-step="7"] .memb{stroke-dasharray:9 6}
+
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
@@ -280,7 +353,8 @@ details.frage p{margin:8px 0 0}
     <button role="tab" data-tab="uebersicht" aria-selected="true"><span class="num">1</span>Übersicht</button>
     <button role="tab" data-tab="ablauf" aria-selected="false"><span class="num">2</span>Ablauf einer Infektion</button>
     <button role="tab" data-tab="kontakt" aria-selected="false"><span class="num">3</span>Erst- und Zweitkontakt</button>
-    <button role="tab" data-tab="test" aria-selected="false"><span class="num">4</span>Selbsttest</button>
+    <button role="tab" data-tab="hiv" aria-selected="false"><span class="num">4</span>HIV und AIDS</button>
+    <button role="tab" data-tab="test" aria-selected="false"><span class="num">5</span>Selbsttest</button>
   </nav>
 </header>
 
@@ -383,7 +457,141 @@ details.frage p{margin:8px 0 0}
   </div>
 </section>
 
-<!-- 4 Selbsttest -->
+<!-- 4 HIV und AIDS -->
+<section class="tab" id="tab-hiv" role="tabpanel">
+  <details class="auftrag" open>
+    <summary>Arbeitsaufträge</summary>
+    <ol>
+      <li>Verschiebe den Zeitregler ohne Therapie von der Ansteckung bis zum Jahr 11. Beschreibe, wie sich die Übersicht, die Zahl der T-Helferzellen und die Viruslast verändern. <span class="afb">AFB I</span></li>
+      <li>Erkläre mithilfe der Übersicht, warum der Verlust der T-Helferzellen sowohl die humorale als auch die zelluläre Immunantwort schwächt. <span class="afb">AFB II</span></li>
+      <li>Erläutere, warum Menschen mit AIDS an Infektionen erkranken, die für Menschen mit intaktem Immunsystem meist harmlos sind. <span class="afb">AFB II</span></li>
+      <li>Stelle die Vermehrung von HIV in einer T-Helferzelle in einem Fließdiagramm dar. <span class="afb">AFB II</span></li>
+      <li>Vergleiche den Verlauf ohne Therapie, mit frühem und mit spätem Therapiebeginn. Begründe, warum die Therapie lebenslang nötig ist. <span class="afb">AFB II</span></li>
+      <li>Beurteile die Aussage „HIV zerstört die T-Helferzellen.“ Nutze dazu die Modellkritik am Ende dieser Seite. <span class="afb">AFB III</span></li>
+    </ol>
+  </details>
+
+  <div class="hv-sec" style="margin-top:0">
+    <h2>HIV in der bekannten Übersicht</h2>
+    <p class="sub">Die Abbildung aus Bereich 1 zeigt jetzt eine HIV-Infektion. Verschiebe den Zeitregler oder spiele den Verlauf ab. Tippe auf Zellen und Erreger, um Informationen zu erhalten.</p>
+    <div class="hv-grid">
+      <div class="scene-wrap"><svg id="hivov" class="scene" viewBox="0 0 1000 640" role="group" aria-label="Übersicht über das Immunsystem bei einer HIV-Infektion"></svg></div>
+      <div class="card" aria-live="polite">
+        <div class="chips" role="group" aria-label="Behandlung">
+          <button class="chip on" data-art="none" style="--c:var(--bad)">Ohne Therapie</button>
+          <button class="chip" data-art="early" style="--c:var(--ok)">Therapie ab Woche 8</button>
+          <button class="chip" data-art="late" style="--c:var(--ok)">Therapie ab Jahr 10</button>
+        </div>
+        <label class="hv-time" for="hvS">Zeit seit der Ansteckung: <output id="hvOut"></output></label>
+        <input type="range" id="hvS" min="0" max="100" step="0.5" value="0">
+        <div class="controls" style="margin:0 0 8px"><button class="btn" id="hvPlay">Verlauf abspielen</button></div>
+        <p class="phase" id="hvPhase"></p>
+        <h2 id="hvTitle" style="margin:4px 0 6px;font-size:1.25rem"></h2>
+        <p id="hvText" style="margin:0 0 8px"></p>
+        <div class="simple"><h3>Einfach gesagt</h3><p id="hvEinfach"></p></div>
+        <div class="meter"><span>T-Helferzellen im Blut</span><div class="bar"><i id="hvCd4Bar"></i><b style="left:16.67%"></b><em style="left:16.67%">200</em></div><div class="dots" id="hvDots"></div><strong id="hvCd4"></strong></div>
+        <div class="meter" style="margin-top:14px"><span>Viruslast im Blut</span><div class="bar vl"><i id="hvVlBar"></i><b style="left:24.3%"></b><em style="left:24.3%">Nachweisgrenze</em></div><strong id="hvVl" style="margin-top:20px"></strong></div>
+        <h3 style="margin:16px 0 2px;font-size:1rem">Opportunistische Infektionen (Richtwerte für T-Helferzellen pro µl)</h3>
+        <ul class="opplist" id="hvOpp"></ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="hv-sec card">
+    <h2>Die Verlaufskurve einer HIV-Infektion</h2>
+    <p class="sub">Das Diagramm ist mit dem Zeitregler oben verbunden. Klicke in das Diagramm oder auf eine Phase, um zu diesem Zeitpunkt zu springen. Die Zeitachse ist unterbrochen: links Wochen, rechts Jahre.</p>
+    <div style="overflow-x:auto"><svg id="hivchart" viewBox="0 0 760 400" role="img" aria-label="Diagramm: Zahl der T-Helferzellen und Viruslast im Verlauf einer HIV-Infektion"></svg></div>
+    <div class="keyline">
+      <span><svg viewBox="0 0 30 10"><line x1="0" y1="5" x2="30" y2="5" class="c-cd4"/></svg>T-Helferzellen pro µl Blut (linke Achse)</span>
+      <span><svg viewBox="0 0 30 10"><line x1="0" y1="5" x2="30" y2="5" class="c-vl"/></svg>Viruslast in Kopien pro ml (rechte Achse, logarithmisch)</span>
+      <span><svg viewBox="0 0 30 10"><line x1="0" y1="5" x2="30" y2="5" class="c-hab"/></svg>Antikörper gegen HIV (nur qualitativ)</span>
+    </div>
+    <label class="tgl" style="margin-top:8px"><input type="checkbox" id="hvHab" checked> Antikörper gegen HIV anzeigen</label>
+  </div>
+
+  <div class="hv-sec">
+    <h2>Wie vermehrt sich HIV in einer T-Helferzelle?</h2>
+    <p class="sub">Gehe die Schritte durch. Schalte danach die Angriffspunkte der Medikamente ein und ordne sie den Schritten zu.</p>
+    <div class="ab-grid">
+      <div class="scene-wrap"><svg id="cyc" viewBox="0 0 1000 540" role="img" aria-label="Vermehrungszyklus von HIV in einer T-Helferzelle"></svg></div>
+      <div class="card steppanel" aria-live="polite">
+        <div class="progress" id="cycProg" style="grid-template-columns:repeat(8,1fr)"></div>
+        <p class="phase" id="cycPhase" style="--c:var(--e)"></p>
+        <h2 id="cycTitle"></h2>
+        <p id="cycText"></p>
+        <div class="simple"><h3>Einfach gesagt</h3><p id="cycEinfach"></p></div>
+        <p id="cycNote" class="note"></p>
+        <div class="controls">
+          <button class="btn" id="cycPrev">Zurück</button>
+          <button class="btn primary" id="cycNext">Weiter</button>
+        </div>
+        <label class="tgl"><input type="checkbox" id="cycArt"> Angriffspunkte der Medikamente zeigen</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="hv-sec">
+    <h2>Übertragung, Schutz und Nachweis</h2>
+    <div class="hv-cards">
+      <div class="card">
+        <h3>Übertragung</h3>
+        <p>HIV wird über Körperflüssigkeiten mit hoher Viruskonzentration übertragen: Blut, Sperma, Scheidenflüssigkeit und Muttermilch.</p>
+        <ul>
+          <li>ungeschützter Geschlechtsverkehr (häufigster Übertragungsweg)</li>
+          <li>gemeinsam benutzte Spritzen und Nadeln</li>
+          <li>von der Mutter auf das Kind während Schwangerschaft, Geburt oder Stillzeit</li>
+        </ul>
+        <p><b>Keine Übertragung</b> durch Umarmen, Händeschütteln, gemeinsames Geschirr, Toiletten, Schwimmbäder, Husten oder Insektenstiche.</p>
+      </div>
+      <div class="card">
+        <h3>Schutz</h3>
+        <ul>
+          <li><b>Kondome</b> beim Geschlechtsverkehr, <b>sterile Spritzen</b></li>
+          <li><b>Testen und Behandeln:</b> Bei dauerhaft nicht nachweisbarer Viruslast unter Therapie wird HIV beim Sex nicht übertragen (WHO, 2023; „n = n“: nicht nachweisbar = nicht übertragbar).</li>
+          <li><b>PrEP</b> (Prä-Expositions-Prophylaxe): Medikamente schützen vor einer Ansteckung, als tägliche Tablette oder als Depotspritze. Seit Juli 2025 empfiehlt die WHO zusätzlich die Spritze Lenacapavir, die nur zweimal im Jahr gegeben wird.</li>
+          <li><b>PEP</b> (Post-Expositions-Prophylaxe): Medikamente nach einem Risikokontakt, Beginn so schnell wie möglich, spätestens nach 72 Stunden, Dauer 28 Tage.</li>
+          <li>Eine Therapie in der Schwangerschaft senkt das Risiko einer Übertragung auf das Kind stark.</li>
+        </ul>
+        <p>Einen Impfstoff gibt es bisher nicht. Ein Grund ist die hohe Mutationsrate: Die Hüllproteine verändern sich ständig.</p>
+      </div>
+      <div class="card">
+        <h3>Nachweis und Fensterphase</h3>
+        <p>Die üblichen Suchtests weisen Antikörper gegen HIV und meist zusätzlich ein Virusprotein (p24-Antigen) nach. Antikörper werden erst einige Wochen nach der Ansteckung gebildet. In dieser <b>Fensterphase</b> kann ein Test negativ sein, obwohl eine Infektion vorliegt.</p>
+        <p>Richtwerte (Deutsche Aidshilfe): Ein Labortest schließt eine Infektion 6 Wochen nach dem Risikokontakt aus, ein Schnell- oder Selbsttest nach 12 Wochen. Ein positiver Suchtest wird immer durch einen zweiten Test bestätigt.</p>
+      </div>
+      <div class="card">
+        <h3>Zahlen</h3>
+        <p><b>Weltweit (2025):</b> rund 41 Millionen Menschen mit HIV, etwa 1,2 Millionen Neuinfektionen und etwa 570 000 Todesfälle durch AIDS-bedingte Erkrankungen. Rund 78 Prozent der Menschen mit HIV erhalten eine Therapie.</p>
+        <p><b>Kenia (2024):</b> etwa 1,33 Millionen Menschen mit HIV, Anteil an der Bevölkerung 3,0 Prozent, knapp 20 000 Neuinfektionen. Die meisten Neuinfektionen aller Counties gab es in Nairobi (3 045). Rund ein Drittel der Neuinfektionen betrifft junge Menschen zwischen 10 und 24 Jahren.</p>
+        <p class="src">Quellen: UNAIDS Fact Sheet 2026 (Schätzungen mit Unsicherheitsbereichen); NSDCC, Kenya AIDS Response Progress Report 2025.</p>
+      </div>
+      <div class="card">
+        <h3>Respektvoll sprechen</h3>
+        <p>Sprich von „Menschen mit HIV“, nicht von „HIV-Infizierten“ oder „Opfern“. In jeder Klasse kann es Menschen geben, die selbst oder in ihrer Familie mit HIV leben.</p>
+        <p>Mit Therapie können Menschen mit HIV heute lange leben, arbeiten, Sport treiben und gesunde Kinder bekommen. Ausgrenzung führt dazu, dass sich Menschen seltener testen lassen.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="hv-sec card mk">
+    <h2>Modellkritik: Was die Darstellungen vereinfachen</h2>
+    <ol>
+      <li><b>„HIV zerstört die T-Helferzellen“ ist stark vereinfacht.</b> Nur ein Teil der T-Helferzellen stirbt, weil sich HIV in ihnen vermehrt. Untersuchungen an menschlichem Lymphgewebe zeigen, dass die meisten absterbenden T-Helferzellen gar nicht produktiv infiziert sind: In ihnen bricht die Infektion nach dem Eindringen vorzeitig ab, und die Zellen sterben durch einen entzündlichen Zelltod (Pyroptose; Doitsh et al., 2014). Hinzu kommen die Beseitigung infizierter Zellen durch zytotoxische T-Zellen, eine dauerhafte Überaktivierung des Immunsystems und eine verringerte Neubildung.</li>
+      <li><b>Nicht nur T-Helferzellen werden infiziert.</b> Auch Makrophagen und dendritische Zellen tragen CD4 und können infiziert werden. In der Übersicht ist nur die T-Helferzelle markiert.</li>
+      <li><b>Eine Zelle steht für Milliarden.</b> Die Übersicht zeigt eine T-Helferzelle stellvertretend für alle. Nur etwa 2 Prozent aller Lymphozyten befinden sich im Blut. Die Messwerte im Blut zeigen daher nur einen kleinen Ausschnitt; in der Darmschleimhaut geht schon in der akuten Phase ein großer Teil der T-Helferzellen verloren.</li>
+      <li><b>B-Lymphozyten sind nicht einfach „weniger aktiv“.</b> Bei einer HIV-Infektion sind sie dauerhaft überaktiviert und bilden viele unspezifische Antikörper, während neue spezifische Immunantworten schwächer werden. Antikörper gegen HIV werden gebildet, beseitigen das Virus aber nicht, weil sich seine Hüllproteine durch Mutationen ständig verändern.</li>
+      <li><b>„Latenz“ heißt nicht, dass das Virus ruht.</b> Der Begriff beschreibt nur das Fehlen von Krankheitszeichen. Nach Modellrechnungen werden in dieser Phase täglich Milliarden neuer Viren gebildet (Perelson et al., 1996).</li>
+      <li><b>Die Verlaufskurve ist schematisch</b> (nach Pantaleo, Graziosi und Fauci, 1993). Die Zeitachse ist unterbrochen, die Antikörperkurve ist rein qualitativ. Einzelne Verläufe unterscheiden sich stark: Bei manchen Menschen entwickelt sich AIDS innerhalb von zwei bis drei Jahren, wenige kontrollieren das Virus über Jahrzehnte ohne Therapie.</li>
+      <li><b>Neuere Forschung zum Vermehrungszyklus.</b> Viele Schulbücher zeigen, dass das Kapsid im Zellplasma zerfällt und die reverse Transkription dort abläuft. Untersuchungen seit etwa 2020 zeigen, dass das Kapsid weitgehend intakt durch die Kernpore gelangt und die reverse Transkription erst im Zellkern abgeschlossen wird.</li>
+      <li><b>Grenzwerte sind Festlegungen.</b> Die Grenze von 200 T-Helferzellen pro µl stammt aus der Definition der US-Gesundheitsbehörde CDC. AIDS liegt auch vor, wenn eine AIDS-definierende Erkrankung bei höherer Zellzahl auftritt; die WHO nutzt zusätzlich klinische Stadien. Die Werte für opportunistische Infektionen sind Richtwerte, Tuberkulose kann bei jeder Zellzahl auftreten.</li>
+      <li><b>Dargestellt ist HIV-1.</b> Es verursacht weltweit die meisten Infektionen. HIV-2, das vor allem in Westafrika vorkommt, verläuft meist langsamer.</li>
+      <li><b>Heilung.</b> Wenige Menschen gelten nach einer Stammzelltransplantation mit Spenderzellen ohne funktionsfähigen Korezeptor CCR5 als geheilt. Diese Behandlung ist sehr riskant, nur bei bestimmten Blutkrebserkrankungen gerechtfertigt und keine allgemeine Therapie.</li>
+      <li><b>Sprache.</b> Formulierungen wie „HIV greift T-Helferzellen an“ oder „HIV versteckt sich“ sind Vermenschlichungen, denn ein Virus hat keine Absicht. Sachlich richtig ist zum Beispiel: „HIV bindet an CD4 und infiziert T-Helferzellen“ oder „Das Provirus liegt inaktiv im Erbgut der Zelle vor“.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- 5 Selbsttest -->
 <section class="tab" id="tab-test" role="tabpanel">
   <div class="t-grid">
     <div class="card">
@@ -427,7 +635,7 @@ const $$=s=>Array.from(document.querySelectorAll(s));
 const R=n=>Math.round(n*10)/10;
 
 /* ---------- Farbgruppen ---------- */
-const GC={unspez:"--u",steu:"--s",hum:"--h",zel:"--z",mem:"--m",erreger:"--e",koerper:"--k",ort:"--accent"};
+const GC={unspez:"--u",steu:"--s",hum:"--h",zel:"--z",mem:"--m",erreger:"--e",koerper:"--k",ort:"--accent",krank:"--bad",therapie:"--ok"};
 const GN={unspez:"Unspezifische Abwehr",steu:"Spezifische Abwehr: Steuerung",hum:"Spezifische Abwehr: humoral",zel:"Spezifische Abwehr: zellulär",mem:"Spezifische Abwehr: Gedächtnis",erreger:"Krankheitserreger",koerper:"Körperzelle",ort:"Ort der Abwehr"};
 
 /* ---------- Inhalte ---------- */
@@ -520,12 +728,12 @@ th:{name:"T-Helferzelle",gram:"die T-Helferzelle, die T-Helferzellen",g:"steu",t
  text:["T-Helferzellen sind T-Lymphozyten. Sie entstehen im Knochenmark und reifen im <b>Thymus</b> (daher „T“). An ihrer Oberfläche tragen sie das Protein CD4.",
  "Ihr <b>T-Zell-Rezeptor</b> bindet nur an ein bestimmtes Antigenbruchstück, das eine antigenpräsentierende Zelle auf einem MHC-II-Molekül präsentiert. An freie Antigene binden T-Zell-Rezeptoren nicht.",
  "Nach der Bindung wird die passende T-Helferzelle aktiviert und teilt sich vielfach (<b>klonale Selektion</b> und <b>klonale Expansion</b>). Die entstehenden Zellen geben Botenstoffe (Zytokine, z. B. Interleukine) ab. Diese aktivieren passende B-Lymphozyten (humorale Antwort) und zytotoxische T-Zellen (zelluläre Antwort).",
- "Das HI-Virus vermehrt sich in T-Helferzellen und führt langfristig zu ihrem Verlust. Dadurch werden beide Bereiche der spezifischen Abwehr geschwächt (Immunschwäche AIDS)."],
+ "HIV infiziert vor allem T-Helferzellen. Ohne Therapie sinkt ihre Zahl über Jahre. Dadurch werden beide Bereiche der spezifischen Abwehr geschwächt, bis die Immunschwäche AIDS entsteht (siehe Bereich 4)."],
  merke:"Ohne T-Helferzellen werden weder B-Lymphozyten noch zytotoxische T-Zellen ausreichend aktiviert.",
  woerter:[["aktivieren","eine Zelle in einen wirksamen Zustand versetzen"],["der Rezeptor, die Rezeptoren","Protein an der Zelloberfläche, an das ein passendes Molekül bindet"],["das Zytokin, die Zytokine","Botenstoff zwischen Zellen des Immunsystems"]],
  frage:"Begründe, warum eine Infektion mit HIV sowohl die humorale als auch die zelluläre Immunantwort schwächt.",
  antwort:"HIV befällt T-Helferzellen. Diese aktivieren über Zytokine sowohl B-Lymphozyten (humoral) als auch zytotoxische T-Zellen (zellulär). Fehlen T-Helferzellen, bleibt die Aktivierung beider Zelltypen weitgehend aus.",
- rel:["makrophage","b","tk","treg"]},
+ rel:["makrophage","b","tk","treg","hiv"]},
 b:{name:"B-Lymphozyt (B-Zelle)",gram:"der B-Lymphozyt, die B-Lymphozyten",g:"hum",tag:"Spezifische Abwehr: humoral",
  kurz:"B-Lymphozyten tragen Antikörper als Rezeptoren an ihrer Oberfläche. Nach ihrer Aktivierung entstehen aus ihnen Plasmazellen und Gedächtniszellen.",
  text:["B-Lymphozyten entstehen und reifen im Knochenmark (engl. <i>bone marrow</i>). Jeder B-Lymphozyt trägt an seiner Membran viele gleiche Rezeptoren. Sie entsprechen in ihrem Aufbau den Antikörpern, die später abgegeben werden.",
@@ -541,7 +749,8 @@ plasma:{name:"Plasmazelle",gram:"die Plasmazelle, die Plasmazellen",g:"hum",tag:
  kurz:"Plasmazellen entstehen aus aktivierten B-Lymphozyten. Sie bilden sehr viele Antikörper und geben sie in Blut und Lymphe ab.",
  text:["Plasmazellen sind auf die Bildung von Antikörpern spezialisiert. Ihr Zellplasma enthält ein stark ausgeprägtes <b>raues endoplasmatisches Retikulum</b> und einen großen <b>Golgi-Apparat</b>. Hier werden die Antikörper (Proteine) synthetisiert, verpackt und durch Exozytose abgegeben.",
  "Alle Plasmazellen eines Klons bilden Antikörper mit derselben Antigenbindungsstelle. Sie entspricht dem Rezeptor des ursprünglich aktivierten B-Lymphozyten.",
- "Die meisten Plasmazellen sind nur wenige Tage aktiv und sterben dann ab. Nach dem Ende einer Infektion sinkt die Antikörperkonzentration daher wieder."],
+ "Die meisten Plasmazellen sind nur wenige Tage aktiv und sterben dann ab. Nach dem Ende einer Infektion sinkt die Antikörperkonzentration daher wieder.",
+ "Ein kleiner Teil entwickelt sich zu <b>langlebigen Plasmazellen</b>. Sie gelangen in das Knochenmark und geben dort über Jahre bis Jahrzehnte weiterhin Antikörper ab, allerdings in geringerer Menge als während der Infektion. Deshalb lassen sich gegen manche Erreger noch lange nach einer Erkrankung oder Impfung Antikörper im Blut nachweisen."],
  merke:"Plasmazellen geben Antikörper ab. B-Lymphozyten tragen Antikörper nur als Rezeptoren in ihrer Membran.",
  woerter:[["die Synthese","Herstellung eines Stoffes"],["die Exozytose","Abgabe von Stoffen aus der Zelle durch Verschmelzen von Bläschen mit der Zellmembran"],["das endoplasmatische Retikulum (ER)","Membransystem in der Zelle; am rauen ER werden Proteine hergestellt"]],
  frage:"Leite aus der Funktion der Plasmazelle ab, warum sie besonders viel raues ER besitzt.",
@@ -583,7 +792,7 @@ gedaechtnis:{name:"Gedächtniszelle",gram:"die Gedächtniszelle, die Gedächtnis
  text:["Bei der klonalen Expansion entstehen neben Plasmazellen und aktivierten T-Zellen auch langlebige <b>B- und T-Gedächtniszellen</b>. Sie tragen dieselben Rezeptoren wie die ursprünglich aktivierten Lymphozyten.",
  "Bei einem erneuten Kontakt mit demselben Antigen (<b>Sekundärantwort</b>) sind bereits viele passende Zellen vorhanden. Die Antikörperbildung beginnt nach ein bis zwei Tagen statt nach etwa einer Woche, und es werden deutlich mehr Antikörper gebildet.",
  "Die Erreger werden meist beseitigt, bevor Krankheitszeichen auftreten. Der Körper ist <b>immun</b>. Auf diesem Prinzip beruht die aktive Impfung."],
- merke:"Immunität beruht auf Gedächtniszellen, nicht auf den Antikörpern selbst. Antikörper werden nach einigen Wochen abgebaut.",
+ merke:"Langfristiger Schutz beruht vor allem auf Gedächtniszellen und zusätzlich auf langlebigen Plasmazellen, die weiter Antikörper abgeben. Die einzelnen Antikörpermoleküle aus der Erkrankung selbst werden dagegen innerhalb weniger Wochen abgebaut.",
  woerter:[["die Immunität","Unempfindlichkeit gegenüber einem bestimmten Erreger"],["die Impfung, die Impfungen","gezielte Auslösung einer Immunantwort zum Schutz vor einer Krankheit"],["langlebig","lebt sehr lange"]],
  frage:"Erkläre, warum man nach einer Masernerkrankung in der Regel lebenslang immun ist, gegen Grippe aber nicht.",
  antwort:"Masernviren verändern ihre Antigene kaum. Gedächtniszellen binden daher auch bei späteren Kontakten. Grippeviren verändern ihre Oberflächenantigene durch Mutationen häufig. Die vorhandenen Gedächtniszellen passen dann nicht mehr ausreichend, sodass erneut eine Primärantwort nötig ist.",
@@ -597,7 +806,50 @@ treg:{name:"Regulatorische T-Zelle",gram:"die regulatorische T-Zelle, die regula
  woerter:[["hemmen","verlangsamen oder stoppen"],["regulieren","steuern, einstellen"],["die Autoimmunerkrankung, die Autoimmunerkrankungen","Krankheit, bei der sich die Immunantwort gegen körpereigene Strukturen richtet"]],
  frage:"Stelle eine Hypothese auf, welche Folgen ein vollständiges Fehlen regulatorischer T-Zellen hätte.",
  antwort:"Immunreaktionen würden nach der Beseitigung der Erreger nicht beendet und könnten sich gegen körpereigene Strukturen richten. Mögliche Folgen wären dauerhafte Entzündungen und Autoimmunerkrankungen.",
- rel:["th","tk","b"]}
+ rel:["th","tk","b"]},
+hiv:{name:"HIV (Humanes Immundefizienz-Virus)",gram:"das HIV (oft auch: das HI-Virus)",g:"erreger",tag:"Krankheitserreger: Retrovirus",
+ kurz:"HIV ist ein Virus, das vor allem T-Helferzellen infiziert. Ohne Behandlung sinkt die Zahl der T-Helferzellen über Jahre. Die spezifische Abwehr wird dadurch immer schwächer.",
+ text:["HIV gehört zu den <b>Retroviren</b>. Seine Erbinformation besteht aus zwei RNA-Strängen. Im Kapsid befinden sich außerdem die Enzyme reverse Transkriptase, Integrase und Protease. Das Kapsid ist von einer Lipidhülle mit den Hüllproteinen gp120 und gp41 umgeben.",
+ "Das Hüllprotein gp120 bindet an das Membranprotein <b>CD4</b> und an einen Korezeptor (CCR5 oder CXCR4). CD4 tragen vor allem T-Helferzellen, aber auch Makrophagen und dendritische Zellen. Nur Zellen mit diesen Proteinen können infiziert werden.",
+ "Die Virus-DNA wird als <b>Provirus</b> in das Erbgut der Wirtszelle eingebaut. In ruhenden Gedächtnis-T-Helferzellen kann das Provirus über Jahre inaktiv bleiben (latentes Reservoir). Diese Zellen präsentieren keine Virusbruchstücke und werden daher weder durch Medikamente noch durch zytotoxische T-Zellen beseitigt.",
+ "Die Bezeichnung „HI-Virus“ ist weit verbreitet, eigentlich aber doppelt gemoppelt, denn das V in HIV steht bereits für Virus."],
+ merke:"HIV ist der Erreger. AIDS ist das späte Krankheitsstadium einer unbehandelten HIV-Infektion.",
+ woerter:[["das Retrovirus, die Retroviren","Virus mit RNA als Erbinformation, die in der Wirtszelle in DNA umgeschrieben wird"],["das Provirus, die Proviren","in das Erbgut der Wirtszelle eingebaute Virus-DNA"],["der Korezeptor, die Korezeptoren","zweites Membranprotein, an das ein Virus binden muss, um in die Zelle zu gelangen"]],
+ frage:"Begründe, warum HIV T-Helferzellen infizieren kann, rote Blutzellen aber nicht.",
+ antwort:"HIV kann nur in Zellen gelangen, die CD4 und einen passenden Korezeptor in ihrer Membran tragen. Rote Blutzellen besitzen diese Proteine nicht. Außerdem haben sie keinen Zellkern, in dessen DNA das Provirus eingebaut werden könnte.",
+ rel:["th","aids","art"]},
+aids:{name:"AIDS",gram:"das AIDS (erworbenes Immunschwächesyndrom)",g:"krank",tag:"Krankheitsstadium",
+ kurz:"AIDS ist das letzte Stadium einer unbehandelten HIV-Infektion. Es gibt dann zu wenige T-Helferzellen. Deshalb verursachen auch sonst harmlose Erreger schwere Krankheiten.",
+ text:["AIDS steht für <i>acquired immunodeficiency syndrome</i>, auf Deutsch erworbenes Immunschwächesyndrom. Ein Syndrom ist eine Gruppe von Krankheitszeichen, die gemeinsam auftreten.",
+ "Medizinisch spricht man von AIDS, wenn die Zahl der T-Helferzellen unter 200 pro Mikroliter Blut sinkt (Normalbereich etwa 500 bis 1500) oder wenn bestimmte <b>AIDS-definierende Erkrankungen</b> auftreten. Ohne Therapie geschieht dies im Mittel etwa 8 bis 10 Jahre nach der Ansteckung, im Einzelfall deutlich früher oder später.",
+ "Typisch sind <b>opportunistische Infektionen</b>, zum Beispiel eine Lungenentzündung durch den Pilz <i>Pneumocystis jirovecii</i>, Tuberkulose oder Pilzinfektionen der Speiseröhre, sowie bestimmte Krebserkrankungen wie das Kaposi-Sarkom.",
+ "Mit antiretroviraler Therapie steigt die Zahl der T-Helferzellen auch nach Beginn von AIDS wieder an. Ohne Behandlung führt AIDS meist innerhalb weniger Jahre zum Tod."],
+ merke:"Tödlich sind meist nicht die Viren selbst, sondern die Folgeerkrankungen bei geschwächter Abwehr. Weltweit ist Tuberkulose die häufigste Todesursache bei Menschen mit HIV.",
+ woerter:[["das Syndrom, die Syndrome","Gruppe von Krankheitszeichen, die gemeinsam auftreten"],["die Immunschwäche","stark verminderte Leistungsfähigkeit des Immunsystems"],["erworben","nicht angeboren, sondern im Laufe des Lebens entstanden"]],
+ frage:"Erkläre, warum ein Mensch mit AIDS an einer Lungenentzündung durch Pneumocystis erkranken kann, ein Mensch mit intaktem Immunsystem aber in der Regel nicht.",
+ antwort:"Bei einem intakten Immunsystem aktivieren T-Helferzellen B-Lymphozyten, zytotoxische T-Zellen und Makrophagen, sodass der Pilz beseitigt wird, bevor Krankheitszeichen auftreten. Bei AIDS fehlen T-Helferzellen. Die Abwehr gegen den Pilz wird kaum noch aktiviert, und er kann sich in der Lunge vermehren.",
+ rel:["hiv","opportunistisch","th","art"]},
+opportunistisch:{name:"Opportunistische Infektionen",gram:"die opportunistische Infektion, die opportunistischen Infektionen",g:"erreger",tag:"Folgeerkrankungen bei Immunschwäche",
+ kurz:"Das sind Infektionen mit Erregern, die bei einem intakten Immunsystem meist keine oder nur leichte Krankheiten verursachen.",
+ text:["Der Begriff kommt von lat. <i>opportunus</i> (günstig). Er beschreibt, dass diese Erreger erst bei geschwächter Abwehr schwere Krankheiten verursachen. Viele davon tragen auch gesunde Menschen in sich, ohne zu erkranken.",
+ "Je niedriger die Zahl der T-Helferzellen, desto mehr Erreger können Krankheiten verursachen. Richtwerte in Zellen pro Mikroliter Blut: unter 500 zum Beispiel Gürtelrose und Mundsoor; unter 200 Pneumocystis-Lungenentzündung und Pilzbefall der Speiseröhre; unter 100 Toxoplasmose des Gehirns und Kryptokokken-Hirnhautentzündung; unter 50 Zytomegalievirus-Infektionen des Auges und atypische Mykobakterien.",
+ "Tuberkulose kann bei jeder Zahl von T-Helferzellen auftreten. Das Risiko ist bei Menschen mit HIV aber stark erhöht. In Ländern wie Kenia ist die Tuberkulose deshalb besonders bedeutsam."],
+ merke:"Die Grenzwerte sind Richtwerte aus der Medizin. Sie zeigen, ab welcher Zellzahl eine Erkrankung häufiger wird, nicht, dass sie sicher auftritt.",
+ woerter:[["die Gürtelrose","schmerzhafter Hautausschlag durch erneute Aktivierung des Windpockenvirus"],["der Soor","Pilzinfektion der Schleimhaut, meist durch den Hefepilz Candida"],["die Tuberkulose","Infektionskrankheit durch Mykobakterien, meist in der Lunge"]],
+ frage:"Leite aus den Richtwerten ab, warum Gürtelrose bei einer unbehandelten HIV-Infektion meist früher auftritt als eine Pneumocystis-Lungenentzündung.",
+ antwort:"Gürtelrose wird schon bei einem mäßigen Absinken der T-Helferzellen häufiger (Richtwert unter 500), die Pneumocystis-Lungenentzündung erst bei sehr niedrigen Zellzahlen (unter 200). Da die Zahl der T-Helferzellen über Jahre langsam sinkt, wird der Richtwert für die Gürtelrose zuerst erreicht.",
+ rel:["aids","th","hiv"]},
+art:{name:"Antiretrovirale Therapie (ART)",gram:"die Therapie, die Therapien",g:"therapie",tag:"Behandlung",
+ kurz:"Medikamente hemmen die Vermehrung von HIV. Die Zahl der T-Helferzellen steigt wieder. Die Medikamente müssen ein Leben lang genommen werden.",
+ text:["Die ART besteht aus einer Kombination von meist zwei bis drei Wirkstoffen, die verschiedene Schritte der Virusvermehrung hemmen, zum Beispiel die reverse Transkriptase, die Integrase oder die Protease. Häufig sind sie in einer Tablette pro Tag zusammengefasst, es gibt auch Depotspritzen.",
+ "Die Kombination ist nötig, weil bei der Vermehrung von HIV sehr häufig Mutationen entstehen. Gegen einen einzelnen Wirkstoff werden resistente Viren schnell selektiert. Dass ein Virus gleichzeitig gegen mehrere Wirkstoffe resistent ist, ist dagegen sehr unwahrscheinlich.",
+ "Bei regelmäßiger Einnahme sinkt die Viruslast innerhalb weniger Monate unter die Nachweisgrenze. Bei frühem Therapiebeginn ist die Lebenserwartung annähernd normal. Nach Angaben der WHO (2023) übertragen Menschen mit dauerhaft nicht nachweisbarer Viruslast HIV beim Sex nicht (n = n: nicht nachweisbar = nicht übertragbar).",
+ "Eine Heilung ist nicht möglich: Das Provirus in ruhenden Zellen wird durch die Medikamente nicht entfernt. Wird die Therapie beendet, steigt die Viruslast wieder an."],
+ merke:"ART hemmt die Vermehrung von HIV, entfernt das Virus aber nicht aus dem Körper.",
+ woerter:[["die Resistenz, die Resistenzen","Unempfindlichkeit eines Erregers gegen ein Medikament"],["die Viruslast","Anzahl der Viruskopien pro Milliliter Blut"],["die Nachweisgrenze, die Nachweisgrenzen","kleinste Menge, die ein Test noch messen kann"]],
+ frage:"Begründe, warum bei HIV immer mehrere Wirkstoffe gleichzeitig gegeben werden.",
+ antwort:"Die reverse Transkriptase arbeitet ungenau, deshalb entstehen ständig Mutanten. Bei nur einem Wirkstoff vermehren sich zufällig resistente Mutanten weiter und werden selektiert. Bei mehreren Wirkstoffen mit verschiedenen Angriffspunkten müsste ein Virus gleichzeitig mehrere passende Mutationen tragen. Das ist sehr unwahrscheinlich.",
+ rel:["hiv","aids","th"]}
 };
 
 const EXTRA=[
@@ -610,7 +862,14 @@ const EXTRA=[
  ["die aktive Impfung","Gabe von abgeschwächten oder abgetöteten Erregern bzw. ihren Antigenen; der Körper bildet selbst Antikörper und Gedächtniszellen"],
  ["die passive Impfung","Gabe fertiger Antikörper; wirkt sofort, aber nur für einige Wochen"],
  ["die Entzündung, die Entzündungen","Reaktion des Gewebes mit Rötung, Schwellung, Wärme und Schmerz"],
- ["die Antigen-Antikörper-Reaktion","spezifische Bindung von Antikörpern an Antigene"]
+ ["die Antigen-Antikörper-Reaktion","spezifische Bindung von Antikörpern an Antigene"],
+ ["die Fensterphase","Zeit nach der Ansteckung, in der ein Test die Infektion noch nicht nachweisen kann"],
+ ["die PrEP","Prä-Expositions-Prophylaxe: Medikamente, die vor einer Ansteckung mit HIV schützen"],
+ ["die PEP","Post-Expositions-Prophylaxe: Medikamente nach einem möglichen Kontakt mit HIV, Beginn spätestens nach 72 Stunden"],
+ ["die reverse Transkription","Umschreiben von RNA in DNA durch das Enzym reverse Transkriptase"],
+ ["die Integration","Einbau der Virus-DNA in die DNA der Wirtszelle"],
+ ["die Knospung","Abschnürung neuer Viren von der Zellmembran"],
+ ["die Pyroptose","entzündlicher, programmierter Zelltod"]
 ];
 const SATZ=[
  "Die/Der … nimmt … durch Phagozytose auf.",
@@ -641,7 +900,7 @@ function plasma(){return `<ellipse rx="36" ry="27" class="cell h"/><circle cx="-
 function kz(){const vs=[[20,14],[30,-16],[-6,32],[34,30]].map(p=>`<g transform="translate(${p[0]} ${p[1]}) scale(.55)">${VIR}</g>`).join("");return `<circle r="58" class="cell k"/><circle cx="-16" cy="-10" r="20" class="nuc k"/>${vs}<g class="mhc1">${mhcAt(-60,58)}${mhcAt(20,58)}${mhcAt(125,58)}${mhcAt(200,58)}</g>`}
 function cyto(){return [[-14,-6],[0,-14],[14,-4],[-6,10],[10,12],[2,0]].map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="3.2" class="cy" style="animation-delay:${i*0.27}s"/>`).join("")}
 function agglu(){return `<g transform="translate(-24 -8) rotate(25)">${bak()}</g><g transform="translate(26 12) rotate(-20)">${bak()}</g><g transform="translate(8 -28) rotate(-12)">${bak()}</g><g transform="translate(2 0) rotate(115)">${AB}</g><g transform="translate(-6 -22) rotate(-30)">${AB}</g><g transform="translate(24 -12) rotate(60)">${AB}</g><g transform="translate(-14 14) rotate(200)">${AB}</g>`}
-function lupe(){return `<line x1="34" y1="34" x2="54" y2="54" class="lupe-h"/><g clip-path="url(#lupeClip)"><rect x="-50" y="-50" width="100" height="100" class="lupe-bg"/><path d="M-50 22 Q0 2 50 22 L50 50 L-50 50Z" class="cell e"/><path class="ag" d="M-32 17 l7 -13 l7 13z M-4 12 l7 -13 l7 13z M24 15 l7 -13 l7 13z"/><g transform="translate(3 -14) rotate(180) scale(1.2)">${AB}</g></g><circle r="46" class="lupe-ring"/>`}
+function lupe(pre){return `<line x1="34" y1="34" x2="54" y2="54" class="lupe-h"/><g clip-path="url(#${pre||""}lupeClip)"><rect x="-50" y="-50" width="100" height="100" class="lupe-bg"/><path d="M-50 22 Q0 2 50 22 L50 50 L-50 50Z" class="cell e"/><path class="ag" d="M-32 17 l7 -13 l7 13z M-4 12 l7 -13 l7 13z M24 15 l7 -13 l7 13z"/><g transform="translate(3 -14) rotate(180) scale(1.2)">${AB}</g></g><circle r="46" class="lupe-ring"/>`}
 
 /* ---------- Übersicht ---------- */
 const OV=[
@@ -673,9 +932,10 @@ const ARR=[
  ["nk","infiziert","löst Apoptose aus",22,"unspez"],
  ["treg","th","hemmt",26,"humoral zellulaer"]
 ];
-function buildOverview(){
+function buildOverview(){$("#ov").innerHTML=buildScene("")}
+function buildScene(pre){
  const P={};OV.forEach(o=>P[o.id]=o);
- let s=`<defs><clipPath id="lupeClip"><circle r="46"/></clipPath><marker id="arrh" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" class="arrhead"/></marker></defs>`;
+ let s=`<defs><clipPath id="${pre}lupeClip"><circle r="46"/></clipPath><marker id="${pre}arrh" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" class="arrhead"/></marker></defs>`;
  s+=`<rect x="0" y="54" width="1000" height="586" class="tissue"/>`;
  s+=`<text class="zone" x="20" y="84">Gewebe</text><text class="zone-s" x="20" y="103">vor allem unspezifische Abwehr</text>`;
  s+=`<path d="M850 292 C 880 330, 890 352, 880 392" class="vessel"/><text class="zone-s" x="902" y="350">Lymphgefäß</text>`;
@@ -687,16 +947,16 @@ function buildOverview(){
  s+=`<g class="item" data-id="barriere" data-f="unspez" tabindex="0" role="button" aria-label="Haut und Schleimhäute"><rect x="0" y="0" width="605" height="54" class="skin"/><rect x="675" y="0" width="325" height="54" class="skin"/><path d="${tex} M0 27 H605 M675 27 H1000" class="skin-t"/><rect x="3" y="3" width="994" height="48" rx="6" class="ring"/><text class="lbl start" x="16" y="34">Haut und Schleimhäute (Barriere)</text><text class="q" x="40" y="34">?</text></g>`;
  s+=`<text class="zone-s" x="640" y="20" text-anchor="middle">Wunde</text>`;
  // Pfeile
- s+=`<g id="arrows">`;
+ s+=`<g id="${pre}arrows">`;
  ARR.forEach(([a,b,lab,bend,f])=>{
   const A=P[a],B=P[b];const dx=B.x-A.x,dy=B.y-A.y,L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L,px=-uy,py=ux;
   const x0=A.x+ux*(A.r+4),y0=A.y+uy*(A.r+4),x2=B.x-ux*(B.r+6),y2=B.y-uy*(B.r+6);
   const cx=(x0+x2)/2+px*bend,cy=(y0+y2)/2+py*bend;const lx=(x0+2*cx+x2)/4,ly=(y0+2*cy+y2)/4;
-  s+=`<g class="arr" data-f="${f}"><path d="M${R(x0)} ${R(y0)} Q${R(cx)} ${R(cy)} ${R(x2)} ${R(y2)}" marker-end="url(#arrh)"/><text x="${R(lx)}" y="${R(ly+4)}">${lab}</text></g>`;
+  s+=`<g class="arr" data-f="${f}" data-k="${a}-${b}"><path d="M${R(x0)} ${R(y0)} Q${R(cx)} ${R(cy)} ${R(x2)} ${R(y2)}" marker-end="url(#${pre}arrh)"/><text x="${R(lx)}" y="${R(ly+4)}">${lab}</text></g>`;
  });
  s+=`</g>`;
- OV.forEach(o=>{s+=`<g class="item${o.cls?" "+o.cls:""}" data-id="${o.id}" data-f="${o.f}" tabindex="0" role="button" aria-label="${INFO[o.id].name}" transform="translate(${o.x} ${o.y})"><circle class="ring" r="${o.r}"/>${o.g()}<text class="lbl" y="${o.ly}">${o.lab}</text><text class="q" y="${o.ly}">?</text></g>`});
- $("#ov").innerHTML=s;
+ OV.forEach(o=>{s+=`<g class="item${o.cls?" "+o.cls:""}" data-id="${o.id}" data-f="${o.f}" tabindex="0" role="button" aria-label="${INFO[o.id].name}" transform="translate(${o.x} ${o.y})"><circle class="ring" r="${o.r}"/>${o.g(pre)}<text class="lbl" y="${o.ly}">${o.lab}</text><text class="q" y="${o.ly}">?</text></g>`});
+ return s;
 }
 
 /* ---------- Ablauf ---------- */
@@ -889,16 +1149,211 @@ const MC=[
  ["Welche Zelle gibt Antikörper ab?",["B-Lymphozyt","Plasmazelle","T-Helferzelle","Makrophage"],1,"Plasmazellen entstehen aus aktivierten B-Lymphozyten und geben Antikörper ab. B-Lymphozyten tragen Antikörper nur als Rezeptoren in ihrer Membran."],
  ["Warum erreichen Antikörper keine Viren, die sich innerhalb einer Körperzelle befinden?",["Antikörper sind große Proteine und gelangen nicht durch die Zellmembran in das Zellinnere.","Viren tragen keine Antigene.","Antikörper binden nur an Bakterien.","Viren werden in der Zelle sofort abgebaut."],0,"Antikörper wirken nur außerhalb von Zellen. Infizierte Zellen werden deshalb durch zytotoxische T-Zellen beseitigt (zelluläre Immunantwort)."],
  ["Was bedeutet „spezifische Abwehr“?",["Die Abwehr richtet sich gegen ein bestimmtes Antigen.","Die Abwehr wirkt besonders schnell.","Die Abwehr wirkt gegen alle Erreger gleich.","Die Abwehr findet nur in der Haut statt."],0,"Spezifisch bedeutet, dass Rezeptoren und Antikörper nur an ein bestimmtes Antigen binden. Die spezifische Abwehr ist bei einer Erstinfektion sogar langsamer als die unspezifische."],
- ["Ein Mensch hatte Windpocken. Warum erkrankt er bei einem erneuten Kontakt in der Regel nicht daran?",["Es sind noch viele Antikörper aus der ersten Erkrankung im Blut.","Gedächtniszellen ermöglichen eine schnellere und stärkere Immunantwort.","Die Haut lässt das Virus nicht mehr hindurch.","Die Viren erkennen, dass der Körper geschützt ist."],1,"Antikörper werden nach einigen Wochen abgebaut. Langfristigen Schutz bieten Gedächtniszellen. Die letzte Antwort ist eine Vermenschlichung: Viren besitzen keine Wahrnehmung."],
+ ["Ein Mensch hatte Windpocken. Warum erkrankt er bei einem erneuten Kontakt in der Regel nicht daran?",["Die Antikörper aus der ersten Erkrankung bleiben dauerhaft im Blut erhalten.","Gedächtniszellen ermöglichen eine schnellere und stärkere Immunantwort.","Die Haut lässt das Virus nicht mehr hindurch.","Die Viren erkennen, dass der Körper geschützt ist."],1,"Einzelne Antikörpermoleküle werden innerhalb weniger Wochen abgebaut. Langfristigen Schutz bieten vor allem Gedächtniszellen; zusätzlich geben langlebige Plasmazellen im Knochenmark weiter kleinere Mengen neuer Antikörper ab. Die letzte Antwort ist eine Vermenschlichung: Viren besitzen keine Wahrnehmung."],
  ["HIV vermehrt sich in T-Helferzellen und führt zu ihrem Verlust. Welche Folge ist zu erwarten?",["Nur die unspezifische Abwehr ist betroffen.","Nur die Antikörperbildung ist betroffen.","Die humorale und die zelluläre Immunantwort werden geschwächt.","Die Immunantwort wird stärker."],2,"T-Helferzellen aktivieren sowohl B-Lymphozyten als auch zytotoxische T-Zellen. Fehlen sie, sind beide Wege der spezifischen Abwehr geschwächt."],
  ["Worin unterscheidet sich eine passive von einer aktiven Impfung?",["Bei der passiven Impfung werden fertige Antikörper übertragen. Es entstehen keine Gedächtniszellen.","Bei der passiven Impfung werden abgeschwächte Erreger verabreicht.","Die passive Impfung schützt lebenslang.","Bei der aktiven Impfung werden fertige Antikörper übertragen."],0,"Die passive Impfung wirkt sofort, schützt aber nur einige Wochen. Die aktive Impfung löst eine eigene Immunantwort mit Gedächtniszellen aus."],
- ["Welche Aussage über die Agglutination ist richtig?",["Antikörper zerstören die Bakterien durch die Verklumpung vollständig.","Antikörper mit zwei Bindungsstellen verbinden mehrere Erreger zu Komplexen, die Fresszellen phagozytieren.","Die Agglutination ist Teil der zellulären Immunantwort.","Bei der Agglutination teilen sich Bakterien."],1,"Antikörper verklumpen und markieren Erreger. Den Abbau übernehmen Fresszellen. Die Agglutination gehört zur humoralen Immunantwort."]
+ ["Welche Aussage über die Agglutination ist richtig?",["Antikörper zerstören die Bakterien durch die Verklumpung vollständig.","Antikörper mit zwei Bindungsstellen verbinden mehrere Erreger zu Komplexen, die Fresszellen phagozytieren.","Die Agglutination ist Teil der zellulären Immunantwort.","Bei der Agglutination teilen sich Bakterien."],1,"Antikörper verklumpen und markieren Erreger. Den Abbau übernehmen Fresszellen. Die Agglutination gehört zur humoralen Immunantwort."],
+ ["Was bezeichnet man als AIDS?",["Die Ansteckung mit HIV.","Das Stadium einer HIV-Infektion mit schwerer Immunschwäche, zum Beispiel bei weniger als 200 T-Helferzellen pro µl Blut oder bei bestimmten Folgeerkrankungen.","Eine Krankheit, die durch Bakterien ausgelöst wird.","Die grippeähnlichen Beschwerden in den ersten Wochen nach der Ansteckung."],1,"HIV ist der Erreger, AIDS ist das späte Krankheitsstadium einer unbehandelten Infektion. Die grippeähnlichen Beschwerden gehören zur akuten Phase."],
+ ["Ein HIV-Antikörpertest ist zwei Wochen nach einem Risikokontakt negativ. Was folgt daraus?",["Eine Infektion ist sicher ausgeschlossen.","Eine Infektion ist noch nicht ausgeschlossen, weil Antikörper erst einige Wochen nach der Ansteckung nachweisbar sind.","Der Test war fehlerhaft.","Die Person ist gegen HIV immun."],1,"In der Fensterphase sind noch keine oder zu wenige Antikörper vorhanden. Der Test muss nach Ablauf der Fensterphase wiederholt werden."],
+ ["Warum heilt die antiretrovirale Therapie eine HIV-Infektion nicht?",["Die Medikamente wirken nur in der akuten Phase.","HIV ist gegen alle Medikamente resistent.","Das Provirus bleibt in ruhenden Zellen erhalten. Diese Zellen werden durch die Medikamente nicht beseitigt.","Die Medikamente töten die T-Helferzellen."],2,"Die Medikamente hemmen nur die Vermehrung. Das in das Erbgut eingebaute Provirus in ruhenden Gedächtniszellen bleibt erhalten. Wird die Therapie beendet, steigt die Viruslast wieder an."]
 ];
 let mcDone={};
 function renderMC(){mcDone={};$("#mc").innerHTML=MC.map((q,i)=>`<div class="mc" data-q="${i}"><p class="qq">${i+1}. ${q[0]}</p><div class="opts">${q[1].map((o,j)=>`<button data-o="${j}">${o}</button>`).join("")}</div><p class="fb"></p></div>`).join("");$("#mScore").textContent=""}
 function mcClick(btn){const box=btn.closest(".mc"),i=+box.dataset.q;if(mcDone[i]!=null)return;const q=MC[i],ok=+btn.dataset.o===q[2];mcDone[i]=ok;btn.classList.add(ok?"pick-ok":"pick-bad");if(!ok)box.querySelector(`button[data-o="${q[2]}"]`).classList.add("pick-ok");
  box.querySelector(".fb").innerHTML=(ok?`<b class="r">richtig.</b> `:`<b class="f">falsch.</b> `)+q[3];
  const n=Object.keys(mcDone).length,r=Object.values(mcDone).filter(Boolean).length;$("#mScore").textContent=`${r} von ${n} richtig`}
+
+/* ---------- HIV und AIDS ---------- */
+const W12=12/52,TS={none:null,early:8/52,late:10};
+const HV={s:0,art:"none",timer:null,cyc:0,cycArt:false};
+const SUP=["⁰","¹","²","³","⁴","⁵","⁶","⁷"];
+function sToT(s){return s<=25?(s/25*12)/52:1+(s-25)/75*10}
+function tToS(T){return T<=W12+1e-9?T*52/12*25:25+(T-1)/10*75}
+function tLabel(s){if(s<=25){const w=Math.round(s/25*12);return w===0?"Zeitpunkt der Ansteckung":(w===1?"1 Woche":w+" Wochen")}return (1+(s-25)/75*10).toFixed(1).replace(".",",")+" Jahre"}
+function cd4u(T){const w=T*52;if(w<=6)return 1000-500*Math.pow(w/6,1.5);if(w<=12)return 500+250*(w-6)/6;if(T<1)return 750;if(T<=8)return 750-55*(T-1);return Math.max(20,365-100*(T-8))}
+function vlu(T){const w=T*52;if(w<=1.5)return 0;if(w<=3.5)return 6.6*(w-1.5)/2;if(T<1)return 4.4+2.2*Math.exp(-(w-3.5)/2.5);if(T<=8)return 4.4+0.15*(T-1);return 5.45+0.4*(T-8)}
+function habu(T){const w=T*52;if(w<3)return 0;if(w<8)return (w-3)/5;if(T<9)return 1;return Math.max(.6,1-.12*(T-9))}
+function hvModel(T){const ts=TS[HV.art];let cd4=cd4u(T),vl=vlu(T),hab=habu(T),onArt=false;
+ if(ts!=null&&T>ts){onArt=true;const c0=cd4u(ts),v0=vlu(ts),tg=c0>350?850:500,d=T-ts;cd4=c0+(tg-c0)*(1-Math.exp(-d/1.5));vl=Math.max(1,v0-12*d);hab=Math.max(habu(ts),hab)}
+ let phase;if(T<=0.002)phase="start";else if(onArt)phase="therapie";else if(T*52<=12.01)phase="akut";else if(cd4<200)phase="aids";else phase="latenz";
+ return{cd4:cd4,vl:vl,hab:hab,phase:phase,onArt:onArt}}
+const HVP={
+ start:{t:"Ansteckung",c:"--e",band:"",
+  text:"HIV gelangt über Schleimhäute, zum Beispiel beim ungeschützten Geschlechtsverkehr, oder direkt über Blut in den Körper. Noch zeigen die Übersicht und die Messwerte keine Veränderung. Verschiebe den Zeitregler nach rechts.",
+  e:"HIV kommt in den Körper. Noch sieht man keine Veränderung."},
+ akut:{t:"Akute Phase",c:"--e",band:"akute Phase",
+  text:"HIV vermehrt sich zunächst fast ungehindert, die Viruslast steigt innerhalb weniger Wochen sehr stark an. Vor allem in der Darmschleimhaut werden viele T-Helferzellen infiziert und gehen zugrunde, ihre Zahl im Blut sinkt vorübergehend. Bei vielen Menschen treten zwei bis vier Wochen nach der Ansteckung grippeähnliche Beschwerden auf, zum Beispiel Fieber, geschwollene Lymphknoten und Hautausschlag. Zytotoxische T-Zellen und Antikörper senken die Viruslast danach deutlich, aber nicht vollständig. In dieser Phase ist die Ansteckungsgefahr für andere besonders hoch, und Antikörpertests können noch negativ sein (Fensterphase).",
+  e:"HIV vermehrt sich sehr schnell. Viele T-Helferzellen gehen zugrunde. Man fühlt sich oft wie bei einer Grippe. Ein Test kann noch negativ sein."},
+ latenz:{t:"Symptomarme Phase (klinische Latenz)",c:"--m",band:"symptomarme Phase",
+  text:"Meist folgen mehrere Jahre ohne deutliche Krankheitszeichen, ohne Therapie im Mittel etwa 8 bis 10 Jahre. Latenz bedeutet hier aber nicht, dass das Virus ruht: In den Lymphknoten werden ständig neue Viren gebildet und T-Helferzellen infiziert. Der Körper bildet laufend neue T-Helferzellen, kann die Verluste aber nicht vollständig ausgleichen. Ihre Zahl sinkt deshalb langsam, und die Pfeile, die von der T-Helferzelle ausgehen, werden in der Übersicht schwächer. Die Person ist ansteckend, oft ohne es zu wissen.",
+  e:"Man fühlt sich lange gesund. Aber HIV vermehrt sich weiter. Die Zahl der T-Helferzellen sinkt langsam. Man kann andere anstecken."},
+ aids:{t:"AIDS",c:"--bad",band:"AIDS",
+  text:"Die Zahl der T-Helferzellen ist unter 200 pro Mikroliter Blut gesunken. Ohne ausreichend T-Helferzellen werden B-Lymphozyten und zytotoxische T-Zellen kaum noch aktiviert: Es entstehen kaum neue Plasmazellen mit wirksamen Antikörpern, und infizierte Körperzellen werden nicht mehr beseitigt. Erreger, die bei einem intakten Immunsystem harmlos bleiben, verursachen nun schwere Erkrankungen (opportunistische Infektionen). Auch bestimmte Krebserkrankungen treten häufiger auf. Ohne Therapie führt AIDS meist innerhalb weniger Jahre zum Tod.",
+  e:"Es gibt sehr wenige T-Helferzellen. Die Abwehr funktioniert kaum noch. Auch sonst harmlose Erreger machen schwer krank."},
+ therapie:{t:"Unter antiretroviraler Therapie (ART)",c:"--ok",band:"Therapie",
+  text:"Die Medikamente hemmen verschiedene Schritte der Virusvermehrung. Die Viruslast sinkt innerhalb weniger Monate unter die Nachweisgrenze, die Zahl der T-Helferzellen steigt langsam wieder an. Je früher die Therapie beginnt, desto vollständiger ist die Erholung. Eine Heilung ist nicht möglich, weil das Provirus in ruhenden T-Helferzellen erhalten bleibt (gestrichelter Kreis in der Übersicht). Die Medikamente müssen deshalb lebenslang eingenommen werden. Bei dauerhaft nicht nachweisbarer Viruslast wird HIV beim Sex nicht übertragen.",
+  e:"Medikamente stoppen die Vermehrung von HIV. Die T-Helferzellen werden wieder mehr. Man muss die Medikamente jeden Tag und ein Leben lang nehmen."}
+};
+const OPP=[[500,"unter 500","Gürtelrose (Herpes zoster), Mundsoor (Candida)"],[200,"unter 200","Pneumocystis-Lungenentzündung, Pilzbefall der Speiseröhre, Kaposi-Sarkom"],[100,"unter 100","Toxoplasmose des Gehirns, Kryptokokken-Hirnhautentzündung"],[50,"unter 50","Zytomegalievirus-Infektion des Auges, atypische Mykobakterien"],[0,"jederzeit","Tuberkulose: Risiko bei HIV stark erhöht, steigt mit sinkender Zellzahl"]];
+const DIM=["th-b","th-tk","b-plasma","b-gedaechtnis","plasma-antikoerper","tk-infiziert","treg-th"];
+
+function hivv(){let s=`<circle r="10" class="env"/>`;for(let i=0;i<7;i++){const a=i/7*Math.PI*2;s+=`<line x1="${R(Math.cos(a)*10)}" y1="${R(Math.sin(a)*10)}" x2="${R(Math.cos(a)*14)}" y2="${R(Math.sin(a)*14)}" class="spk"/><circle cx="${R(Math.cos(a)*15)}" cy="${R(Math.sin(a)*15)}" r="2.6" class="hivk"/>`}return s+`<path d="M-2.4 -6 L2.4 -6 L5.5 6 L-5.5 6Z" class="cap"/>`}
+function oppItem(id,x,y,lab,inner){return `<g class="item" id="${id}" data-id="opportunistisch" tabindex="0" role="button" aria-label="Opportunistische Infektionen: ${lab}" transform="translate(${x} ${y})" style="opacity:0;pointer-events:none"><circle class="ring" r="28"/>${inner}<text class="lbl sml" y="40">${lab}</text></g>`}
+function buildHivScene(){
+ let s=buildScene("hv");
+ // Infektionsmarkierung an der T-Helferzelle
+ let v="";[-35,95,200].forEach(d=>{const a=d*Math.PI/180;v+=`<g transform="translate(${R(Math.cos(a)*36)} ${R(Math.sin(a)*36)}) scale(.75)">${hivv()}</g>`});
+ s+=`<g id="hx-thv" transform="translate(330 480)" style="opacity:0"><circle r="29" fill="none" class="rna" stroke-dasharray="5 4"/><g id="hx-thvir">${v}</g></g>`;
+ // freie Viren
+ const pos=[[255,420],[410,428],[870,325],[650,410],[888,368],[95,432],[505,398],[790,602],[200,604],[600,612],[945,548]];
+ pos.forEach((p,i)=>{s+=`<g class="item hxv" data-id="hiv" ${i===0?'tabindex="0" ':''}role="button" aria-label="HIV" transform="translate(${p[0]} ${p[1]})" style="opacity:0;pointer-events:none"><circle class="ring" r="18"/>${hivv()}${i===0?'<text class="lbl sml" y="-21">HIV</text>':''}</g>`});
+ // opportunistische Erreger
+ const rods=[[-10,-6,20],[6,-9,-30],[-3,6,70],[11,6,10],[-14,9,-40]].map(r=>`<rect x="-8" y="-2.5" width="16" height="5" rx="2.5" class="opp" transform="translate(${r[0]} ${r[1]}) rotate(${r[2]})"/>`).join("");
+ const yeast=[[-9,-4],[8,6],[-4,12]].map(p=>`<ellipse cx="${p[0]}" cy="${p[1]}" rx="8" ry="6" class="opp"/><ellipse cx="${p[0]+8}" cy="${p[1]-5}" rx="4" ry="3" class="opp"/>`).join("");
+ const cres=[[-8,-4,0],[8,2,120],[-2,10,240]].map(c=>`<path d="M-8 4 Q0 -10 8 4 Q0 -2 -8 4Z" class="opp" transform="translate(${c[0]} ${c[1]}) rotate(${c[2]})"/>`).join("");
+ s+=oppItem("hx-tb",925,250,"Mykobakterien",rods)+oppItem("hx-pilz",420,325,"Pilze",yeast)+oppItem("hx-toxo",60,345,"Toxoplasma",cres);
+ $("#hivov").innerHTML=s;
+}
+function fmtVl(vl){if(vl<1.7)return "unter der Nachweisgrenze (weniger als 50 Kopien pro ml)";const n=Math.pow(10,vl);const r=Math.pow(10,Math.floor(Math.log10(n))-1);return "etwa "+(Math.round(n/r)*r).toLocaleString("de-DE")+" Kopien pro ml"}
+function hvUpdate(){
+ const s=HV.s,T=sToT(s),m=hvModel(T),P=HVP[m.phase];
+ $("#hvS").value=s;$("#hvOut").textContent=tLabel(s);
+ const pe=$("#hvPhase");pe.style.setProperty("--c",`var(${P.c})`);pe.innerHTML=`<span>${P.t}</span><span class="time">${tLabel(s)}</span>`;
+ $("#hvTitle").textContent=P.t;
+ let tx=P.text;if(m.phase==="therapie"&&HV.art==="late")tx="Die Therapie hat erst nach Beginn von AIDS begonnen. "+tx+" Bestehende opportunistische Infektionen müssen zusätzlich behandelt werden.";
+ $("#hvText").textContent=tx;$("#hvEinfach").textContent=P.e;
+ $("#hvCd4Bar").style.width=Math.min(100,m.cd4/1200*100).toFixed(1)+"%";
+ $("#hvDots").innerHTML=Array.from({length:12},(_,i)=>`<i class="${m.cd4>=(i+.5)*100?"":"off"}"></i>`).join("")+`<small>1 Punkt = 100 Zellen pro µl</small>`;
+ $("#hvCd4").textContent=`etwa ${Math.round(m.cd4/10)*10} Zellen pro µl Blut (Normalbereich etwa 500 bis 1500)`;
+ $("#hvVlBar").style.width=Math.min(100,m.vl/7*100).toFixed(1)+"%";
+ $("#hvVl").textContent="Viruslast: "+fmtVl(m.vl);
+ const inf=T>0.003;
+ $("#hvOpp").innerHTML=OPP.map(o=>`<li class="${inf&&(o[0]===0||m.cd4<o[0])?"on":""}"><b>${o[1]}</b><span>${o[2]}</span></li>`).join("");
+ // Übersicht
+ const sv=$("#hivov"),f=Math.min(1,m.cd4/800);
+ sv.querySelector('.item[data-id="th"]').style.opacity=(.2+.8*f).toFixed(2);
+ ["plasma","antikoerper"].forEach(id=>{sv.querySelector(`.item[data-id="${id}"]`).style.opacity=(.25+.75*f).toFixed(2)});
+ DIM.forEach(k=>{const a=sv.querySelector(`.arr[data-k="${k}"]`);if(a)a.style.opacity=(.1+.9*f).toFixed(2)});
+ $("#hx-thv").style.opacity=inf?1:0;$("#hx-thvir").style.opacity=m.vl>2?1:0;
+ const n=Math.max(0,Math.min(11,Math.round((m.vl-2)*2.4)));
+ $$("#hivov .hxv").forEach((g,i)=>{const on=i<n;g.style.opacity=on?1:0;g.style.pointerEvents=on?"auto":"none"});
+ [["hx-tb",500],["hx-pilz",200],["hx-toxo",100]].forEach(([id,thr])=>{const g=document.getElementById(id),on=inf&&m.cd4<thr;g.style.opacity=on?1:0;g.style.pointerEvents=on?"auto":"none"});
+ hvChart(T);
+}
+const HC={W:760,H:400,l:64,r:72,t:46,b:54,gap:16,f1:.27};
+function hcG(){const pw=HC.W-HC.l-HC.r,w1=pw*HC.f1,w2=pw-w1-HC.gap;return{w1:w1,w2:w2,x1:HC.l,x2:HC.l+w1+HC.gap,ph:HC.H-HC.t-HC.b,y0:HC.H-HC.b}}
+function hX(T,G){return T<=W12+1e-9?G.x1+(T*52/12)*G.w1:G.x2+(T-1)/10*G.w2}
+function hvChart(Tc){
+ const G=hcG(),yC=v=>G.y0-Math.min(v,1200)/1200*G.ph,yV=v=>G.y0-v/7*G.ph,yA=v=>G.y0-v*.62*G.ph;
+ const segs=[[0,W12,W12/60],[1,11,.04]];
+ let s="";
+ for(let v=0;v<=1200;v+=200)s+=`<line x1="${HC.l}" x2="${HC.W-HC.r}" y1="${R(yC(v))}" y2="${R(yC(v))}" class="grid"/><text x="${HC.l-8}" y="${R(yC(v)+4)}" class="tick" text-anchor="end">${v}</text>`;
+ for(let v=0;v<=7;v++)s+=`<text x="${HC.W-HC.r+8}" y="${R(yV(v)+4)}" class="tick">10${SUP[v]}</text>`;
+ // Phasen
+ segs.forEach(([a,b,st])=>{let cur=null;const runs=[];for(let T=a;T<=b+1e-9;T+=st){let p=hvModel(T).phase;if(p==="start")p="akut";if(!cur||cur.p!==p){cur={p:p,a:T,b:T};runs.push(cur)}else cur.b=T}
+  runs.forEach(r=>{const xa=hX(r.a,G),xb=hX(r.b,G),w=xb-xa;if(w<1)return;const P=HVP[r.p];const sh={aids:"AIDS",therapie:"ART",akut:"akut",latenz:"Latenz"}[r.p];const lab=w>(P.band.length*6.6+8)?P.band:(w>sh.length*7+8?sh:"");
+   s+=`<g class="band" data-s="${R(tToS((r.a+r.b)/2))}" role="button" aria-label="${P.t}"><rect x="${R(xa)}" y="${HC.t-34}" width="${R(w)}" height="26" rx="4" style="fill:var(${P.c})"/><text x="${R((xa+xb)/2)}" y="${HC.t-16}">${lab}</text></g>`})});
+ // Achsen
+ s+=`<line x1="${HC.l}" y1="${G.y0}" x2="${R(G.x1+G.w1)}" y2="${G.y0}" class="ax"/><line x1="${R(G.x2)}" y1="${G.y0}" x2="${HC.W-HC.r}" y2="${G.y0}" class="ax"/>`;
+ const bx=G.x1+G.w1+HC.gap/2;s+=`<path d="M${R(bx-7)} ${G.y0+6} l5 -12 M${R(bx+1)} ${G.y0+6} l5 -12" class="ax"/>`;
+ s+=`<line x1="${HC.l}" y1="${HC.t}" x2="${HC.l}" y2="${G.y0}" class="ax"/><line x1="${HC.W-HC.r}" y1="${HC.t}" x2="${HC.W-HC.r}" y2="${G.y0}" class="ax"/>`;
+ [0,3,6,9,12].forEach(w=>s+=`<text x="${R(hX(w/52,G))}" y="${G.y0+17}" class="tick" text-anchor="middle">${w}</text>`);
+ [1,3,5,7,9,11].forEach(y=>s+=`<text x="${R(hX(y,G))}" y="${G.y0+17}" class="tick" text-anchor="middle">${y}</text>`);
+ s+=`<text x="${R(G.x1+G.w1/2)}" y="${G.y0+38}" class="axlbl" text-anchor="middle">Wochen</text><text x="${R(G.x2+G.w2/2)}" y="${G.y0+38}" class="axlbl" text-anchor="middle">Jahre nach der Ansteckung</text>`;
+ s+=`<text transform="translate(16 ${R(HC.t+G.ph/2)}) rotate(-90)" class="axlbl" text-anchor="middle" style="fill:var(--s)">T-Helferzellen pro µl Blut</text>`;
+ s+=`<text transform="translate(${HC.W-12} ${R(HC.t+G.ph/2)}) rotate(90)" class="axlbl" text-anchor="middle" style="fill:var(--e)">Viruslast (Kopien pro ml)</text>`;
+ // Schwellen
+ [[G.x1,G.x1+G.w1],[G.x2,G.x2+G.w2]].forEach(([a,b])=>{s+=`<line x1="${R(a)}" x2="${R(b)}" y1="${R(yC(200))}" y2="${R(yC(200))}" class="c-th"/><line x1="${R(a)}" x2="${R(b)}" y1="${R(yV(1.7))}" y2="${R(yV(1.7))}" class="c-th" style="stroke:var(--e)"/>`});
+ s+=`<text x="${R(G.x2+G.w2-4)}" y="${R(yC(200)-6)}" class="thl" text-anchor="end">Grenze für AIDS: 200 pro µl</text><text x="${R(G.x2+4)}" y="${R(yV(1.7)+14)}" class="thl">Nachweisgrenze der Viruslast</text>`;
+ // Therapiebeginn
+ const ts=TS[HV.art];if(ts!=null){const x=hX(ts,G);s+=`<line x1="${R(x)}" x2="${R(x)}" y1="${HC.t}" y2="${G.y0}" class="ev"/><text x="${R(x>HC.W*.7?x-5:x+5)}" y="${HC.t+14}" class="evt" text-anchor="${x>HC.W*.7?"end":"start"}" style="fill:var(--ok)">Therapiebeginn</text>`}
+ // Kurven
+ const showA=$("#hvHab").checked;
+ segs.forEach(([a,b,st])=>{let pc="",pv="",pa="";for(let T=a;T<=b+1e-9;T+=st){const m=hvModel(T),x=R(hX(T,G));pc+=`${x},${R(yC(m.cd4))} `;pv+=`${x},${R(yV(m.vl))} `;pa+=`${x},${R(yA(m.hab))} `}
+  if(showA)s+=`<polyline points="${pa}" class="c-hab"/>`;s+=`<polyline points="${pv}" class="c-vl"/><polyline points="${pc}" class="c-cd4"/>`});
+ // Cursor
+ const m=hvModel(Tc),xc=hX(Tc,G);
+ s+=`<line x1="${R(xc)}" x2="${R(xc)}" y1="${HC.t}" y2="${G.y0}" class="cursor"/><circle cx="${R(xc)}" cy="${R(yC(m.cd4))}" r="5" style="fill:var(--s)"/><circle cx="${R(xc)}" cy="${R(yV(m.vl))}" r="5" style="fill:var(--e)"/>`;
+ $("#hivchart").innerHTML=s;
+}
+function hvChartClick(e){const b=e.target.closest(".band");if(b){HV.s=+b.dataset.s}else{const r=$("#hivchart").getBoundingClientRect();if(!r.width)return;const x=(e.clientX-r.left)/r.width*HC.W,G=hcG();let s;if(x<=G.x1+G.w1+HC.gap/2)s=(x-G.x1)/G.w1*25;else s=25+(x-G.x2)/G.w2*75;HV.s=Math.round(Math.max(0,Math.min(100,s))*2)/2}hvStop();hvUpdate()}
+function hvStop(){if(HV.timer){clearInterval(HV.timer);HV.timer=null;$("#hvPlay").textContent="Verlauf abspielen"}}
+function hvPlay(){if(HV.timer){hvStop();return}if(HV.s>=100)HV.s=0;$("#hvPlay").textContent="Pause";HV.timer=setInterval(()=>{HV.s=Math.min(100,HV.s+.5);hvUpdate();if(HV.s>=100)hvStop()},110)}
+
+/* Vermehrungszyklus */
+const CYCT=[
+ {t:"Aufbau von HIV",
+  text:"HIV hat einen Durchmesser von etwa 100 Nanometern und ist damit rund 70-mal kleiner als eine T-Helferzelle. Außen liegt eine Lipidhülle, die aus der Membran der zuletzt infizierten Zelle stammt. In ihr stecken die Hüllproteine gp120 und gp41. Innen liegt das kegelförmige Kapsid aus Proteinen. Es enthält zwei RNA-Stränge mit der Erbinformation und die Enzyme reverse Transkriptase, Integrase und Protease.",
+  e:"HIV ist sehr klein. Außen hat es eine Hülle mit Proteinen. Innen liegen RNA und Enzyme.",n:""},
+ {t:"Bindung an die T-Helferzelle",
+  text:"Das Hüllprotein gp120 bindet an das Membranprotein CD4 der T-Helferzelle. Dadurch verändert es seine räumliche Struktur und bindet zusätzlich an einen Korezeptor, meist CCR5 oder CXCR4. Die Bindung beruht auf dem Schlüssel-Schloss-Prinzip.",
+  e:"HIV bindet an zwei passende Proteine auf der T-Helferzelle.",
+  n:"Menschen, die von beiden Eltern eine bestimmte Mutation im Gen für CCR5 geerbt haben (CCR5-Δ32), sind gegen die meisten HIV-Varianten weitgehend geschützt."},
+ {t:"Fusion der Membranen",
+  text:"Das Hüllprotein gp41 bewirkt, dass die Lipidhülle des Virus mit der Zellmembran verschmilzt (Fusion). Das Kapsid mit der RNA und den Enzymen gelangt in das Zellplasma.",
+  e:"Die Hülle von HIV verschmilzt mit der Zellmembran. Das Innere von HIV kommt in die Zelle.",n:""},
+ {t:"Reverse Transkription",
+  text:"Im Kapsid schreibt das Enzym reverse Transkriptase die Virus-RNA in DNA um. Der Name bedeutet „umgekehrte Umschreibung“, weil in Zellen normalerweise DNA in RNA umgeschrieben wird. Die reverse Transkriptase arbeitet sehr ungenau: Bei fast jeder Vermehrung entstehen Mutationen. So entstehen ständig veränderte Viren, an deren Hüllproteine vorhandene Antikörper nicht mehr passen.",
+  e:"Ein Enzym schreibt die RNA von HIV in DNA um. Dabei entstehen viele Fehler (Mutationen).",
+  n:"Neuere Forschung: Das Kapsid gelangt weitgehend intakt durch die Kernpore, die reverse Transkription wird erst im Zellkern abgeschlossen. Viele Schulbücher zeigen noch, dass das Kapsid im Zellplasma zerfällt."},
+ {t:"Integration: das Provirus",
+  text:"Das Enzym Integrase baut die Virus-DNA in die DNA der T-Helferzelle ein. Die eingebaute Virus-DNA heißt Provirus. Bei jeder Teilung der Zelle wird sie mitverdoppelt. In ruhenden Gedächtniszellen kann das Provirus über Jahre inaktiv bleiben. Diese Zellen bilden das latente Reservoir, das eine Heilung durch Medikamente verhindert.",
+  e:"Die DNA von HIV wird in die DNA der Zelle eingebaut. Sie bleibt dort für immer.",n:""},
+ {t:"Herstellung der Virusbestandteile",
+  text:"Wird die T-Helferzelle aktiviert, zum Beispiel durch eine andere Infektion, liest die Zelle das Provirus wie eigene Gene ab. Es entsteht Virus-RNA (Transkription). Ein Teil davon dient als neue Erbinformation, ein anderer Teil wird an den Ribosomen in Virusproteine übersetzt (Translation).",
+  e:"Die Zelle stellt nach der Bauanleitung von HIV Virus-RNA und Virusproteine her.",n:""},
+ {t:"Zusammenbau und Knospung",
+  text:"Virusproteine und Virus-RNA lagern sich an der Zellmembran zusammen. Die neuen Viren schnüren sich von der Zelle ab (Knospung) und nehmen dabei ein Stück der Zellmembran als Hülle mit.",
+  e:"Neue Viren entstehen an der Zellmembran und lösen sich ab.",n:""},
+ {t:"Reifung und Folgen für die Zelle",
+  text:"Das Enzym Protease schneidet lange Vorläuferproteine in ihre Einzelteile. Erst dann bildet sich das kegelförmige Kapsid, und das Virus wird infektiös (Reifung). Eine produktiv infizierte T-Helferzelle setzt zahlreiche neue Viren frei und stirbt meist nach kurzer Zeit ab oder wird durch zytotoxische T-Zellen beseitigt.",
+  e:"Ein Enzym schneidet Proteine zurecht. Dann können die neuen Viren weitere Zellen infizieren. Die infizierte Zelle stirbt meist.",
+  n:"Die meisten T-Helferzellen gehen aber auf andere Weise verloren, siehe Modellkritik Punkt 1."}
+];
+function cvir(x,y,sc,mature,big){let s=`<g transform="translate(${x} ${y}) scale(${sc})"><circle r="20" class="env" ${big?'style="stroke-width:.6"':''}/>`;
+ for(let i=0;i<9;i++){const a=i/9*Math.PI*2-Math.PI/2;s+=`<line x1="${R(Math.cos(a)*20)}" y1="${R(Math.sin(a)*20)}" x2="${R(Math.cos(a)*25)}" y2="${R(Math.sin(a)*25)}" class="spk" ${big?'style="stroke-width:.6"':''}/><circle cx="${R(Math.cos(a)*26)}" cy="${R(Math.sin(a)*26)}" r="2.8" class="hivk"/>`}
+ s+=mature?capIn(big):`<circle r="14" class="cap" stroke-dasharray="3 2" ${big?'style="stroke-width:.5"':''}/>`;return s+`</g>`}
+function capIn(big,dna){const w=big?'style="stroke-width:.5"':'';return `<path d="M-4 -12 L4 -12 L10 12 L-10 12Z" class="cap" ${w}/><path d="M-1.5 -9 q2 3 0 6 t0 6 t0 6" class="rna" ${w}/><path d="M2 -9 q2 3 0 6 t0 6 t0 6" class="${dna?"dnav":"rna"}" ${w}/><circle cx="-4" cy="8" r="1.5" class="enz"/><circle cx="5" cy="8" r="1.5" class="enz"/><circle cx="0" cy="-2" r="1.3" class="enz"/>`}
+function badge(x,y,txt,st){const w=R(txt.length*7.1+18);return `<g class="drugb" data-st="${st}" transform="translate(${x} ${y})"><rect width="${w}" height="26" rx="13"/><text x="9" y="17.5">${txt}</text></g>`}
+function buildCycle(){
+ const wave=(y0,sg)=>{let d="";for(let x=290;x<=830;x+=6)d+=(x===290?"M":"L")+x+" "+R(y0+sg*6*Math.sin(x/14))+" ";return d};
+ const provi=()=>{let d="";for(let x=540;x<=620;x+=4)d+=(x===540?"M":"L")+x+" "+R(462+6*Math.sin(x/14))+" ";return d};
+ let s=`<defs><marker id="cycArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" class="arrhead"/></marker></defs><g class="cellbg"><rect x="0" y="0" width="1000" height="150" class="cyc-out"/><rect x="0" y="150" width="1000" height="390" class="cyc-in"/><path d="M0 150 H1000" class="memb"/>`;
+ s+=`<ellipse cx="560" cy="452" rx="330" ry="74" class="nucl-r"/><rect x="459" y="372" width="22" height="12" class="cyc-in"/><path d="${wave(462,1)}" class="dna"/><path d="${wave(472,-1)}" class="dna"/>`;
+ s+=`<text class="clbl" x="16" y="28">außerhalb der Zelle (Blut, Lymphe)</text><text class="clbl" x="16" y="178">Zellplasma der T-Helferzelle</text><text class="clbl" x="300" y="428">Zellkern mit DNA</text><text class="clbl e" x="992" y="142">Zellmembran</text></g>`;
+ // Schritt 0: Aufbau
+ s+=`<g data-st="0">${cvir(500,300,4.4,true,true)}`;
+ s+=`<line x1="384" y1="252" x2="470" y2="262" class="cline"/><text class="clbl e" x="380" y="256">Kapsid aus Proteinen</text>`;
+ s+=`<line x1="384" y1="312" x2="492" y2="300" class="cline"/><text class="clbl e" x="380" y="316">RNA (2 Stränge, Erbinformation)</text>`;
+ s+=`<line x1="384" y1="372" x2="480" y2="336" class="cline"/><text class="clbl e" x="380" y="368">Enzyme: reverse Transkriptase,</text><text class="clbl e" x="380" y="386">Integrase, Protease</text>`;
+ s+=`<line x1="626" y1="196" x2="580" y2="212" class="cline"/><text class="clbl" x="630" y="200">Hüllproteine gp120 und gp41</text>`;
+ s+=`<line x1="626" y1="386" x2="567" y2="357" class="cline"/><text class="clbl" x="630" y="384">Lipidhülle</text><text class="clbl" x="630" y="402">(stammt von der Wirtszelle)</text></g>`;
+ // Rezeptoren
+ let rc="";[130,300,880].forEach(x=>{rc+=`<line x1="${x}" y1="150" x2="${x}" y2="124" class="cd4s"/><circle cx="${x}" cy="120" r="6" class="cd4r"/><path d="M${x+14} 160 l4 -16 l4 16 l4 -16 l4 16" class="ccr"/>`});
+ s+=`<g data-st="1 2 3 4 5 6 7">${rc}</g>`;
+ s+=`<g data-st="1"><text class="clbl e" x="292" y="140">CD4</text><text class="clbl" x="340" y="180">Korezeptor (CCR5 oder CXCR4)</text>${cvir(312,84,1.1,true)}<text class="clbl" x="350" y="60">gp120 bindet an CD4 und an den Korezeptor</text></g>`;
+ // Schritt 2
+ s+=`<g data-st="2"><path d="M280 150 Q312 102 344 150" class="env"/><g transform="translate(318 214) scale(1.3)">${capIn()}</g><text class="clbl" x="360" y="110">Fusion: Hüllmembran verschmilzt mit der Zellmembran</text><text class="clbl" x="350" y="220">Kapsid im Zellplasma</text></g>`;
+ // Schritt 3
+ s+=`<g data-st="3"><g transform="translate(470 330) scale(1.7)">${capIn(false,true)}</g><text class="clbl" x="510" y="314">RNA wird in DNA umgeschrieben</text><text class="clbl" x="510" y="332" style="fill:var(--s)">(blau: neue DNA)</text><text class="clbl m" x="470" y="404">Kernpore</text></g>`;
+ // Schritt 4 bis 7: Provirus
+ s+=`<g data-st="4 5 6 7"><path d="${provi()}" class="prov"/></g><g data-st="4"><text class="clbl m" x="580" y="504">Provirus: Virus-DNA im Erbgut der Zelle</text></g>`;
+ // Schritt 5
+ s+=`<g data-st="5"><path d="M590 400 q8 -10 0 -20 t0 -20 t0 -20" class="rna"/><path d="M640 395 q8 -10 0 -20 t0 -20 t0 -20 t0 -20" class="rna"/><circle cx="660" cy="250" r="7" class="ribo"/><circle cx="720" cy="270" r="7" class="ribo"/><circle cx="780" cy="245" r="7" class="ribo"/><path d="M667 250 l10 -6 l8 4 l8 -5" class="rna" style="stroke-width:3"/><path d="M727 270 l10 -6 l8 4 l8 -5" class="rna" style="stroke-width:3"/><path d="M787 245 l10 -6 l8 4 l8 -5" class="rna" style="stroke-width:3"/><text class="clbl" x="560" y="296">Virus-RNA</text><text class="clbl" x="680" y="215">Ribosomen bilden Virusproteine</text></g>`;
+ // Schritt 6
+ s+=`<g data-st="6"><path d="M728 150 A32 32 0 1 1 792 150" class="env"/><circle cx="760" cy="136" r="16" class="cap" stroke-dasharray="3 2"/><path d="M700 196 l8 -5 l6 3 M720 205 l8 -5 l6 3 M690 214 l8 -5 l6 3" class="rna" style="stroke-width:3"/><g class="enz"><circle cx="742" cy="170" r="3"/><circle cx="752" cy="178" r="3"/><circle cx="768" cy="176" r="3"/><circle cx="778" cy="168" r="3"/><circle cx="735" cy="186" r="3"/></g><path d="M700 196 Q 720 180 735 172" class="cline" stroke-dasharray="3 3"/><text class="clbl" x="808" y="96">Knospung</text><text class="clbl" x="640" y="240">Zusammenbau an der Zellmembran</text></g>`;
+ // Schritt 7
+ s+=`<g data-st="7">${cvir(620,78,1,false)}${cvir(800,78,1,true)}<text class="clbl m" x="620" y="128">unreif</text><text class="clbl m" x="800" y="128">reif und infektiös</text><path d="M655 78 H758" class="cline" style="stroke-width:2" marker-end="url(#cycArr)"/><text class="clbl m" x="706" y="68">Protease</text><text class="clbl m" x="560" y="260">Die infizierte Zelle stirbt meist nach kurzer Zeit ab.</text></g>`;
+ // Medikamente
+ s+=badge(40,64,"Entry-Hemmer (z. B. CCR5-Blocker)","1")+badge(40,64,"Fusionshemmer","2")+badge(40,262,"Hemmer der reversen Transkriptase (NRTI, NNRTI)","3")+badge(40,296,"Kapsid-Hemmer (Lenacapavir)","3")+badge(630,388,"Integrase-Hemmer (z. B. Dolutegravir)","4")+badge(640,8,"Protease-Hemmer","7")+badge(470,186,"Kapsid-Hemmer (Lenacapavir)","6");
+ $("#cyc").innerHTML=s;
+ $("#cycProg").innerHTML=CYCT.map((c,i)=>`<button style="--c:var(--e)" data-ci="${i}" aria-label="Schritt ${i+1}: ${c.t}"></button>`).join("");
+}
+function cycStep(n){HV.cyc=Math.max(0,Math.min(CYCT.length-1,n));const k=HV.cyc,svg=$("#cyc");svg.dataset.step=k;
+ $$("#cyc [data-st]").forEach(el=>{const on=el.dataset.st.split(" ").map(Number).indexOf(k)>-1&&(!el.classList.contains("drugb")||HV.cycArt);el.style.opacity=on?1:0});
+ const C=CYCT[k];$("#cycPhase").innerHTML=`<span>Schritt ${k+1} von ${CYCT.length}</span>`;$("#cycTitle").textContent=C.t;$("#cycText").textContent=C.text;$("#cycEinfach").textContent=C.e;$("#cycNote").textContent=C.n;
+ $$("#cycProg button").forEach((b,i)=>{b.classList.toggle("cur",i===k);b.classList.toggle("done",i<k)});
+ $("#cycPrev").disabled=k===0;$("#cycNext").disabled=k===CYCT.length-1}
 
 /* ---------- Panel ---------- */
 let lastFocus=null;
@@ -936,6 +1391,8 @@ document.addEventListener("click",e=>{
  const pb=t.closest("#prog button");if(pb){stopPlay();applyStep(+pb.dataset.i);return}
  const zb=t.closest(".zbtns button");if(zb){zClick(zb);return}
  const mb=t.closest(".mc .opts button");if(mb){mcClick(mb);return}
+ const ar=t.closest("[data-art]");if(ar){$$("[data-art]").forEach(b=>b.classList.toggle("on",b===ar));HV.art=ar.dataset.art;hvUpdate();return}
+ const ci=t.closest("#cycProg button");if(ci){cycStep(+ci.dataset.ci);return}
  const mv=t.closest(".mv");if(mv){const pos=+mv.closest("li").dataset.pos,d=+mv.dataset.d,np=pos+d;if(np<0||np>=ordState.length)return;[ordState[pos],ordState[np]]=[ordState[np],ordState[pos]];renderOrder(false);$$("#order li")[np].querySelector(`.mv[data-d="${d}"]`)?.focus();return}
 });
 document.addEventListener("keydown",e=>{
@@ -958,12 +1415,19 @@ $("#zReset").addEventListener("click",renderZ);
 $("#oReset").addEventListener("click",()=>renderOrder(true));
 $("#oCheck").addEventListener("click",oCheck);
 $("#mReset").addEventListener("click",renderMC);
-function switchTab(id){stopPlay();$$(".tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===id?"true":"false"));$$(".tab").forEach(s=>s.classList.toggle("active",s.id==="tab-"+id));
- if(id==="kontakt")drawChart();if(id==="ablauf")applyStep(cur,true)}
+$("#hvS").addEventListener("input",e=>{hvStop();HV.s=+e.target.value;hvUpdate()});
+$("#hvPlay").addEventListener("click",hvPlay);
+$("#hvHab").addEventListener("change",hvUpdate);
+$("#hivchart").addEventListener("click",hvChartClick);
+$("#cycPrev").addEventListener("click",()=>cycStep(HV.cyc-1));
+$("#cycNext").addEventListener("click",()=>cycStep(HV.cyc+1));
+$("#cycArt").addEventListener("change",e=>{HV.cycArt=e.target.checked;cycStep(HV.cyc)});
+function switchTab(id){stopPlay();hvStop();$$(".tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===id?"true":"false"));$$(".tab").forEach(s=>s.classList.toggle("active",s.id==="tab-"+id));
+ if(id==="kontakt")drawChart();if(id==="ablauf")applyStep(cur,true);if(id==="hiv"){hvUpdate();cycStep(HV.cyc)}}
 
 /* ---------- Legende und Start ---------- */
 $("#legend").innerHTML=[["--u","Unspezifische Abwehr"],["--s","Steuerung (T-Helferzelle, regulatorische T-Zelle)"],["--h","Humorale Abwehr"],["--z","Zelluläre Abwehr"],["--m","Gedächtnis"],["--e","Erreger und Antigene"]].map(l=>`<span><i style="--c:var(${l[0]})"></i>${l[1]}</span>`).join("");
-buildOverview();buildAblauf();applyStep(0,true);renderZ();renderOrder(true);renderMC();
+buildOverview();buildAblauf();applyStep(0,true);buildHivScene();buildCycle();hvUpdate();cycStep(0);renderZ();renderOrder(true);renderMC();
 })();
 </script>
 </body>
