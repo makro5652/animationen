@@ -1,0 +1,1367 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Meiose und Keimzellbildung</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: Präparatebühne links, Protokollspalte rechts (Phasen in Stichpunkten, Zähler, Zufall des Durchlaufs); zweiter Reiter stellt Mitose und Meiose als Doppelpräparat nebeneinander */
+:root{
+  --bg:#f1eff4; --surface:#ffffff; --surface-2:#f7f5f9; --ink:#1d1824; --muted:#625a6c; --line:#d8d2de;
+  --accent:#7a3486; --accent-ink:#ffffff; --accent-2:#0f7a6a;
+  --mat:#c8372d; --pat:#2a64c4;
+  --cyto:#ece8f1; --membrane:#3f3550; --nucenv:#6a5f7a; --nucleoplasm:#ddd6e6; --nucleolus:#857b92;
+  --spindle:#1a9466; --centro:#b7860b; --stage:#faf9fb; --label:#2a2433;
+  --ok:#17733a; --ok-bg:#e3f4e8; --bad:#b42318; --bad-bg:#fbe7e4; --mid:#8a5a00; --mid-bg:#fbf1dc;
+  --f-display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", Verdana, system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#121016; --surface:#1b1820; --surface-2:#221e28; --ink:#ece7f1; --muted:#a69fb0; --line:#332d3b;
+  --accent:#d08ee0; --accent-ink:#1a0d1e; --accent-2:#4fd1bd;
+  --mat:#ff7a6e; --pat:#74a6ff;
+  --cyto:#1f1b25; --membrane:#a99bc0; --nucenv:#8d82a0; --nucleoplasm:#2a2533; --nucleolus:#5f5670;
+  --spindle:#4fd09c; --centro:#f0c04a; --stage:#151219; --label:#e2dbea;
+  --ok:#62d38f; --ok-bg:#12291c; --bad:#ff8574; --bad-bg:#2e1714; --mid:#f0c04a; --mid-bg:#2b2410;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#121016; --surface:#1b1820; --surface-2:#221e28; --ink:#ece7f1; --muted:#a69fb0; --line:#332d3b;
+  --accent:#d08ee0; --accent-ink:#1a0d1e; --accent-2:#4fd1bd;
+  --mat:#ff7a6e; --pat:#74a6ff;
+  --cyto:#1f1b25; --membrane:#a99bc0; --nucenv:#8d82a0; --nucleoplasm:#2a2533; --nucleolus:#5f5670;
+  --spindle:#4fd09c; --centro:#f0c04a; --stage:#151219; --label:#e2dbea;
+  --ok:#62d38f; --ok-bg:#12291c; --bad:#ff8574; --bad-bg:#2e1714; --mid:#f0c04a; --mid-bg:#2b2410;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;padding-inline:16px;padding-block:0 48px}
+.wrap{max-width:1200px;margin-inline:auto}
+h1,h2,h3,h4{font-family:var(--f-display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(1.9rem,4.4vw,3rem);font-weight:700;letter-spacing:-.02em}
+h2{font-size:clamp(1.4rem,2.6vw,1.9rem);font-weight:700;letter-spacing:-.01em}
+h3{font-size:1.12rem;font-weight:700}
+p{margin:0}
+.eyebrow{font-family:var(--f-mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent)}
+.muted{color:var(--muted)}
+button{font:inherit;color:inherit;cursor:pointer}
+button:disabled{opacity:.4;cursor:default}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
+sup{line-height:0}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line);margin-inline:-16px;padding:10px 16px}
+.top-in{max-width:1200px;margin-inline:auto;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between}
+.brand{font-family:var(--f-display);font-weight:700;font-size:1.05rem}
+.brand span{color:var(--accent)}
+nav.links{display:flex;flex-wrap:wrap;gap:4px}
+nav.links a{color:var(--muted);text-decoration:none;font-size:.92rem;padding:5px 10px;border-radius:999px}
+nav.links a:hover{color:var(--ink);background:var(--surface)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--surface)}
+.seg button{border:0;background:transparent;padding:5px 13px;border-radius:999px;font-size:.88rem;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.hero{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:24px;align-items:end;padding-block:30px 22px}
+.hero p.lead{font-size:1.08rem;max-width:62ch;margin-top:12px}
+.hero .note{font-size:.92rem;color:var(--muted);border-left:3px solid var(--accent-2);padding-left:12px}
+@media (max-width:820px){.hero{grid-template-columns:1fr}}
+@media (max-width:700px){.top{position:static}}
+
+/* Reiter */
+.tabs{display:flex;gap:4px;border-bottom:2px solid var(--line);margin-bottom:16px;flex-wrap:wrap}
+.tabs button{border:0;background:transparent;padding:10px 16px;font-family:var(--f-display);font-weight:700;font-size:1.05rem;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px}
+.tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.tabs button:hover{color:var(--ink)}
+
+section{scroll-margin-top:80px}
+.sim{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+@media (max-width:980px){.sim{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.stage{padding:10px;min-width:0}
+.stage-head{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:space-between;align-items:center;padding:4px 6px 10px}
+.phase-now{font-family:var(--f-display);font-size:1.45rem;font-weight:700}
+.phase-now small{font-family:var(--f-mono);font-size:.75rem;font-weight:400;color:var(--muted);margin-left:8px;letter-spacing:.04em}
+.toggles{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface-2);border-radius:999px;padding:4px 11px;font-size:.84rem}
+.chip[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:700}
+.canvas-box{position:relative;border-radius:8px;overflow:hidden;background:var(--stage);border:1px solid var(--line)}
+canvas.sim-cv{display:block;width:100%;height:auto;aspect-ratio:720/440;max-width:100%}
+.canvas-hint{position:absolute;left:10px;bottom:8px;font-size:.78rem;color:var(--muted);font-family:var(--f-mono);pointer-events:none}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.84rem;color:var(--muted);padding:8px 6px 0}
+.legend i{display:inline-block;width:18px;height:6px;border-radius:3px;margin-right:6px;vertical-align:middle}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 4px 4px}
+.btn{border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:7px 12px;font-size:.92rem;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700;min-width:118px;justify-content:center}
+.speed{display:flex;align-items:center;gap:8px;font-size:.86rem;color:var(--muted);margin-left:auto}
+.speed output{font-family:var(--f-mono);min-width:3.2em;color:var(--ink)}
+input[type=range]{accent-color:var(--accent)}
+.timeline{padding:8px 4px 2px}
+.tl-label{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);font-family:var(--f-mono);margin-bottom:4px}
+.tl-bar{position:relative;display:flex;height:34px;border-radius:7px;overflow:hidden;border:1px solid var(--line)}
+.tl-bar button{border:0;border-right:1px solid var(--line);background:var(--surface-2);font-size:.72rem;padding:0 2px;color:var(--muted);min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.tl-bar button:last-of-type{border-right:0}
+.tl-bar button.m2{background:color-mix(in srgb,var(--accent) 7%,var(--surface-2))}
+.tl-bar button.cur{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.tl-bar .cursor{position:absolute;top:0;bottom:0;width:2px;background:var(--accent-2);pointer-events:none}
+.scrub{width:100%;margin-top:6px}
+
+.side{display:flex;flex-direction:column;gap:16px;min-width:0}
+.panel{padding:14px 16px}
+.panel h3{margin-bottom:8px}
+.counters{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ctr{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.ctr b{display:block;font-family:var(--f-mono);font-size:1.3rem;font-variant-numeric:tabular-nums;line-height:1.2}
+.ctr span{font-size:.78rem;color:var(--muted);line-height:1.25;display:block}
+.ctr.wide{grid-column:1/-1}
+.info p{margin-bottom:8px}
+.tag{display:inline-block;font-family:var(--f-mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--accent-2);color:var(--accent-2);border-radius:4px;padding:1px 6px;margin-bottom:6px}
+.term{border:0;background:none;padding:0;color:var(--accent);text-decoration:underline dotted;text-underline-offset:3px;font-weight:700}
+.struct-box{display:none;background:var(--surface-2);border:1px solid var(--accent);border-radius:8px;padding:10px 12px;margin-bottom:10px}
+.struct-box.show{display:block}
+.struct-box h4{margin:0 0 4px;font-size:1rem}
+.close-x{float:right;border:0;background:none;color:var(--muted);font-size:.85rem}
+.termpop{position:fixed;z-index:50;max-width:min(340px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--accent);border-radius:10px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.18);font-size:.94rem}
+.termpop .gr{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);margin-bottom:6px}
+
+.plist{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.pgroup{font-family:var(--f-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:12px 2px 3px}
+.pgroup:first-child{padding-top:2px}
+.phead{width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px;border:0;background:transparent;border-radius:7px;padding:5px 10px;text-align:left;font-family:var(--f-display);font-weight:500;font-size:.98rem;color:var(--ink)}
+.phead:hover{background:var(--surface-2)}
+.pitem.cur .phead{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.phead .now{font-family:var(--f-mono);font-size:.66rem;font-weight:400;text-transform:uppercase;letter-spacing:.08em}
+.pbody{border-left:3px solid var(--accent);margin:6px 0 8px 10px;padding:2px 0 2px 10px;font-size:.95rem;line-height:1.45}
+.info .pbody ul{margin:0;padding-left:16px}
+.info .pbody li{margin-bottom:4px}
+.pbody .ober{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+details.warn{background:var(--bad-bg);border-radius:8px;padding:6px 10px;font-size:.9rem;margin-top:10px}
+details.warn summary{cursor:pointer;font-weight:700;color:var(--bad)}
+details.warn p{margin:6px 0 2px}
+
+.rnd-list{list-style:none;margin:8px 0 10px;padding:0;display:grid;gap:4px;font-size:.88rem}
+.rnd-list li{display:flex;gap:8px;align-items:baseline}
+.rnd-list .cell{font-family:var(--f-mono);font-size:.72rem;color:var(--muted);min-width:7.5em}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:3px;vertical-align:middle}
+.dot.m{background:var(--mat)} .dot.p{background:var(--pat)}
+.dot.mp{background:linear-gradient(90deg,var(--mat) 50%,var(--pat) 50%)} .dot.pm{background:linear-gradient(90deg,var(--pat) 50%,var(--mat) 50%)}
+
+/* Vergleich */
+.cmp-stages{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.cmp-stages button{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 11px;font-size:.88rem;display:flex;gap:7px;align-items:baseline}
+.cmp-stages button .n{font-family:var(--f-mono);font-size:.74rem;color:var(--muted)}
+.cmp-stages button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.cmp-stages button[aria-pressed="true"] .n{color:var(--accent-ink)}
+.cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:760px){.cmp-grid{grid-template-columns:1fr}}
+.cmp-card{padding:10px;min-width:0}
+.cmp-card h3{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:2px 4px 8px}
+.cmp-card h3 small{font-family:var(--f-mono);font-size:.74rem;font-weight:400;color:var(--muted)}
+.mini-ctr{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.82rem;color:var(--muted);padding:8px 4px 2px}
+.mini-ctr b{font-family:var(--f-mono);color:var(--ink);font-variant-numeric:tabular-nums}
+.cmp-text{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+@media (max-width:760px){.cmp-text{grid-template-columns:1fr}}
+.cmp-text .box{padding:12px 14px;min-width:0}
+.cmp-text .box h4{font-size:.98rem;margin-bottom:6px}
+.cmp-text ul{margin:0;padding-left:18px}
+.cmp-text li{margin-bottom:4px}
+.box.same h4{color:var(--ok)} .box.diff h4{color:var(--accent)}
+.cmp-table-wrap{margin-top:16px;padding:14px 16px}
+.cmp-table-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:center;margin-bottom:10px}
+table.cmp{border-collapse:collapse;width:100%;min-width:560px;font-size:.92rem}
+table.cmp th,table.cmp td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+table.cmp thead th{background:var(--surface-2);font-family:var(--f-display)}
+table.cmp tbody th{font-weight:700;width:24%}
+.cover{width:100%;border:1px dashed var(--line);background:var(--surface-2);border-radius:6px;padding:5px;font-size:.8rem;color:var(--muted)}
+.cover:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Abschnitte unten */
+.block{padding-block:44px 8px}
+.block-head{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:baseline;justify-content:space-between;margin-bottom:16px}
+.block-head p{max-width:70ch;color:var(--muted)}
+.stages{display:grid;gap:18px}
+.stages>*,.task,.q{min-width:0}
+.stage-block h3{display:flex;gap:10px;align-items:baseline;margin-bottom:10px}
+.stage-block h3 .n{font-family:var(--f-mono);font-size:.8rem;color:var(--accent)}
+.tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:12px}
+.task{padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.task-top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.task-top .nr{font-family:var(--f-display);font-weight:700;font-size:1.05rem}
+.afb{font-family:var(--f-mono);font-size:.7rem;border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:var(--muted);white-space:nowrap}
+.afb.o{border-color:var(--accent-2);color:var(--accent-2)}
+.op{font-weight:700;color:var(--accent)}
+.helps{display:flex;flex-wrap:wrap;gap:6px}
+.helps button{font-size:.8rem;border:1px dashed var(--line);background:transparent;border-radius:6px;padding:3px 9px;color:var(--muted)}
+.helps button[aria-expanded="true"]{border-style:solid;border-color:var(--accent);color:var(--accent)}
+.helpbox{background:var(--surface-2);border-radius:8px;padding:8px 10px;font-size:.92rem}
+.wordbank{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.wordbank span{border:1px solid var(--line);border-radius:5px;padding:1px 7px;font-size:.86rem;background:var(--surface)}
+.tablewrap{overflow-x:auto}
+table.data{border-collapse:collapse;font-size:.9rem;margin-top:4px}
+table.data th,table.data td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+table.data th{background:var(--surface-2)}
+table.mk{min-width:760px}
+table.mk td.pro{background:var(--ok-bg)} table.mk td.mid{background:var(--mid-bg)} table.mk td.con{background:var(--bad-bg)}
+
+.quiz{display:grid;gap:12px}
+.q{padding:14px 16px}
+.q .qhead{display:flex;justify-content:space-between;gap:10px;margin-bottom:8px;align-items:baseline}
+.q .qtext{font-weight:700}
+.opts{display:grid;gap:6px}
+.opts label{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;padding:7px 10px;cursor:pointer;background:var(--surface-2)}
+.opts label:hover{border-color:var(--accent)}
+.opts input{margin-top:4px;accent-color:var(--accent)}
+.order-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.order-list li{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:5px 8px;background:var(--surface-2)}
+.order-list li .pos{font-family:var(--f-mono);color:var(--muted);width:1.6em}
+.order-list li .lbl{flex:1}
+.order-list li button{border:1px solid var(--line);background:var(--surface);border-radius:6px;width:32px;height:30px}
+.numin{font:inherit;font-family:var(--f-mono);width:8em;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink)}
+.qcanvas{width:100%;max-width:440px;aspect-ratio:720/440;height:auto;border:1px solid var(--line);border-radius:8px;display:block;margin-bottom:8px;background:var(--stage)}
+.fb{margin-top:10px;border-radius:8px;padding:8px 10px;font-size:.93rem;display:none}
+.fb.show{display:block}
+.fb.ok{background:var(--ok-bg)} .fb.ok strong{color:var(--ok)}
+.fb.no{background:var(--bad-bg)} .fb.no strong{color:var(--bad)}
+.quiz-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}
+.score{font-family:var(--f-display);font-size:1.25rem;font-weight:700}
+
+.gloss{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));gap:10px}
+.gl{padding:11px 14px}
+.gl h4{font-size:1.02rem}
+.gl .gr{font-family:var(--f-mono);font-size:.76rem;color:var(--muted);margin:2px 0 6px}
+.gl p{font-size:.92rem}
+.gl.flash{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+#glSearch{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);width:min(100%,300px)}
+
+details.teach summary{cursor:pointer;padding:14px 16px;font-family:var(--f-display);font-weight:700;font-size:1.1rem}
+.teach-body{padding:0 16px 16px;display:grid;gap:18px}
+.teach-body section{max-width:90ch;min-width:0}
+.teach-body h4{margin:4px 0 6px;font-size:1.08rem}
+.teach-body ul{margin:4px 0;padding-left:20px}
+.teach-body li{margin-bottom:4px}
+.teach-body p{margin-bottom:6px}
+.lit li{font-size:.9rem}
+footer{margin-top:40px;font-size:.84rem;color:var(--muted)}
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">Meiose <span>und Keimzellbildung</span></div>
+    <nav class="links" aria-label="Abschnitte">
+      <a href="#simulation">Simulation</a>
+      <a href="#vergleich">Vergleich</a>
+      <a href="#auftraege">Arbeitsaufträge</a>
+      <a href="#test">Test</a>
+      <a href="#glossar">Glossar</a>
+      <a href="#lehrkraefte">Für Lehrkräfte</a>
+    </nav>
+    <div class="seg" role="group" aria-label="Niveau wählen">
+      <button type="button" id="lvlSek" aria-pressed="true">Sek I</button>
+      <button type="button" id="lvlOber" aria-pressed="false">Oberstufe</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Biologie · Genetik · Sek I und Sek II</div>
+      <h1>Wie aus einer diploiden Zelle vier verschiedene Keimzellen werden</h1>
+      <p class="lead">Die Animation zeigt die Meiose einer tierischen Zelle mit vier Chromosomen (2n = 4). Rot sind die Chromosomen von der Mutter, blau die vom Vater. Klicke auf Strukturen in der Zelle und auf <button type="button" class="term" data-term="Crossing-over">markierte Begriffe</button>.</p>
+    </div>
+    <p class="note">Wähle oben dein Niveau. Im Reiter <b>Vergleich mit Mitose</b> laufen beide Teilungen nebeneinander. Jeder Durchlauf der Meiose ist zufällig: Achte darauf, wie sich die Endzellen unterscheiden.</p>
+  </div>
+
+  <section id="simulation" aria-label="Simulation">
+    <div class="tabs" role="tablist" aria-label="Ansicht">
+      <button type="button" role="tab" id="tabMei" aria-selected="true" aria-controls="panelMei">Meiose</button>
+      <button type="button" role="tab" id="tabCmp" aria-selected="false" aria-controls="vergleich">Vergleich mit Mitose</button>
+    </div>
+
+    <div id="panelMei" role="tabpanel" aria-labelledby="tabMei">
+      <div class="sim">
+        <div class="card stage">
+          <div class="stage-head">
+            <div class="phase-now" id="phaseNow" aria-live="polite">Interphase <small>Vor der Meiose</small></div>
+            <div class="toggles">
+              <button type="button" class="chip" id="tLabels" aria-pressed="true">Beschriftung</button>
+              <button type="button" class="chip" id="tFluo" aria-pressed="false">Fluoreszenz-Ansicht</button>
+            </div>
+          </div>
+          <div class="canvas-box">
+            <canvas id="cv" class="sim-cv" width="720" height="440" aria-label="Animierte Zelle in der Meiose"></canvas>
+            <div class="canvas-hint">Klick auf eine Struktur zeigt Details</div>
+          </div>
+          <div class="legend" id="legend">
+            <span><i style="background:var(--mat)"></i>Chromosom von der Mutter</span>
+            <span><i style="background:var(--pat)"></i>Chromosom vom Vater</span>
+            <span><i style="background:var(--spindle)"></i>Mikrotubuli</span>
+            <span><i style="background:var(--centro)"></i>Centrosom</span>
+            <span>Die Farben zeigen die Herkunft. In echten Zellen haben Chromosomen keine Farbe.</span>
+          </div>
+          <div class="controls">
+            <button type="button" class="btn" id="bPrev" aria-label="Vorherige Phase">&#9664;&#9664; Phase</button>
+            <button type="button" class="btn primary" id="bPlay">Pause</button>
+            <button type="button" class="btn" id="bNext" aria-label="Nächste Phase">Phase &#9654;&#9654;</button>
+            <label class="speed" for="speed">Tempo <input type="range" id="speed" min="0.25" max="3" step="0.25" value="1"><output id="speedOut">1×</output></label>
+          </div>
+          <div class="timeline">
+            <div class="tl-label"><span>Ablauf in der Animation (nicht maßstabsgetreu)</span><span id="tlPct">0 %</span></div>
+            <div class="tl-bar" id="tlBar"></div>
+            <input type="range" class="scrub" id="scrub" min="0" max="1000" value="0" aria-label="Zeitpunkt in der Meiose wählen">
+          </div>
+        </div>
+
+        <aside class="side">
+          <div class="card panel info">
+            <div class="struct-box" id="structBox" role="region" aria-live="polite"></div>
+            <div class="eyebrow" style="margin-bottom:6px">Phasen in Stichpunkten</div>
+            <div id="phaseInfo"></div>
+          </div>
+          <div class="card panel">
+            <h3>Zähler</h3>
+            <div class="counters">
+              <div class="ctr"><b id="cCells">1</b><span>Zellen</span></div>
+              <div class="ctr"><b id="cChr">4</b><span>Chromosomen pro Zelle</span></div>
+              <div class="ctr"><b id="cCtd">1</b><span>Chromatiden pro Chromosom</span></div>
+              <div class="ctr"><b id="cPloid">2n</b><span>Chromosomensätze</span></div>
+              <div class="ctr wide"><span id="cNote"></span></div>
+            </div>
+          </div>
+          <div class="card panel">
+            <h3>Zufall in diesem Durchlauf</h3>
+            <p class="muted" style="font-size:.88rem" id="rndText"></p>
+            <ul class="rnd-list" id="rndList"></ul>
+            <button type="button" class="btn" id="bRnd">Neue Zufallsmeiose</button>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <div id="vergleich" role="tabpanel" aria-labelledby="tabCmp" hidden>
+      <div class="cmp-stages" id="cmpStages" role="group" aria-label="Vergleichsstation wählen"></div>
+      <div class="controls" style="padding-top:0">
+        <button type="button" class="btn" id="cPrev">&#9664;&#9664; Station</button>
+        <button type="button" class="btn primary" id="cPlay">Pause</button>
+        <button type="button" class="btn" id="cNext">Station &#9654;&#9654;</button>
+        <button type="button" class="chip" id="cLabels" aria-pressed="true">Beschriftung</button>
+      </div>
+      <div class="cmp-grid">
+        <div class="card cmp-card">
+          <h3>Mitose <small id="cmpMitPh"></small></h3>
+          <div class="canvas-box"><canvas id="cvMit" class="sim-cv" width="720" height="440" aria-label="Animation der Mitose"></canvas></div>
+          <div class="mini-ctr" id="cmpMitCtr"></div>
+        </div>
+        <div class="card cmp-card">
+          <h3>Meiose <small id="cmpMeiPh"></small></h3>
+          <div class="canvas-box"><canvas id="cvMei" class="sim-cv" width="720" height="440" aria-label="Animation der Meiose"></canvas></div>
+          <div class="mini-ctr" id="cmpMeiCtr"></div>
+        </div>
+      </div>
+      <div class="cmp-text">
+        <div class="card box same"><h4>Gleich</h4><ul id="cmpSame"></ul></div>
+        <div class="card box diff"><h4>Verschieden</h4><ul id="cmpDiff"></ul></div>
+      </div>
+      <div class="card cmp-table-wrap">
+        <div class="cmp-table-head">
+          <h3>Mitose und Meiose im Überblick</h3>
+          <button type="button" class="btn" id="bCover">Tabelle verdecken (Selbsttest)</button>
+        </div>
+        <div class="tablewrap"><table class="cmp" id="cmpTable"></table></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="auftraege" class="block">
+    <div class="block-head">
+      <h2>Arbeitsaufträge</h2>
+      <p>Arbeite in der Reihenfolge der drei Schritte. Öffne eine Hilfe erst, wenn du allein nicht weiterkommst.</p>
+    </div>
+    <div class="stages" id="taskStages"></div>
+  </section>
+
+  <section id="test" class="block">
+    <div class="block-head">
+      <h2>Test: Überprüfe dein Wissen</h2>
+      <p>Bearbeite zuerst alle Fragen. Dann klicke auf „Auswerten“. Die Ergebnisse werden nicht gespeichert.</p>
+    </div>
+    <div class="quiz" id="quiz"></div>
+    <div class="quiz-bar">
+      <button type="button" class="btn primary" id="qEval">Auswerten</button>
+      <button type="button" class="btn" id="qReset">Neu starten</button>
+      <span class="score" id="qScore" aria-live="polite"></span>
+    </div>
+  </section>
+
+  <section id="glossar" class="block">
+    <div class="block-head">
+      <h2>Glossar</h2>
+      <input type="search" id="glSearch" placeholder="Begriff suchen" aria-label="Glossar durchsuchen">
+    </div>
+    <p class="muted" style="margin-bottom:12px">Zu jedem Nomen stehen Artikel und Plural. In Klammern steht das englische Wort.</p>
+    <div class="gloss" id="gloss"></div>
+  </section>
+
+  <section id="lehrkraefte" class="block">
+    <details class="card teach">
+      <summary>Für Lehrkräfte: didaktische Analyse, Modellkritik und Erwartungshorizont</summary>
+      <div class="teach-body" id="teachBody"></div>
+    </details>
+  </section>
+
+  <footer>Modell einer tierischen Keimbahnzelle mit 2n = 4. Zeitanteile, Größen und Bewegungen sind vereinfacht dargestellt.</footer>
+</div>
+
+<div class="termpop" id="termPop" hidden role="dialog" aria-label="Begriffserklärung"></div>
+
+<script>
+/* =====================================================================
+   Engine: deklarative Keyframes + generische Interpolation
+   Zustand S: Zellen (4 Slots), Kerne (4), Centrosomen (4), Spindeln,
+   8 Chromatiden (A/B × mütterlich/väterlich × Schwester 0/1)
+   ===================================================================== */
+const W=720,H=440,CX=360,CY=222,TAU=Math.PI*2,HALF=Math.PI/2;
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const angDiff=(a,b)=>{let d=(b-a)%TAU;if(d>Math.PI)d-=TAU;if(d<-Math.PI)d+=TAU;return d;};
+const ARMS={A:[16,29],B:[10,18]};               /* p-Arm, q-Arm */
+const SEED={Am:1.3,Ap:2.7,Bm:5.9,Bp:4.1};
+const KEYS=['Am0','Am1','Ap0','Ap1','Bm0','Bm1','Bp0','Bp1'];
+const XL=-175,XR=175;
+
+const MEI_PHASES=[
+ {id:'inter', name:'Interphase', group:'Vor der Meiose', short:'Inter', dur:10},
+ {id:'pro1',  name:'Prophase I', group:'Meiose I', short:'Pro I', dur:22},
+ {id:'meta1', name:'Metaphase I', group:'Meiose I', short:'Meta I', dur:9},
+ {id:'ana1',  name:'Anaphase I', group:'Meiose I', short:'Ana I', dur:9},
+ {id:'telo1', name:'Telophase I und Zytokinese', group:'Meiose I', short:'Telo I', dur:11},
+ {id:'interk',name:'Interkinese', group:'Zwischen den Teilungen', short:'Interk.', dur:6},
+ {id:'pro2',  name:'Prophase II', group:'Meiose II', short:'Pro II', dur:10},
+ {id:'meta2', name:'Metaphase II', group:'Meiose II', short:'Meta II', dur:8},
+ {id:'ana2',  name:'Anaphase II', group:'Meiose II', short:'Ana II', dur:8},
+ {id:'telo2', name:'Telophase II und Zytokinese', group:'Meiose II', short:'Telo II', dur:12}
+];
+const MIT_PHASES=[
+ {id:'inter', name:'Interphase', group:'Interphase', short:'Inter', dur:10},
+ {id:'pro',   name:'Prophase', group:'Mitose', short:'Pro', dur:12},
+ {id:'meta',  name:'Metaphase', group:'Mitose', short:'Meta', dur:9},
+ {id:'ana',   name:'Anaphase', group:'Mitose', short:'Ana', dur:9},
+ {id:'telo',  name:'Telophase und Zytokinese', group:'Mitose', short:'Telo', dur:14}
+];
+[MEI_PHASES,MIT_PHASES].forEach(P=>{let a=0;P.forEach(p=>{p.start=a;a+=p.dur;});P.total=a;});
+const atP=(P,id,f)=>{const p=P.find(q=>q.id===id);return p.start+p.dur*f;};
+function phaseAt(P,T){T=((T%P.total)+P.total)%P.total;for(const p of P)if(T<p.start+p.dur)return{p,u:(T-p.start)/p.dur};const l=P[P.length-1];return{p:l,u:.999};}
+
+/* Zufall eines Durchlaufs: Orientierung der Bivalente, Ort des Crossing-overs */
+function makeRnd(r=Math.random){return{oA:r()<.5?1:-1,oB:r()<.5?1:-1,coA:.25+r()*.3,coB:.25+r()*.3};}
+/* Lage einer Chromatide relativ zu ihrem Homologen; innere Chromatide = Schwester 1 */
+function chromInfo(key,rnd){
+ const X=key[0],par=key[1],sis=+key[2],left=(par==='m')===(rnd['o'+X]===1);
+ const pos=left?(sis===0?-1:1):(sis===1?-1:1);
+ return{X,par,sis,left,pos,s:pos<0?1:-1,inner:sis===1,hom:X+par};
+}
+function baseState(){
+ const four=f=>[0,1,2,3].map(f);
+ const S={alpha:1,c:0,ls:.8,co:0,chi:0,nol:1,eq1:0,eq2:0,sp1:0,sp2L:0,sp2R:0,bLR:0,bL:0,bR:0,
+  cells:four(()=>({x:0,y:0,r:150})),nuc:four(()=>({x:0,y:0,r:68,env:1,frag:0})),cs:four(()=>({x:0,y:0,a:1})),chr:{}};
+ KEYS.forEach(k=>S.chr[k]={x:0,y:0,tau:0,delta:HALF,a:1,att:0,pole:0,s:1});
+ return S;
+}
+const clone=o=>JSON.parse(JSON.stringify(o));
+/* Ein Chromosom (Dyade) platzieren: axis = Richtung des p-Arms */
+function setDyad(S,rnd,hom,cx,cy,axis,g,o={}){
+ const sep=axis+HALF,ux=Math.cos(sep),uy=Math.sin(sep);
+ [0,1].forEach(sis=>{
+  const key=hom+sis,ci=chromInfo(key,rnd),k=S.chr[key];
+  k.x=cx+ci.pos*g*ux;k.y=cy+ci.pos*g*uy;k.tau=ci.pos<0?sep:sep+Math.PI;k.s=ci.s;
+  if(o.delta!==undefined)k.delta=o.delta;
+  if(o.att!==undefined)k.att=o.att;
+  if(o.pole)k.pole=o.pole(ci);
+  if(o.rep!==undefined)k.a=ci.pos>0?o.rep:1;
+ });
+}
+/* Bivalent: zwei homologe Dyaden nebeneinander, hg = halber Abstand der Homologen */
+function setBivalent(S,rnd,X,cx,cy,axis,hg,g,o={}){
+ const sep=axis+HALF,ux=Math.cos(sep),uy=Math.sin(sep);
+ ['m','p'].forEach(par=>{const left=(par==='m')===(rnd['o'+X]===1),sg=left?-1:1;setDyad(S,rnd,X+par,cx+sg*hg*ux,cy+sg*hg*uy,axis,g,o);});
+}
+const setCells=(S,arr)=>arr.forEach((c,i)=>Object.assign(S.cells[i],c));
+const setNuc=(S,arr)=>arr.forEach((c,i)=>Object.assign(S.nuc[i],c));
+const setCs=(S,arr)=>arr.forEach((c,i)=>Object.assign(S.cs[i],c));
+const POLE_MI=ci=>ci.left?0:2, POLE_MII=ci=>(ci.left?0:2)+(ci.pos<0?0:1), POLE_MIT=ci=>ci.pos<0?0:2;
+const IP={Am:[-30,-20,-1.0],Ap:[24,22,-2.3],Bm:[-22,30,.7],Bp:[26,-30,2.5]};
+const D_META=HALF+.14;
+
+function interphaseKeys(P,key,rnd){
+ key(atP(P,'inter',0),S=>{S.alpha=0;setCells(S,[0,1,2,3].map(()=>({r:128})));setNuc(S,[0,1,2,3].map(()=>({r:62})));
+  setCs(S,[0,1,2,3].map(()=>({x:-46,y:-62})));Object.keys(IP).forEach(h=>setDyad(S,rnd,h,IP[h][0],IP[h][1],IP[h][2],0,{rep:0,delta:HALF}));});
+ key(atP(P,'inter',.08),S=>{S.alpha=1;});
+ key(atP(P,'inter',.35),S=>{setCells(S,[0,1,2,3].map(()=>({r:146})));setNuc(S,[0,1,2,3].map(()=>({r:68})));setCs(S,[0,1,2,3].map(()=>({x:-50,y:-68})));});
+ key(atP(P,'inter',.78),S=>{setCells(S,[0,1,2,3].map(()=>({r:150})));Object.keys(IP).forEach(h=>setDyad(S,rnd,h,IP[h][0],IP[h][1],IP[h][2],2.6,{rep:1}));
+  setCs(S,[{x:-58,y:-62},{x:-58,y:-62},{x:-40,y:-76},{x:-40,y:-76}]);});
+ key(atP(P,'inter',1),()=>{});
+}
+
+function buildMeiosis(rnd){
+ const P=MEI_PHASES,KF=[];let S=baseState();
+ const key=(t,fn)=>{S=clone(S);fn(S);KF.push({t,S});};
+ interphaseKeys(P,key,rnd);
+ /* Prophase I: Kondensation, Synapse, Crossing-over, Diplotän, Zerfall der Kernhülle */
+ key(atP(P,'pro1',.18),S=>{S.c=.45;S.ls=.9;Object.keys(IP).forEach(h=>setDyad(S,rnd,h,IP[h][0],IP[h][1],IP[h][2],3,{delta:HALF+.06}));
+  setCs(S,[{x:-74,y:-46},{x:-74,y:-46},{x:-24,y:-84},{x:-24,y:-84}]);});
+ key(atP(P,'pro1',.42),S=>{S.c=.62;S.ls=.95;setBivalent(S,rnd,'A',-18,-26,-1.25,6.5,2.6,{delta:HALF+.08});setBivalent(S,rnd,'B',22,28,-1.85,5.5,2.6,{delta:HALF+.08});});
+ key(atP(P,'pro1',.6),S=>{S.c=.74;S.co=1;S.chi=1;});
+ key(atP(P,'pro1',.8),S=>{S.c=.88;S.nol=0;S.sp1=.5;setBivalent(S,rnd,'A',-18,-26,-1.3,10,3.2,{delta:HALF+.1});setBivalent(S,rnd,'B',22,28,-1.8,9,3.2,{delta:HALF+.1});
+  setCs(S,[{x:-86,y:0},{x:-86,y:0},{x:86,y:0},{x:86,y:0}]);});
+ key(atP(P,'pro1',1),S=>{S.c=1;S.ls=1;S.sp1=1;setNuc(S,[0,1,2,3].map(()=>({env:0,frag:1})));setCs(S,[{x:-117,y:0},{x:-117,y:0},{x:117,y:0},{x:117,y:0}]);
+  setBivalent(S,rnd,'A',-6,-42,-1.45,11,3.6,{delta:D_META,att:.6,pole:POLE_MI});setBivalent(S,rnd,'B',8,42,-1.7,11,3.6,{delta:D_META,att:.6,pole:POLE_MI});});
+ /* Metaphase I */
+ key(atP(P,'meta1',.45),S=>{S.eq1=1;setBivalent(S,rnd,'A',0,-50,-HALF,12,4,{att:1});setBivalent(S,rnd,'B',0,50,-HALF,12,4,{att:1});});
+ key(atP(P,'meta1',1),()=>{});
+ /* Anaphase I: Trennung der Homologen */
+ key(atP(P,'ana1',.25),S=>{S.eq1=0;S.chi=0;setBivalent(S,rnd,'A',0,-48,-HALF,26,4);setBivalent(S,rnd,'B',0,48,-HALF,26,4);});
+ key(atP(P,'ana1',1),S=>{setCells(S,[{x:-42,r:138},{x:-42,r:138},{x:42,r:138},{x:42,r:138}]);S.bLR=138;
+  setBivalent(S,rnd,'A',0,-40,-HALF,100,4);setBivalent(S,rnd,'B',0,40,-HALF,100,4);setCs(S,[{x:-150},{x:-150},{x:150},{x:150}]);});
+ /* Telophase I und Zytokinese */
+ key(atP(P,'telo1',.45),S=>{setCells(S,[{x:-92,r:126},{x:-92,r:126},{x:92,r:126},{x:92,r:126}]);S.bLR=58;S.c=.84;S.sp1=.35;
+  setBivalent(S,rnd,'A',0,-32,-HALF,118,4,{att:.3});setBivalent(S,rnd,'B',0,32,-HALF,118,4,{att:.3});
+  setNuc(S,[{x:-118,r:42,env:.4,frag:.6},{x:-118,r:42,env:.4,frag:.6},{x:118,r:42,env:.4,frag:.6},{x:118,r:42,env:.4,frag:.6}]);
+  setCs(S,[{x:-175},{x:-175},{x:175},{x:175}]);});
+ key(atP(P,'telo1',1),S=>{setCells(S,[{x:XL,r:118},{x:XL,r:118},{x:XR,r:118},{x:XR,r:118}]);S.bLR=0;S.c=.6;S.ls=.75;S.sp1=0;S.nol=.7;
+  setNuc(S,[{x:XL,r:48,env:1,frag:0},{x:XL,r:48,env:1,frag:0},{x:XR,r:48,env:1,frag:0},{x:XR,r:48,env:1,frag:0}]);
+  ['A','B'].forEach(X=>['m','p'].forEach(par=>{const left=(par==='m')===(rnd['o'+X]===1),cx=left?XL:XR;
+   setDyad(S,rnd,X+par,cx+(X==='A'?-12:14),X==='A'?-12:16,-HALF,3,{att:0,delta:HALF+.08});}));
+  setCs(S,[{x:XL-40,y:-66},{x:XL-40,y:-66},{x:XR+40,y:-66},{x:XR+40,y:-66}]);});
+ /* Interkinese: keine Replikation, Centrosomen werden verdoppelt */
+ key(atP(P,'interk',.7),S=>{setCs(S,[{x:XL-52,y:-58},{x:XL-30,y:-72},{x:XR+30,y:-72},{x:XR+52,y:-58}]);});
+ key(atP(P,'interk',1),()=>{});
+ /* Prophase II */
+ key(atP(P,'pro2',.5),S=>{S.c=.85;S.ls=.9;S.nol=0;S.sp2L=S.sp2R=.5;setNuc(S,[0,1,2,3].map(()=>({env:.7,frag:.3})));
+  setCs(S,[{x:XL,y:-66},{x:XL,y:66},{x:XR,y:-66},{x:XR,y:66}]);
+  ['A','B'].forEach(X=>['m','p'].forEach(par=>{const left=(par==='m')===(rnd['o'+X]===1),cx=left?XL:XR;
+   setDyad(S,rnd,X+par,cx+(X==='A'?-14:16),X==='A'?-10:12,-Math.PI/4,3.4,{att:0,pole:POLE_MII,delta:HALF+.1});}));});
+ key(atP(P,'pro2',1),S=>{S.c=1;S.ls=1;S.sp2L=S.sp2R=1;setNuc(S,[0,1,2,3].map(()=>({env:0,frag:1})));
+  setCs(S,[{x:XL,y:-87},{x:XL,y:87},{x:XR,y:-87},{x:XR,y:87}]);
+  ['A','B'].forEach(X=>['m','p'].forEach(par=>{const left=(par==='m')===(rnd['o'+X]===1),cx=left?XL:XR;
+   setDyad(S,rnd,X+par,cx+(X==='A'?-22:28),X==='A'?-6:6,0,4,{att:.6,delta:D_META});}));});
+ /* Metaphase II */
+ key(atP(P,'meta2',.45),S=>{S.eq2=1;['A','B'].forEach(X=>['m','p'].forEach(par=>{const left=(par==='m')===(rnd['o'+X]===1),cx=left?XL:XR;
+   setDyad(S,rnd,X+par,cx+(X==='A'?-22:28),0,0,4,{att:1});}));});
+ key(atP(P,'meta2',1),()=>{});
+ /* Anaphase II: Trennung der Schwesterchromatiden */
+ const dyadsII=(S,g,o)=>['A','B'].forEach(X=>['m','p'].forEach(par=>{const left=(par==='m')===(rnd['o'+X]===1),cx=left?XL:XR;setDyad(S,rnd,X+par,cx+(X==='A'?-22:28),0,0,g,o);}));
+ key(atP(P,'ana2',.25),S=>{S.eq2=0;dyadsII(S,14,{delta:1.2});});
+ key(atP(P,'ana2',1),S=>{setCells(S,[{x:XL,y:-40,r:104},{x:XL,y:40,r:104},{x:XR,y:-40,r:104},{x:XR,y:40,r:104}]);S.bL=S.bR=104;
+  dyadsII(S,84,{delta:.55});setCs(S,[{x:XL,y:-121},{x:XL,y:121},{x:XR,y:-121},{x:XR,y:121}]);});
+ /* Telophase II und Zytokinese */
+ key(atP(P,'telo2',.45),S=>{setCells(S,[{x:XL,y:-74,r:96},{x:XL,y:74,r:96},{x:XR,y:-74,r:96},{x:XR,y:74,r:96}]);S.bL=S.bR=48;S.c=.8;S.sp2L=S.sp2R=.3;
+  dyadsII(S,100,{delta:HALF,att:.3});
+  setNuc(S,[{x:XL,y:-98,r:34,env:.4,frag:.6},{x:XL,y:98,r:34,env:.4,frag:.6},{x:XR,y:-98,r:34,env:.4,frag:.6},{x:XR,y:98,r:34,env:.4,frag:.6}]);
+  setCs(S,[{x:XL,y:-150},{x:XL,y:150},{x:XR,y:-150},{x:XR,y:150}]);});
+ key(atP(P,'telo2',.85),S=>{const C4=[[XL,-108],[XL,108],[XR,-108],[XR,108]];
+  setCells(S,C4.map(([x,y])=>({x,y,r:92})));S.bL=S.bR=0;S.c=.32;S.ls=.5;S.sp2L=S.sp2R=0;S.nol=.8;
+  setNuc(S,C4.map(([x,y])=>({x,y,r:40,env:1,frag:0})));setCs(S,C4.map(([x,y])=>({x:x+(x<0?-58:58),y:y+(y<0?-40:40)})));
+  KEYS.forEach(key=>{const ci=chromInfo(key,rnd),cell=(ci.left?0:2)+(ci.pos<0?0:1),[x,y]=C4[cell],k=S.chr[key];
+   k.x=x+(ci.X==='A'?-10:10);k.y=y+(ci.X==='A'?-9:9);k.att=0;});});
+ key(atP(P,'telo2',.93),()=>{});
+ key(atP(P,'telo2',1),S=>{S.alpha=0;});
+ return KF;
+}
+
+const MIT_META_Y={Am:-74,Bp:-24,Ap:24,Bm:74};
+function buildMitosis(rnd){
+ const P=MIT_PHASES,KF=[];let S=baseState();
+ const key=(t,fn)=>{S=clone(S);fn(S);KF.push({t,S});};
+ interphaseKeys(P,key,rnd);
+ key(atP(P,'pro',.5),S=>{S.c=.6;S.ls=.92;S.nol=0;S.sp1=.5;Object.keys(IP).forEach(h=>setDyad(S,rnd,h,IP[h][0]*.9,IP[h][1]*.9,IP[h][2],3.4,{delta:HALF+.08}));
+  setCs(S,[{x:-86,y:0},{x:-86,y:0},{x:86,y:0},{x:86,y:0}]);});
+ key(atP(P,'pro',1),S=>{S.c=1;S.ls=1;S.sp1=1;setNuc(S,[0,1,2,3].map(()=>({env:0,frag:1})));setCs(S,[{x:-117,y:0},{x:-117,y:0},{x:117,y:0},{x:117,y:0}]);
+  Object.keys(MIT_META_Y).forEach(h=>setDyad(S,rnd,h,IP[h][0]*.3,MIT_META_Y[h]*.8,-HALF+.3,4,{delta:D_META,att:.6,pole:POLE_MIT}));});
+ key(atP(P,'meta',.45),S=>{S.eq1=1;Object.keys(MIT_META_Y).forEach(h=>setDyad(S,rnd,h,0,MIT_META_Y[h],-HALF,4,{att:1}));});
+ key(atP(P,'meta',1),()=>{});
+ key(atP(P,'ana',.25),S=>{S.eq1=0;Object.keys(MIT_META_Y).forEach(h=>setDyad(S,rnd,h,0,MIT_META_Y[h],-HALF,16,{delta:1.2}));});
+ key(atP(P,'ana',1),S=>{setCells(S,[{x:-42,r:138},{x:-42,r:138},{x:42,r:138},{x:42,r:138}]);S.bLR=138;
+  Object.keys(MIT_META_Y).forEach(h=>setDyad(S,rnd,h,0,MIT_META_Y[h]*.8,-HALF,100,{delta:.55}));setCs(S,[{x:-150},{x:-150},{x:150},{x:150}]);});
+ key(atP(P,'telo',.4),S=>{setCells(S,[{x:-92,r:126},{x:-92,r:126},{x:92,r:126},{x:92,r:126}]);S.bLR=58;S.c=.8;S.sp1=.35;
+  Object.keys(MIT_META_Y).forEach(h=>setDyad(S,rnd,h,0,MIT_META_Y[h]*.6,-HALF,118,{delta:HALF,att:.3}));
+  setNuc(S,[{x:-118,r:44,env:.4,frag:.6},{x:-118,r:44,env:.4,frag:.6},{x:118,r:44,env:.4,frag:.6},{x:118,r:44,env:.4,frag:.6}]);setCs(S,[{x:-175},{x:-175},{x:175},{x:175}]);});
+ key(atP(P,'telo',.82),S=>{setCells(S,[{x:XL,r:118},{x:XL,r:118},{x:XR,r:118},{x:XR,r:118}]);S.bLR=0;S.c=.3;S.ls=.6;S.sp1=0;S.nol=.8;
+  setNuc(S,[{x:XL,r:54,env:1,frag:0},{x:XL,r:54,env:1,frag:0},{x:XR,r:54,env:1,frag:0},{x:XR,r:54,env:1,frag:0}]);
+  const OFF={Am:[-18,-16],Ap:[16,-18],Bm:[-16,18],Bp:[18,16]};
+  KEYS.forEach(key=>{const ci=chromInfo(key,rnd),k=S.chr[key],cx=ci.pos<0?XL:XR,o=OFF[ci.hom];k.x=cx+o[0];k.y=o[1];k.att=0;});
+  setCs(S,[{x:XL-70,y:-50},{x:XL-70,y:-50},{x:XR+70,y:-50},{x:XR+70,y:-50}]);});
+ key(atP(P,'telo',.93),()=>{});
+ key(atP(P,'telo',1),S=>{S.alpha=0;});
+ return KF;
+}
+
+/* Interpolation zwischen Keyframes */
+function lerpState(A,B,t){
+ const out=Array.isArray(A)?[]:{};
+ for(const k in A){const a=A[k],b=B[k];
+  if(typeof a==='number'){out[k]=k==='pole'||k==='s'?(t<.5?a:b):k==='tau'?a+angDiff(a,b)*t:lerp(a,b,t);}
+  else out[k]=lerpState(a,b,t);}
+ return out;
+}
+function stateAt(KF,total,T){
+ T=((T%total)+total)%total;
+ let i=0;while(i<KF.length-2&&KF[i+1].t<=T)i++;
+ const a=KF[i],b=KF[i+1],span=Math.max(1e-6,b.t-a.t);
+ return lerpState(a.S,b.S,ease(clamp((T-a.t)/span)));
+}
+
+/* ===================== Zeichnen ===================== */
+function readColors(){const cs=getComputedStyle(document.documentElement),g=n=>cs.getPropertyValue(n).trim();
+ return{stage:g('--stage'),cyto:g('--cyto'),membrane:g('--membrane'),nucenv:g('--nucenv'),nucleoplasm:g('--nucleoplasm'),nucleolus:g('--nucleolus'),
+  spindle:g('--spindle'),centro:g('--centro'),mat:g('--mat'),pat:g('--pat'),label:g('--label'),ink:g('--ink')};}
+const FLUO={stage:'#04070a',cyto:'#0a1114',membrane:'#2f4a4f',nucenv:'#2c4757',nucleoplasm:'rgba(70,110,235,0.30)',nucleolus:'#060a10',
+ spindle:'#43e383',centro:'#ffc94a',mat:'#7aa3ff',pat:'#7aa3ff',label:'#d2e4ff',ink:'#d2e4ff'};
+
+function distinct(list,eps=1){const out=[];list.forEach(p=>{if(!out.some(q=>Math.hypot(q.x-p.x,q.y-p.y)<eps))out.push(p);});return out;}
+function cellShapes(S){
+ const sh=distinct(S.cells,.5).map(c=>({t:'c',x:c.x,y:c.y,r:c.r}));
+ /* Verbindungsstück zwischen zwei Zellhälften: höchstens so breit wie der natürliche Hals der beiden Kreise,
+    damit es beim Abschnüren auf null schrumpft und kein Steg zwischen getrennten Zellen bleibt */
+ const br=(a,b,w,r)=>{const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy),neck=Math.sqrt(Math.max(0,r*r-d*d/4)),ry=Math.min(w,1.15*neck);
+  if(d>1&&ry>.5)sh.push({t:'e',x:(a.x+b.x)/2,y:(a.y+b.y)/2,rx:d/2,ry,rot:Math.atan2(dy,dx)});};
+ const m=(i,j)=>({x:(S.cells[i].x+S.cells[j].x)/2,y:(S.cells[i].y+S.cells[j].y)/2});
+ br(m(0,1),m(2,3),S.bLR,S.cells[0].r);br(S.cells[0],S.cells[1],S.bL,S.cells[0].r);br(S.cells[2],S.cells[3],S.bR,S.cells[2].r);
+ return sh;
+}
+function drawCells(ctx,S,C){
+ const sh=cellShapes(S);
+ [[3,C.membrane],[0,C.cyto]].forEach(([g,col])=>{ctx.fillStyle=col;sh.forEach(s=>{ctx.beginPath();
+  if(s.t==='c')ctx.arc(s.x,s.y,s.r+g,0,TAU);else ctx.ellipse(s.x,s.y,s.rx,s.ry+g,s.rot,0,TAU);ctx.fill();});});
+}
+function drawNucleus(ctx,n,C,nol){
+ if(n.env<=.01&&n.frag>=.99)return;
+ ctx.save();ctx.globalAlpha*=clamp(n.env);ctx.fillStyle=C.nucleoplasm;ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,TAU);ctx.fill();
+ if(nol>0){ctx.globalAlpha*=nol;ctx.fillStyle=C.nucleolus;ctx.beginPath();ctx.arc(n.x+n.r*.38,n.y-n.r*.32,n.r*.16,0,TAU);ctx.fill();}
+ ctx.restore();
+ ctx.save();ctx.strokeStyle=C.nucenv;ctx.lineWidth=1.6;let r=n.r;
+ if(n.frag>.01){ctx.setLineDash([Math.max(2,16*(1-n.frag)),6+22*n.frag]);ctx.globalAlpha*=clamp(Math.max(n.env,1-n.frag));r*=1+.1*n.frag;}
+ else ctx.globalAlpha*=clamp(n.env);
+ ctx.beginPath();ctx.arc(n.x,n.y,r,0,TAU);ctx.stroke();ctx.beginPath();ctx.arc(n.x,n.y,Math.max(1,r-3.2),0,TAU);ctx.stroke();ctx.restore();
+}
+function drawCentro(ctx,p,C,fluo){
+ ctx.save();ctx.globalAlpha*=p.a;ctx.fillStyle=C.centro;ctx.globalAlpha*=.24;ctx.beginPath();ctx.arc(p.x,p.y,10,0,TAU);ctx.fill();
+ ctx.globalAlpha/=.24;if(fluo){ctx.shadowColor=C.centro;ctx.shadowBlur=8;}
+ ctx.fillRect(p.x-6,p.y-1.6,9,3.2);ctx.fillRect(p.x+4,p.y-4.5,3.2,9);ctx.restore();
+}
+function drawSpindle(ctx,A,B,a,C,fluo,width){
+ if(a<=.01)return;const ax=B.x-A.x,ay=B.y-A.y,len=Math.hypot(ax,ay);if(len<8)return;
+ ctx.save();ctx.strokeStyle=C.spindle;ctx.lineWidth=1.2;if(fluo){ctx.shadowColor=C.spindle;ctx.shadowBlur=5;}
+ const ux=ax/len,uy=ay/len,nx=-uy,ny=ux,mx=(A.x+B.x)/2,my=(A.y+B.y)/2;
+ [[A,-1],[B,1]].forEach(([P,sg])=>{const out=Math.atan2(sg*uy,sg*ux);ctx.globalAlpha=.5*a;
+  for(let k=-3;k<=3;k++){const an=out+k*.38,L=(12+14*a)*(1-Math.abs(k)*.06);ctx.beginPath();ctx.moveTo(P.x,P.y);ctx.lineTo(P.x+Math.cos(an)*L,P.y+Math.sin(an)*L);ctx.stroke();}});
+ ctx.globalAlpha=.45*a;
+ [-2,-1,0,1,2].forEach(k=>{const off=k*width,ov=14;
+  ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.quadraticCurveTo(mx-ux*len*.2+nx*off*1.2,my-uy*len*.2+ny*off*1.2,mx+ux*ov+nx*off,my+uy*ov+ny*off);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(B.x,B.y);ctx.quadraticCurveTo(mx+ux*len*.2+nx*off*1.2,my+uy*len*.2+ny*off*1.2,mx-ux*ov+nx*off,my-uy*ov+ny*off);ctx.stroke();});
+ ctx.restore();
+}
+/* Punkte eines Arms; arm 0 = p (kurz), arm 1 = q (lang) */
+function armPts(key,k,S,arm,time){
+ const ci=key[2],X=key[0],L=ARMS[X][arm],c=S.c,f=(1+1.7*(1-c))*S.ls,N=16,step=L*f/N;
+ const dir=arm===0?k.tau-k.s*k.delta:k.tau+k.s*k.delta,seed=SEED[key.slice(0,2)];
+ const pts=[[k.x,k.y]];let x=k.x,y=k.y;
+ for(let j=1;j<=N;j++){const a=dir+(1-c)*1.25*Math.sin(j*1.9+seed*3+arm*2+(+ci)*.7+time*.5);x+=Math.cos(a)*step;y+=Math.sin(a)*step;pts.push([x,y]);}
+ return pts;
+}
+function strokePts(ctx,pts,i0,i1){ctx.beginPath();ctx.moveTo(pts[i0][0],pts[i0][1]);for(let i=i0+1;i<=i1;i++)ctx.lineTo(pts[i][0],pts[i][1]);ctx.stroke();}
+function drawChromatids(ctx,S,C,fluo,time,rnd,cache){
+ KEYS.forEach(key=>{
+  const k=S.chr[key];if(k.a<=.01)return;
+  const ci=chromInfo(key,rnd),own=ci.par==='m'?C.mat:C.pat,other=ci.par==='m'?C.pat:C.mat;
+  ctx.save();ctx.globalAlpha*=k.a*(.5+.5*S.c);ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=1.3+4.4*S.c;
+  if(fluo){ctx.shadowColor=own;ctx.shadowBlur=6;}
+  const p=armPts(key,k,S,0,time),q=armPts(key,k,S,1,time);
+  ctx.strokeStyle=own;strokePts(ctx,p,0,16);
+  if(ci.inner&&S.co>0){const m=Math.round(16*rnd['co'+ci.X]);
+   strokePts(ctx,q,0,m);const ga=ctx.globalAlpha;
+   ctx.globalAlpha=ga*(1-S.co);strokePts(ctx,q,m,16);ctx.globalAlpha=ga*S.co;ctx.strokeStyle=other;strokePts(ctx,q,m,16);ctx.globalAlpha=ga;}
+  else strokePts(ctx,q,0,16);
+  if(S.c>.5){ctx.shadowBlur=0;ctx.globalAlpha=k.a*(S.c-.5)*2*S.alpha;ctx.fillStyle=fluo?'#ffffff':C.ink;ctx.beginPath();ctx.arc(k.x,k.y,1.8,0,TAU);ctx.fill();}
+  ctx.restore();
+  if(cache)cache[key]={x:k.x,y:k.y,pts:p.concat(q)};
+ });
+}
+function chiasmaPoint(S,rnd,X,time){
+ const km=S.chr[X+'m1'],kp=S.chr[X+'p1'],m=Math.round(16*rnd['co'+X]);
+ const qm=armPts(X+'m1',km,S,1,time),qp=armPts(X+'p1',kp,S,1,time);
+ return{qm,qp,m,x:(qm[m][0]+qp[m][0])/2,y:(qm[m][1]+qp[m][1])/2};
+}
+function drawChiasmata(ctx,S,C,rnd,time){
+ if(S.chi<=.01||S.co<.5)return;
+ ['A','B'].forEach(X=>{const {qm,qp,m}=chiasmaPoint(S,rnd,X,time),a=Math.max(1,m-2),b=Math.min(16,m+2);
+  ctx.save();ctx.globalAlpha*=S.chi*S.c;ctx.lineCap='round';ctx.lineWidth=1.3+3.2*S.c;
+  ctx.strokeStyle=C.mat;ctx.beginPath();ctx.moveTo(qm[a][0],qm[a][1]);ctx.lineTo(qp[b][0],qp[b][1]);ctx.stroke();
+  ctx.strokeStyle=C.pat;ctx.beginPath();ctx.moveTo(qp[a][0],qp[a][1]);ctx.lineTo(qm[b][0],qm[b][1]);ctx.stroke();ctx.restore();});
+}
+function drawKMT(ctx,S,C,fluo){
+ ctx.save();ctx.strokeStyle=C.spindle;ctx.lineWidth=1.3;if(fluo){ctx.shadowColor=C.spindle;ctx.shadowBlur=5;}
+ KEYS.forEach(key=>{const k=S.chr[key],al=k.att*k.a;if(al<=.01)return;const P=S.cs[k.pole],dx=k.x-P.x,dy=k.y-P.y,L=Math.hypot(dx,dy)||1,nx=-dy/L*1.8,ny=dx/L*1.8;
+  ctx.globalAlpha=.8*al*S.alpha;[-1,1].forEach(sg=>{ctx.beginPath();ctx.moveTo(P.x,P.y);ctx.lineTo(k.x+nx*sg,k.y+ny*sg);ctx.stroke();});});
+ ctx.restore();
+}
+function label(ctx,ax,ay,tx,ty,text,align,C,fs){
+ ctx.save();ctx.strokeStyle=C.label;ctx.fillStyle=C.label;ctx.globalAlpha=.85;ctx.lineWidth=1;
+ ctx.font=`${fs}px "Atkinson Hyperlegible", Verdana, sans-serif`;ctx.textAlign=align;ctx.textBaseline='middle';
+ const w=ctx.measureText(text).width,ex=align==='left'?tx+w+6:align==='right'?tx-w-6:tx,ey=align==='center'?ty+fs*.8:ty;
+ ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ex,ey);ctx.stroke();ctx.beginPath();ctx.arc(ax,ay,2.2,0,TAU);ctx.fill();
+ ctx.globalAlpha=1;ctx.fillText(text,tx,ty);ctx.restore();
+}
+/* Beschriftungen je Phase (Koordinaten des Canvas) */
+function drawLabels(ctx,S,C,fs,kind,ph,rnd,time){
+ const A=(x,y)=>[CX+x,CY+y],L=(a,t,p,al)=>label(ctx,a[0],a[1],p[0],p[1],t,al,C,fs),id=ph.p.id,u=ph.u,k=key=>S.chr[key];
+ const homC=hom=>{const a=k(hom+'0'),b=k(hom+'1');return A((a.x+b.x)/2,(a.y+b.y)/2);};
+ const leftHom=X=>X+(rnd['o'+X]===1?'m':'p'),rightHom=X=>X+(rnd['o'+X]===1?'p':'m');
+ if(id==='inter'){
+  L(A(S.cells[0].r*Math.cos(-.6),S.cells[0].r*Math.sin(-.6)),'Zellmembran',[700,40],'right');
+  L(A(-S.nuc[0].r*.72,S.nuc[0].r*.72),'Zellkern',[18,404],'left');
+  L(A(S.cs[0].x,S.cs[0].y),'Centrosom',[18,40],'left');
+  L(A(k('Am0').x,k('Am0').y),u<.7?'Chromatin (lockere DNA)':'Chromosom aus 2 Chromatiden',[18,222],'left');
+  L(A(k('Bp0').x,k('Bp0').y),'homologe Chromosomen: gleiche Form, andere Farbe',[700,404],'right');
+ }else if(id==='pro1'||id==='pro'){
+  if(kind==='mei'&&u>.38){L(A(k('Am0').x+(k('Ap0').x-k('Am0').x)/2,k('Am0').y+(k('Ap0').y-k('Am0').y)/2),'Bivalent (gepaarte Homologe)',[18,40],'left');
+   if(u>.55){const c=chiasmaPoint(S,rnd,'B',time);L(A(c.x,c.y),'Chiasma (Crossing-over)',[700,404],'right');}}
+  else L(A(k('Am0').x,k('Am0').y),'Chromosomen kondensieren',[18,40],'left');
+  L(A(-S.nuc[0].r*.72,S.nuc[0].r*.72),'Kernhülle',[18,404],'left');
+  if(S.sp1>.3)L(A(S.cs[2].x,S.cs[2].y),'Centrosom',[700,40],'right');
+ }else if(id==='meta1'){
+  L(A(0,-128),'Äquatorialebene',[CX,18],'center');
+  L(homC(leftHom('A')),'Bivalent',[18,40],'left');
+  {const c=chiasmaPoint(S,rnd,'B',time);L(A(c.x,c.y),'Chiasma',[700,404],'right');}
+  L(A(S.cs[0].x,S.cs[0].y),'Pol',[18,404],'left');
+  L(A((k(rightHom('A')+'0').x+S.cs[2].x)/2,(k(rightHom('A')+'0').y+S.cs[2].y)/2),'beide Chromatiden zum selben Pol',[700,40],'right');
+ }else if(id==='meta'){
+  L(A(0,-128),'Äquatorialebene',[CX,18],'center');L(A(S.cs[0].x,S.cs[0].y),'Pol',[18,404],'left');
+  L(A(k('Am0').x,k('Am0').y),'einzelne Chromosomen',[18,40],'left');
+ }else if(id==='ana1'){
+  L(homC(leftHom('A')),'Homologe werden getrennt',[18,40],'left');
+  L(homC(rightHom('B')),'Chromosom bleibt aus 2 Chromatiden',[700,404],'right');
+ }else if(id==='ana'){
+  L(A(k('Am0').x,k('Am0').y),'Schwesterchromatiden werden getrennt',[18,40],'left');
+ }else if(id==='telo1'){
+  if(u<.75)L(A(0,-S.bLR),'Teilungsfurche',[CX,18],'center');
+  else L(A(XL,-S.cells[0].r*.8),'haploide Zelle (n = 2)',[18,40],'left');
+  L(homC(rightHom('A')),'Chromosom aus 2 Chromatiden',[700,404],'right');
+ }else if(id==='telo'){
+  if(u<.7)L(A(0,-S.bLR),'Teilungsfurche',[CX,18],'center');else L(A(XL,-S.cells[0].r*.8),'diploide Zelle (2n = 4)',[18,40],'left');
+ }else if(id==='interk'){
+  L(homC(leftHom('A')),'keine DNA-Replikation',[18,404],'left');
+  L(A(S.cs[2].x,S.cs[2].y),'Centrosom verdoppelt',[700,40],'right');
+ }else if(id==='pro2'){
+  L(A(S.cs[0].x,S.cs[0].y),'neuer Spindelapparat',[18,40],'left');
+  L(homC(rightHom('B')),'Chromosom aus 2 Chromatiden',[700,404],'right');
+ }else if(id==='meta2'){
+  L(A(XL-80,0),'Äquatorialebene',[18,222],'left');
+  L(homC(rightHom('A')),'einzelnes Chromosom',[700,404],'right');
+ }else if(id==='ana2'){
+  L(A(k(leftHom('A')+'0').x,k(leftHom('A')+'0').y),'Schwesterchromatiden werden getrennt',[18,22],'left');
+ }else if(id==='telo2'){
+  if(u<.6)L(A(XL,-S.bL),'Teilungsfurche',[18,222],'left');
+  else{L(A(S.cells[0].x-30,S.cells[0].y+40),'haploide Zelle (n = 2)',[18,222],'left');L(A(S.cells[3].x+30,S.cells[3].y-40),'jede Zelle genetisch verschieden',[700,222],'right');}
+ }
+}
+function drawScene(ctx,S,o){
+ const C=o.fluo?FLUO:o.colors,fluo=o.fluo,rnd=o.rnd;
+ ctx.save();ctx.fillStyle=C.stage;ctx.fillRect(0,0,W,H);ctx.translate(CX,CY);ctx.globalAlpha=S.alpha;
+ drawCells(ctx,S,C);
+ const cs=S.cs;
+ drawSpindle(ctx,cs[0],cs[2],S.sp1,C,fluo,13);
+ drawSpindle(ctx,cs[0],cs[1],S.sp2L,C,fluo,9);drawSpindle(ctx,cs[2],cs[3],S.sp2R,C,fluo,9);
+ distinct(S.nuc).forEach(n=>drawNucleus(ctx,n,C,S.nol));
+ if(o.labels&&S.eq1>.01){ctx.save();ctx.setLineDash([4,5]);ctx.strokeStyle=C.label;ctx.globalAlpha*=.45*S.eq1;ctx.beginPath();ctx.moveTo(0,-125);ctx.lineTo(0,125);ctx.stroke();ctx.restore();}
+ if(o.labels&&S.eq2>.01){ctx.save();ctx.setLineDash([4,5]);ctx.strokeStyle=C.label;ctx.globalAlpha*=.45*S.eq2;[XL,XR].forEach(x=>{ctx.beginPath();ctx.moveTo(x-82,0);ctx.lineTo(x+82,0);ctx.stroke();});ctx.restore();}
+ drawKMT(ctx,S,C,fluo);
+ drawChromatids(ctx,S,C,fluo,o.time,rnd,o.cache);
+ drawChiasmata(ctx,S,C,rnd,o.time);
+ distinct(cs,1).forEach(p=>drawCentro(ctx,p,C,fluo));
+ ctx.restore();
+ if(o.labels&&o.ph&&S.alpha>.5)drawLabels(ctx,S,C,o.fs||12.5,o.kind,o.ph,rnd,o.time);
+}
+</script>
+
+<script>
+/* ===================== Phasen in Stichpunkten (Meiose) ===================== */
+const PINFO={
+ inter:{
+  sek:['Ausgangszelle: <b>diploide</b> Zelle (2n) in Hoden oder Eierstock','2n = 4: zwei Paare [[homologe Chromosomen|homologer Chromosomen]], je eines von Mutter und Vater','Homologe: gleiche Länge, dieselben Gene, aber oft verschiedene [[Allel|Allele]]','S-Phase: [[DNA-Replikation]] → jedes Chromosom aus 2 [[Schwesterchromatiden]]','[[Centrosom]] wird verdoppelt'],
+  ober:['meiotisches Cohesin enthält die meiosespezifische Untereinheit Rec8','bei Pflanzen und Pilzen entstehen durch Meiose Sporen, keine Gameten (Generationswechsel)','dies ist die <b>einzige</b> Replikation vor beiden meiotischen Teilungen'],
+  fehler:'„Zwischen Meiose I und Meiose II wird die DNA noch einmal repliziert.“ Das ist <b>falsch</b>. Die einzige Replikation findet in der S-Phase <b>vor</b> der Meiose statt.'
+ },
+ pro1:{
+  sek:['Chromosomen <b>kondensieren</b> (je 2 Chromatiden)','homologe Chromosomen werden der Länge nach <b>gepaart</b> ([[Synapse]])','es entsteht ein [[Bivalent]] (Tetrade) aus 4 Chromatiden','<b>[[Crossing-over]]</b>: Abschnitte werden zwischen <b>Nicht-Schwesterchromatiden</b> ausgetauscht','Kreuzungsstellen sichtbar als [[Chiasma|Chiasmata]]','Kernhülle zerfällt, [[Spindelapparat]] wird aufgebaut'],
+  ober:['Unterstadien: Leptotän → Zygotän (Synapse) → Pachytän (Crossing-over) → Diplotän (Chiasmata sichtbar) → Diakinese','[[Synaptonemaler Komplex]] verbindet die Homologen im Pachytän','Rekombination beginnt mit gezielten DNA-Doppelstrangbrüchen (Spo11); nur ein Teil davon wird zu Crossovern','mindestens ein Chiasma pro Bivalent ist nötig für die korrekte Trennung in der Anaphase I','menschliche Oozyten verharren im Diplotän (Diktyotän) bis zur Ovulation, also bis zu etwa 50 Jahre'],
+  fehler:'„Beim Crossing-over werden Abschnitte zwischen Schwesterchromatiden ausgetauscht.“ Das ist <b>falsch</b>. Der Austausch erfolgt zwischen <b>Nicht-Schwesterchromatiden</b> homologer Chromosomen. Ein Austausch zwischen identischen Schwesterchromatiden ergäbe keine neue Kombination.'
+ },
+ meta1:{
+  sek:['<b>Bivalente</b> liegen in der [[Äquatorialebene]]','die beiden Homologen eines Bivalents sind mit <b>verschiedenen</b> Polen verbunden','beide Schwesterchromatiden eines Chromosoms sind mit <b>demselben</b> Pol verbunden','welches Homologe zu welchem Pol zeigt, ist <b>zufällig</b>','der Zufall gilt für jedes Paar unabhängig → [[Neukombination]]'],
+  ober:['Schwesterkinetochore sind monopolar (co-)orientiert; die Spannung entsteht über die Chiasmata','der Spindelkontrollpunkt prüft die bipolare Anheftung jedes Bivalents','Zahl der Kombinationen durch zufällige Orientierung: 2<sup>n</sup>; Mensch: 2<sup>23</sup> ≈ 8,4 Millionen'],
+  fehler:'„In der Metaphase I liegen die Chromosomen einzeln in der Äquatorialebene, wie bei der Mitose.“ Das ist <b>falsch</b>. In der Metaphase I liegen <b>Paare</b> homologer Chromosomen (Bivalente) in der Äquatorialebene.'
+ },
+ ana1:{
+  sek:['<b>homologe Chromosomen</b> werden getrennt','gerichtete Bewegung zu entgegengesetzten Polen','Schwesterchromatiden bleiben <b>verbunden</b>','an jedem Pol: 2 Chromosomen aus je 2 Chromatiden','<b>[[Reduktionsteilung]]</b>: die Chromosomenzahl wird halbiert'],
+  ober:['Separase spaltet Rec8-Cohesin nur an den Chromosomenarmen → die Chiasmata lösen sich','Cohesin am Centromer bleibt erhalten, geschützt durch Shugoshin (bei Säugern SGO2) zusammen mit der Phosphatase PP2A','Fehlverteilung hier ([[Non-Disjunction]]) → [[Aneuploidie]], z. B. Trisomie 21 nach der Befruchtung'],
+  fehler:'„In der Anaphase I werden die Schwesterchromatiden getrennt.“ Das ist <b>falsch</b>. In der Anaphase I werden homologe Chromosomen getrennt. Die Schwesterchromatiden werden erst in der Anaphase II getrennt.'
+ },
+ telo1:{
+  sek:['an jedem Pol: ein <b>einfacher</b> Chromosomensatz (n = 2)','Zellplasma wird geteilt → <b>2 haploide Zellen</b>','jedes Chromosom besteht noch aus 2 Chromatiden','die Chromatiden sind durch Crossing-over nicht mehr ganz identisch','je nach Lebewesen: neue Kernhülle oder direkter Übergang zur Meiose II'],
+  ober:['Ploidie zählt Chromosomensätze, nicht Chromatiden: die Zellen sind haploid, obwohl jedes Chromosom 2 Chromatiden hat','Oogenese: ungleiche Zytokinese → sekundäre Oozyte und 1. [[Polkörperchen]]','Spermatogenese: die Zellen bleiben über Plasmabrücken miteinander verbunden'],
+  fehler:'„Nach der Meiose I sind die Zellen noch diploid, weil jedes Chromosom zwei Chromatiden hat.“ Das ist <b>falsch</b>. Jede Zelle hat von jedem homologen Paar nur noch ein Chromosom. Sie ist daher haploid (n).'
+ },
+ interk:{
+  sek:['kurzer Abschnitt zwischen Meiose I und Meiose II','<b>keine</b> S-Phase, <b>keine</b> DNA-Replikation','Centrosomen werden verdoppelt','bei manchen Lebewesen fehlt die Interkinese fast ganz'],
+  ober:['die CDK-Aktivität fällt zwischen den Teilungen nicht vollständig ab; dadurch wird keine neue Replikation lizenziert (an Oozyten gut untersucht)','die Verdopplung der Centrosomen ist hier vereinfacht dargestellt; Oozyten vieler Säuger bilden ihre Spindeln ohne Centrosomen'],
+  fehler:'„Die Interkinese ist eine normale Interphase.“ Das ist <b>falsch</b>. Es fehlt die S-Phase, die Chromosomen werden nicht noch einmal repliziert.'
+ },
+ pro2:{
+  sek:['läuft in <b>beiden</b> Zellen gleichzeitig ab','Chromosomen kondensieren wieder','Kernhülle zerfällt (falls sie neu gebildet wurde)','neuer [[Spindelapparat]], hier senkrecht zum ersten','Meiose II ähnelt im Ablauf einer Mitose, aber mit nur <b>einem</b> Chromosomensatz'],
+  ober:['die Kinetochore der Schwesterchromatiden werden jetzt bipolar orientiert','der Schutz des Cohesins am Centromer wird bis zur Anaphase II aufgehoben; die genauen Mechanismen sind noch Gegenstand der Forschung'],
+  fehler:'„Die Meiose II ist eine Mitose.“ Das ist <b>falsch</b>. Der Ablauf ist ähnlich, aber die Zellen sind haploid, es gibt keine vorangehende Replikation, und die Schwesterchromatiden sind durch Crossing-over nicht mehr identisch.'
+ },
+ meta2:{
+  sek:['Chromosomen (je 2 Chromatiden) liegen <b>einzeln</b> in der Äquatorialebene','Schwesterchromatiden sind mit <b>verschiedenen</b> Polen verbunden','in jeder Zelle nur 2 Chromosomen (n = 2)'],
+  ober:['amphitelische Anheftung wie in der Mitose; erneuter Spindelkontrollpunkt','Oozyten der Wirbeltiere: Arrest in der Metaphase II (cytostatischer Faktor, u. a. Emi2) bis zur Befruchtung'],
+  fehler:'„In der Metaphase II liegen Bivalente in der Äquatorialebene.“ Das ist <b>falsch</b>. Bivalente gibt es nur in der Prophase I und Metaphase I. In der Metaphase II liegen einzelne Chromosomen.'
+ },
+ ana2:{
+  sek:['<b>Schwesterchromatiden</b> werden getrennt','gerichtete Bewegung zu entgegengesetzten Polen','jede Chromatide ist jetzt ein eigenes Chromosom','<b>[[Äquationsteilung]]</b>: die Chromosomenzahl pro Kern bleibt n'],
+  ober:['Separase spaltet das verbliebene Cohesin am Centromer','Non-Disjunction in Meiose II: beide Schwesterchromatiden gelangen in dieselbe Zelle'],
+  fehler:'„In der Meiose II wird die Chromosomenzahl noch einmal halbiert.“ Das ist <b>falsch</b>. Die Halbierung geschieht in der Meiose I. In der Meiose II werden die Chromatiden verteilt.'
+ },
+ telo2:{
+  sek:['4 neue Zellkerne, Zytokinese → <b>4 haploide Zellen</b>','jede Zelle: 2 Chromosomen aus je 1 Chromatide (n = 2)','alle 4 Zellen sind <b>genetisch verschieden</b>','Ursachen: zufällige Verteilung der Homologen und Crossing-over','aus den Zellen entwickeln sich [[Keimzelle|Keimzellen]]'],
+  ober:['Spermatogenese: 4 Spermatiden → 4 Spermien','Oogenese: 1 Eizelle und Polkörperchen; die Meiose II wird erst nach dem Eindringen des Spermiums abgeschlossen','bei der Befruchtung entsteht wieder ein diploider Zellkern ([[Zygote]], 2n)'],
+  fehler:'„Bei der Meiose entstehen vier gleiche Keimzellen.“ Das ist <b>falsch</b>. Die vier Zellen sind haploid und genetisch verschieden. Bei Frauen entsteht außerdem nur eine Eizelle.'
+ }
+};
+/* Zähler je Phase: Zellen, Chromosomen pro Zelle, Chromatiden pro Chromosom, Ploidie */
+function countsMei(id,u){
+ const T={
+  inter:['1','4',u<.55?'1':u<.8?'1 → 2':'2','2n','Diploide Ausgangszelle. In der S-Phase wird jedes Chromosom repliziert.'],
+  pro1:['1','4','2','2n',u<.4?'Die Chromosomen kondensieren.':'4 Chromosomen bilden 2 Bivalente.'],
+  meta1:['1','4','2','2n','2 Bivalente in der Äquatorialebene.'],
+  ana1:['1','4','2','2n','An jedem Pol sammeln sich 2 Chromosomen (n).'],
+  telo1:u<.6?['1 → 2','4 → 2','2','2n → n','Die Zelle teilt sich.']:['2','2','2','n','Haploid, obwohl jedes Chromosom noch 2 Chromatiden hat.'],
+  interk:['2','2','2','n','Keine Replikation.'],
+  pro2:['2','2','2','n','Werte pro Zelle.'],
+  meta2:['2','2','2','n','Werte pro Zelle.'],
+  ana2:['2','4','1','n','Getrennte Chromatiden zählen als Chromosomen. Die 4 Chromosomen einer Zelle sind kein doppelter Satz homologer Chromosomen.'],
+  telo2:u<.6?['2 → 4','4 → 2','1','n','Die Zellen teilen sich.']:['4','2','1','n','4 haploide, genetisch verschiedene Zellen.']
+ };return T[id];
+}
+function countsMit(id,u){
+ const T={inter:['1','4',u<.55?'1':u<.8?'1 → 2':'2','2n'],pro:['1','4','2','2n'],meta:['1','4','2','2n'],ana:['1','8','1','2n'],telo:u<.6?['1 → 2','8 → 4','1','2n']:['2','4','1','2n']};return T[id];
+}
+
+/* ===================== Klick auf Strukturen ===================== */
+const STRUCT={
+ membrane:['Zellmembran','Sie begrenzt die Zelle. Bei der Zytokinese wird sie in der Mitte eingeschnürt (Teilungsfurche).'],
+ cyto:['Cytoplasma','Zellplasma mit Organellen. In der Animation sind die Organellen nicht dargestellt.'],
+ env:['Kernhülle','Doppelmembran um den Zellkern. Sie zerfällt in der Prophase I und wird je nach Lebewesen in der Telophase I und II neu gebildet.'],
+ centro:['Centrosom','Organisationszentrum der Mikrotubuli in tierischen Zellen. Die Centrosomen bilden die Pole der Spindel. In Oozyten vieler Säugetiere entsteht die Spindel ohne Centrosomen.'],
+ spindle:['Spindelapparat','Mikrotubuli zwischen den Polen. In der Meiose I verbinden sie jedes homologe Chromosom mit einem Pol, in der Meiose II jede Schwesterchromatide.'],
+ chiasma:['Chiasma','Kreuzungsstelle zwischen zwei Nicht-Schwesterchromatiden eines Bivalents. Hier hat ein Crossing-over stattgefunden. Die Chiasmata halten die Homologen bis zur Anaphase I zusammen.'],
+ equator:['Äquatorialebene','Gedachte Ebene zwischen den Polen. In der Metaphase I liegen hier Bivalente, in der Metaphase II einzelne Chromosomen.']
+};
+
+/* ===================== Glossar: Begriff, Artikel, Plural, Englisch, Erklärung ===================== */
+const GLOSS=[
+ ['Meiose','die','die Meiosen','meiosis','Zwei aufeinanderfolgende Kernteilungen nach einer einzigen DNA-Replikation. Aus einer diploiden Zelle entstehen vier haploide, genetisch verschiedene Zellen.'],
+ ['Mitose','die','die Mitosen','mitosis','Kernteilung, bei der zwei Zellkerne mit identischem Erbgut und gleicher Chromosomenzahl entstehen.'],
+ ['Keimzelle','die','die Keimzellen','gamete, germ cell','Haploide Fortpflanzungszelle: Spermium oder Eizelle. Auch: Gamet (der, die Gameten).'],
+ ['Zygote','die','die Zygoten','zygote','Diploide Zelle, die bei der Befruchtung aus Eizelle und Spermium entsteht.'],
+ ['haploid','Adjektiv','–','haploid','Mit einem einfachen Chromosomensatz (n). Menschliche Keimzellen: n = 23.'],
+ ['diploid','Adjektiv','–','diploid','Mit zwei Chromosomensätzen (2n). Menschliche Körperzellen: 2n = 46.'],
+ ['Chromosomensatz','der','die Chromosomensätze','chromosome set','Je ein Chromosom von jeder Sorte. Ein Satz enthält jedes Gen einmal.'],
+ ['homologe Chromosomen','die (Pl.)','–','homologous chromosomes','Zwei Chromosomen mit denselben Genen an denselben Orten: eines von der Mutter, eines vom Vater. Sie können verschiedene Allele tragen.'],
+ ['Allel','das','die Allele','allele','Eine Variante eines Gens, z. B. für Blutgruppe A oder B.'],
+ ['Chromosom','das','die Chromosomen','chromosome','DNA-Molekül mit Proteinen. Es kann aus einer oder aus zwei Chromatiden bestehen. Man zählt Chromosomen an den Centromeren.'],
+ ['Chromatin','das','–','chromatin','DNA mit Proteinen in lockerer Form, wie sie in der Interphase vorliegt.'],
+ ['Chromatide','die','die Chromatiden','chromatid','Ein DNA-Doppelstrang mit Proteinen; eine Hälfte eines 2-Chromatid-Chromosoms.'],
+ ['Schwesterchromatiden','die (Pl.)','–','sister chromatids','Die zwei Chromatiden eines Chromosoms. Sie entstehen bei der Replikation und sind zunächst identisch.'],
+ ['Centromer','das','die Centromere','centromere','Einschnürung, an der die Schwesterchromatiden verbunden sind.'],
+ ['Centrosom','das','die Centrosomen','centrosome','Organisationszentrum der Mikrotubuli in tierischen Zellen; bildet einen Pol der Spindel.'],
+ ['Spindelapparat','der','die Spindelapparate','spindle','Gesamtheit der Mikrotubuli zwischen den Polen. Er verteilt Chromosomen oder Chromatiden.'],
+ ['Äquatorialebene','die','die Äquatorialebenen','metaphase plate','Gedachte Ebene in der Mitte zwischen den Polen.'],
+ ['DNA-Replikation','die','die DNA-Replikationen','DNA replication','Verdopplung der DNA in der S-Phase.'],
+ ['Synapse','die','die Synapsen','synapsis','Hier: Paarung der homologen Chromosomen der Länge nach in der Prophase I. Nicht verwechseln mit der Synapse zwischen Nervenzellen.'],
+ ['Bivalent','das','die Bivalente','bivalent','Paar gepaarter homologer Chromosomen aus insgesamt 4 Chromatiden. Auch: Tetrade (die, die Tetraden).'],
+ ['Crossing-over','das','die Crossing-over','crossing over','Austausch von Abschnitten zwischen Nicht-Schwesterchromatiden homologer Chromosomen in der Prophase I.'],
+ ['Chiasma','das','die Chiasmata','chiasma','Sichtbare Kreuzungsstelle zweier Nicht-Schwesterchromatiden nach einem Crossing-over.'],
+ ['Neukombination','die','die Neukombinationen','recombination, independent assortment','Neue Zusammenstellung von Erbanlagen: durch zufällige Verteilung der Homologen (interchromosomal) und durch Crossing-over (intrachromosomal).'],
+ ['Reduktionsteilung','die','die Reduktionsteilungen','reductional division','Meiose I: Die Chromosomenzahl wird halbiert, weil homologe Chromosomen getrennt werden.'],
+ ['Äquationsteilung','die','die Äquationsteilungen','equational division','Meiose II: Schwesterchromatiden werden getrennt; die Chromosomenzahl pro Kern bleibt gleich.'],
+ ['Interkinese','die','die Interkinesen','interkinesis','Kurzer Abschnitt zwischen Meiose I und Meiose II ohne DNA-Replikation.'],
+ ['Polkörperchen','das','die Polkörperchen','polar body','Kleine Zelle, die bei der Oogenese durch ungleiche Teilung entsteht und zugrunde geht.'],
+ ['Non-Disjunction','die','die Non-Disjunctions','nondisjunction','Fehlerhafte Trennung homologer Chromosomen (Meiose I) oder Schwesterchromatiden (Meiose II).'],
+ ['Aneuploidie','die','die Aneuploidien','aneuploidy','Abweichende Zahl einzelner Chromosomen, z. B. Trisomie 21 (drei Chromosomen 21).'],
+ ['Synaptonemaler Komplex','der','die Synaptonemalen Komplexe','synaptonemal complex','Proteinstruktur, die die gepaarten Homologen im Pachytän der Länge nach verbindet.'],
+ ['Cohesin','das','die Cohesine','cohesin','Ringförmiger Proteinkomplex, der Schwesterchromatiden zusammenhält. In der Meiose mit der Untereinheit Rec8.'],
+ ['Spermatogenese','die','–','spermatogenesis','Bildung von Spermien im Hoden; aus einer Zelle entstehen 4 Spermien.'],
+ ['Oogenese','die','–','oogenesis','Bildung von Eizellen im Eierstock; aus einer Zelle entstehen 1 Eizelle und Polkörperchen.']
+];
+
+/* ===================== Arbeitsaufträge ===================== */
+const TASKS=[
+ {n:'Schritt 1',title:'Orientieren',tasks:[
+  {nr:'1',afb:'AFB I',lvl:'all',text:'Sieh dir die Animation einmal vollständig mit Beschriftung an. <span class="op">Beschreibe</span> in fünf bis sieben Sätzen, wie aus einer Zelle vier Zellen entstehen.',
+   helps:[{l:'Satzbausteine',h:'Zuerst … · In der Prophase I … · Danach werden … getrennt. · In der Meiose II … · Am Ende entstehen …'},
+          {l:'Wortliste',w:['die Schwesterchromatiden','sich paaren','haploid','das Bivalent','getrennt werden','die Äquatorialebene','die homologen Chromosomen','die Tochterzelle']}]},
+  {nr:'2',afb:'AFB I',lvl:'all',text:'Lege eine Tabelle mit den Spalten <i>Phase</i>, <i>Was geschieht?</i>, <i>Zellen</i>, <i>Chromosomen pro Zelle</i>, <i>Chromatiden pro Chromosom</i> an. <span class="op">Fülle</span> sie für alle Phasen <span class="op">aus</span>. Nutze die Stichpunkte und die Zähler.',
+   helps:[{l:'Hilfe 1',h:'Halte die Animation an und springe mit „Phase ▶▶“ von Phase zu Phase.'},
+          {l:'Hilfe 2',h:'Chromosomen zählt man an den Centromeren. Ein Chromosom kann aus einer oder aus zwei Chromatiden bestehen.'}]}
+ ]},
+ {n:'Schritt 2',title:'Erarbeiten',tasks:[
+  {nr:'3',afb:'AFB II',lvl:'all',text:'<span class="op">Erkläre</span> den Unterschied zwischen <i>homologen Chromosomen</i> und <i>Schwesterchromatiden</i>. Klicke dazu in der Prophase I auf einzelne Chromatiden und nutze die Farben.',
+   helps:[{l:'Hilfe 1',h:'Woher stammen die beiden Homologen? Wie entstehen Schwesterchromatiden?'},
+          {l:'Satzbausteine',h:'Homologe Chromosomen stammen … · Sie tragen dieselben … · Schwesterchromatiden entstehen bei … · Sie sind deshalb …'}]},
+  {nr:'4',afb:'AFB II',lvl:'all',text:'Klicke mehrmals auf <b>„Neue Zufallsmeiose“</b> und beobachte die Metaphase I und das Ergebnis. <span class="op">Beschreibe</span>, welche Kombinationen von Chromosomen in den Endzellen auftreten. <span class="op">Erkläre</span>, warum es ohne Crossing-over bei 2n = 4 genau vier Kombinationen gibt, und <span class="op">berechne</span> die Zahl für den Menschen (2n = 46).',
+   helps:[{l:'Hilfe 1',h:'Jedes Bivalent kann sich auf zwei Arten anordnen. Wie viele Möglichkeiten ergeben sich für zwei Bivalente?'},
+          {l:'Hilfe 2',h:'Allgemein gilt: Zahl der Kombinationen = 2<sup>n</sup>. Für den Menschen ist n = 23.'}]},
+  {nr:'5',afb:'AFB II',lvl:'all',text:'<span class="op">Erkläre</span> mithilfe der Animation, warum die vier Zellen am Ende genetisch verschieden sind. Gehe auf <b>zwei</b> Ursachen ein.',
+   helps:[{l:'Hilfe 1',h:'Ursache 1 sieht man in der Metaphase I. Ursache 2 sieht man in der Prophase I.'},
+          {l:'Hilfe 2',h:'Vergleiche in der Metaphase II die beiden Schwesterchromatiden eines Chromosoms. Sind sie gleich gefärbt?'}]},
+  {nr:'6',afb:'AFB II',lvl:'all',text:'Öffne den Reiter <b>„Vergleich mit Mitose“</b>. Schalte die Tabelle auf „verdeckt“. <span class="op">Vergleiche</span> Mitose und Meiose in den Merkmalen der Tabelle, schreibe deine Antworten auf und überprüfe sie dann durch Aufdecken.',
+   helps:[{l:'Hilfe 1',h:'Gehe die Vergleichsstationen der Reihe nach durch. Achte jeweils auf die Kästen „gleich“ und „verschieden“.'}]}
+ ]},
+ {n:'Schritt 3',title:'Vertiefen und beurteilen',tasks:[
+  {nr:'7',afb:'AFB III',lvl:'all',text:'<span class="op">Begründe</span>, warum Lebewesen mit geschlechtlicher Fortpflanzung eine Meiose brauchen. Überlege, was geschehen würde, wenn Keimzellen durch Mitose entstünden.',
+   helps:[{l:'Hilfe 1',h:'Wie viele Chromosomen hätte eine Zygote, wenn Eizelle und Spermium je 46 Chromosomen hätten? Und in der nächsten Generation?'}]},
+  {nr:'8',afb:'AFB III',lvl:'all',text:'<b>Modellkritik.</b> <span class="op">Beurteile</span> die Animation als Modell der Meiose. Nenne drei Aspekte, die das Modell gut darstellt, und drei Grenzen des Modells. Begründe jeweils.',
+   helps:[{l:'Hilfe 1',h:'Denke an: Farben der Chromosomen, Zahl der Chromosomen, Dauer der Phasen, Zahl der Crossing-over, Eizellbildung.'},
+          {l:'Hilfe 2',h:'Vergleiche die Animation mit einem Foto aus dem Mikroskop (Fluoreszenz-Ansicht). Was sieht man dort nicht?'},
+          {l:'Satzbausteine',h:'Gut dargestellt ist …, weil … · Eine Grenze des Modells ist …, denn in Wirklichkeit … · Das Modell könnte verbessert werden, indem …'}]},
+  {nr:'9',afb:'AFB II–III',lvl:'ober',text:'<span class="op">Erläutere</span>, wie durch [[Non-Disjunction]] in der Anaphase I bzw. in der Anaphase II Keimzellen mit falscher Chromosomenzahl entstehen. <span class="op">Vergleiche</span> die Folgen für die vier Zellen. <span class="op">Skizziere</span> beide Fälle für ein Chromosomenpaar.',
+   helps:[{l:'Hilfe 1',h:'Fall 1: Beide Homologen gelangen in der Anaphase I zum selben Pol. Fall 2: Beide Schwesterchromatiden gelangen in der Anaphase II zum selben Pol.'},
+          {l:'Hilfe 2',h:'Zähle danach in jeder der vier Zellen die Chromosomen dieses Paares: n + 1, n − 1 oder n?'}]},
+  {nr:'10',afb:'AFB III',lvl:'ober',text:'Zwei Gene liegen auf demselben Chromosom. <span class="op">Erläutere</span>, warum sie umso häufiger durch Crossing-over getrennt werden, je weiter sie voneinander entfernt liegen. <span class="op">Beurteile</span>, ob die Animation diesen Zusammenhang darstellen kann.',
+   helps:[{l:'Hilfe 1',h:'Der Ort des Crossing-overs ändert sich in der Animation bei jedem Durchlauf. Wo liegt er?'},
+          {l:'Hilfe 2',h:'Liegen zwei Genorte weit auseinander, gibt es zwischen ihnen mehr mögliche Bruchstellen.'}]}
+ ]}
+];
+
+/* ===================== Test ===================== */
+const IMG_RND={oA:1,oB:-1,coA:.42,coB:.38};
+const QUESTIONS=[
+ {id:'q1',lvl:'all',type:'mc',q:'In welcher Phase findet das Crossing-over statt?',o:['Prophase I','Metaphase I','Anaphase II','Interkinese'],a:0,
+  ex:'Das Crossing-over findet in der Prophase I statt, wenn die homologen Chromosomen gepaart sind (Pachytän).'},
+ {id:'q2',lvl:'all',type:'mc',q:'Was wird in der Anaphase I voneinander getrennt?',o:['die Schwesterchromatiden','die homologen Chromosomen','die beiden Zellkerne','die Centromere'],a:1,
+  ex:'In der Anaphase I werden die homologen Chromosomen getrennt. Die Schwesterchromatiden bleiben bis zur Anaphase II verbunden.'},
+ {id:'q3',lvl:'all',type:'img',kind:'mei',at:'meta1',u:.75,q:'Welche Phase zeigt dieses Bild?',o:['Metaphase der Mitose','Metaphase I','Metaphase II','Anaphase I'],a:1,
+  ex:'In der Äquatorialebene liegen Bivalente aus je vier Chromatiden. Das gibt es nur in der Metaphase I.'},
+ {id:'q4',lvl:'all',type:'img',kind:'mei',at:'meta2',u:.75,q:'Welche Phase zeigt dieses Bild?',o:['Metaphase der Mitose','Metaphase I','Metaphase II','Telophase I'],a:2,
+  ex:'Es gibt zwei Zellen mit je zwei einzelnen Chromosomen in der Äquatorialebene. Das ist die Metaphase II.'},
+ {id:'q5',lvl:'all',type:'img',kind:'mei',at:'ana1',u:.75,q:'Welche Phase zeigt dieses Bild?',o:['Anaphase der Mitose','Anaphase I','Anaphase II','Metaphase I'],a:1,
+  ex:'Ganze Chromosomen aus zwei Chromatiden bewegen sich zu den Polen. Getrennt werden Homologe: Anaphase I.'},
+ {id:'q6',lvl:'all',type:'num',q:'Eine Körperzelle des Menschen hat 46 Chromosomen. Wie viele Chromosomen hat ein Spermium?',a:23,
+  ex:'Keimzellen sind haploid: n = 23.'},
+ {id:'q7',lvl:'all',type:'num',q:'Wie viele Chromatiden enthält eine menschliche Zelle direkt nach der Meiose I?',a:46,
+  ex:'Nach der Meiose I hat die Zelle 23 Chromosomen, jedes aus 2 Chromatiden: 23 · 2 = 46.'},
+ {id:'q8',lvl:'all',type:'order',q:'Bringe die Phasen der Meiose in die richtige Reihenfolge.',items:['Prophase I','Metaphase I','Anaphase I','Telophase I','Prophase II','Metaphase II','Anaphase II','Telophase II'],
+  ex:'Meiose I: Prophase I – Metaphase I – Anaphase I – Telophase I; dann ohne Replikation Meiose II mit denselben Phasen.'},
+ {id:'q9',lvl:'all',type:'mc',q:'Ab wann ist die Zelle haploid?',o:['nach der S-Phase','nach der Meiose I','erst nach der Meiose II','erst nach der Befruchtung'],a:1,
+  ex:'Nach der Meiose I enthält jede Zelle von jedem homologen Paar nur noch ein Chromosom. Sie ist haploid, obwohl die Chromosomen noch aus zwei Chromatiden bestehen.'},
+ {id:'q10',lvl:'all',type:'mc',q:'Welche Aussage über die Meiose II ist richtig?',o:['Die Chromosomenzahl wird halbiert.','Schwesterchromatiden werden getrennt; vorher findet keine DNA-Replikation statt.','Homologe Chromosomen werden gepaart.','Es findet Crossing-over statt.'],a:1,
+  ex:'Die Meiose II trennt Schwesterchromatiden. Eine Replikation findet vorher nicht statt.'},
+ {id:'q11',lvl:'all',type:'mc',q:'Welcher Vorgang kommt nur in der Meiose vor, nicht in der Mitose?',o:['Kondensation der Chromosomen','Aufbau eines Spindelapparats','Paarung homologer Chromosomen','Trennung von Schwesterchromatiden'],a:2,
+  ex:'Nur in der Meiose werden homologe Chromosomen gepaart (Bivalente). Die anderen Vorgänge kommen in beiden Teilungen vor.'},
+ {id:'q12',lvl:'all',type:'num',q:'Wie viele verschiedene Kombinationen von Chromosomen sind ohne Crossing-over bei einem Lebewesen mit 2n = 8 in den Keimzellen möglich?',a:16,
+  ex:'n = 4, also 2<sup>4</sup> = 16 Kombinationen.'},
+ {id:'q13',lvl:'ober',type:'mc',q:'Welche Funktion haben die Chiasmata für die Meiose I?',o:['Sie lösen die DNA-Replikation aus.','Sie halten die Homologen bis zur Anaphase I zusammen und ermöglichen die Spannung bei der Anheftung an die Spindel.','Sie trennen die Schwesterchromatiden.','Sie bilden die neue Kernhülle.'],a:1,
+  ex:'Ohne Chiasma fehlt die physische Verbindung der Homologen. Dann kann keine Spannung entstehen, und die Fehlverteilung wird wahrscheinlicher.'},
+ {id:'q14',lvl:'ober',type:'mc',q:'Ein Chromosomenpaar wird in der Anaphase I nicht getrennt (Non-Disjunction). Was gilt für die vier entstehenden Zellen?',o:['2 Zellen normal, 2 fehlerhaft','alle 4 fehlerhaft: 2 mit n + 1, 2 mit n − 1','nur 1 Zelle fehlerhaft','alle 4 normal, weil die Meiose II den Fehler korrigiert'],a:1,
+  ex:'Nach Non-Disjunction in der Meiose I erhalten beide Tochterzellen eine falsche Zahl, die sich in der Meiose II auf alle vier Zellen überträgt. Bei Non-Disjunction in der Meiose II sind nur zwei der vier Zellen betroffen.'},
+ {id:'q15',lvl:'ober',type:'mc',q:'Warum bleiben die Schwesterchromatiden in der Anaphase I am Centromer verbunden?',o:['Das Cohesin am Centromer wird durch Shugoshin vor der Spaltung durch Separase geschützt.','In der Anaphase I gibt es keine Separase.','Am Centromer gibt es kein Cohesin.','Die Mikrotubuli halten die Chromatiden zusammen.'],a:0,
+  ex:'Separase spaltet in der Anaphase I nur das Cohesin an den Armen. Das centromere Cohesin ist durch Shugoshin mit PP2A geschützt.'},
+ {id:'q16',lvl:'ober',type:'mc',q:'Wie viele Chromosomenkombinationen sind in einer menschlichen Zygote allein durch zufällige Verteilung der Homologen möglich (ohne Crossing-over)?',o:['2<sup>23</sup> ≈ 8,4 Millionen','2 · 2<sup>23</sup> ≈ 16,8 Millionen','2<sup>23</sup> · 2<sup>23</sup> = 2<sup>46</sup> ≈ 7 · 10<sup>13</sup>','46<sup>2</sup> = 2116'],a:2,
+  ex:'Eizelle und Spermium haben je 2<sup>23</sup> Möglichkeiten. Kombiniert: 2<sup>23</sup> · 2<sup>23</sup> = 2<sup>46</sup> ≈ 7,0 · 10<sup>13</sup>.'}
+];
+
+/* ===================== Vergleichsstationen ===================== */
+const CMP=[
+ {name:'Interphase',mit:['inter',.08,'inter',1],mei:['inter',.08,'inter',1],
+  same:['DNA-Replikation in der S-Phase','danach: jedes Chromosom aus 2 Schwesterchromatiden','Centrosom wird verdoppelt'],
+  diff:['Mitose: fast alle Körperzellen','Meiose: nur bestimmte Zellen in Hoden und Eierstock']},
+ {name:'Prophase',mit:['pro',0,'pro',1],mei:['pro1',0,'pro1',1],
+  same:['Chromosomen kondensieren','Kernhülle zerfällt, Spindelapparat entsteht'],
+  diff:['nur Meiose: homologe Chromosomen werden gepaart (Bivalente)','nur Meiose: Crossing-over zwischen Nicht-Schwesterchromatiden']},
+ {name:'Metaphase',mit:['meta',0,'meta',1],mei:['meta1',0,'meta1',1],
+  same:['Anordnung in der Äquatorialebene','Mikrotubuli heften an den Kinetochoren an'],
+  diff:['Mitose: einzelne Chromosomen; die Schwesterchromatiden sind mit verschiedenen Polen verbunden','Meiose I: Bivalente; beide Schwesterchromatiden eines Chromosoms sind mit demselben Pol verbunden']},
+ {name:'Anaphase',mit:['ana',0,'ana',1],mei:['ana1',0,'ana1',1],
+  same:['gerichtete Bewegung zu den Polen','die Zelle wird länger'],
+  diff:['Mitose: Schwesterchromatiden werden getrennt','Meiose I: homologe Chromosomen werden getrennt, Schwesterchromatiden bleiben verbunden']},
+ {name:'Ende der 1. Teilung',mit:['telo',0,'telo',.9],mei:['telo1',0,'telo1',1],
+  same:['aus 1 Zelle entstehen 2 Zellen'],
+  diff:['Mitose: je 4 Chromosomen aus 1 Chromatide (2n); die Teilung ist abgeschlossen','Meiose: je 2 Chromosomen aus 2 Chromatiden (n); es folgt die Meiose II']},
+ {name:'2. Teilung',mit:['telo',.9,'telo',.9],mei:['interk',0,'ana2',1],
+  same:['in der Meiose II werden wie in der Mitose Schwesterchromatiden getrennt'],
+  diff:['Mitose: bereits abgeschlossen','Meiose II: vorher keine DNA-Replikation','Meiose II: nur ein Chromosomensatz (n); die Chromatiden sind durch Crossing-over nicht identisch']},
+ {name:'Ergebnis',mit:['telo',.9,'telo',.9],mei:['telo2',.88,'telo2',.88],
+  same:['Zellkerne werden neu gebildet'],
+  diff:['Mitose: 2 Zellen, diploid (2n), genetisch identisch','Meiose: 4 Zellen, haploid (n), genetisch verschieden']}
+];
+const CMPTABLE=[
+ ['Funktion','Wachstum, Erneuerung von Geweben, ungeschlechtliche Fortpflanzung','Bildung von Keimzellen (Tiere) bzw. Sporen (Pflanzen, Pilze)'],
+ ['Ort beim Menschen','fast alle Körperzellen','Hoden und Eierstöcke'],
+ ['DNA-Replikation','einmal, vor der Teilung','einmal, nur vor der Meiose I'],
+ ['Zahl der Kernteilungen','1','2'],
+ ['Paarung homologer Chromosomen','nein','ja, in der Prophase I (Bivalente)'],
+ ['Crossing-over','nein (regulär)','ja, zwischen Nicht-Schwesterchromatiden'],
+ ['Anordnung in der Metaphase','einzelne Chromosomen','Metaphase I: Bivalente; Metaphase II: einzelne Chromosomen'],
+ ['In der Anaphase getrennt','Schwesterchromatiden','Anaphase I: homologe Chromosomen; Anaphase II: Schwesterchromatiden'],
+ ['Zahl der Tochterzellen','2','4'],
+ ['Chromosomensätze der Tochterzellen','wie die Ausgangszelle (2n → 2n)','halbiert (2n → n)'],
+ ['Genetische Ausstattung','identisch untereinander und mit der Ausgangszelle','verschieden untereinander und von der Ausgangszelle']
+];
+</script>
+
+<script>
+const TEACH=`
+<section><h4>1 Fachliche Klärung und Lernziele</h4>
+<p>Im Sinne der Didaktischen Rekonstruktion wird die Meiose nicht als Abfolge von Phasennamen strukturiert, sondern über drei Kernkonzepte, an denen sich die bekannten Lernschwierigkeiten bündeln:</p>
+<ul>
+<li><b>Struktur vs. Zahl:</b> Chromosom, Chromatide und Chromosomensatz werden getrennt gezählt. Ploidie bezieht sich auf Sätze, nicht auf Chromatiden (Zellen nach der Meiose I: n, aber 2 Chromatiden je Chromosom).</li>
+<li><b>Homologie vs. Schwesterschaft:</b> Homologe sind verschiedenen elterlichen Ursprungs und allelisch verschieden. Schwesterchromatiden sind Replikationsprodukte und bis zum Crossing-over identisch.</li>
+<li><b>Zwei Quellen der Variabilität:</b> interchromosomale Neukombination durch zufällige Orientierung der Bivalente und intrachromosomale Rekombination durch Crossing-over. Beide werden im Modell getrennt beobachtbar.</li>
+</ul>
+<p>Die übergeordneten Lernziele: Die Lernenden können (1) den Ablauf der Meiose beschreiben, (2) die Reduktion der Chromosomenzahl auf die Trennung der Homologen in der Anaphase I zurückführen, (3) die genetische Verschiedenheit der Keimzellen mit zwei Mechanismen erklären, (4) Mitose und Meiose kriteriengeleitet vergleichen und (5) die Animation als Modell beurteilen.</p></section>
+
+<section><h4>2 Lernpsychologische Begründung der Gestaltung</h4>
+<ul>
+<li><b>Räumliche Kontiguität:</b> Die Phasenstichpunkte stehen neben der Animation statt darunter. Das reduziert Suchprozesse und den Split-Attention-Effekt.</li>
+<li><b>Segmentierung und Lernersteuerung</b>: Animationen erzeugen einen transienten Informationseffekt, weil frühere Zustände nicht mehr sichtbar sind. Dem wirken Pause, Phasensprung, Zeitleiste und Tempo entgegen. Empirisch zeigen repräsentationale Animationen gegenüber statischen Bildern einen moderaten Vorteil, vor allem bei prozeduralem Wissen; der Effekt hängt stark von der Gestaltung ab.</li>
+<li><b>Signalisierung und Salienz</b>: In Animationen lenken perzeptuell auffällige Veränderungen die Aufmerksamkeit, auch wenn sie thematisch wenig relevant sind (hier: Zellform, Bewegung der Centrosomen). Die thematisch zentralen, aber unauffälligen Ereignisse (Chiasma, Ko-Orientierung der Schwesterkinetochore in der Metaphase I) werden deshalb beschriftet, farblich codiert und in den Aufgaben 3 bis 5 eigens angesteuert.</li>
+<li><b>Multiple Repräsentationen:</b> Animation, Stichpunkte, Zähler und Vergleichstabelle sind komplementär. Die Zähler übersetzen das Bild in Zahlen. Gerade die Übersetzungsleistung zwischen den Repräsentationen ist anspruchsvoll und wird in Aufgabe 2 explizit gefordert.</li>
+</ul></section>
+
+<section><h4>3 Vergleich als Erkenntnismethode</h4>
+<p>Der Vergleichsreiter folgt dem Prinzip der kontrastierenden Fälle. Nach der Strukturabbildungstheorie werden Unterschiede dann gut erkannt, wenn sie in einer gemeinsamen Struktur ausgerichtet sind („alignable differences“). Deshalb laufen beide Teilungen in denselben Stationen synchron, und jede Station trennt explizit „gleich“ und „verschieden“.</p>
+<p><b>Risiko:</b> Die Parallelführung kann die Fehlvorstellung „Meiose II ist eine Mitose“ verstärken. Station 6 und der Fehlerhinweis in der Prophase II benennen deshalb die drei Unterschiede: keine Replikation, haploider Satz, durch Crossing-over nicht identische Schwesterchromatiden.</p></section>
+
+<section><h4>4 Adressierte Fehlvorstellungen</h4>
+<p>Die folgenden Lernschwierigkeiten sind fachdidaktisch gut beschrieben. Sie sind im Material jeweils als „Typischer Fehler“ oder als Testdistraktor aufgegriffen:</p>
+<ul>
+<li>Chromosomen werden über die Zahl der Chromatiden gezählt; X-förmige Darstellung gilt als „ein Chromosom = zwei Chromosomen“.</li>
+<li>Homologe Chromosomen und Schwesterchromatiden werden verwechselt.</li>
+<li>Crossing-over zwischen Schwesterchromatiden.</li>
+<li>Replikation zwischen Meiose I und II.</li>
+<li>Reduktion in der Meiose II statt in der Meiose I; Zellen nach der Meiose I gelten als diploid.</li>
+<li>Paarung der Homologen auch in der Mitose.</li>
+<li>„Vier gleiche Keimzellen“ sowie die Übertragung der Spermatogenese auf die Oogenese.</li>
+</ul></section>
+
+<section><h4>5 Modellkritik</h4>
+<div class="tablewrap"><table class="data mk">
+<thead><tr><th>Aspekt</th><th>Darstellung im Modell</th><th>Fachliche Realität</th><th>Bewertung</th></tr></thead>
+<tbody>
+<tr><td>Herkunft der Homologen</td><td>Farbcodierung rot (mütterlich) und blau (väterlich)</td><td>Homologe unterscheiden sich in Allelen, nicht sichtbar in der Farbe</td><td class="pro">Gelingt: macht Homologie, Neukombination und Rekombination erst verfolgbar. Die Farbe ist ein explizites Modellmerkmal und wird in der Legende benannt.</td></tr>
+<tr><td>Crossing-over</td><td>genau ein Austausch je Bivalent, stets im langen Arm, als scharfer Farbwechsel</td><td>beim Menschen grob 1 bis 3 Crossover je Bivalent, positionsabhängig (Hotspots, Interferenz), geschlechtsabhängig; molekular über Doppelstrangbrüche und Synaptonemalen Komplex</td><td class="mid">Teilweise: das obligatorische Chiasma ist korrekt abgebildet, Häufigkeit und Mechanismus nicht. Der Farbwechsel kann als „Umfärben“ missverstanden werden; deshalb wird der Austausch im Verlauf eingeblendet und das Chiasma gezeichnet.</td></tr>
+<tr><td>Kinetochor-Orientierung</td><td>Meiose I: beide Schwesterchromatiden zum selben Pol; Meiose II: zu verschiedenen Polen</td><td>entspricht der Ko-Orientierung bzw. amphitelischen Anheftung</td><td class="pro">Gelingt: in vielen Schulbuchabbildungen fehlt dieser zentrale Unterschied.</td></tr>
+<tr><td>Ploidie nach Meiose I</td><td>Zähler zeigt n bei 2 Chromatiden je Chromosom</td><td>korrekt; terminologisch in Schulbüchern uneinheitlich</td><td class="pro">Gelingt: adressiert eine häufige Verwechslung von Satz- und Chromatidenzahl.</td></tr>
+<tr><td>Zeitliche Proportionen</td><td>Prophase I nimmt etwa ein Viertel der Animation ein</td><td>Prophase I dominiert; Oozyten verharren beim Menschen Jahre bis Jahrzehnte im Diktyotän</td><td class="con">Gelingt nicht: Die Animation ist didaktisch gedehnt. Im Text wird darauf hingewiesen; der Arrest der Oozyten erscheint nur auf Oberstufen-Niveau.</td></tr>
+<tr><td>Zytokinese</td><td>symmetrisch, vier gleich große Zellen</td><td>entspricht etwa der Spermatogenese; Oogenese asymmetrisch mit Polkörperchen</td><td class="con">Grenze: Die Oogenese ist nicht animiert, nur im Text. Hier ist ein Tafelbild oder eine zweite Darstellung nötig.</td></tr>
+<tr><td>Centrosomen</td><td>Centrosomen an allen Polen, Verdopplung in der Interkinese</td><td>Oozyten vieler Säuger einschließlich des Menschen bilden azentrosomale Spindeln</td><td class="con">Vereinfachung; im Text benannt.</td></tr>
+<tr><td>Chromosomenzahl</td><td>2n = 4</td><td>Mensch 2n = 46</td><td class="mid">Notwendige Reduktion: Die Kombinatorik ist bei 4 Möglichkeiten anschaulich; der Transfer auf 2<sup>23</sup> erfolgt in Aufgabe 4 rechnerisch.</td></tr>
+<tr><td>Raum und Bewegung</td><td>zweidimensional; Chromosomen als starre Objekte, gleichmäßig bewegt; Spindel II senkrecht zur Spindel I</td><td>dreidimensional; Bewegung durch Mikrotubuli-Dynamik und Motorproteine; Spindelorientierung variiert</td><td class="mid">Didaktische Konvention. Die gerichtete Bewegung wird sprachlich ohne Anthropomorphismen beschrieben.</td></tr>
+<tr><td>Kernhülle in Telophase I</td><td>wird neu gebildet</td><td>artabhängig; teils direkter Übergang in die Meiose II</td><td class="mid">Im Text benannt.</td></tr>
+<tr><td>Allele</td><td>nicht dargestellt</td><td>die eigentliche genetische Konsequenz</td><td class="con">Grenze: Rekombination von Genen ist nur über die Farbsegmente erschließbar. Mögliche Erweiterung: Genorte A/a und B/b markieren und so die Kopplung (Aufgabe 10) anbinden.</td></tr>
+</tbody></table></div>
+<p>Die Aufgaben 8 und 10 zielen auf Modellkompetenz, insbesondere die Teilkompetenzen „Eigenschaften von Modellen“ und „Ändern von Modellen“. Niveau III ist erreicht, wenn Lernende Grenzen nicht nur benennen, sondern Modelländerungen aus einer fachlichen Frage ableiten, etwa: „Um Kopplung zu untersuchen, müssten Genorte dargestellt werden.“</p></section>
+
+<section><h4>6 Differenzierung und DaF/DaZ</h4>
+<ul><li>Der Niveau-Schalter ergänzt Inhalte, er ersetzt sie nicht. Sek-I-Lernende sehen keine molekularen Details.</li>
+<li>Gestufte Hilfen je Aufgabe, Satzbausteine, Wortlisten in gemischter Reihenfolge, Operatoren hervorgehoben.</li>
+<li>Glossar mit Artikel, Plural und englischer Entsprechung. Doppeldeutige Begriffe (Synapse) werden ausdrücklich abgegrenzt.</li></ul></section>
+
+<section><h4>7 Einsatzvorschlag</h4>
+<p>Voraussetzung: Mitose und Begriffe Chromosom, Chromatide, homolog. Einstieg über ein Problem: „Bei jeder Befruchtung verschmelzen zwei Zellkerne. Warum verdoppelt sich die Chromosomenzahl nicht in jeder Generation?“ Erarbeitung in Partnerarbeit (Aufgaben 1 bis 5), Sicherung über die Tabelle aus Aufgabe 2. Enaktive Ergänzung, z. B. ein Chromosomenmodell aus Pfeifenputzern oder Socken, bevor der Vergleichsreiter genutzt wird. Aufgaben 7 bis 10 und der Test als Vertiefung.</p></section>
+
+<section><h4>8 Erwartungshorizont (Kurzfassung)</h4>
+<ul>
+<li><b>A2:</b> (Zellen / Chromosomen pro Zelle / Chromatiden pro Chromosom) Interphase nach S: 1 / 4 / 2 · Metaphase I: 1 / 4 / 2 · nach Telophase I: 2 / 2 / 2 · Metaphase II: 2 / 2 / 2 · nach Telophase II: 4 / 2 / 1.</li>
+<li><b>A3:</b> Homologe: verschiedener elterlicher Ursprung, gleiche Gene, ggf. verschiedene Allele. Schwesterchromatiden: durch Replikation entstanden, identisch (bis zum Crossing-over), am Centromer verbunden.</li>
+<li><b>A4:</b> Jedes Bivalent hat zwei Orientierungen; unabhängig → 2 · 2 = 4 = 2<sup>2</sup>. Mensch: 2<sup>23</sup> = 8 388 608.</li>
+<li><b>A5:</b> (1) Zufällige, voneinander unabhängige Orientierung der Bivalente in der Metaphase I; (2) Crossing-over in der Prophase I. Folge: auch die Schwesterchromatiden eines Chromosoms unterscheiden sich, daher sind auch die beiden Produkte einer Zelle aus der Meiose II verschieden.</li>
+<li><b>A6:</b> Siehe Vergleichstabelle.</li>
+<li><b>A7:</b> Ohne Reduktion verdoppelte sich die Chromosomenzahl mit jeder Generation (46 → 92 → 184 …). Die Meiose hält die Chromosomenzahl über Generationen konstant und erzeugt Variabilität.</li>
+<li><b>A8:</b> Erwartet werden je drei begründete Aspekte, z. B. aus der Tabelle in Abschnitt 5.</li>
+<li><b>A9:</b> Non-Disjunction in Meiose I: alle vier Zellen fehlerhaft (2 × n + 1, 2 × n − 1). In Meiose II: zwei normal, eine n + 1, eine n − 1.</li>
+<li><b>A10:</b> Die Wahrscheinlichkeit eines Crossovers zwischen zwei Genorten steigt mit ihrem Abstand (Grundlage der Genkartierung; Einschränkung: Interferenz, Mehrfach-Crossover). Die Animation variiert den Ort, zeigt aber keine Genorte. Sie kann den Zusammenhang daher nur andeuten.</li>
+</ul></section>
+`;
+</script>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const terms=t=>t.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g,(m,a,b)=>`<button type="button" class="term" data-term="${esc(a)}">${b||a}</button>`);
+const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const store={get(k,d){try{return localStorage.getItem(k)??d;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,v);}catch(e){}}};
+let level=store.get('meioseLevel','sek');
+let colors=readColors(),labels=true,fluo=false;
+const fontFor=cv=>Math.min(24,12.5*Math.max(1,600/(cv.clientWidth||720)));
+function setupCanvas(cv){const dpr=Math.min(2,window.devicePixelRatio||1);cv.width=W*dpr;cv.height=H*dpr;return{ctx:cv.getContext('2d'),dpr};}
+
+/* ===================== Meiose-Reiter ===================== */
+const P=MEI_PHASES;
+let rnd=makeRnd(),KF=buildMeiosis(rnd),T=atP(P,'inter',.12),time=0,drawTime=0,playing=!reduced,speed=1,lastS=null,lastPhase=null,dragging=false,hitCache={};
+const main=setupCanvas($('#cv'));
+
+/* Zeitleiste */
+const tlBar=$('#tlBar');
+P.forEach((p,i)=>{const b=document.createElement('button');b.type='button';b.textContent=p.short;b.title=p.name;b.style.flex=p.dur;
+ if(p.group==='Meiose II')b.classList.add('m2');b.addEventListener('click',()=>goPhase(i));tlBar.appendChild(b);});
+const cursor=document.createElement('div');cursor.className='cursor';tlBar.appendChild(cursor);
+const tlBtns=[...tlBar.querySelectorAll('button')];
+
+/* Phasenliste */
+let refocus=null;
+function renderInfo(p){
+ const ci=P.indexOf(p);let h='<ol class="plist">',grp='';
+ P.forEach((q,i)=>{
+  if(q.group!==grp){grp=q.group;h+=`<li class="pgroup" aria-hidden="true">${grp}</li>`;}
+  const I=PINFO[q.id],cur=i===ci;
+  h+=`<li class="pitem${cur?' cur':''}"><button type="button" class="phead" data-pi="${i}" aria-expanded="${cur}"><span>${q.name}</span>${cur?'<span class="now">aktuell</span>':''}</button>`;
+  if(cur){h+=`<div class="pbody"><ul>${I.sek.map(b=>`<li>${terms(b)}</li>`).join('')}</ul>`;
+   if(level==='ober')h+=`<div class="ober"><span class="tag">Oberstufe</span><ul>${I.ober.map(b=>`<li>${terms(b)}</li>`).join('')}</ul></div>`;
+   h+=`<details class="warn"><summary>Typischer Fehler</summary><p>${terms(I.fehler)}</p></details></div>`;}
+  h+='</li>';});
+ const box=$('#phaseInfo');box.innerHTML=h+'</ol>';
+ box.querySelectorAll('.phead').forEach(b=>b.addEventListener('click',()=>{refocus=+b.dataset.pi;goPhase(refocus);}));
+ if(refocus!==null){const f=box.querySelector(`.phead[data-pi="${refocus}"]`);if(f)f.focus({preventScroll:true});refocus=null;}
+}
+const structBox=$('#structBox');
+function showStruct(t,d){structBox.innerHTML=`<button type="button" class="close-x" aria-label="Schließen">Schließen ✕</button><h4>${t}</h4><p>${terms(d)}</p>`;structBox.classList.add('show');
+ structBox.querySelector('.close-x').addEventListener('click',()=>structBox.classList.remove('show'));}
+
+/* Zähler */
+const setT=(el,v)=>{if(el.textContent!==v)el.textContent=v;};
+function counters(ph){const c=countsMei(ph.p.id,ph.u);setT($('#cCells'),c[0]);setT($('#cChr'),c[1]);setT($('#cCtd'),c[2]);setT($('#cPloid'),c[3]);setT($('#cNote'),c[4]);}
+
+/* Zufall dieses Durchlaufs */
+const CELLNAME=['oben links','unten links','oben rechts','unten rechts'];
+function chromDesc(key){const ci=chromInfo(key,rnd);const cls=ci.inner?(ci.par==='m'?'mp':'pm'):ci.par;
+ return `<span><i class="dot ${cls}"></i>${ci.X==='A'?'lang':'kurz'}, ${ci.par==='m'?'mütterlich':'väterlich'}${ci.inner?' mit '+(ci.par==='m'?'väterlichem':'mütterlichem')+' Abschnitt':''}</span>`;}
+function updateRnd(){
+ const side=X=>rnd['o'+X]===1?'das mütterliche':'das väterliche';
+ $('#rndText').innerHTML=`Metaphase I: Bei Paar A (lang) zeigt ${side('A')} Chromosom nach links, bei Paar B (kurz) ${side('B')}. Endzellen:`;
+ const cells=[[],[],[],[]];KEYS.forEach(k=>{const ci=chromInfo(k,rnd);cells[(ci.left?0:2)+(ci.pos<0?0:1)].push(k);});
+ $('#rndList').innerHTML=cells.map((ks,i)=>`<li><span class="cell">${CELLNAME[i]}</span><span>${ks.sort().map(chromDesc).join('<br>')}</span></li>`).join('');
+}
+updateRnd();
+$('#bRnd').addEventListener('click',()=>{rnd=makeRnd();KF=buildMeiosis(rnd);updateRnd();});
+
+/* Steuerung */
+const bPlay=$('#bPlay');
+function setPlaying(v){playing=v;bPlay.textContent=v?'Pause':'Abspielen';}
+setPlaying(playing);
+bPlay.addEventListener('click',()=>setPlaying(!playing));
+const curIdx=()=>P.indexOf(phaseAt(P,T).p);
+function goPhase(i){i=(i+P.length)%P.length;T=P[i].start+P[i].dur*(P[i].id==='inter'?.6:P[i].id==='pro1'?.7:.6);setPlaying(false);}
+$('#bPrev').addEventListener('click',()=>goPhase(curIdx()-1));
+$('#bNext').addEventListener('click',()=>goPhase(curIdx()+1));
+$('#speed').addEventListener('input',e=>{speed=+e.target.value;$('#speedOut').textContent=String(speed).replace('.',',')+'×';});
+const scrub=$('#scrub');
+scrub.addEventListener('input',()=>{T=scrub.value/1000*P.total*.9999;setPlaying(false);});
+scrub.addEventListener('pointerdown',()=>dragging=true);window.addEventListener('pointerup',()=>dragging=false);
+const tLab=$('#tLabels'),cLab=$('#cLabels'),tFluo=$('#tFluo');
+function setLabels(v){labels=v;tLab.setAttribute('aria-pressed',v);cLab.setAttribute('aria-pressed',v);}
+tLab.addEventListener('click',()=>setLabels(!labels));cLab.addEventListener('click',()=>setLabels(!labels));
+const legend=$('#legend'),legModel=legend.innerHTML;
+tFluo.addEventListener('click',()=>{fluo=!fluo;tFluo.setAttribute('aria-pressed',fluo);
+ legend.innerHTML=fluo?'<span><i style="background:#7aa3ff"></i>DNA (Farbstoff DAPI)</span><span><i style="background:#43e383"></i>Mikrotubuli (markiertes Tubulin)</span><span><i style="background:#ffc94a"></i>Centrosom</span><span>So sehen Zellen im Fluoreszenzmikroskop aus. Herkunft und Crossing-over sind hier nicht erkennbar.</span>':legModel;});
+
+/* Klick in die Zelle */
+function toLocal(ev,cv){const r=cv.getBoundingClientRect();return[(ev.clientX-r.left)*W/r.width-CX,(ev.clientY-r.top)*H/r.height-CY];}
+function hit(S,x,y){
+ if(!S)return null;const D=(ax,ay)=>Math.hypot(x-ax,y-ay);
+ if(S.chi>.3&&S.co>.5)for(const X of ['A','B']){const c=chiasmaPoint(S,rnd,X,drawTime);if(D(c.x,c.y)<9)return{type:'chiasma'};}
+ let best=null,bd=8;
+ for(const key of KEYS){const h=hitCache[key];if(!h||S.chr[key].a<.4)continue;for(const p of h.pts){const d=D(p[0],p[1]);if(d<bd){bd=d;best=key;}}}
+ if(best)return{type:'chromo',key:best};
+ for(const p of S.cs)if(D(p.x,p.y)<13)return{type:'centro'};
+ for(const n of S.nuc)if(n.env>.3&&Math.abs(D(n.x,n.y)-n.r)<7)return{type:'env'};
+ if(S.eq1>.3&&Math.abs(x)<7&&Math.abs(y)<120)return{type:'equator'};
+ if(S.eq2>.3&&Math.abs(y)<7&&(Math.abs(x-XL)<80||Math.abs(x-XR)<80))return{type:'equator'};
+ if(S.sp1>.5&&Math.abs(y)<40&&Math.abs(x)<Math.abs(S.cs[2].x))return{type:'spindle'};
+ if((S.sp2L>.5||S.sp2R>.5)&&(Math.abs(x-XL)<30||Math.abs(x-XR)<30)&&Math.abs(y)<Math.abs(S.cs[1].y))return{type:'spindle'};
+ for(const c of distinct(S.cells,.5)){const d=D(c.x,c.y);if(Math.abs(d-c.r)<7)return{type:'membrane'};}
+ for(const c of distinct(S.cells,.5))if(D(c.x,c.y)<c.r)return{type:'cyto'};
+ return null;
+}
+function chromoText(key,ph){
+ const ci=chromInfo(key,rnd),id=ph.p.id,X=ci.X==='A'?'lange':'kurze',par=ci.par==='m'?'von der Mutter (rot)':'vom Vater (blau)';
+ let t=`Das ${X} Chromosom ${par}. `;
+ const order=P.findIndex(p=>p.id===id);
+ if(id==='inter'&&ph.u<.55)t+='Es besteht aus einer Chromatide und liegt locker als [[Chromatin]] vor.';
+ else if(order<=P.findIndex(p=>p.id==='ana1'))t+='Es besteht aus zwei [[Schwesterchromatiden]]. Du hast eine davon angeklickt.';
+ else if(order<=P.findIndex(p=>p.id==='meta2'))t+='Es besteht weiterhin aus zwei Chromatiden; dazwischen gab es keine Replikation.';
+ else t+='Die Schwesterchromatiden sind getrennt. Diese Chromatide ist jetzt ein eigenes Chromosom.';
+ if(id==='pro1'&&ph.u>.4||id==='meta1')t+=' Es ist mit seinem [[homologe Chromosomen|homologen Chromosom]] zu einem [[Bivalent]] gepaart.';
+ const after=order>P.findIndex(p=>p.id==='pro1')||(id==='pro1'&&ph.u>.6);
+ if(ci.inner&&after)t+=` Durch [[Crossing-over]] trägt diese Chromatide am Ende des langen Arms einen Abschnitt ${ci.par==='m'?'vom väterlichen':'vom mütterlichen'} Homologen. Ihre Schwesterchromatide ist deshalb nicht mehr identisch.`;
+ else if(after)t+=' Diese Chromatide war nicht am Crossing-over beteiligt.';
+ return t;
+}
+$('#cv').addEventListener('click',ev=>{const [x,y]=toLocal(ev,ev.currentTarget),h=hit(lastS,x,y);if(!h)return;
+ if(h.type==='chromo')showStruct('Chromosom',chromoText(h.key,phaseAt(P,T)));
+ else if(h.type==='cyto'||h.type==='membrane')showStruct(...STRUCT[h.type]);
+ else showStruct(...STRUCT[h.type]);
+ if(window.innerWidth<980)structBox.scrollIntoView({block:'nearest',behavior:reduced?'auto':'smooth'});});
+$('#cv').addEventListener('mousemove',ev=>{const [x,y]=toLocal(ev,ev.currentTarget);ev.currentTarget.style.cursor=hit(lastS,x,y)?'pointer':'default';});
+
+/* ===================== Vergleichsreiter ===================== */
+const CRND={oA:1,oB:-1,coA:.42,coB:.38};
+const KFmit=buildMitosis(CRND),KFmei=buildMeiosis(CRND);
+const cvMit=setupCanvas($('#cvMit')),cvMei=setupCanvas($('#cvMei'));
+let cmpIdx=0,cmpU=0,cmpHold=0,cmpPlaying=!reduced,cmpActive=false;
+$('#cmpStages').innerHTML=CMP.map((c,i)=>`<button type="button" data-ci="${i}" aria-pressed="${i===0}"><span class="n">${i+1}</span>${c.name}</button>`).join('');
+$('#cmpStages').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>setStage(+b.dataset.ci)));
+function setStage(i){cmpIdx=(i+CMP.length)%CMP.length;cmpU=0;cmpHold=0;
+ $('#cmpStages').querySelectorAll('button').forEach((b,j)=>b.setAttribute('aria-pressed',j===cmpIdx));
+ const c=CMP[cmpIdx];$('#cmpSame').innerHTML=c.same.length?c.same.map(s=>`<li>${s}</li>`).join(''):'<li class="muted">–</li>';$('#cmpDiff').innerHTML=c.diff.map(s=>`<li>${s}</li>`).join('');}
+setStage(0);
+$('#cPrev').addEventListener('click',()=>setStage(cmpIdx-1));$('#cNext').addEventListener('click',()=>setStage(cmpIdx+1));
+const cPlay=$('#cPlay');function setCmpPlaying(v){cmpPlaying=v;cPlay.textContent=v?'Pause':'Abspielen';}setCmpPlaying(cmpPlaying);
+cPlay.addEventListener('click',()=>setCmpPlaying(!cmpPlaying));
+const spanT=(PH,s,u)=>lerp(atP(PH,s[0],Math.min(s[1],.995)),atP(PH,s[2],Math.min(s[3],.995)),u);
+const miniCtr=c=>`<span>Zellen <b>${c[0]}</b></span><span>Chromosomen pro Zelle <b>${c[1]}</b></span><span>Chromatiden pro Chromosom <b>${c[2]}</b></span><span><b>${c[3]}</b></span>`;
+function drawCompare(){
+ const c=CMP[cmpIdx],Tm=spanT(MIT_PHASES,c.mit,cmpU),Te=spanT(MEI_PHASES,c.mei,cmpU);
+ const phm=phaseAt(MIT_PHASES,Tm),phe=phaseAt(MEI_PHASES,Te);
+ [[cvMit,KFmit,MIT_PHASES,Tm,phm,'mit'],[cvMei,KFmei,MEI_PHASES,Te,phe,'mei']].forEach(([cv,kf,PH,t,ph,kind])=>{
+  const S=stateAt(kf,PH.total,t);
+  cv.ctx.setTransform(cv.dpr,0,0,cv.dpr,0,0);drawScene(cv.ctx,S,{labels,fluo:false,colors,time,rnd:CRND,kind,ph,fs:fontFor(cv.ctx.canvas)});});
+ setT($('#cmpMitPh'),phm.p.name);setT($('#cmpMeiPh'),phe.p.name);
+ const hm=miniCtr(countsMit(phm.p.id,phm.u)),he=miniCtr(countsMei(phe.p.id,phe.u));
+ if($('#cmpMitCtr').innerHTML!==hm)$('#cmpMitCtr').innerHTML=hm;if($('#cmpMeiCtr').innerHTML!==he)$('#cmpMeiCtr').innerHTML=he;
+}
+/* Vergleichstabelle mit Selbsttest */
+let covered=false;
+function renderTable(){
+ $('#cmpTable').innerHTML=`<thead><tr><th scope="col">Merkmal</th><th scope="col">Mitose</th><th scope="col">Meiose</th></tr></thead><tbody>${CMPTABLE.map((r,i)=>`<tr><th scope="row">${r[0]}</th>${[1,2].map(j=>`<td>${covered?`<button type="button" class="cover" data-r="${i}" data-c="${j}">aufdecken</button>`:r[j]}</td>`).join('')}</tr>`).join('')}</tbody>`;
+ $('#cmpTable').querySelectorAll('.cover').forEach(b=>b.addEventListener('click',()=>{b.parentElement.textContent=CMPTABLE[+b.dataset.r][+b.dataset.c];}));
+ $('#bCover').textContent=covered?'Alle aufdecken':'Tabelle verdecken (Selbsttest)';
+}
+$('#bCover').addEventListener('click',()=>{covered=!covered;renderTable();});
+renderTable();
+
+/* Reiter */
+const tabMei=$('#tabMei'),tabCmp=$('#tabCmp');
+function selectTab(cmp){cmpActive=cmp;tabMei.setAttribute('aria-selected',!cmp);tabCmp.setAttribute('aria-selected',cmp);$('#panelMei').hidden=cmp;$('#vergleich').hidden=!cmp;}
+tabMei.addEventListener('click',()=>selectTab(false));tabCmp.addEventListener('click',()=>selectTab(true));
+[tabMei,tabCmp].forEach(t=>t.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const n=t===tabMei?tabCmp:tabMei;n.focus();selectTab(n===tabCmp);}}));
+function fromHash(){if(location.hash==='#vergleich'){selectTab(true);document.getElementById('simulation').scrollIntoView({behavior:reduced?'auto':'smooth'});}
+ else if(location.hash==='#simulation')selectTab(false);}
+window.addEventListener('hashchange',fromHash);fromHash();
+document.querySelector('nav.links a[href="#vergleich"]').addEventListener('click',e=>{e.preventDefault();selectTab(true);document.getElementById('simulation').scrollIntoView({behavior:reduced?'auto':'smooth'});});
+
+/* ===================== Begriffe und Glossar ===================== */
+const pop=$('#termPop'),slug=s=>s.toLowerCase().replace(/[^a-z0-9äöüß]+/g,'-');
+document.addEventListener('click',ev=>{
+ const b=ev.target.closest('.term');
+ if(b){ev.stopPropagation();const e=GLOSS.find(x=>x[0]===b.dataset.term);if(!e)return;
+  pop.innerHTML=`<h4 style="margin:0 0 2px">${e[0]}</h4><div class="gr">${e[1]} · ${e[2]} · engl. ${e[3]}</div><p>${e[4]}</p><p style="margin-top:8px"><button type="button" class="btn" data-goto="${esc(e[0])}">Im Glossar zeigen</button></p>`;
+  pop.hidden=false;const r=b.getBoundingClientRect(),pw=pop.offsetWidth,ph=pop.offsetHeight;
+  let left=Math.min(Math.max(16,r.left),window.innerWidth-pw-16),top=r.bottom+8;if(top+ph>window.innerHeight-10)top=Math.max(10,r.top-ph-8);
+  pop.style.left=left+'px';pop.style.top=top+'px';return;}
+ const go=ev.target.closest('[data-goto]');
+ if(go){pop.hidden=true;$('#glSearch').value='';renderGloss('');const card=document.getElementById('gl-'+slug(go.dataset.goto));
+  if(card){card.scrollIntoView({block:'center',behavior:reduced?'auto':'smooth'});card.classList.add('flash');setTimeout(()=>card.classList.remove('flash'),1800);}return;}
+ if(!pop.contains(ev.target))pop.hidden=true;
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')pop.hidden=true;});
+function renderGloss(q){q=q.trim().toLowerCase();
+ $('#gloss').innerHTML=[...GLOSS].sort((a,b)=>a[0].localeCompare(b[0],'de')).filter(e=>!q||e.join(' ').toLowerCase().includes(q))
+  .map(e=>`<div class="card gl" id="gl-${slug(e[0])}"><h4>${e[0]}</h4><div class="gr">${e[1]} · ${e[2]} · engl. ${e[3]}</div><p>${e[4]}</p></div>`).join('')||'<p class="muted">Kein Begriff gefunden.</p>';}
+$('#glSearch').addEventListener('input',e=>renderGloss(e.target.value));renderGloss('');
+
+/* ===================== Arbeitsaufträge ===================== */
+function renderTasks(){
+ $('#taskStages').innerHTML=TASKS.map(st=>{const ts=st.tasks.filter(t=>t.lvl==='all'||level==='ober');if(!ts.length)return'';
+  return `<div class="stage-block"><h3><span class="n">${st.n}</span>${st.title}</h3><div class="tasks">${ts.map(t=>`
+   <div class="card task"><div class="task-top"><span class="nr">Aufgabe ${t.nr}</span><span class="afb${t.lvl==='ober'?' o':''}">${t.lvl==='ober'?'Oberstufe · ':''}${t.afb}</span></div>
+   <div>${terms(t.text)}</div>
+   <div class="helps">${t.helps.map((h,j)=>`<button type="button" aria-expanded="false" data-h="${t.nr}-${j}">${h.l}</button>`).join('')}</div>
+   ${t.helps.map((h,j)=>`<div class="helpbox" id="h-${t.nr}-${j}" hidden>${h.w?`<div class="wordbank">${h.w.map(w=>`<span>${w}</span>`).join('')}</div>`:h.h}</div>`).join('')}
+   </div>`).join('')}</div></div>`;}).join('');
+ document.querySelectorAll('.helps button').forEach(b=>b.addEventListener('click',()=>{const box=document.getElementById('h-'+b.dataset.h),o=b.getAttribute('aria-expanded')==='true';b.setAttribute('aria-expanded',!o);box.hidden=o;}));
+}
+
+/* ===================== Test ===================== */
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const KFimg=buildMeiosis(IMG_RND);
+let orderState={};
+function drawQ(c,q){const x=c.getContext('2d');x.setTransform(2,0,0,2,0,0);const t=atP(P,q.at,q.u);
+ drawScene(x,stateAt(KFimg,P.total,t),{labels:false,fluo:false,colors,time:2,rnd:IMG_RND});}
+function renderQuiz(){
+ const qs=QUESTIONS.filter(q=>q.lvl==='all'||level==='ober');orderState={};
+ $('#quiz').innerHTML=qs.map((q,n)=>{let body='';
+  if(q.type==='mc'||q.type==='img'){
+   if(q.type==='img')body+=`<canvas class="qcanvas" width="1440" height="880" data-q="${q.id}" aria-label="Bild einer Zelle in der Meiose"></canvas>`;
+   body+=`<div class="opts">${q.o.map((o,i)=>`<label><input type="radio" name="${q.id}" value="${i}"><span>${o}</span></label>`).join('')}</div>`;}
+  else if(q.type==='num')body=`<label>Antwort: <input class="numin" type="number" inputmode="numeric" id="in-${q.id}"></label>`;
+  else{let s=shuffle(q.items);while(s.join()===q.items.join())s=shuffle(q.items);orderState[q.id]=s;body=`<ol class="order-list" id="ol-${q.id}"></ol>`;}
+  return `<div class="card q" id="box-${q.id}"><div class="qhead"><span class="qtext">${n+1}. ${q.q}</span><span class="afb${q.lvl==='ober'?' o':''}">${q.lvl==='ober'?'Oberstufe':'Basis'}</span></div>${body}<div class="fb" id="fb-${q.id}"></div></div>`;}).join('');
+ Object.keys(orderState).forEach(renderOrder);
+ document.querySelectorAll('.qcanvas').forEach(c=>drawQ(c,QUESTIONS.find(q=>q.id===c.dataset.q)));
+ $('#qScore').textContent='';
+}
+function renderOrder(id){
+ const s=orderState[id],ol=document.getElementById('ol-'+id);
+ ol.innerHTML=s.map((it,i)=>`<li><span class="pos">${i+1}.</span><span class="lbl">${it}</span><button type="button" aria-label="${it} nach oben" data-mv="-1" data-i="${i}" ${i===0?'disabled':''}>▲</button><button type="button" aria-label="${it} nach unten" data-mv="1" data-i="${i}" ${i===s.length-1?'disabled':''}>▼</button></li>`).join('');
+ ol.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.i,j=i+ +b.dataset.mv;[s[i],s[j]]=[s[j],s[i]];renderOrder(id);
+  const nb=document.getElementById('ol-'+id).querySelectorAll('li')[j]?.querySelector(`button[data-mv="${b.dataset.mv}"]`);if(nb&&!nb.disabled)nb.focus();}));
+}
+$('#qEval').addEventListener('click',()=>{
+ const qs=QUESTIONS.filter(q=>q.lvl==='all'||level==='ober');let ok=0;
+ qs.forEach(q=>{let right=false,sol='';
+  if(q.type==='mc'||q.type==='img'){const v=document.querySelector(`input[name="${q.id}"]:checked`);right=!!v&&+v.value===q.a;sol=q.o[q.a];}
+  else if(q.type==='num'){const v=document.getElementById('in-'+q.id).value;right=v!==''&&+v===q.a;sol=String(q.a);}
+  else{right=orderState[q.id].join()===q.items.join();sol=q.items.join(' – ');}
+  if(right)ok++;const fb=document.getElementById('fb-'+q.id);fb.className='fb show '+(right?'ok':'no');
+  fb.innerHTML=right?`<strong>Richtig.</strong> ${q.ex}`:`<strong>Falsch.</strong> Richtig ist: ${sol.replace(/\.$/,'')}. ${q.ex}`;});
+ $('#qScore').textContent=`${ok} von ${qs.length} richtig`;
+});
+$('#qReset').addEventListener('click',renderQuiz);
+
+/* Niveau */
+function setLevel(l){level=l;store.set('meioseLevel',l);
+ $('#lvlSek').setAttribute('aria-pressed',l==='sek');$('#lvlOber').setAttribute('aria-pressed',l==='ober');renderTasks();renderQuiz();lastPhase=null;}
+$('#lvlSek').addEventListener('click',()=>setLevel('sek'));$('#lvlOber').addEventListener('click',()=>setLevel('ober'));
+$('#teachBody').innerHTML=TEACH;
+setLevel(level);
+
+/* Farbschema */
+function refreshColors(){colors=readColors();document.querySelectorAll('.qcanvas').forEach(c=>drawQ(c,QUESTIONS.find(q=>q.id===c.dataset.q)));}
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',refreshColors);
+new MutationObserver(refreshColors).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','class']});
+
+/* ===================== Schleife ===================== */
+let last=performance.now();
+function frame(now){
+ const dt=Math.min(.05,(now-last)/1000);last=now;time+=dt;
+ if(!cmpActive){
+  if(playing){T+=dt*speed*P.total/64;if(T>=P.total){T-=P.total;rnd=makeRnd();KF=buildMeiosis(rnd);updateRnd();}}
+  const S=stateAt(KF,P.total,T),ph=phaseAt(P,T);lastS=S;hitCache={};
+  main.ctx.setTransform(main.dpr,0,0,main.dpr,0,0);
+  drawTime=playing?time:2;drawScene(main.ctx,S,{labels,fluo,colors,time:drawTime,rnd,kind:'mei',ph,fs:fontFor($('#cv')),cache:hitCache});
+  if(ph.p!==lastPhase){lastPhase=ph.p;const i=P.indexOf(ph.p);$('#phaseNow').innerHTML=`${ph.p.name} <small>${ph.p.group}</small>`;renderInfo(ph.p);tlBtns.forEach((b,j)=>b.classList.toggle('cur',j===i));}
+  counters(ph);
+  const f=T/P.total;cursor.style.left=`calc(${(f*100).toFixed(2)}% - 1px)`;if(!dragging)scrub.value=Math.round(f*1000);setT($('#tlPct'),Math.round(f*100)+' %');
+ }else{
+  if(cmpPlaying){if(cmpU<1)cmpU=Math.min(1,cmpU+dt/7);else{cmpHold+=dt;if(cmpHold>1.6){cmpU=0;cmpHold=0;}}}
+  drawCompare();
+ }
+ requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+</script>
+
+</body></html>
