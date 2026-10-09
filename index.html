@@ -344,7 +344,7 @@
     Jeder Eintrag ist ein <a class="card"> mit:
       href        = Dateiname der Animation (relativ, unverändert lassen)
       data-fach   = Chemie | Biologie | Informatik
-      data-typ    = Modell | Simulation | Werkzeug
+      data-typ    = Modell | Simulation | Werkzeug | Übung
       data-jg     = Jahrgangsstufe, z. B. "9" oder "10-12"
     Etikett, Jahrgangszeile und Tabellenansicht werden daraus automatisch erzeugt.
   -->
@@ -501,8 +501,18 @@
         </div>
       </details>
 
-      <details class="thema" id="t-genetik" data-label="Genetik & Molekularbiologie" open>
-        <summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Genetik &amp; Molekularbiologie<span class="count"></span></summary>
+      <details class="thema" id="t-vererbung" data-label="Vererbung & Humangenetik" open>
+        <summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Vererbung &amp; Humangenetik<span class="count"></span></summary>
+        <div class="grid">
+          <a class="card" href="stammbaumanalyse.html" data-fach="Biologie" data-typ="Übung" data-jg="9-12">
+            <h3>Stammbaumanalyse</h3>
+            <p>Ermittlung des Erbgangs aus Familienstammbäumen (autosomal oder gonosomal, dominant oder rezessiv) und Ableitung der Genotypen einzelner Personen.</p>
+          </a>
+        </div>
+      </details>
+
+      <details class="thema" id="t-genetik" data-label="Molekulargenetik" open>
+        <summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Molekulargenetik<span class="count"></span></summary>
         <div class="grid">
           <a class="card" href="DNA-Baukasten.html" data-fach="Biologie" data-typ="Modell" data-jg="9-10">
             <h3>DNA-Baukasten</h3>
