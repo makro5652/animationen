@@ -1,253 +1,1238 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animation der Fehling-Probe (Ionenverbindung)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            background-color: #f8fafc;
-            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
-        canvas {
-            background-color: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-            max-width: 100%;
-            height: auto;
-        }
-        .control-panel {
-            background-color: #ffffff;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-        }
-    </style>
-</head>
-<body class="p-4 md:p-8">
-    <div class="max-w-5xl mx-auto">
-        <h1 class="text-2xl mb-4 text-slate-800">Animation: Fehling-Reaktion (Ethanal zu Essigsäure)</h1>
-        
-        <div class="control-panel p-6 rounded-lg mb-6 border border-slate-200">
-            <div class="flex flex-wrap items-center gap-6">
-                <button id="playPauseBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded transition-colors">
-                    Start
-                </button>
-                
-                <button id="resetBtn" class="border border-slate-300 hover:bg-slate-50 px-6 py-2 rounded transition-colors">
-                    Zurücksetzen
-                </button>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Fehling-Labor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: feste Kopfzeile mit Stationsleiste; je Station eine Ansicht. Labor = Werkbank aus Vorräten | Versuchsszene | Beobachtung, darunter das Protokoll. */
+:root{
+  --paper:#edf1f5; --surface:#ffffff; --surface-2:#f5f7fa; --ink:#141c28; --muted:#55617a; --line:#d2dae4;
+  --accent:#2346a8; --accent-soft:#e0e7f7; --on-accent:#ffffff;
+  --brick:#a33d27; --brick-soft:#f7e4de;
+  --ok:#22683f; --ok-soft:#dcefe3; --bad:#a3221a; --bad-soft:#f8e0dd; --open:#6b5a12; --open-soft:#f4eccf;
+  --glass:#76839a; --glass-fill:rgba(205,220,236,.22); --bench:#c6d0dc; --bench-2:#aab6c5;
+  --water:rgba(110,165,220,.30); --plate:#39414f; --plate-hi:#c94b2e;
+  --hl-ald:rgba(163,61,39,.20); --hl-keto:rgba(35,70,168,.17); --hl-oh:rgba(34,104,63,.18); --hl-gly:rgba(150,112,18,.22);
+  --f-display:"Zilla Slab", Rockwell, "Roboto Slab", Georgia, serif;
+  --f-body:"Source Sans 3", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0e131b; --surface:#151c27; --surface-2:#1b2431; --ink:#e3e8f0; --muted:#9ba6b8; --line:#2b3546;
+    --accent:#8ea8f2; --accent-soft:#1d2846; --on-accent:#0e131b;
+    --brick:#e48a70; --brick-soft:#3a231d;
+    --ok:#7fcb9d; --ok-soft:#163226; --bad:#f2958c; --bad-soft:#3c1d1a; --open:#e0c86e; --open-soft:#332c12;
+    --glass:#a3afc2; --glass-fill:rgba(160,185,215,.10); --bench:#2b3443; --bench-2:#3a4556;
+    --water:rgba(100,150,215,.26); --plate:#090c11; --plate-hi:#e0603f;
+    --hl-ald:rgba(228,138,112,.26); --hl-keto:rgba(142,168,242,.24); --hl-oh:rgba(127,203,157,.22); --hl-gly:rgba(224,200,110,.24);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0e131b; --surface:#151c27; --surface-2:#1b2431; --ink:#e3e8f0; --muted:#9ba6b8; --line:#2b3546;
+  --accent:#8ea8f2; --accent-soft:#1d2846; --on-accent:#0e131b;
+  --brick:#e48a70; --brick-soft:#3a231d;
+  --ok:#7fcb9d; --ok-soft:#163226; --bad:#f2958c; --bad-soft:#3c1d1a; --open:#e0c86e; --open-soft:#332c12;
+  --glass:#a3afc2; --glass-fill:rgba(160,185,215,.10); --bench:#2b3443; --bench-2:#3a4556;
+  --water:rgba(100,150,215,.26); --plate:#090c11; --plate-hi:#e0603f;
+  --hl-ald:rgba(228,138,112,.26); --hl-keto:rgba(142,168,242,.24); --hl-oh:rgba(127,203,157,.22); --hl-gly:rgba(224,200,110,.24);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--paper)}
+body{color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55}
+.wrap{max-width:1200px;margin:0 auto;padding-inline:16px}
+main.wrap{padding-block:8px 64px}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap;padding-block:14px 6px}
+.brand h1{font-family:var(--f-display);font-weight:700;font-size:1.75rem;line-height:1;margin:0;letter-spacing:-.01em}
+.brand h1 span{color:var(--brick)}
+.brand .sub{color:var(--muted);font-size:.95rem;flex:1 1 220px;min-width:0}
+#wspOpen{margin-left:auto}
+@media (max-width:640px){.brand .sub{display:none}.brand h1{font-size:1.45rem}.brand{padding-block:10px 4px}}
+nav.stations{display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin}
+nav.stations button{border:0;background:none;padding:10px 12px 9px;border-bottom:3px solid transparent;font:600 .95rem var(--f-body);color:var(--muted);white-space:nowrap;cursor:pointer}
+nav.stations button:hover{color:var(--ink)}
+nav.stations button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+nav.stations .num{font-family:var(--f-mono);font-size:.78rem;margin-right:6px;color:var(--accent)}
+nav.stations .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-left:6px;vertical-align:2px}
+section.station{padding-top:26px;display:flex;flex-direction:column;gap:20px}
+section.station>*{min-width:0}
+h2{font-family:var(--f-display);font-weight:700;font-size:clamp(1.55rem,3.2vw,2.15rem);line-height:1.12;margin:0;text-wrap:balance}
+h3{font-family:var(--f-display);font-weight:600;font-size:1.28rem;line-height:1.2;margin:0 0 .45em;text-wrap:balance}
+h4{font-size:.78rem;font-family:var(--f-mono);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 .5em}
+p{margin:0 0 .7em;max-width:70ch}
+p:last-child{margin-bottom:0}
+ul,ol{margin:0 0 .7em;padding-left:1.3em;max-width:70ch}
+li{margin-bottom:.25em}
+.eyebrow{font-family:var(--f-mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.lead{font-size:1.12rem}
+.muted{color:var(--muted)}
+.small{font-size:.9rem}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;min-width:0}
+.panel.flat{background:var(--surface-2)}
+.question{border-left:4px solid var(--accent);background:var(--accent-soft);padding:14px 18px;border-radius:0 8px 8px 0}
+.question .eyebrow{color:var(--accent)}
+.question p{font-family:var(--f-display);font-size:1.3rem;font-weight:600;line-height:1.3;margin:0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:16px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{font:600 .95rem var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer;min-height:40px;line-height:1.2}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.danger{color:var(--bad)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.fb{margin-top:10px;padding:8px 12px;border-radius:6px;font-weight:600;max-width:70ch}
+.fb:empty{display:none}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.bad{background:var(--bad-soft);color:var(--bad)}
+.fb.info{background:var(--open-soft);color:var(--open)}
+.fb span.n{font-weight:400;color:var(--ink)}
+.chip{display:inline-block;font-size:.78rem;padding:2px 9px;border-radius:999px;font-weight:600;white-space:nowrap}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+.chip.open{background:var(--open-soft);color:var(--open)}
+.chip.neutral{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+details.help{border:1px solid var(--line);border-radius:8px;background:var(--surface);margin-top:8px}
+details.help>summary{cursor:pointer;padding:9px 12px;font-weight:600;list-style-position:inside}
+details.help>div{padding:0 14px 12px}
+details.help.sol>summary{color:var(--brick)}
+textarea,select,input[type=number]{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px}
+textarea{width:100%;min-height:96px;padding:10px;resize:vertical;line-height:1.45}
+select{padding:5px 6px;max-width:100%}
+.steps{counter-reset:s;list-style:none;padding:0}
+.steps li{counter-increment:s;position:relative;padding-left:2.1em;margin-bottom:.55em}
+.steps li::before{content:counter(s);position:absolute;left:0;top:.05em;width:1.5em;height:1.5em;border-radius:50%;background:var(--accent-soft);color:var(--accent);font:600 .82rem/1.5em var(--f-mono);text-align:center}
+.next{align-self:flex-start}
+/* Reagenzien */
+.reag{display:grid;grid-template-columns:52px minmax(0,1fr);gap:14px;align-items:start}
+.reag svg{width:52px;height:auto}
+.formula{font-family:var(--f-body)}
+.safety{border-left:4px solid var(--brick);background:var(--brick-soft);padding:12px 16px;border-radius:0 8px 8px 0}
+.safety h4{color:var(--brick)}
+/* Labor */
+.lab{display:grid;grid-template-columns:250px minmax(0,1fr) 270px;gap:16px;align-items:start}
+@media (max-width:1060px){.lab{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.lab .scene{grid-column:1/-1;order:-1}}
+@media (max-width:640px){.lab{grid-template-columns:minmax(0,1fr)}}
+.scene{padding:10px}
+.scene svg{width:100%;height:auto;display:block;touch-action:manipulation}
+.scene .legend{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:.85rem;color:var(--muted);padding:4px 6px 0}
+.tube{cursor:pointer}
+.tube:focus{outline:none}
+.tube:focus-visible .glass-o{stroke:var(--accent);stroke-width:3}
+.tube .tlabel{font:600 13px var(--f-mono);fill:var(--muted)}
+.tube.sel .tlabel{fill:var(--on-accent)}
+.tube .tpill{fill:transparent}
+.tube.sel .tpill{fill:var(--accent)}
+.tube.sel .glass-o{stroke:var(--accent);stroke-width:2.4}
+.shelf{display:flex;flex-direction:column;gap:14px}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.seg button{font:600 .9rem var(--f-mono);padding:6px 0;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:6px;cursor:pointer;min-height:38px}
+.seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.reagbtns{display:flex;flex-direction:column;gap:6px}
+.reagbtn{display:flex;align-items:center;gap:10px;text-align:left}
+.swatch{width:14px;height:22px;border-radius:3px 3px 6px 6px;border:1px solid var(--glass);flex:none}
+.samples{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sample-btn{text-align:left;font-size:.86rem;padding:6px 8px;min-height:44px}
+.sample-btn small{display:block;color:var(--muted);font:400 .74rem var(--f-mono);margin-top:1px}
+.sample-btn.special{border-style:dashed}
+.sample-btn.unknown{border-color:var(--brick)}
+.status dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;margin:0 0 10px}
+.status dt{color:var(--muted);font-size:.9rem}
+.status dd{margin:0;font-variant-numeric:tabular-nums}
+.status .temp{font:600 1.5rem var(--f-mono);font-variant-numeric:tabular-nums}
+.status ul{margin:0;padding-left:1.1em}
+.desc{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:.95rem}
+.msg{min-height:1.5em;font-size:.92rem;color:var(--muted);margin-top:8px}
+.toggle{display:flex;gap:8px;align-items:flex-start;font-size:.92rem;cursor:pointer}
+.toggle input{margin-top:.25em;width:18px;height:18px;flex:none}
+/* Protokoll */
+.tablewrap{position:relative;overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:.95rem}
+th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:middle}
+th{font:600 .74rem var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--surface-2)}
+tr:last-child td{border-bottom:0}
+td .why{display:block;font-size:.82rem;color:var(--muted);margin-top:3px;max-width:30ch}
+td.sub{font-weight:600}
+td.sub small{display:block;font-weight:400;color:var(--muted)}
+/* Strukturformeln */
+.mol{max-width:100%;height:auto;display:block;margin:0 auto}
+.mol text{font-family:var(--f-body);font-size:15px;fill:var(--ink)}
+.mol text .sb{font-size:10.5px}
+.mol text.note{font:500 10px var(--f-mono);fill:var(--muted)}
+.mol .bd{stroke:var(--ink);stroke-width:1.5;stroke-linecap:round}
+.mol .grp{fill:transparent}
+.mol .mk{fill:none;stroke:var(--brick);stroke-width:1.8;stroke-dasharray:3 3}
+.show-groups .grp-ald,.groups-always .grp-ald{fill:var(--hl-ald)}
+.show-groups .grp-keto,.groups-always .grp-keto{fill:var(--hl-keto)}
+.show-groups .grp-oh,.groups-always .grp-oh{fill:var(--hl-oh)}
+.show-groups .grp-cooh,.groups-always .grp-cooh{fill:var(--hl-keto)}
+.show-groups .grp-gly,.groups-always .grp-gly{fill:var(--hl-gly)}
+.sortcols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px}
+.sortcol{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px;min-width:0}
+.sortcol h4{display:flex;justify-content:space-between;align-items:center}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.molcard{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.molcard .nm{font-weight:600;font-size:.95rem;line-height:1.2}
+.molcard .sf{font-size:.82rem;color:var(--muted)}
+.molcard .pic{flex:1;display:flex;align-items:center;justify-content:center;min-height:90px}
+.legendrow{display:flex;flex-wrap:wrap;gap:12px;font-size:.85rem;color:var(--muted)}
+.legendrow i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:5px}
+/* MC */
+.mc fieldset{border:0;padding:0;margin:0}
+.mc legend{font-weight:600;margin-bottom:8px;padding:0;max-width:70ch}
+.mc label{display:flex;gap:10px;align-items:flex-start;padding:7px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;cursor:pointer;background:var(--surface);max-width:70ch}
+.mc label:hover{border-color:var(--accent)}
+.mc input{margin-top:.3em;flex:none;width:17px;height:17px}
+/* Gleichungen */
+.eq{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;font-size:1.15rem;padding:10px 0;font-variant-numeric:tabular-nums}
+.eq .lab{display:block;width:100%;font:600 .74rem var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.eq input{width:2.6em;height:2.1em;text-align:center;font:600 1.05rem var(--f-mono);padding:0}
+.eq .op{color:var(--muted)}
+.eq .arrow{font-size:1.3rem;padding:0 4px}
+.bal{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 6px}
+.bal .chip{font-family:var(--f-mono);font-weight:500}
+.oxgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:12px}
+.oxgrid label{display:flex;flex-direction:column;gap:4px;font-size:.95rem}
+.oxpics{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 24px;padding:6px 0 12px}
+.oxpics figure{margin:0;text-align:center}
+.oxpics figcaption{font-size:.85rem;color:var(--muted)}
+.gaptext{font-size:1.05rem;line-height:2.2;max-width:75ch}
+.gaptext select{font-size:.95rem;margin:0 2px}
+.gaptext select.ok{border-color:var(--ok);background:var(--ok-soft)}
+.gaptext select.bad{border-color:var(--bad);background:var(--bad-soft)}
+.bank{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px}
+.bank span{border:1px dashed var(--glass);border-radius:6px;padding:2px 8px;font-size:.92rem;background:var(--surface)}
+.chain{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 4px}
+.chain .eqarrow{font-size:1.4rem;color:var(--muted);padding:0 4px}
+.chain figure{margin:0;text-align:center}
+.chain figcaption{font-size:.82rem;color:var(--muted)}
+.task{display:flex;flex-direction:column;gap:10px}
+.task-head{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;justify-content:space-between}
+.unknown-sel{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center}
+.unknown-sel label{display:flex;gap:8px;align-items:center}
+/* Wortspeicher */
+#wsp{position:fixed;top:0;right:0;bottom:0;width:min(560px,100%);background:var(--surface);border-left:1px solid var(--line);z-index:60;overflow-y:auto;padding:calc(16px + env(safe-area-inset-top,0px)) 18px calc(24px + env(safe-area-inset-bottom,0px));box-shadow:-14px 0 40px rgba(10,20,40,.18)}
+#wsp table{min-width:0;font-size:.92rem}
+#wsp td,#wsp th{padding:6px 8px;vertical-align:top}
+#wsp .en{color:var(--muted);font-style:italic}
+.wsp-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+.sb-list{list-style:none;padding:0}
+.sb-list li{background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:6px 10px;margin-bottom:6px}
+.scheme{width:100%;max-width:640px;height:auto;display:block}
+.scheme text{font-family:var(--f-body);fill:var(--ink)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.footer{margin-top:28px;padding-top:16px;border-top:1px solid var(--line);font-size:.88rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
 
-                <div class="flex flex-col gap-1">
-                    <label for="speedSlider" class="text-sm text-slate-600">Geschwindigkeit</label>
-                    <input type="range" id="speedSlider" min="0.1" max="3" step="0.1" value="1" class="w-40">
-                </div>
-            </div>
-            
-            <div id="statusText" class="mt-4 text-slate-700 min-h-[1.5rem]">
-                Bereit zum Starten
-            </div>
-        </div>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <h1>Fehling<span>-</span>Labor</h1>
+      <div class="sub">Die Fehling-Probe erforschen, deuten und anwenden</div>
+      <button class="btn" id="wspOpen" aria-controls="wsp" aria-expanded="false">Wortspeicher</button>
+    </div>
+    <nav class="stations" role="tablist" aria-label="Stationen">
+      <button role="tab" data-st="einstieg"><span class="num">1</span>Einstieg</button>
+      <button role="tab" data-st="labor"><span class="num">2</span>Labor</button>
+      <button role="tab" data-st="auswertung"><span class="num">3</span>Auswertung</button>
+      <button role="tab" data-st="deutung"><span class="num">4</span>Deutung</button>
+      <button role="tab" data-st="transfer"><span class="num">5</span>Transfer</button>
+      <button role="tab" data-st="lehrkraft">Für Lehrkräfte</button>
+    </nav>
+  </div>
+</header>
 
-        <div class="relative overflow-hidden">
-            <canvas id="reactionCanvas" width="900" height="550" class="w-full"></canvas>
-            <div id="legend" class="absolute top-4 left-4 bg-white/80 p-3 rounded text-xs border border-slate-200 pointer-events-none">
-                <div class="flex items-center gap-2 mb-1"><span class="w-3 h-3 rounded-full bg-gray-400"></span> Kohlenstoff (C)</div>
-                <div class="flex items-center gap-2 mb-1"><span class="w-3 h-3 rounded-full bg-red-500"></span> Sauerstoff (O)</div>
-                <div class="flex items-center gap-2 mb-1"><span class="w-3 h-3 rounded-full bg-blue-500"></span> Kupfer (Cu)</div>
-                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-white border border-slate-400"></span> Wasserstoff (H)</div>
-            </div>
-        </div>
+<main class="wrap">
 
-        <div class="mt-6 text-slate-600 text-sm leading-relaxed">
-            Reaktionsgleichung: CH3CHO + 2 Cu2+ + 4 OH- -> CH3COOH + Cu2O + 2 H2O.
-            In dieser Darstellung werden für die Kupfer-Ionen und das Oxid-Ion reale Ladungen (z.B. 2+, 2-) verwendet, um den ionischen Charakter des Kupfer(I)-oxids zu verdeutlichen. Die kovalent gebundenen Atome zeigen weiterhin Oxidationszahlen.
+<!-- ================= 1 EINSTIEG ================= -->
+<section class="station" id="st-einstieg" data-station="einstieg" hidden>
+  <div>
+    <div class="eyebrow">Station 1 · Einstieg</div>
+    <h2>Ein Nachweis aus dem 19. Jahrhundert</h2>
+  </div>
+  <div class="grid2">
+    <div class="panel">
+      <p class="lead">Um 1850 entwickelte der Chemiker Hermann von Fehling eine Lösung, mit der man bestimmte Zucker nachweisen kann. In der Medizin wurde sie lange verwendet, um Glucose im Urin von Menschen mit Diabetes mellitus nachzuweisen.</p>
+      <p>Die Fehling-Probe zeigt aber nicht nur Glucose an. Auch viele andere Stoffe führen zu einem positiven Ergebnis, andere dagegen nicht. In dieser Lerneinheit findest du heraus, worauf es ankommt.</p>
+    </div>
+    <div class="question">
+      <div class="eyebrow">Leitfrage</div>
+      <p>Welche Stoffe reagieren mit Fehling-Lösung – und welches Strukturmerkmal haben sie gemeinsam?</p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Die Reagenzien</h3>
+    <p>Fehling-Lösung wird aus zwei Lösungen hergestellt. Sie werden getrennt aufbewahrt und erst direkt vor dem Versuch im Verhältnis 1 : 1 gemischt, weil das Gemisch nur begrenzt haltbar ist.</p>
+    <div class="grid2" style="margin-top:12px">
+      <div class="reag">
+        <svg viewBox="0 0 52 90" aria-hidden="true"><rect x="16" y="2" width="20" height="12" rx="2" fill="var(--bench-2)"/><path d="M14 14h24v10c8 4 12 10 12 18v40a6 6 0 0 1-6 6H8a6 6 0 0 1-6-6V42c0-8 4-14 12-18z" fill="var(--glass-fill)" stroke="var(--glass)" stroke-width="1.5"/><path d="M3 50h46v32a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5z" fill="#8fc3ea" opacity=".85"/></svg>
+        <div>
+          <h4>Fehling I</h4>
+          <p><strong>Kupfer(II)-sulfat-Lösung</strong>, hellblau. Enthält hydratisierte Kupfer(II)-Ionen (Cu<sup>2+</sup>) und Sulfat-Ionen.</p>
+          <p class="small muted">Typische Zusammensetzung: ca. 69 g CuSO<sub>4</sub> · 5 H<sub>2</sub>O pro Liter.</p>
         </div>
+      </div>
+      <div class="reag">
+        <svg viewBox="0 0 52 90" aria-hidden="true"><rect x="16" y="2" width="20" height="12" rx="2" fill="var(--bench-2)"/><path d="M14 14h24v10c8 4 12 10 12 18v40a6 6 0 0 1-6 6H8a6 6 0 0 1-6-6V42c0-8 4-14 12-18z" fill="var(--glass-fill)" stroke="var(--glass)" stroke-width="1.5"/><path d="M3 50h46v32a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5z" fill="rgba(170,200,230,.35)"/></svg>
+        <div>
+          <h4>Fehling II</h4>
+          <p><strong>Kalium-natrium-tartrat (Seignettesalz) in Natronlauge</strong>, farblos und stark alkalisch. Enthält Tartrat-Ionen und Hydroxid-Ionen (OH<sup>−</sup>).</p>
+          <p class="small muted">Typische Zusammensetzung: ca. 346 g Kalium-natrium-tartrat und 100 g Natriumhydroxid pro Liter.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h3>Durchführung im Realversuch</h3>
+      <ol class="steps">
+        <li>Je 2 mL Fehling I und Fehling II in ein Reagenzglas geben und mischen.</li>
+        <li>Etwa 1 mL der Probelösung hinzufügen.</li>
+        <li>Das Reagenzglas in ein heißes Wasserbad (ca. 70–80 °C) stellen und einige Minuten beobachten.</li>
+        <li>Zum Vergleich eine Blindprobe mit Wasser statt Probelösung durchführen.</li>
+      </ol>
+      <p class="small muted">Im virtuellen Labor (Station 2) führst du genau diese Schritte aus. Die Zeit läuft dort im Zeitraffer.</p>
+    </div>
+    <div class="safety">
+      <h4>Sicherheit im Realversuch</h4>
+      <ul class="small">
+        <li>Schutzbrille tragen: Fehling II enthält Natronlauge und ist ätzend.</li>
+        <li>Fehling I ist gesundheitsschädlich beim Verschlucken und giftig für Wasserorganismen.</li>
+        <li>Kupferhaltige Reste in den Sammelbehälter für Schwermetallabfälle geben, nicht in den Ausguss.</li>
+        <li>Einige Proben (z. B. Methanal) sind giftig bzw. krebserzeugend und werden im Schulversuch nur eingeschränkt oder gar nicht eingesetzt. Im virtuellen Labor ist jeder Versuch gefahrlos.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="panel flat">
+    <h3>Deine Lernziele</h3>
+    <p>Am Ende dieser Lerneinheit kannst du …</p>
+    <ul>
+      <li>die Durchführung der Fehling-Probe beschreiben und Beobachtungen fachsprachlich protokollieren,</li>
+      <li>aus Versuchsergebnissen ableiten, welches Strukturmerkmal die Fehling-Probe nachweist,</li>
+      <li>die Reaktion als Redoxreaktion deuten und mit Oxidationszahlen und Reaktionsgleichungen beschreiben,</li>
+      <li>Sonderfälle erklären und beurteilen, wie aussagekräftig der Nachweis ist.</li>
+    </ul>
+    <p class="small muted">Unbekannte Wörter findest du im <strong>Wortspeicher</strong> (oben rechts) – mit Artikel, Plural und englischer Übersetzung.</p>
+  </div>
+  <button class="btn primary next" data-go="labor">Weiter zum Labor</button>
+</section>
+
+<!-- ================= 2 LABOR ================= -->
+<section class="station" id="st-labor" data-station="labor" hidden>
+  <div>
+    <div class="eyebrow">Station 2 · Virtuelles Labor</div>
+    <h2>Versuchsreihe: Welche Stoffe reagieren?</h2>
+  </div>
+  <div class="panel flat">
+    <h4>Arbeitsauftrag</h4>
+    <ol class="steps">
+      <li>Führe die Fehling-Probe mit allen Stoffen der Versuchsreihe 1 durch (siehe Protokoll unten). Beginne mit der Blindprobe (Wasser).</li>
+      <li>Nutze die vier Reagenzgläser, um Proben direkt nebeneinander zu vergleichen.</li>
+      <li>Trage deine Beobachtungen in das Protokoll ein und prüfe es.</li>
+    </ol>
+    <details class="help"><summary>Hilfe 1: In welcher Reihenfolge gehe ich vor?</summary><div>
+      <p>Wähle ein Reagenzglas. Gib Fehling I und Fehling II hinzu (je einmal klicken = je 2 mL). Gib dann die Probe hinzu (1 mL). Stelle das Reagenzglas anschließend in das Wasserbad.</p></div></details>
+    <details class="help"><summary>Hilfe 2: Woran erkenne ich ein Ergebnis?</summary><div>
+      <p>Beobachte die Farbe der Flüssigkeit und den Boden des Reagenzglases. Lass das Reagenzglas ausreichend lange im Wasserbad (mindestens 3 Minuten Heizdauer) und vergleiche immer mit der Blindprobe.</p></div></details>
+  </div>
+
+  <div class="lab">
+    <div class="panel shelf" aria-label="Vorräte und Aktionen">
+      <div>
+        <h4 id="selLbl">Reagenzglas wählen</h4>
+        <div class="seg" role="group" aria-labelledby="selLbl" id="tubeSel"></div>
+      </div>
+      <div>
+        <h4>Reagenzien (je 2 mL)</h4>
+        <div class="reagbtns">
+          <button class="btn reagbtn" data-add="fI"><span class="swatch" style="background:#8fc3ea"></span>Fehling I</button>
+          <button class="btn reagbtn" data-add="fII"><span class="swatch" style="background:rgba(170,200,230,.35)"></span>Fehling II</button>
+          <button class="btn reagbtn" data-add="naoh"><span class="swatch" style="background:rgba(170,200,230,.35)"></span>Natronlauge (ohne Tartrat)</button>
+        </div>
+      </div>
+      <div>
+        <h4>Aktionen</h4>
+        <div class="reagbtns">
+          <button class="btn primary" id="bathBtn">In das Wasserbad stellen</button>
+          <button class="btn danger" id="emptyBtn">Reagenzglas leeren</button>
+        </div>
+      </div>
     </div>
 
-    <script>
-        const canvas = document.getElementById('reactionCanvas');
-        const ctx = canvas.getContext('2d');
-        const playPauseBtn = document.getElementById('playPauseBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const speedSlider = document.getElementById('speedSlider');
-        const statusText = document.getElementById('statusText');
+    <div class="panel scene">
+      <svg id="sceneSvg" viewBox="0 0 650 330" role="group" aria-label="Laborszene: Reagenzglasständer mit vier Reagenzgläsern und ein Wasserbad auf einer Heizplatte"></svg>
+      <div class="legend"><span>Reagenzglas antippen, um es auszuwählen</span><span>Zeitraffer: 1 s ≈ 20 s</span></div>
+    </div>
 
-        let isRunning = false;
-        let progress = 0;
-        let speed = 0.0025;
+    <div class="panel status" aria-label="Beobachtung">
+      <h3 id="stTitle">Reagenzglas 1</h3>
+      <dl>
+        <dt>Temperatur</dt><dd><span class="temp" id="stTemp">22 °C</span></dd>
+        <dt>Standort</dt><dd id="stPlace">Reagenzglasständer</dd>
+        <dt>Heizdauer</dt><dd id="stHeat">0:00 min</dd>
+        <dt>Inhalt</dt><dd id="stContent">leer</dd>
+      </dl>
+      <label class="toggle"><input type="checkbox" id="descToggle"> Beobachtung als Text anzeigen (Sprachhilfe)</label>
+      <p class="desc" id="stDesc" hidden></p>
+      <div class="msg" id="msg" role="status" aria-live="polite"></div>
+    </div>
+  </div>
 
-        const atoms = [
-            // Ethanal: Methylgruppe
-            { id: 'C1', type: 'C', label: 'C', x: 80, y: 250, ox: '-III', targetX: 80, targetY: 250, targetOx: '-III' },
-            { id: 'H_m1', type: 'H', label: 'H', x: 40, y: 250, ox: '+I', targetX: 40, targetY: 250, targetOx: '+I' },
-            { id: 'H_m2', type: 'H', label: 'H', x: 80, y: 210, ox: '+I', targetX: 80, targetY: 210, targetOx: '+I' },
-            { id: 'H_m3', type: 'H', label: 'H', x: 80, y: 290, ox: '+I', targetX: 80, targetY: 290, targetOx: '+I' },
-            
-            // Ethanal: Carbonylgruppe
-            { id: 'C2', type: 'C', label: 'C', x: 160, y: 250, ox: '+I', targetX: 160, targetY: 250, targetOx: '+III' },
-            { id: 'O1', type: 'O', label: 'O', x: 200, y: 210, ox: '-II', targetX: 200, targetY: 210, targetOx: '-II' },
-            { id: 'H_ald', type: 'H', label: 'H', x: 200, y: 290, ox: '+I', targetX: 450, targetY: 420, targetOx: '+I' },
-            
-            // Kupfer-Ionen (Hier reale Ladungen statt Oxidationszahlen)
-            { id: 'Cu1', type: 'Cu', label: 'Cu', x: 700, y: 150, ox: '2+', targetX: 740, targetY: 230, targetOx: '+' },
-            { id: 'Cu2', type: 'Cu', label: 'Cu', x: 820, y: 150, ox: '2+', targetX: 800, targetY: 270, targetOx: '+' },
-            
-            // 4 Hydroxid-Ionen
-            // OH- 1: Bildet die OH-Gruppe der Essigsäure
-            { id: 'O_OH1', type: 'O', label: 'O', x: 300, y: 100, ox: '-II', targetX: 200, targetY: 290, targetOx: '-II' },
-            { id: 'H_OH1', type: 'H', label: 'H', x: 340, y: 100, ox: '+I', targetX: 240, targetY: 330, targetOx: '+I' },
-            
-            // OH- 2: Startet bei Cu1 -> O geht zu Cu2O Gitter (Hier reale Ladung 2- im Gitterkontext)
-            { id: 'O_OH2', type: 'O', label: 'O', x: 700, y: 190, ox: '2-', targetX: 770, targetY: 250, targetOx: '2-' },
-            { id: 'H_OH2', type: 'H', label: 'H', x: 730, y: 210, ox: '+I', targetX: 520, targetY: 420, targetOx: '+I' },
-            
-            // OH- 3: Startet bei Cu2 -> Bildet Wasser 1
-            { id: 'O_OH3', type: 'O', label: 'O', x: 820, y: 190, ox: '-II', targetX: 485, targetY: 420, targetOx: '-II' },
-            { id: 'H_OH3', type: 'H', label: 'H', x: 850, y: 210, ox: '+I', targetX: 630, targetY: 420, targetOx: '+I' },
+  <div class="panel">
+    <h4>Proben (je 1 mL)</h4>
+    <div class="samples" id="sampleGrid" style="grid-template-columns:repeat(auto-fill,minmax(170px,1fr))"></div>
+    <p class="small muted" style="margin-top:8px">Gestrichelt umrandet: Stoffe für Station 5 (Transfer). Rot umrandet: unbekannte Proben.</p>
+  </div>
 
-            // OH- 4: Bildet Wasser 2
-            { id: 'O_OH4', type: 'O', label: 'O', x: 650, y: 450, ox: '-II', targetX: 650, targetY: 420, targetOx: '-II' },
-            { id: 'H_OH4', type: 'H', label: 'H', x: 690, y: 470, ox: '+I', targetX: 670, targetY: 460, targetOx: '+I' }
-        ];
+  <div class="panel">
+    <div class="task-head"><h3>Versuchsprotokoll</h3><span class="small muted">Vor dem Erhitzen = nach Zugabe der Probe, noch bei Raumtemperatur</span></div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Probe</th><th>Vor dem Erhitzen</th><th>Nach dem Erhitzen</th><th>Nachweis</th><th>Prüfung</th><th><span class="sr">Aktion</span></th></tr></thead>
+        <tbody id="protoBody"></tbody>
+      </table>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <label for="addRowSel" class="small">Weitere Probe aufnehmen:</label>
+      <select id="addRowSel"></select>
+      <button class="btn" id="addRowBtn">Zeile hinzufügen</button>
+      <span style="flex:1"></span>
+      <button class="btn primary" id="checkProto">Protokoll prüfen</button>
+    </div>
+    <div class="fb" id="protoFb"></div>
+  </div>
+  <button class="btn primary next" data-go="auswertung">Weiter zur Auswertung</button>
+</section>
 
-        function drawAtom(atom, p) {
-            const curX = atom.x + (atom.targetX - atom.x) * p;
-            const curY = atom.y + (atom.targetY - atom.y) * p;
-            
-            let color = '#94a3b8';
-            if (atom.type === 'O') color = '#ef4444';
-            if (atom.type === 'Cu') {
-                const r = Math.floor(59 + (185 - 59) * p);
-                const g = Math.floor(130 + (28 - 130) * p);
-                const b = Math.floor(246 + (28 - 246) * p);
-                color = `rgb(${r},${g},${b})`;
-            }
-            if (atom.type === 'H') color = '#ffffff';
+<!-- ================= 3 AUSWERTUNG ================= -->
+<section class="station" id="st-auswertung" data-station="auswertung" hidden>
+  <div>
+    <div class="eyebrow">Station 3 · Auswertung</div>
+    <h2>Was haben die positiv getesteten Stoffe gemeinsam?</h2>
+  </div>
+  <div class="panel flat">
+    <p>Die Stoffe der Versuchsreihe 1 sind hier nach den Ergebnissen <strong>deines Protokolls</strong> sortiert. Vergleiche die Strukturformeln der beiden Gruppen.</p>
+    <div class="row">
+      <label class="toggle"><input type="checkbox" id="grpToggle"> Funktionelle Gruppen farbig markieren (Hilfe)</label>
+    </div>
+    <div class="legendrow" style="margin-top:6px"><span><i style="background:var(--hl-ald)"></i>Aldehydgruppe</span><span><i style="background:var(--hl-keto)"></i>Keto-Carbonylgruppe</span><span><i style="background:var(--hl-oh)"></i>Hydroxygruppe</span></div>
+  </div>
+  <div class="sortcols" id="sortCols"></div>
+  <div class="panel">
+    <div class="mc" data-mc="merkmal"></div>
+  </div>
+  <div class="panel">
+    <h3>Merksatz formulieren</h3>
+    <p>Formuliere mit deinen Worten, was die Fehling-Probe nachweist. Nutze die Satzbausteine.</p>
+    <ul class="sb-list small">
+      <li>Die Fehling-Probe ist ein Nachweis für …</li>
+      <li>Ein positiver Nachweis zeigt sich durch …</li>
+      <li>Stoffe mit … reagieren dagegen nicht, zum Beispiel …</li>
+    </ul>
+    <textarea id="merksatz" aria-label="Dein Merksatz"></textarea>
+    <details class="help sol"><summary>Musterlösung anzeigen</summary><div>
+      <p>Die Fehling-Probe ist ein Nachweis für Aldehyde (Stoffe mit Aldehydgruppe –CHO). Beim Erhitzen mit Fehling-Lösung entsteht ein ziegelroter Niederschlag von Kupfer(I)-oxid. Ketone wie Propanon und Alkohole wie Ethanol reagieren nicht; die Lösung bleibt tiefblau.</p>
+    </div></details>
+  </div>
+  <div class="panel flat">
+    <h3>Hinweis zur Glucose</h3>
+    <div class="grid2">
+      <div>
+        <p>In wässriger Lösung liegt Glucose ganz überwiegend als Ring vor. Im Gleichgewicht ist jedoch ein sehr kleiner Anteil (deutlich unter 1 %) offenkettig. Diese offenkettige Form besitzt eine Aldehydgruppe.</p>
+        <p>Weil die offenkettige Form bei der Reaktion verbraucht wird, stellt sich das Gleichgewicht laufend neu ein. So kann nach und nach die gesamte Glucose reagieren.</p>
+      </div>
+      <figure style="margin:0;text-align:center" id="glucoseFig"></figure>
+    </div>
+  </div>
+  <button class="btn primary next" data-go="deutung">Weiter zur Deutung</button>
+</section>
 
-            ctx.beginPath();
-            ctx.arc(curX, curY, 15, 0, Math.PI * 2);
-            ctx.fillStyle = color;
-            ctx.fill();
-            ctx.strokeStyle = '#334155';
-            ctx.lineWidth = 1.2;
-            ctx.stroke();
+<!-- ================= 4 DEUTUNG ================= -->
+<section class="station" id="st-deutung" data-station="deutung" hidden>
+  <div>
+    <div class="eyebrow">Station 4 · Deutung auf Teilchenebene</div>
+    <h2>Die Fehling-Probe als Redoxreaktion</h2>
+  </div>
+  <div class="panel flat">
+    <p>Der ziegelrote Niederschlag besteht aus <strong>Kupfer(I)-oxid</strong> (Cu<sub>2</sub>O). Aus dem Aldehyd entsteht im alkalischen Milieu das Anion der entsprechenden Carbonsäure (Carboxylat-Anion). Am Beispiel von Ethanal untersuchst du, welche Teilchen oxidiert und welche reduziert werden.</p>
+  </div>
 
-            ctx.fillStyle = atom.type === 'H' ? '#000' : '#fff';
-            ctx.font = '10px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(atom.label, curX, curY);
+  <div class="panel">
+    <h3>Aufgabe 1: Oxidationszahlen bestimmen</h3>
+    <div class="oxpics" id="oxPics"></div>
+    <div class="oxgrid">
+      <label><span>C-Atom der Aldehydgruppe in Ethanal</span> <select id="ox-c1"></select></label>
+      <label><span>C-Atom der Carboxylatgruppe im Ethanoat-Ion</span> <select id="ox-c2"></select></label>
+      <label><span>Kupfer in Cu<sup>2+</sup></span> <select id="ox-cu1"></select></label>
+      <label><span>Kupfer in Cu<sub>2</sub>O</span> <select id="ox-cu2"></select></label>
+    </div>
+    <details class="help"><summary>Hilfe: Wie bestimme ich Oxidationszahlen in organischen Molekülen?</summary><div>
+      <p>Ordne die Bindungselektronen jeder Bindung dem elektronegativeren Bindungspartner zu (O &gt; C &gt; H). Zwischen gleichen Atomen werden sie geteilt. Vergleiche dann die Zahl der zugeordneten Valenzelektronen mit der Zahl der Valenzelektronen des ungebundenen Atoms (C: 4).</p>
+      <p>Für Ionen aus einem Atom gilt: Oxidationszahl = Ionenladung. In Cu<sub>2</sub>O hat Sauerstoff die Oxidationszahl −II.</p>
+    </div></details>
+    <div class="row" style="margin-top:12px"><button class="btn primary" id="checkOx">Überprüfen</button></div>
+    <div class="fb" id="oxFb"></div>
+  </div>
 
-            const curOx = p < 0.5 ? atom.ox : atom.targetOx;
-            ctx.fillStyle = '#475569';
-            ctx.font = '9px sans-serif';
-            ctx.fillText(curOx, curX, curY - 22);
-        }
+  <div class="panel">
+    <h3>Aufgabe 2: Reaktionsgleichungen aufstellen</h3>
+    <p>Ergänze die fehlenden Koeffizienten. Leere Felder ohne Eingabefeld haben den Koeffizienten 1.</p>
+    <p class="small muted">Vereinfachung: In Fehling-Lösung liegen die Kupfer(II)-Ionen als Tartrat-Komplex vor. In den Gleichungen wird dieser Komplex vereinfacht als Cu<sup>2+</sup> geschrieben.</p>
+    <div id="eqArea"></div>
+    <label class="toggle" style="margin-top:6px"><input type="checkbox" id="balToggle"> Atom- und Ladungsbilanz anzeigen (Hilfe)</label>
+    <div class="row" style="margin-top:12px"><button class="btn primary" id="checkEq">Überprüfen</button></div>
+    <div class="fb" id="eqFb"></div>
+    <p class="small" id="eqGeneral" hidden style="margin-top:10px">Allgemein für Aldehyde: R–CHO + 2 Cu<sup>2+</sup> + 5 OH<sup>−</sup> → R–COO<sup>−</sup> + Cu<sub>2</sub>O + 3 H<sub>2</sub>O</p>
+  </div>
 
-        function drawBonds(p) {
-            ctx.strokeStyle = '#cbd5e1';
-            ctx.lineWidth = 2.5;
+  <div class="panel">
+    <h3>Aufgabe 3: Zusammenfassung</h3>
+    <p>Ergänze den Lückentext. Die Wörter im Kasten stehen nicht in der Reihenfolge der Lücken; zwei Wörter bleiben übrig.</p>
+    <div class="bank" id="bank"></div>
+    <div class="gaptext" id="gapText"></div>
+    <div class="row" style="margin-top:12px"><button class="btn primary" id="checkGap">Überprüfen</button></div>
+    <div class="fb" id="gapFb"></div>
+    <details class="help sol"><summary>Übersicht anzeigen: Elektronenübertragung</summary><div id="schemeBox"></div></details>
+  </div>
+  <button class="btn primary next" data-go="transfer">Weiter zum Transfer</button>
+</section>
 
-            const pos = (id) => {
-                const a = atoms.find(atom => atom.id === id);
-                return {
-                    x: a.x + (a.targetX - a.x) * p,
-                    y: a.y + (a.targetY - a.y) * p
-                };
-            };
+<!-- ================= 5 TRANSFER ================= -->
+<section class="station" id="st-transfer" data-station="transfer" hidden>
+  <div>
+    <div class="eyebrow">Station 5 · Transfer</div>
+    <h2>Die Regel anwenden und an ihre Grenzen bringen</h2>
+  </div>
 
-            const c1 = pos('C1'); const c2 = pos('C2');
-            const o1 = pos('O1'); const hAld = pos('H_ald');
-            const oOH1 = pos('O_OH1'); const hOH1 = pos('H_OH1');
-            const oOH2 = pos('O_OH2'); const hOH2 = pos('H_OH2');
-            const oOH3 = pos('O_OH3'); const hOH3 = pos('H_OH3');
-            const oOH4 = pos('O_OH4'); const hOH4 = pos('H_OH4');
+  <div class="panel task">
+    <div class="task-head"><h3>A · Zwei Flaschen, eine Summenformel</h3><span id="unkStatus"></span></div>
+    <p>Auf zwei Flaschen steht nur „C<sub>3</sub>H<sub>6</sub>O“. Eine enthält Propanal, die andere Propanon. Untersuche <strong>Probe A</strong> und <strong>Probe B</strong> im Labor und ordne sie zu.</p>
+    <div class="unknown-sel">
+      <label>Probe A ist <select id="unkA"><option value="">– wählen –</option><option value="propanal">Propanal</option><option value="propanon">Propanon</option></select></label>
+      <label>Probe B ist <select id="unkB"><option value="">– wählen –</option><option value="propanal">Propanal</option><option value="propanon">Propanon</option></select></label>
+      <button class="btn primary" id="checkUnk">Überprüfen</button>
+    </div>
+    <div class="fb" id="unkFb"></div>
+    <textarea id="unkText" aria-label="Begründung zu Aufgabe A" placeholder="Begründe deine Zuordnung mit Beobachtung und Strukturmerkmal: „Probe … ist …, weil …“"></textarea>
+  </div>
 
-            // Methylgruppe
-            ['H_m1', 'H_m2', 'H_m3'].forEach(id => {
-                const h = pos(id);
-                ctx.beginPath(); ctx.moveTo(c1.x, c1.y); ctx.lineTo(h.x, h.y); ctx.stroke();
-            });
-            ctx.beginPath(); ctx.moveTo(c1.x, c1.y); ctx.lineTo(c2.x, c2.y); ctx.stroke();
+  <div class="panel task">
+    <div class="task-head"><h3>B · Fructose – ein Keton reagiert?</h3><span data-tested="fructose"></span></div>
+    <div class="grid2">
+      <div>
+        <p>Fructose ist eine Ketohexose. Sie besitzt keine Aldehydgruppe. Prüfe im Labor, ob Fructose-Lösung mit Fehling-Lösung reagiert.</p>
+        <p><strong>Aufgabe:</strong> Erkläre deine Beobachtung.</p>
+      </div>
+      <figure style="margin:0;text-align:center" id="fructoseFig"></figure>
+    </div>
+    <textarea id="fruText" aria-label="Erklärung zu Aufgabe B"></textarea>
+    <details class="help"><summary>Hilfe 1</summary><div><p>Betrachte die direkte Umgebung der Carbonylgruppe. Welche funktionelle Gruppe befindet sich am benachbarten C-Atom (C1)?</p></div></details>
+    <details class="help"><summary>Hilfe 2</summary><div><p>Fehling-Lösung ist stark alkalisch. In alkalischer Lösung kann sich Fructose über eine Zwischenstufe mit C=C-Doppelbindung und zwei Hydroxygruppen (Endiol) in andere Zucker umlagern.</p></div></details>
+    <details class="help sol"><summary>Lösung anzeigen</summary><div>
+      <div class="chain" id="endiolChain"></div>
+      <p>Fructose ist ein α-Hydroxyketon: Das C-Atom neben der Carbonylgruppe trägt eine Hydroxygruppe. Im alkalischen Milieu stellt sich über ein Endiol ein Gleichgewicht zwischen Fructose, Glucose (und Mannose) ein (Keto-Endiol-Tautomerie, Lobry-de-Bruyn-van-Ekenstein-Umlagerung). Die dabei gebildeten Aldosen besitzen in ihrer offenkettigen Form eine Aldehydgruppe und reduzieren die Kupfer(II)-Ionen. Zusätzlich können α-Hydroxyketone selbst durch Kupfer(II)-Ionen oxidiert werden.</p>
+      <p>Folgerung: Die Fehling-Probe unterscheidet Glucose und Fructose nicht.</p>
+    </div></details>
+  </div>
 
-            // C=O Doppelbindung
-            ctx.beginPath();
-            ctx.moveTo(c2.x-3, c2.y); ctx.lineTo(o1.x-3, o1.y);
-            ctx.moveTo(c2.x+3, c2.y); ctx.lineTo(o1.x+3, o1.y);
-            ctx.stroke();
+  <div class="panel task">
+    <div class="task-head"><h3>C · Saccharose – vor und nach der Hydrolyse</h3><span data-tested="saccharose,saccH"></span></div>
+    <div class="grid2">
+      <div>
+        <p>Saccharose (Haushaltszucker) ist ein Disaccharid aus einem Glucose- und einem Fructose-Baustein. Untersuche im Labor Saccharose-Lösung und eine Saccharose-Lösung, die zuvor mit Säure hydrolysiert und anschließend neutralisiert wurde.</p>
+        <p><strong>Aufgaben:</strong> (1) Erkläre beide Ergebnisse. (2) Begründe, warum die hydrolysierte Lösung vor der Fehling-Probe neutralisiert werden muss.</p>
+      </div>
+      <figure style="margin:0;text-align:center" id="saccFig"></figure>
+    </div>
+    <textarea id="saccText" aria-label="Erklärung zu Aufgabe C"></textarea>
+    <details class="help"><summary>Hilfe 1</summary><div><p>Welche C-Atome der beiden Bausteine sind über die glycosidische Bindung miteinander verknüpft? Es handelt sich jeweils um das C-Atom, das in der offenkettigen Form die Carbonylgruppe trägt (anomeres C-Atom).</p></div></details>
+    <details class="help"><summary>Hilfe 2</summary><div><p>Ein Zuckerring kann sich nur öffnen, wenn am anomeren C-Atom eine freie Hydroxygruppe (Halbacetal-Gruppe) vorliegt. Denke außerdem an die Reaktion zwischen Säure und den Hydroxid-Ionen der Fehling-Lösung.</p></div></details>
+    <details class="help sol"><summary>Lösung anzeigen</summary><div>
+      <p>(1) In Saccharose sind C1 der Glucose und C2 der Fructose über die glycosidische Bindung verknüpft. Beide anomeren C-Atome sind damit gebunden; eine Ringöffnung zur offenkettigen Form ist nicht möglich. Saccharose ist ein nicht-reduzierender Zucker, die Fehling-Probe verläuft negativ. Bei der säurekatalysierten Hydrolyse entstehen Glucose und Fructose. Beide reagieren positiv (siehe Aufgabe B).</p>
+      <p>(2) Die Säure würde die Hydroxid-Ionen der Fehling-Lösung neutralisieren. Die Reaktion benötigt jedoch ein alkalisches Milieu; außerdem wäre der Kupfer-Tartrat-Komplex im Sauren nicht beständig. Ohne Neutralisation kann das Ergebnis deshalb falsch negativ ausfallen.</p>
+    </div></details>
+  </div>
 
-            if (p < 0.5) {
-                const factor = 1 - (p / 0.5);
-                ctx.globalAlpha = factor;
-                ctx.beginPath(); ctx.moveTo(c2.x, c2.y); ctx.lineTo(hAld.x, hAld.y); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(oOH2.x, oOH2.y); ctx.lineTo(hOH2.x, hOH2.y); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(oOH3.x, oOH3.y); ctx.lineTo(hOH3.x, hOH3.y); ctx.stroke();
-                ctx.globalAlpha = 1;
-            }
+  <div class="panel task">
+    <div class="task-head"><h3>D · Benzaldehyd – eine Ausnahme</h3><span data-tested="benzaldehyd"></span></div>
+    <div class="grid2">
+      <div>
+        <p>Benzaldehyd besitzt eine Aldehydgruppe an einem Benzolring. Untersuche Benzaldehyd im Labor und vergleiche mit deinem Merksatz aus Station 3.</p>
+        <p><strong>Aufgabe:</strong> Beschreibe, inwiefern das Ergebnis deiner Regel widerspricht, und formuliere die Regel genauer.</p>
+      </div>
+      <figure style="margin:0;text-align:center" id="benzFig"></figure>
+    </div>
+    <textarea id="benzText" aria-label="Antwort zu Aufgabe D"></textarea>
+    <details class="help sol"><summary>Lösung anzeigen</summary><div>
+      <p>Benzaldehyd zeigt mit Fehling-Lösung in der Regel keinen ziegelroten Niederschlag, obwohl eine Aldehydgruppe vorliegt. Die Regel muss eingeschränkt werden: Die Fehling-Probe weist aliphatische Aldehyde (und reduzierende Zucker) nach; aromatische Aldehyde reagieren nicht bzw. kaum.</p>
+      <p>Als Ursachen werden in der Literatur u. a. die geringe Wasserlöslichkeit von Benzaldehyd und Konkurrenzreaktionen im stark alkalischen Milieu diskutiert; eine einheitliche Begründung findet sich nicht. Mit der Tollens-Probe (Silberspiegelprobe) lässt sich Benzaldehyd dagegen nachweisen.</p>
+    </div></details>
+  </div>
 
-            // Essigsäure-Bildung
-            if (p > 0.4) {
-                ctx.beginPath(); ctx.moveTo(c2.x, c2.y); ctx.lineTo(oOH1.x, oOH1.y); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(oOH1.x, oOH1.y); ctx.lineTo(hOH1.x, hOH1.y); ctx.stroke();
-            }
+  <div class="panel task">
+    <div class="task-head"><h3>E · Wozu dient das Tartrat?</h3><span data-tested="trommer"></span></div>
+    <p>Führe im Labor einen Versuch mit <strong>Fehling I + Natronlauge (ohne Tartrat)</strong> durch: einmal mit Wasser und einmal mit Glucose-Lösung. Erhitze beide Proben und vergleiche mit der Fehling-Probe.</p>
+    <div class="mc" data-mc="tartrat"></div>
+  </div>
 
-            // Wasser-Moleküle
-            if (p > 0.6) {
-                ctx.beginPath(); ctx.moveTo(oOH3.x, oOH3.y); ctx.lineTo(hAld.x, hAld.y); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(oOH3.x, oOH3.y); ctx.lineTo(hOH2.x, hOH2.y); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(oOH4.x, oOH4.y); ctx.lineTo(hOH3.x, hOH3.y); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(oOH4.x, oOH4.y); ctx.lineTo(hOH4.x, hOH4.y); ctx.stroke();
-            }
+  <div class="panel task">
+    <div class="task-head"><h3>F · Bewerten: Ein Glucose-Nachweis?</h3></div>
+    <div class="mc" data-mc="spez"></div>
+  </div>
+</section>
 
-            // Kupfer(I)-oxid Gitterbereich (Ionenverbindung)
-            if (p > 0.8) {
-                ctx.save();
-                ctx.globalAlpha = (p - 0.8) * 3;
-                ctx.fillStyle = 'rgba(153, 27, 27, 0.15)';
-                ctx.beginPath();
-                ctx.roundRect(710, 200, 120, 100, 8);
-                ctx.fill();
-                ctx.restore();
-            }
-        }
+<!-- ================= LEHRKRAFT ================= -->
+<section class="station" id="st-lehrkraft" data-station="lehrkraft" hidden>
+  <div>
+    <div class="eyebrow">Für Lehrkräfte</div>
+    <h2>Didaktischer Kommentar</h2>
+  </div>
+  <div class="grid2">
+    <div class="panel">
+      <h3>Einordnung</h3>
+      <ul>
+        <li><strong>Zielgruppe:</strong> Klasse 10 (Sauerstoffhaltige organische Verbindungen) oder Einführungsphase der Oberstufe.</li>
+        <li><strong>Voraussetzungen:</strong> funktionelle Gruppen (Hydroxy-, Carbonyl-, Carboxygruppe), Redoxbegriff als Elektronenübertragung, Oxidationszahlen in organischen Molekülen.</li>
+        <li><strong>Zeitbedarf:</strong> ca. 90 Minuten für die Stationen 1–4, weitere 45 Minuten für Station 5.</li>
+        <li><strong>Basiskonzepte:</strong> Struktur-Eigenschafts-Konzept; Konzept der chemischen Reaktion (Donator-Akzeptor-Prinzip).</li>
+        <li><strong>Kompetenzbereiche:</strong> Sachkompetenz/Fachwissen (Redoxdeutung), Erkenntnisgewinnung (Blindprobe, induktive Regelbildung, Hypothesenprüfung an Sonderfällen), Kommunikation (Protokoll, fachsprachliche Beschreibung), Bewertung (Spezifität eines Nachweises).</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>Didaktische Struktur</h3>
+      <ul>
+        <li><strong>Ebenenwechsel nach Johnstone:</strong> Station 2 bedient die phänomenologische Ebene, Station 4 die submikroskopische und die symbolische Ebene.</li>
+        <li><strong>Induktiv-forschender Zugang:</strong> Die Regel („Aldehydgruppe“) wird aus selbst erhobenen Daten abgeleitet (Station 3) und anschließend an Gegenbeispielen geprüft und präzisiert (Station 5).</li>
+        <li><strong>Gestufte Lernhilfen und Selbstkontrolle:</strong> Hilfen werden nur bei Bedarf geöffnet; Rückmeldungen benennen Fehler eindeutig als „falsch“ und geben eine fachliche Begründung.</li>
+        <li><strong>Sprachsensibilität (DaF/DaZ):</strong> Wortspeicher mit Artikel, Plural und englischer Übersetzung; Satzbausteine für Beobachtung, Auswertung und Deutung; optionale Textbeschreibung der Laborbeobachtung; Lückentext mit gemischter Wortliste und Distraktoren.</li>
+        <li><strong>Trennung Beobachtung/Deutung:</strong> Im Labor werden nur Farben und Niederschläge beschrieben; die Deutung folgt erst in Station 4.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>Fachliche Vereinfachungen und Grenzen der Simulation</h3>
+    <ul>
+      <li>Die Kupfer(II)-Spezies in Fehling-Lösung wird als „Cu<sup>2+</sup> (komplexiert)“ dargestellt. Die genaue Zusammensetzung des Kupfer-Tartrat-Komplexes ist in der Literatur nicht einheitlich beschrieben; Schulbücher verwenden unterschiedliche Formeln.</li>
+      <li>Der Farbverlauf (blau → grün → gelb → orange → ziegelrot) ist idealisiert. Im Realversuch hängen Farbe und Geschwindigkeit von Konzentration, Probenmenge und Temperatur ab. Bei geringer Probenmenge bleibt die überstehende Lösung blau, weil Fehling-Lösung im Überschuss vorliegt – so auch in der Simulation.</li>
+      <li>Die Zeit läuft im Zeitraffer (ca. 1 : 20). Die Reaktionsgeschwindigkeit ist qualitativ temperaturabhängig modelliert; unterhalb von ca. 45 °C findet in der Simulation keine sichtbare Reaktion statt.</li>
+      <li>Benzaldehyd wird gemäß der verbreiteten Schulbuchkonvention als Fehling-negativ dargestellt. Die Begründung ist fachlich nicht einheitlich.</li>
+      <li>Bei Methanal kann sich zusätzlich elementares Kupfer als Belag an der Glaswand abscheiden; die Simulation deutet dies an.</li>
+      <li>Nebenreaktionen (z. B. Aldolreaktion von Ethanal im Alkalischen, Zersetzung des Reagenzes bei langem Kochen) werden nicht abgebildet.</li>
+      <li>Der Versuch mit Natronlauge ohne Tartrat entspricht vereinfacht der Trommer-Probe: Kupfer(II)-hydroxid fällt aus und wird beim Erhitzen zu schwarzem Kupfer(II)-oxid entwässert, das ein mögliches Kupfer(I)-oxid überdeckt.</li>
+    </ul>
+    <p><strong>Die Simulation ersetzt das Realexperiment nicht.</strong> Sie eignet sich zur Vorbereitung, zur Nachbereitung, für Versuche mit Stoffen, die in der Schule nicht eingesetzt werden sollen, sowie für das individuelle Arbeitstempo. Für den Realversuch ist eine Gefährdungsbeurteilung nach den aktuellen Vorgaben (RiSU, GESTIS) erforderlich.</p>
+  </div>
+  <div class="panel flat">
+    <h3>Fortschritt dieses Geräts</h3>
+    <p class="small">Eingaben werden nur lokal in diesem Browser gespeichert. Für eine neue Lerngruppe am selben Gerät kann alles zurückgesetzt werden.</p>
+    <button class="btn danger" id="resetBtn">Alle Eingaben zurücksetzen</button>
+    <div class="fb" id="resetFb"></div>
+  </div>
+</section>
 
-        function updateStatus() {
-            if (progress === 0) statusText.innerText = 'Edukte: Ethanal, Cu2+ (als Hydroxid-Komplex) und OH-Ionen';
-            else if (progress < 0.4) statusText.innerText = 'Oxidation: Das Hydroxid-Ion greift das Carbonyl-C-Atom an';
-            else if (progress < 0.8) statusText.innerText = 'Umlagerung: Essigsäure bildet sich; Elektronen wandern zum Kupfer';
-            else statusText.innerText = 'Produkte: Essigsäure, Wasser und festes Kupfer(I)-oxid (Ionengitter)';
-        }
+<div class="footer"><span>Fehling-Labor · Simulation für den Chemieunterricht</span><span>Zeitraffer und Farbverlauf idealisiert</span></div>
+</main>
 
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawBonds(progress);
-            atoms.forEach(atom => drawAtom(atom, progress));
-            
-            if (isRunning) {
-                progress += speed * parseFloat(speedSlider.value);
-                if (progress >= 1) {
-                    progress = 1;
-                    isRunning = false;
-                    playPauseBtn.innerText = 'Start';
-                }
-            }
-            updateStatus();
-            requestAnimationFrame(animate);
-        }
+<!-- ================= WORTSPEICHER ================= -->
+<aside id="wsp" hidden aria-label="Wortspeicher">
+  <div class="wsp-head"><h3 style="margin:0">Wortspeicher</h3><button class="btn" id="wspClose">Schließen</button></div>
+  <h4>Fachbegriffe</h4>
+  <div class="tablewrap"><table><thead><tr><th>Begriff</th><th>Englisch</th><th>Erklärung</th></tr></thead><tbody id="wspBody"></tbody></table></div>
+  <h4 style="margin-top:16px">Wichtige Verben</h4>
+  <p class="small">mischen (to mix) · hinzugeben (to add) · erhitzen (to heat) · beobachten (to observe) · entstehen (to form) · sich absetzen (to settle) · nachweisen (to detect) · oxidieren (to oxidise) · reduzieren (to reduce)</p>
+  <h4 style="margin-top:16px">Satzbausteine: Beobachtung</h4>
+  <ul class="sb-list small">
+    <li>Nach dem Mischen von Fehling I und Fehling II ist die Lösung …</li>
+    <li>Nach Zugabe der Probe bleibt die Lösung …</li>
+    <li>Beim Erhitzen im Wasserbad färbt sich die Lösung zuerst … und dann …</li>
+    <li>Am Boden des Reagenzglases setzt sich ein … Niederschlag ab.</li>
+    <li>Bei der Blindprobe ist keine Veränderung zu beobachten.</li>
+  </ul>
+  <h4>Satzbausteine: Auswertung</h4>
+  <ul class="sb-list small">
+    <li>Alle Stoffe mit positivem Nachweis besitzen …</li>
+    <li>Propanon reagiert nicht, obwohl …</li>
+    <li>Daraus folgt, dass …</li>
+  </ul>
+  <h4>Satzbausteine: Deutung</h4>
+  <ul class="sb-list small">
+    <li>… wird zu … oxidiert, denn die Oxidationszahl des C-Atoms steigt von … auf …</li>
+    <li>Die Kupfer(II)-Ionen werden zu … reduziert.</li>
+    <li>Der ziegelrote Niederschlag besteht aus …</li>
+  </ul>
+</aside>
 
-        playPauseBtn.addEventListener('click', () => {
-            if (progress >= 1) progress = 0;
-            isRunning = !isRunning;
-            playPauseBtn.innerText = isRunning ? 'Pause' : 'Start';
-        });
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sf=s=>esc(s).replace(/(\d+)/g,'<sub>$1</sub>');
 
-        resetBtn.addEventListener('click', () => {
-            isRunning = false;
-            progress = 0;
-            playPauseBtn.innerText = 'Start';
-        });
+/* ---------- Stoffdaten ---------- */
+const SUBS={
+  wasser:{n:'Wasser (Blindprobe)',f:'H2O',pos:false,k:0,set:'core'},
+  ethanol:{n:'Ethanol',f:'C2H5OH',pos:false,k:0,set:'core'},
+  methanal:{n:'Methanal',f:'HCHO',pos:true,k:1.4,mirror:true,set:'core'},
+  ethanal:{n:'Ethanal',f:'CH3CHO',pos:true,k:1.2,set:'core'},
+  propanal:{n:'Propanal',f:'C2H5CHO',pos:true,k:1.0,set:'core'},
+  propanon:{n:'Propanon (Aceton)',f:'CH3COCH3',pos:false,k:0,set:'core'},
+  glucose:{n:'Glucose-Lösung',f:'C6H12O6',pos:true,k:0.9,set:'core'},
+  fructose:{n:'Fructose-Lösung',f:'C6H12O6',pos:true,k:0.75,set:'special'},
+  saccharose:{n:'Saccharose-Lösung',f:'C12H22O11',pos:false,k:0,set:'special'},
+  saccH:{n:'Saccharose, hydrolysiert und neutralisiert',short:'Saccharose, hydrolysiert',f:'Glucose + Fructose',pos:true,k:0.8,set:'special'},
+  benzaldehyd:{n:'Benzaldehyd',f:'C6H5CHO',pos:false,k:0,emul:true,set:'special'},
+  probeA:{n:'Probe A',f:'C3H6O',unknown:'A',set:'unknown'},
+  probeB:{n:'Probe B',f:'C3H6O',unknown:'B',set:'unknown'}
+};
+const ORDER=['wasser','ethanol','methanal','ethanal','propanal','propanon','glucose','fructose','saccharose','saccH','benzaldehyd','probeA','probeB'];
+const CORE=ORDER.filter(k=>SUBS[k].set==='core');
 
-        animate();
-    </script>
-</body>
-</html>
+/* ---------- Zustand ---------- */
+const KEY='fehling-labor-v1';
+const ROOM=22, BATH=80, VR=2, VS=1, VMAX=10, TIMESCALE=20;
+function newTube(i){return {fI:0,fII:0,naoh:0,sample:null,sv:0,T:ROOM,inBath:false,p:0,set:0,cuo:0,tHeat:0,seed:17+i*101};}
+const S={station:'einstieg',sel:0,tubes:[0,1,2,3].map(newTube),tested:{},protocol:null,ans:{},done:{},unknown:null,showDesc:false};
+function defaultProtocol(){return CORE.map(k=>({sub:k,b:'',a:'',r:'',st:null}));}
+try{const raw=localStorage.getItem(KEY); if(raw){const d=JSON.parse(raw); ['station','tested','protocol','ans','done','unknown','showDesc'].forEach(k=>{if(d[k]!==undefined&&d[k]!==null)S[k]=d[k];});}}catch(e){}
+if(!Array.isArray(S.protocol))S.protocol=defaultProtocol();
+if(!S.unknown||!S.unknown.A)S.unknown=Math.random()<.5?{A:'propanal',B:'propanon'}:{A:'propanon',B:'propanal'};
+function save(){try{localStorage.setItem(KEY,JSON.stringify({station:S.station,tested:S.tested,protocol:S.protocol,ans:S.ans,done:S.done,unknown:S.unknown,showDesc:S.showDesc}));}catch(e){}}
+const realId=id=>id==='probeA'?S.unknown.A:id==='probeB'?S.unknown.B:id;
+
+/* ---------- Strukturformeln ---------- */
+function lbl(l,q){
+  let o='',sub=false;
+  for(const ch of l){const d=/\d/.test(ch);
+    if(d&&!sub){o+='<tspan class="sb" dy="4">'+ch;sub=true;continue;}
+    if(d&&sub){o+=ch;continue;}
+    if(!d&&sub){o+='</tspan><tspan dy="-4">'+esc(ch)+'</tspan>';sub=false;continue;}
+    o+=esc(ch);}
+  if(sub)o+='</tspan>';
+  if(q)o+='<tspan dy="-7" font-size="12">'+q+'</tspan>';
+  return o;
+}
+function hw(l){if(!l)return 0;let n=0;for(const c of l)n+=/\d/.test(c)?.6:1;return n*4.7+3;}
+function mol(m){
+  const U=m.u||38,A=m.a;
+  const xs=A.map(a=>a[0]),ys=A.map(a=>a[1]).concat((m.n||[]).map(n=>n[1]+.15));
+  const minx=Math.min(...xs),maxx=Math.max(...xs),miny=Math.min(...ys),maxy=Math.max(...ys);
+  const padL=22+Math.max(...A.filter(a=>a[0]===minx).map(a=>hw(a[2]))),padR=22+Math.max(...A.filter(a=>a[0]===maxx).map(a=>hw(a[2]))),padY=20;
+  const X=x=>(x-minx)*U+padL,Y=y=>(y-miny)*U+padY;
+  const W=Math.round((maxx-minx)*U+padL+padR),H=Math.round((maxy-miny)*U+2*padY);
+  let s='';
+  (m.g||[]).forEach(g=>{let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;g.i.forEach(i=>{const a=A[i],w=Math.max(hw(a[2]),5);x0=Math.min(x0,X(a[0])-w-5);x1=Math.max(x1,X(a[0])+w+5);y0=Math.min(y0,Y(a[1])-13);y1=Math.max(y1,Y(a[1])+13);});
+    s+=`<rect class="grp grp-${g.t}" x="${x0.toFixed(1)}" y="${y0.toFixed(1)}" width="${(x1-x0).toFixed(1)}" height="${(y1-y0).toFixed(1)}" rx="11"/>`;});
+  (m.b||[]).forEach(([i,j,o])=>{
+    let x1=X(A[i][0]),y1=Y(A[i][1]),x2=X(A[j][0]),y2=Y(A[j][1]);
+    const dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L;
+    const sh=l=>{if(!l)return 0;const w=hw(l),h=10;return Math.min(Math.abs(ux)>1e-6?w/Math.abs(ux):1e9,Math.abs(uy)>1e-6?h/Math.abs(uy):1e9);};
+    const s1=sh(A[i][2]),s2=sh(A[j][2]);
+    x1+=ux*s1;y1+=uy*s1;x2-=ux*s2;y2-=uy*s2;
+    const ln=(a,b,c,d)=>`<line class="bd" x1="${a.toFixed(1)}" y1="${b.toFixed(1)}" x2="${c.toFixed(1)}" y2="${d.toFixed(1)}"/>`;
+    if(o===2){const nx=-uy*2.7,ny=ux*2.7;s+=ln(x1+nx,y1+ny,x2+nx,y2+ny)+ln(x1-nx,y1-ny,x2-nx,y2-ny);}
+    else s+=ln(x1,y1,x2,y2);
+  });
+  (m.mk||[]).forEach(i=>{s+=`<circle class="mk" cx="${X(A[i][0])}" cy="${Y(A[i][1])}" r="${Math.max(hw(A[i][2]),9)+4}"/>`;});
+  A.forEach(a=>{if(a[2])s+=`<text x="${X(a[0]).toFixed(1)}" y="${(Y(a[1])+5).toFixed(1)}" text-anchor="middle">${lbl(a[2],a[3])}</text>`;});
+  (m.n||[]).forEach(n=>{s+=`<text class="note" x="${X(n[0]).toFixed(1)}" y="${Y(n[1]).toFixed(1)}" text-anchor="middle">${esc(n[2])}</text>`;});
+  return `<svg class="mol" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${esc(m.alt||'Strukturformel')}">${s}</svg>`;
+}
+function hexRing(cx,cy,r,start){const p=[];for(let k=0;k<6;k++){const a=(start+60*k)*Math.PI/180;p.push([cx+r*Math.cos(a),cy+r*Math.sin(a),'']);}return p;}
+const MOL={
+  wasser:{alt:'Wasser',a:[[0,.65,'H'],[.85,0,'O'],[1.7,.65,'H']],b:[[0,1,1],[1,2,1]]},
+  ethanol:{alt:'Ethanol',a:[[0,.6,'H3C'],[1,0,'CH2'],[2,.6,'OH']],b:[[0,1,1],[1,2,1]],g:[{t:'oh',i:[2]}]},
+  methanal:{alt:'Methanal',a:[[.85,.95,'C'],[.85,0,'O'],[0,1.5,'H'],[1.7,1.5,'H']],b:[[0,1,2],[0,2,1],[0,3,1]],g:[{t:'ald',i:[0,1,3]}]},
+  ethanal:{alt:'Ethanal',a:[[0,.9,'H3C'],[1.1,.9,'C'],[1.65,.05,'O'],[1.65,1.75,'H']],b:[[0,1,1],[1,2,2],[1,3,1]],g:[{t:'ald',i:[1,2,3]}]},
+  propanal:{alt:'Propanal',a:[[0,1.1,'H3C'],[1,.55,'CH2'],[2,1.1,'C'],[2.85,.55,'O'],[2,2.05,'H']],b:[[0,1,1],[1,2,1],[2,3,2],[2,4,1]],g:[{t:'ald',i:[2,3,4]}]},
+  propanon:{alt:'Propanon',a:[[0,1.15,'H3C'],[1,.6,'C'],[2,1.15,'CH3'],[1,-.35,'O']],b:[[0,1,1],[1,2,1],[1,3,2]],g:[{t:'keto',i:[1,3]}]},
+  ethanoat:{alt:'Ethanoat-Ion',a:[[0,.9,'H3C'],[1.1,.9,'C'],[1.65,.05,'O'],[1.65,1.75,'O','−']],b:[[0,1,1],[1,2,2],[1,3,1]],mk:[1]},
+  ethanalMk:{alt:'Ethanal',a:[[0,.9,'H3C'],[1.1,.9,'C'],[1.65,.05,'O'],[1.65,1.75,'H']],b:[[0,1,1],[1,2,2],[1,3,1]],mk:[1]},
+  glucose:{alt:'Glucose, offenkettige Form in Fischer-Projektion',u:34,a:[[1.2,0,'C'],[2.05,-.5,'O'],[.35,-.5,'H'],[1.2,1,'C'],[.15,1,'H'],[2.3,1,'OH'],[1.2,2,'C'],[.1,2,'HO'],[2.25,2,'H'],[1.2,3,'C'],[.15,3,'H'],[2.3,3,'OH'],[1.2,4,'C'],[.15,4,'H'],[2.3,4,'OH'],[1.2,5,'CH2OH']],
+    b:[[0,1,2],[0,2,1],[0,3,1],[3,4,1],[3,5,1],[3,6,1],[6,7,1],[6,8,1],[6,9,1],[9,10,1],[9,11,1],[9,12,1],[12,13,1],[12,14,1],[12,15,1]],g:[{t:'ald',i:[0,1,2]}]},
+  fructose:{alt:'Fructose, offenkettige Form in Fischer-Projektion',u:34,a:[[1.2,0,'CH2OH'],[1.2,1,'C'],[2.2,1,'O'],[1.2,2,'C'],[.1,2,'HO'],[2.25,2,'H'],[1.2,3,'C'],[.15,3,'H'],[2.3,3,'OH'],[1.2,4,'C'],[.15,4,'H'],[2.3,4,'OH'],[1.2,5,'CH2OH']],
+    b:[[0,1,1],[1,2,2],[1,3,1],[3,4,1],[3,5,1],[3,6,1],[6,7,1],[6,8,1],[6,9,1],[9,10,1],[9,11,1],[9,12,1]],g:[{t:'keto',i:[1,2]},{t:'oh',i:[0]}]},
+  fruTop:{alt:'Fructose, C1 bis C2',u:34,a:[[1,0,'CH2OH'],[1,1,'C'],[2,1,'O'],[1,2,'R']],b:[[0,1,1],[1,2,2],[1,3,1]],n:[[.1,.15,'C1'],[.45,1.15,'C2']]},
+  endiol:{alt:'Endiol',u:34,a:[[1,0,'C'],[.1,0,'H'],[1.95,0,'OH'],[1,1,'C'],[1.95,1,'OH'],[1,2,'R']],b:[[0,1,1],[0,2,1],[0,3,2],[3,4,1],[3,5,1]]},
+  gluTop:{alt:'Glucose, C1 bis C2',u:34,a:[[1,0,'C'],[1.8,-.5,'O'],[.2,-.5,'H'],[1,1,'C'],[.05,1,'H'],[2,1,'OH'],[1,2,'R']],b:[[0,1,2],[0,2,1],[0,3,1],[3,4,1],[3,5,1],[3,6,1]]}
+};
+(function(){ // Benzaldehyd
+  const ring=hexRing(1,2.1,.8,-90), top=ring[0];
+  const a=ring.concat([[1,1.2-.95,'C'],[1.82,1.2-.95-.48,'O'],[.18,1.2-.95-.48,'H']]);
+  a[0]=[top[0],top[1],''];
+  MOL.benzaldehyd={alt:'Benzaldehyd',a,b:[[0,1,2],[1,2,1],[2,3,2],[3,4,1],[4,5,2],[5,0,1],[0,6,1],[6,7,2],[6,8,1]],g:[{t:'ald',i:[6,7,8]}]};
+  // Saccharose (schematisch)
+  const h=[[.2,1],[.6,.31],[1.4,.31],[1.8,1],[1.4,1.69],[.6,1.69]].map(p=>[p[0],p[1],'']);
+  h[2][2]='O';
+  const cx=3.45+.7,cy=1,r=.7,pent=[];
+  for(let k=0;k<5;k++){const ang=(180+72*k)*Math.PI/180;pent.push([cx+r*Math.cos(ang),cy-r*Math.sin(ang),'']);}
+  pent[4][2]='O';
+  const sa=h.concat([[2.62,1,'O']]).concat(pent);
+  MOL.saccharose={alt:'Saccharose, schematisch: Glucose-Ring und Fructose-Ring über ein Sauerstoffatom verknüpft',u:40,a:sa,
+    b:[[0,1,1],[1,2,1],[2,3,1],[3,4,1],[4,5,1],[5,0,1],[3,6,1],[6,7,1],[7,8,1],[8,9,1],[9,10,1],[10,11,1],[11,7,1]],
+    g:[{t:'gly',i:[3,6,7]}],n:[[1.85,1.4,'C1'],[3.45,1.4,'C2'],[1,2.15,'Glucose'],[4.15,2.15,'Fructose']]};
+})();
+
+/* ---------- Navigation ---------- */
+const STATIONS=['einstieg','labor','auswertung','deutung','transfer','lehrkraft'];
+function show(st,push){
+  if(!STATIONS.includes(st))st='einstieg';
+  S.station=st;save();
+  $$('section.station').forEach(s=>s.hidden=s.dataset.station!==st);
+  $$('nav.stations button').forEach(b=>{b.setAttribute('aria-selected',b.dataset.st===st?'true':'false');b.tabIndex=b.dataset.st===st?0:-1;});
+  if(st==='auswertung')renderSort();
+  if(st==='transfer')renderTestedChips();
+  if(push){try{history.replaceState(null,'','#'+st);}catch(e){}}
+  window.scrollTo({top:0});
+}
+$$('nav.stations button').forEach(b=>b.addEventListener('click',()=>show(b.dataset.st,true)));
+$('nav.stations').addEventListener('keydown',e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;const bs=$$('nav.stations button');let i=bs.findIndex(b=>b.getAttribute('aria-selected')==='true');i=(i+(e.key==='ArrowRight'?1:-1)+bs.length)%bs.length;bs[i].focus();show(bs[i].dataset.st,true);});
+$$('[data-go]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.go,true)));
+function renderDots(){$$('nav.stations button').forEach(b=>{const old=b.querySelector('.dot');if(old)old.remove();if(S.done[b.dataset.st]){const d=document.createElement('span');d.className='dot';d.title='erledigt';b.appendChild(d);}});}
+
+/* ---------- Wortspeicher ---------- */
+const WSP=[
+ ['das Reagenzglas','die Reagenzgläser','test tube','kleines Glasrohr für Versuche'],
+ ['das Reagenz','die Reagenzien','reagent','Stoff, mit dem man einen anderen Stoff nachweist'],
+ ['die Fehling-Lösung','–',"Fehling's solution",'Nachweisreagenz aus Fehling I und Fehling II'],
+ ['das Wasserbad','die Wasserbäder','water bath','Gefäß mit heißem Wasser zum gleichmäßigen Erwärmen'],
+ ['der Niederschlag','die Niederschläge','precipitate','fester Stoff, der in einer Lösung entsteht und sich absetzt'],
+ ['die Trübung','die Trübungen','cloudiness, turbidity','die Flüssigkeit ist nicht mehr klar'],
+ ['der Nachweis','die Nachweise','test, detection','Versuch, der zeigt, ob ein Stoff vorhanden ist'],
+ ['die Blindprobe','die Blindproben','blank test, control','Vergleichsversuch ohne den gesuchten Stoff (hier: mit Wasser)'],
+ ['der Aldehyd','die Aldehyde','aldehyde','Stoff mit der Aldehydgruppe –CHO'],
+ ['das Keton','die Ketone','ketone','Stoff mit einer Carbonylgruppe zwischen zwei C-Atomen'],
+ ['die funktionelle Gruppe','die funktionellen Gruppen','functional group','Atomgruppe, die die Eigenschaften eines Stoffes bestimmt'],
+ ['die Oxidationszahl','die Oxidationszahlen','oxidation number','gedachte Ladung eines Atoms in einer Verbindung'],
+ ['die Oxidation','die Oxidationen','oxidation','Elektronenabgabe; die Oxidationszahl steigt'],
+ ['die Reduktion','die Reduktionen','reduction','Elektronenaufnahme; die Oxidationszahl sinkt'],
+ ['der Elektronendonator','die Elektronendonatoren','electron donor','Teilchen, von dem Elektronen übertragen werden'],
+ ['der Elektronenakzeptor','die Elektronenakzeptoren','electron acceptor','Teilchen, auf das Elektronen übertragen werden'],
+ ['der Komplex','die Komplexe','complex','Teilchen aus einem Zentralion und daran gebundenen Teilchen (Liganden)'],
+ ['alkalisch','–','alkaline, basic','die Lösung enthält viele Hydroxid-Ionen (pH-Wert über 7)'],
+ ['das Kupfer(I)-oxid','–','copper(I) oxide','ziegelroter Feststoff, Formel Cu₂O'],
+ ['ziegelrot · tiefblau · hellblau','–','brick-red · deep blue · light blue','Farbwörter für die Beobachtung']
+];
+$('#wspBody').innerHTML=WSP.map(w=>`<tr><td><strong>${esc(w[0])}</strong>${w[1]!=='–'?`<br><span class="small muted">Pl.: ${esc(w[1])}</span>`:''}</td><td class="en">${esc(w[2])}</td><td>${esc(w[3])}</td></tr>`).join('');
+let wspLast=null;
+function wsp(open){const a=$('#wsp');a.hidden=!open;$('#wspOpen').setAttribute('aria-expanded',open?'true':'false');if(open){wspLast=document.activeElement;$('#wspClose').focus();}else if(wspLast)wspLast.focus();}
+$('#wspOpen').addEventListener('click',()=>wsp($('#wsp').hidden));
+$('#wspClose').addEventListener('click',()=>wsp(false));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#wsp').hidden)wsp(false);});
+
+/* ---------- Labor: Chemie-Modell ---------- */
+const vol=t=>t.fI+t.fII+t.naoh+t.sv;
+function info(t){const s=t.sample?SUBS[realId(t.sample)]:null;return {hasCu:t.fI>0,tart:t.fII>0,alk:t.fII>0||t.naoh>0,s};}
+function step(dt){
+  let active=false;
+  S.tubes.forEach(t=>{
+    const target=t.inBath?BATH:ROOM,tau=t.inBath?2.5:10;
+    t.T+=(target-t.T)*(1-Math.exp(-dt/tau));
+    if(Math.abs(target-t.T)>0.05)active=true;else t.T=target;
+    if(!vol(t))return;
+    const {hasCu,tart,alk,s}=info(t);
+    const f=t.T<45?0:Math.min(1,Math.pow((t.T-45)/35,2));
+    if(t.T>60){t.tHeat+=dt;active=true;}
+    if(hasCu&&alk&&s&&s.pos&&t.sv>0&&t.p<1&&f>0){t.p=Math.min(1,t.p+0.11*s.k*(tart?1:0.55)*f*dt);active=true;}
+    if(hasCu&&t.naoh>0&&!tart&&t.cuo<1&&f>0){t.cuo=Math.min(1,t.cuo+0.08*f*dt*(1-0.5*t.p));active=true;}
+    if(t.p>t.set){t.set=Math.min(t.p,t.set+(t.p-t.set)*(0.015+0.5*Math.pow(t.p,4))*dt);if(t.p>=1&&t.p-t.set<0.002)t.set=t.p;else active=true;}
+    if(t.sample&&t.tHeat>8){
+      let key=null;
+      if(hasCu&&tart)key=t.sample;
+      else if(hasCu&&t.naoh>0)key='trommer:'+t.sample;
+      if(key&&!S.tested[key]){S.tested[key]=1;save();renderTestedChips();}
+    }
+  });
+  return active;
+}
+const hex=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+const mix=(a,b,t)=>a.map((v,i)=>Math.round(v+(b[i]-v)*Math.max(0,Math.min(1,t))));
+const rgba=(c,a)=>`rgba(${c[0]},${c[1]},${c[2]},${a})`;
+const C={deep:hex('#1f45b0'),pale:hex('#9cbfe8'),light:hex('#8fc3ea'),none:[175,200,228],cu2o:hex('#a63f29'),cuoh:hex('#86bde6'),cuo:hex('#2a2421'),copper:hex('#b8733a')};
+const KF=[[0,'#1f45b0'],[.18,'#1f7c95'],[.38,'#5f9a3c'],[.58,'#c7a12a'],[.78,'#cf6f28'],[1,'#a63f29']].map(([p,h])=>[p,hex(h)]);
+function kf(p){for(let i=1;i<KF.length;i++){if(p<=KF[i][0]){const [p0,c0]=KF[i-1],[p1,c1]=KF[i];return mix(c0,c1,(p-p0)/(p1-p0));}}return KF[KF.length-1][1];}
+function residual(t){const c=Math.min(.85,t.fI?0.35*t.sv/(t.fI/2):0)*t.p;return {c,col:mix(C.deep,C.pale,c/0.85*0.9)};}
+function look(t){
+  if(!vol(t))return null;
+  const {hasCu,tart,alk,s}=info(t);
+  const L={liquid:C.none,alpha:.3,precip:null,pH:0,dots:0,dotC:null,dotR:1.3,mirror:0,drops:!!(s&&s.emul)};
+  if(!hasCu){return L;}
+  if(!alk){L.liquid=C.light;L.alpha=.78;return L;}
+  if(tart){
+    const r=residual(t),sus=t.p-t.set,fr=t.p>0?sus/t.p:0;
+    L.liquid=t.p>0?mix(r.col,kf(t.p),fr):r.col;L.alpha=.9;
+    L.precip=C.cu2o;L.pH=t.set;L.dots=Math.round(sus*46);L.dotC=kf(Math.max(.62,t.p));
+    if(s&&s.mirror)L.mirror=Math.max(0,(t.p-.7)/.3);
+    return L;
+  }
+  const fl=mix(mix(C.cuoh,C.cuo,t.cuo),C.cu2o,t.p*0.55);
+  L.liquid=mix([205,226,242],fl,.3);L.alpha=.55;L.dots=34;L.dotC=fl;L.dotR=2.3;
+  return L;
+}
+function describe(t){
+  const v=vol(t);if(!v)return 'Das Reagenzglas ist leer.';
+  const {hasCu,tart,s}=info(t);const out=[];
+  if(!hasCu){out.push('Die Flüssigkeit ist farblos und klar.');}
+  else if(!(t.fII>0||t.naoh>0)){out.push('Die Lösung ist hellblau und klar.');}
+  else if(tart){
+    const sus=t.p-t.set,fr=t.p>0?sus/t.p:0;
+    if(t.p<0.08)out.push('Die Lösung ist tiefblau und klar.');
+    else if(fr>0.3){
+      if(t.p<0.3)out.push('Die Lösung färbt sich blaugrün.');
+      else if(t.p<0.5)out.push('Die Flüssigkeit ist grün und trüb.');
+      else if(t.p<0.7)out.push('Die Flüssigkeit ist gelb bis orange und trüb.');
+      else out.push('Die Flüssigkeit ist orange bis ziegelrot und trüb.');
+    }
+    if(t.set>0.12)out.push('Am Boden setzt sich ein ziegelroter Niederschlag ab.');
+    if(t.p>0.08&&fr<=0.3){const r=residual(t);out.push(r.c>0.5?'Darüber ist die Lösung klar und hellblau.':'Darüber ist die Lösung klar und blau.');}
+    if(t.p>0.85&&s&&s.mirror)out.push('An der Glaswand bildet sich ein kupferfarbener Belag.');
+  }else{
+    if(t.cuo<0.2&&t.p<0.2)out.push('Es bildet sich ein hellblauer, flockiger Niederschlag.');
+    else if(t.cuo>=0.2)out.push(t.cuo>0.6?'Der Niederschlag ist schwarz.':'Der Niederschlag färbt sich dunkel.');
+    if(t.p>0.25)out.push('Ein Teil des Niederschlags ist rotbraun.');
+  }
+  if(s&&s.emul)out.push('Es sind kleine Tröpfchen zu erkennen; die Flüssigkeit ist leicht trüb.');
+  return out.join(' ');
+}
+
+/* ---------- Labor: Darstellung ---------- */
+const RACK_X=i=>48+i*70,RACK_Y=58,BATH_X=i=>397+i*55,BATH_Y=104;
+function rnd(seed){let x=seed;return ()=>{x=(x*16807)%2147483647;return (x-1)/2147483646;};}
+function tubeSVG(i,t){
+  const sel=i===S.sel,x=t.inBath?BATH_X(i):RACK_X(i),y=t.inBath?BATH_Y:RACK_Y;
+  const L=look(t),v=vol(t),h=v/VMAX*138;
+  let g=`<g class="tube${sel?' sel':''}" data-i="${i}" transform="translate(${x},${y})" tabindex="0" role="button" aria-pressed="${sel}" aria-label="Reagenzglas ${i+1}${t.inBath?', im Wasserbad':''}">`;
+  g+=`<rect x="-10" y="-34" width="50" height="210" fill="transparent"/>`;
+  g+=`<path d="M0,0 L0,155 A15,15 0 0 0 30,155 L30,0" fill="var(--glass-fill)"/>`;
+  if(L){
+    g+=`<g clip-path="url(#tclip)">`;
+    g+=`<rect x="0" y="${(168-h).toFixed(1)}" width="30" height="${h.toFixed(1)}" fill="${rgba(L.liquid,L.alpha)}"/>`;
+    if(L.dots&&L.dotC){const r=rnd(t.seed);for(let k=0;k<L.dots;k++){const dx=4+r()*22,dy=168-h+5+r()*(h-8);g+=`<circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" r="${L.dotR}" fill="${rgba(L.dotC,.9)}"/>`;}}
+    if(L.pH>0.01&&L.precip){const ph=L.pH*14+1;g+=`<rect x="0" y="${(168-ph).toFixed(1)}" width="30" height="${(ph+2).toFixed(1)}" fill="${rgba(L.precip,1)}"/>`;}
+    if(L.drops){const r=rnd(t.seed+7);for(let k=0;k<7;k++){const dx=5+r()*20,dy=168-h+6+r()*(h-10);g+=`<circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" r="${(1.6+r()*1.6).toFixed(1)}" fill="rgba(255,255,255,.45)" stroke="rgba(120,140,160,.6)" stroke-width=".6"/>`;}}
+    if(L.mirror>0){g+=`<rect x="1" y="${(168-h).toFixed(1)}" width="3.5" height="${h.toFixed(1)}" fill="${rgba(C.copper,(.75*L.mirror).toFixed(2))}"/><rect x="25.5" y="${(168-h).toFixed(1)}" width="3.5" height="${h.toFixed(1)}" fill="${rgba(C.copper,(.75*L.mirror).toFixed(2))}"/>`;}
+    g+=`<rect x="0" y="${(168-h).toFixed(1)}" width="30" height="1.6" fill="rgba(255,255,255,.4)"/>`;
+    g+=`</g>`;
+  }
+  g+=`<line x1="6" y1="8" x2="6" y2="150" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="round"/>`;
+  g+=`<path class="glass-o" d="M0,0 L0,155 A15,15 0 0 0 30,155 L30,0" fill="none" stroke="var(--glass)" stroke-width="1.6"/>`;
+  g+=`<path d="M-3,0 L33,0" stroke="var(--glass)" stroke-width="2.4" stroke-linecap="round"/>`;
+  g+=`<rect class="tpill" x="3" y="-27" width="24" height="18" rx="9"/><text class="tlabel" x="15" y="-13.5" text-anchor="middle">${i+1}</text>`;
+  g+='</g>';
+  return g;
+}
+function sceneStatic(){
+  return `<defs><clipPath id="tclip"><path d="M1.5,0 L1.5,155 A13.5,13.5 0 0 0 28.5,155 L28.5,0 Z"/></clipPath>
+   <linearGradient id="waterG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgb(120,170,225)" stop-opacity=".38"/><stop offset="1" stop-color="rgb(90,140,205)" stop-opacity=".5"/></linearGradient></defs>
+   <rect x="0" y="312" width="650" height="18" fill="var(--bench)"/>
+   <rect x="22" y="226" width="290" height="14" rx="3" fill="var(--bench-2)"/>
+   <rect x="34" y="240" width="10" height="72" fill="var(--bench-2)"/><rect x="290" y="240" width="10" height="72" fill="var(--bench-2)"/>
+   <rect x="22" y="300" width="290" height="12" rx="3" fill="var(--bench-2)"/>
+   <text x="167" y="290" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" fill="var(--muted)">Reagenzglasständer</text>
+   <rect x="360" y="290" width="270" height="22" rx="4" fill="var(--plate)"/>
+   <circle cx="610" cy="301" r="4" fill="var(--plate-hi)"/>
+   <text x="375" y="305" font-family="IBM Plex Mono, monospace" font-size="11" fill="#e7ecf3">Heizplatte · Wasserbad 80 °C</text>`;
+}
+function sceneBath(){
+  return `<rect x="378" y="150" width="236" height="134" fill="url(#waterG)"/>
+   <path d="M376,86 L376,282 Q376,288 382,288 L610,288 Q616,288 616,282 L616,86" fill="none" stroke="var(--glass)" stroke-width="2"/>
+   <line x1="378" y1="150" x2="614" y2="150" stroke="rgba(150,190,235,.9)" stroke-width="1.5"/>`;
+}
+const svg=$('#sceneSvg');
+function renderScene(){
+  let s=sceneStatic();
+  S.tubes.forEach((t,i)=>{if(!t.inBath)s+=tubeSVG(i,t);});
+  s+=`<rect x="22" y="150" width="290" height="12" rx="3" fill="var(--bench-2)" opacity=".92"/>`;
+  S.tubes.forEach((t,i)=>{if(t.inBath)s+=tubeSVG(i,t);});
+  s+=sceneBath();
+  const hadFocus=document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.tube');
+  svg.innerHTML=s;
+  if(hadFocus){const n=svg.querySelector(`.tube[data-i="${S.sel}"]`);if(n)n.focus({preventScroll:true});}
+}
+svg.addEventListener('click',e=>{const g=e.target.closest('.tube');if(g){select(+g.dataset.i);}});
+svg.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const g=e.target.closest('.tube');if(g){e.preventDefault();select(+g.dataset.i);}});
+function renderSelector(){
+  $('#tubeSel').innerHTML=S.tubes.map((t,i)=>`<button aria-pressed="${i===S.sel}" data-sel="${i}" aria-label="Reagenzglas ${i+1}">${i+1}</button>`).join('');
+}
+$('#tubeSel').addEventListener('click',e=>{const b=e.target.closest('button');if(b)select(+b.dataset.sel);});
+function select(i){S.sel=i;renderSelector();renderScene();renderStatus();}
+const cur=()=>S.tubes[S.sel];
+const NAMES={fI:'Fehling I',fII:'Fehling II',naoh:'Natronlauge'};
+function msg(t){$('#msg').textContent=t;}
+function fmtTime(sec){const s=Math.round(sec*TIMESCALE);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')+' min';}
+function renderStatus(){
+  const t=cur();
+  $('#stTitle').textContent='Reagenzglas '+(S.sel+1);
+  $('#stTemp').textContent=Math.round(t.T)+' °C';
+  $('#stPlace').textContent=t.inBath?'Wasserbad (80 °C)':'Reagenzglasständer';
+  $('#stHeat').textContent=fmtTime(t.tHeat);
+  const parts=[];
+  if(t.fI)parts.push(`Fehling I: ${t.fI} mL`);
+  if(t.fII)parts.push(`Fehling II: ${t.fII} mL`);
+  if(t.naoh)parts.push(`Natronlauge: ${t.naoh} mL`);
+  if(t.sample)parts.push(`${SUBS[t.sample].short||SUBS[t.sample].n}: ${t.sv} mL`);
+  $('#stContent').innerHTML=parts.length?'<ul>'+parts.map(p=>'<li>'+esc(p)+'</li>').join('')+'</ul>':'leer';
+  $('#bathBtn').textContent=t.inBath?'Aus dem Wasserbad nehmen':'In das Wasserbad stellen';
+  $('#bathBtn').disabled=!vol(t);
+  $('#emptyBtn').disabled=!vol(t);
+  const d=$('#stDesc');d.hidden=!S.showDesc;if(S.showDesc)d.textContent=describe(t);
+}
+$('#descToggle').checked=!!S.showDesc;
+$('#descToggle').addEventListener('change',e=>{S.showDesc=e.target.checked;save();renderStatus();});
+$$('[data-add]').forEach(b=>b.addEventListener('click',()=>{
+  const t=cur(),k=b.dataset.add;
+  if(vol(t)+VR>VMAX){msg('Das Reagenzglas ist zu voll. Leere es oder wähle ein anderes Reagenzglas.');return;}
+  t[k]+=VR;msg(`${NAMES[k]} (2 mL) in Reagenzglas ${S.sel+1} gegeben.`);kick();
+}));
+function renderSamples(){
+  $('#sampleGrid').innerHTML=ORDER.map(k=>{const s=SUBS[k];const cls=s.set==='special'?' special':s.set==='unknown'?' unknown':'';
+    return `<button class="btn sample-btn${cls}" data-sample="${k}">${esc(s.short||s.n)}<small>${s.f.includes('+')?esc(s.f):sf(s.f)}</small></button>`;}).join('');
+}
+$('#sampleGrid').addEventListener('click',e=>{
+  const b=e.target.closest('[data-sample]');if(!b)return;
+  const id=b.dataset.sample,t=cur();
+  if(t.sample&&t.sample!==id){msg('In diesem Reagenzglas ist bereits eine andere Probe. Verwende ein sauberes Reagenzglas, damit sich das Ergebnis eindeutig zuordnen lässt.');return;}
+  if(t.sv>=2){msg('Mehr Probe ist nicht nötig: 1 bis 2 mL genügen.');return;}
+  if(vol(t)+VS>VMAX){msg('Das Reagenzglas ist zu voll.');return;}
+  t.sample=id;t.sv+=VS;msg(`${SUBS[id].short||SUBS[id].n} (1 mL) in Reagenzglas ${S.sel+1} gegeben.`);kick();
+});
+$('#bathBtn').addEventListener('click',()=>{const t=cur();t.inBath=!t.inBath;msg(t.inBath?`Reagenzglas ${S.sel+1} steht im Wasserbad.`:`Reagenzglas ${S.sel+1} steht wieder im Ständer.`);kick();});
+$('#emptyBtn').addEventListener('click',()=>{const old=cur();S.tubes[S.sel]=newTube(S.sel);S.tubes[S.sel].inBath=false;msg(`Reagenzglas ${S.sel+1} geleert und gespült. Im Realversuch gehören kupferhaltige Reste in den Schwermetallabfall.`);kick();});
+
+let running=false,last=0,acc=0;
+function kick(){renderScene();renderStatus();if(!running){running=true;last=performance.now();requestAnimationFrame(loop);}}
+function loop(now){
+  const dt=Math.min(0.1,(now-last)/1000);last=now;
+  const active=step(dt);
+  acc+=dt;
+  if(acc>1/30){acc=0;renderScene();renderStatus();}
+  if(active)requestAnimationFrame(loop);else{running=false;renderScene();renderStatus();}
+}
+
+/* ---------- Protokoll ---------- */
+const OPT_B=['hellblau, klar','tiefblau, klar','tiefblau, trüb','farblos, klar','hellblauer Niederschlag'];
+const OPT_A=['keine Veränderung (tiefblau)','ziegelroter Niederschlag','schwarzer Niederschlag','Lösung wird farblos'];
+const OPT_R=['positiv','negativ'];
+function expected(id){const s=SUBS[realId(id)];return {b:s.emul?['tiefblau, trüb','tiefblau, klar']:['tiefblau, klar'],a:[s.pos?'ziegelroter Niederschlag':'keine Veränderung (tiefblau)'],r:[s.pos?'positiv':'negativ']};}
+const sel=(name,opts,val,i)=>`<select data-row="${i}" data-f="${name}" aria-label="${name==='b'?'Vor dem Erhitzen':name==='a'?'Nach dem Erhitzen':'Nachweis'}"><option value="">– wählen –</option>${opts.map(o=>`<option${o===val?' selected':''}>${esc(o)}</option>`).join('')}</select>`;
+function renderProto(){
+  $('#protoBody').innerHTML=S.protocol.map((r,i)=>{
+    const s=SUBS[r.sub];
+    let st='<span class="chip neutral">–</span>';
+    if(r.st){const m={ok:['ok','richtig'],bad:['bad','falsch'],open:['open','noch nicht untersucht'],inc:['open','unvollständig']}[r.st.k];st=`<span class="chip ${m[0]}">${m[1]}</span>${r.st.why?`<span class="why">${esc(r.st.why)}</span>`:''}`;}
+    const rm=CORE.includes(r.sub)?'':`<button class="btn" data-rm="${i}" aria-label="Zeile entfernen">Entfernen</button>`;
+    return `<tr><td class="sub">${esc(s.short||s.n)}<small>${s.f.includes('+')?esc(s.f):sf(s.f)}</small></td><td>${sel('b',OPT_B,r.b,i)}</td><td>${sel('a',OPT_A,r.a,i)}</td><td>${sel('r',OPT_R,r.r,i)}</td><td>${st}</td><td>${rm}</td></tr>`;
+  }).join('');
+  const used=new Set(S.protocol.map(r=>r.sub));
+  const rest=ORDER.filter(k=>!used.has(k));
+  $('#addRowSel').innerHTML=rest.length?rest.map(k=>`<option value="${k}">${esc(SUBS[k].short||SUBS[k].n)}</option>`).join(''):'<option value="">alle Proben aufgenommen</option>';
+  $('#addRowBtn').disabled=!rest.length;
+}
+$('#protoBody').addEventListener('change',e=>{const s=e.target.closest('select');if(!s)return;const r=S.protocol[+s.dataset.row];r[s.dataset.f]=s.value;r.st=null;save();renderProto();});
+$('#protoBody').addEventListener('click',e=>{const b=e.target.closest('[data-rm]');if(!b)return;S.protocol.splice(+b.dataset.rm,1);save();renderProto();});
+$('#addRowBtn').addEventListener('click',()=>{const v=$('#addRowSel').value;if(!v)return;S.protocol.push({sub:v,b:'',a:'',r:'',st:null});save();renderProto();});
+$('#checkProto').addEventListener('click',()=>{
+  let ok=0,bad=0,open=0;
+  S.protocol.forEach(r=>{
+    if(!S.tested[r.sub]){r.st={k:'open',why:'Zuerst Fehling I, Fehling II und Probe mischen und mindestens 3 min im Wasserbad erhitzen.'};open++;return;}
+    if(!r.b||!r.a||!r.r){r.st={k:'inc',why:'Bitte alle drei Spalten ausfüllen.'};open++;return;}
+    const e=expected(r.sub),w=[];
+    if(!e.b.includes(r.b))w.push('vor dem Erhitzen');
+    if(!e.a.includes(r.a))w.push('nach dem Erhitzen');
+    if(!e.r.includes(r.r))w.push('Nachweis');
+    if(w.length){r.st={k:'bad',why:'Prüfe erneut: '+w.join(', ')+'.'};bad++;}else{r.st={k:'ok',why:''};ok++;}
+  });
+  const coreOk=CORE.every(k=>{const r=S.protocol.find(x=>x.sub===k);return r&&r.st&&r.st.k==='ok';});
+  if(coreOk){S.done.labor=true;renderDots();}
+  save();renderProto();
+  const fb=$('#protoFb');
+  if(bad){fb.className='fb bad';fb.innerHTML=`falsch: ${bad} Zeile(n) enthalten Fehler. <span class="n">Wiederhole den Versuch und vergleiche genau mit der Blindprobe.</span>`;}
+  else if(open){fb.className='fb info';fb.textContent=`${ok} Zeile(n) richtig, ${open} Zeile(n) noch offen.`;}
+  else {fb.className='fb ok';fb.textContent='richtig: Alle Einträge stimmen mit den Versuchsergebnissen überein.';}
+});
+
+/* ---------- Auswertung ---------- */
+function card(k){const s=SUBS[k];return `<div class="molcard"><div class="nm">${esc(s.short||s.n)}</div><div class="pic">${mol(MOL[k])}</div><div class="sf">${sf(s.f)}</div></div>`;}
+function renderSort(){
+  const g={positiv:[],negativ:[],offen:[]};
+  CORE.forEach(k=>{const r=S.protocol.find(x=>x.sub===k);const v=r&&r.r?r.r:'offen';g[v].push(k);});
+  const col=(t,arr,ch)=>`<div class="sortcol"><h4>${t}<span class="chip ${ch}">${arr.length}</span></h4><div class="cards">${arr.map(card).join('')||'<p class="small muted">keine</p>'}</div></div>`;
+  $('#sortCols').innerHTML=col('Nachweis positiv',g.positiv,'ok')+col('Nachweis negativ',g.negativ,'neutral')+(g.offen.length?col('Noch nicht im Protokoll eingetragen',g.offen,'open'):'');
+}
+$('#grpToggle').addEventListener('change',e=>{$('#sortCols').classList.toggle('show-groups',e.target.checked);});
+$('#glucoseFig').innerHTML=`<div class="groups-always">${mol(MOL.glucose)}</div><figcaption class="small muted">Glucose, offenkettige Form (Fischer-Projektion)</figcaption>`;
+
+/* ---------- Multiple Choice ---------- */
+const MCS={
+  merkmal:{q:'Welches Strukturmerkmal besitzen alle Stoffe der Versuchsreihe 1, die einen positiven Nachweis zeigen?',o:[
+    ['Eine Hydroxygruppe (–OH)',0,'Ethanol besitzt eine Hydroxygruppe und reagiert nicht; Methanal besitzt keine Hydroxygruppe und reagiert.'],
+    ['Eine Carbonylgruppe (C=O) an beliebiger Stelle im Molekül',0,'Propanon besitzt ebenfalls eine Carbonylgruppe, zeigt aber keinen positiven Nachweis.'],
+    ['Eine Aldehydgruppe (–CHO)',1,'Methanal, Ethanal, Propanal und die offenkettige Form der Glucose besitzen eine Aldehydgruppe. Ethanol, Propanon und Wasser besitzen keine.'],
+    ['Eine Kohlenstoffkette aus mindestens zwei C-Atomen',0,'Methanal besitzt nur ein C-Atom und reagiert positiv; Ethanol und Propanon besitzen längere Ketten und reagieren nicht.']],done:'auswertung'},
+  tartrat:{q:'Vergleiche die Versuche mit und ohne Tartrat. Welche Aufgabe haben die Tartrat-Ionen in Fehling II?',o:[
+    ['Sie reduzieren die Kupfer(II)-Ionen.',0,'Ohne Probe bleibt die Fehling-Lösung beim kurzen Erhitzen tiefblau; das Reduktionsmittel ist die Probe.'],
+    ['Sie bilden mit den Kupfer(II)-Ionen einen löslichen Komplex und verhindern so, dass im alkalischen Milieu Kupfer(II)-hydroxid ausfällt.',1,'Ohne Tartrat fällt hellblaues Kupfer(II)-hydroxid aus. Beim Erhitzen entsteht daraus schwarzes Kupfer(II)-oxid, das einen roten Niederschlag überdecken kann.'],
+    ['Sie sorgen für das alkalische Milieu.',0,'Das alkalische Milieu stammt von der Natronlauge (Hydroxid-Ionen) in Fehling II.'],
+    ['Sie färben die Lösung blau.',0,'Tartrat-Lösung ist farblos. Die Farbe stammt von den Kupfer(II)-Ionen bzw. vom Kupfer-Tartrat-Komplex.']],done:'tE'},
+  spez:{q:'Eine Urinprobe zeigt mit Fehling-Lösung einen ziegelroten Niederschlag. Welche Aussage ist fachlich korrekt?',o:[
+    ['Die Probe enthält sicher Glucose.',0,'Auch andere reduzierende Zucker (z. B. Fructose, Lactose) und weitere reduzierend wirkende Stoffe führen zu einem positiven Ergebnis.'],
+    ['Die Probe enthält einen reduzierend wirkenden Stoff, zum Beispiel einen reduzierenden Zucker.',1,'Die Fehling-Probe ist ein Gruppennachweis, kein spezifischer Glucose-Nachweis. Heutige Teststreifen nutzen deshalb das Enzym Glucoseoxidase, das spezifisch mit Glucose reagiert.'],
+    ['Die Probe enthält keine Ketone.',0,'Ketone reagieren nicht, stören den Nachweis aber auch nicht. Ihre Anwesenheit wird durch das Ergebnis nicht ausgeschlossen.'],
+    ['Die Probe ist sauer.',0,'Die Reaktion benötigt ein alkalisches Milieu; über den pH-Wert der ursprünglichen Probe sagt das Ergebnis nichts aus.']],done:'tF'}
+};
+$$('.mc').forEach(el=>{
+  const id=el.dataset.mc,m=MCS[id];
+  el.innerHTML=`<fieldset><legend>${esc(m.q)}</legend>${m.o.map((o,i)=>`<label><input type="radio" name="mc-${id}" value="${i}"${S.ans['mc-'+id]==i?' checked':''}><span>${esc(o[0])}</span></label>`).join('')}</fieldset><div class="row"><button class="btn primary" data-check="${id}">Überprüfen</button></div><div class="fb" id="fb-${id}"></div>`;
+  el.addEventListener('change',e=>{if(e.target.name==='mc-'+id){S.ans['mc-'+id]=e.target.value;save();}});
+  el.querySelector('[data-check]').addEventListener('click',()=>{
+    const v=el.querySelector('input:checked'),fb=el.querySelector('.fb');
+    if(!v){fb.className='fb info';fb.textContent='Bitte wähle eine Antwort aus.';return;}
+    const o=m.o[+v.value];
+    if(o[1]){fb.className='fb ok';fb.innerHTML='richtig: <span class="n">'+esc(o[2])+'</span>';S.done[m.done]=true;}
+    else{fb.className='fb bad';fb.innerHTML='falsch: <span class="n">'+esc(o[2])+'</span>';}
+    updateTransferDone();save();renderDots();
+  });
+});
+
+/* ---------- Deutung: Oxidationszahlen ---------- */
+const OXN=['−III','−II','−I','0','+I','+II','+III','+IV'];
+const OXA={'ox-c1':'+I','ox-c2':'+III','ox-cu1':'+II','ox-cu2':'+I'};
+const OXNAME={'ox-c1':'C-Atom in Ethanal','ox-c2':'C-Atom im Ethanoat-Ion','ox-cu1':'Kupfer in Cu²⁺','ox-cu2':'Kupfer in Cu₂O'};
+$('#oxPics').innerHTML=`<figure>${mol(MOL.ethanalMk)}<figcaption>Ethanal</figcaption></figure><span class="muted" style="font-size:1.4rem">→</span><figure>${mol(MOL.ethanoat)}<figcaption>Ethanoat-Ion</figcaption></figure>`;
+Object.keys(OXA).forEach(id=>{const s=$('#'+id);s.innerHTML='<option value="">– wählen –</option>'+OXN.map(o=>`<option${S.ans[id]===o?' selected':''}>${o}</option>`).join('');s.addEventListener('change',()=>{S.ans[id]=s.value;save();});});
+$('#checkOx').addEventListener('click',()=>{
+  const fb=$('#oxFb');let wrong=[],empty=0;
+  Object.keys(OXA).forEach(id=>{const v=$('#'+id).value;if(!v)empty++;else if(v!==OXA[id])wrong.push(OXNAME[id]);});
+  if(empty){fb.className='fb info';fb.textContent='Bitte alle vier Oxidationszahlen auswählen.';return;}
+  if(wrong.length){fb.className='fb bad';fb.innerHTML='falsch: <span class="n">Prüfe erneut: '+esc(wrong.join('; '))+'.</span>';S.ans.oxOk=false;}
+  else{fb.className='fb ok';fb.innerHTML='richtig: <span class="n">Die Oxidationszahl des Carbonyl-C-Atoms steigt von +I auf +III (Oxidation). Die Oxidationszahl des Kupfers sinkt von +II auf +I (Reduktion).</span>';S.ans.oxOk=true;}
+  updateDeutDone();save();
+});
+
+/* ---------- Deutung: Gleichungen ---------- */
+const SP={
+  ald:{h:'CH<sub>3</sub>CHO',c:{C:2,H:4,O:1},q:0},
+  oh:{h:'OH<sup>−</sup>',c:{O:1,H:1},q:-1},
+  ac:{h:'CH<sub>3</sub>COO<sup>−</sup>',c:{C:2,H:3,O:2},q:-1},
+  w:{h:'H<sub>2</sub>O',c:{H:2,O:1},q:0},
+  e:{h:'e<sup>−</sup>',c:{},q:-1},
+  cu:{h:'Cu<sup>2+</sup>',c:{Cu:1},q:2},
+  cu2o:{h:'Cu<sub>2</sub>O',c:{Cu:2,O:1},q:0}
+};
+const EQS=[
+  {id:'ox',t:'Oxidation',L:[['ald',1],['oh','x']],R:[['ac',1],['w','y'],['e','z']]},
+  {id:'red',t:'Reduktion',L:[['cu','a'],['e','b'],['oh','c']],R:[['cu2o',1],['w','d']]},
+  {id:'tot',t:'Redoxreaktion (Gesamtgleichung)',L:[['ald',1],['cu','a'],['oh','b']],R:[['ac',1],['cu2o',1],['w','c']]}
+];
+function side(eq,arr){return arr.map(([sp,co],i)=>{const inp=co===1?'':`<input type="number" min="1" max="9" inputmode="numeric" id="eq-${eq.id}-${co}" aria-label="Koeffizient vor ${SP[sp].h.replace(/<[^>]+>/g,'')}" value="${S.ans['eq-'+eq.id+'-'+co]||''}">`;return (i?'<span class="op">+</span>':'')+inp+`<span class="formula">${SP[sp].h}</span>`;}).join(' ');}
+$('#eqArea').innerHTML=EQS.map(eq=>`<div class="eq" data-eq="${eq.id}"><span class="lab">${eq.t}</span>${side(eq,eq.L)}<span class="arrow">→</span>${side(eq,eq.R)}</div><div class="bal" id="bal-${eq.id}" hidden></div>`).join('');
+function coef(eq,co){if(co===1)return 1;const v=parseInt($(`#eq-${eq.id}-${co}`).value,10);return isNaN(v)?0:v;}
+function balance(eq){
+  const tot=arr=>{const o={q:0};arr.forEach(([sp,co])=>{const n=coef(eq,co);Object.entries(SP[sp].c).forEach(([el,c])=>o[el]=(o[el]||0)+n*c);o.q+=n*SP[sp].q;});return o;};
+  const l=tot(eq.L),r=tot(eq.R),keys=[...new Set([...Object.keys(l),...Object.keys(r)])].filter(k=>k!=='q');keys.push('q');
+  return keys.map(k=>({k,l:l[k]||0,r:r[k]||0,ok:(l[k]||0)===(r[k]||0)}));
+}
+const fq=n=>n>0?'+'+n:n<0?'−'+Math.abs(n):'0';
+function renderBal(){
+  const on=$('#balToggle').checked;
+  EQS.forEach(eq=>{const el=$('#bal-'+eq.id);el.hidden=!on;if(!on)return;
+    el.innerHTML=balance(eq).map(b=>`<span class="chip ${b.ok?'ok':'bad'}">${b.k==='q'?'Ladung':b.k}: ${b.k==='q'?fq(b.l):b.l} | ${b.k==='q'?fq(b.r):b.r}</span>`).join('');});
+}
+$('#eqArea').addEventListener('input',e=>{if(e.target.id){S.ans[e.target.id]=e.target.value;save();}renderBal();});
+$('#balToggle').addEventListener('change',renderBal);
+$('#checkEq').addEventListener('click',()=>{
+  const fb=$('#eqFb');const res=EQS.map(eq=>{const filled=[...eq.L,...eq.R].every(([,co])=>coef(eq,co)>0);const bal=balance(eq);return {eq,filled,ok:filled&&bal.every(b=>b.ok),bad:bal.filter(b=>!b.ok).map(b=>b.k==='q'?'Ladung':b.k+'-Atome')};});
+  if(res.some(r=>!r.filled)){fb.className='fb info';fb.textContent='Bitte alle Koeffizienten eintragen.';return;}
+  const wrong=res.filter(r=>!r.ok);
+  if(wrong.length){fb.className='fb bad';fb.innerHTML='falsch: <span class="n">'+wrong.map(r=>esc(r.eq.t)+' – nicht ausgeglichen ('+esc(r.bad.join(', '))+')').join('; ')+'.</span>';S.ans.eqOk=false;$('#eqGeneral').hidden=true;}
+  else{fb.className='fb ok';fb.innerHTML='richtig: <span class="n">Alle drei Gleichungen sind in Atom- und Ladungsbilanz ausgeglichen. Die Zahl der übertragenen Elektronen (2) ist in beiden Teilgleichungen gleich.</span>';S.ans.eqOk=true;$('#eqGeneral').hidden=false;}
+  updateDeutDone();save();
+});
+if(S.ans.eqOk)$('#eqGeneral').hidden=false;
+
+/* ---------- Deutung: Lückentext ---------- */
+const GAPS=['oxidiert','+I','+III','reduziert','Elektronendonator','Elektronenakzeptor','alkalischen','Komplex','Kupfer(II)-hydroxid'];
+const BANK=['Komplex','+III','reduziert','sauren','Elektronenakzeptor','+I','Kupfer(II)-hydroxid','oxidiert','−I','alkalischen','Elektronendonator'];
+const GAPTEXT='Bei der Fehling-Probe wird der Aldehyd zum Carboxylat-Anion {0}. Die Oxidationszahl des C-Atoms der Aldehydgruppe steigt dabei von {1} auf {2}. Die Kupfer(II)-Ionen werden zu Kupfer(I)-oxid {3}. Der Aldehyd wirkt als {4}, die Kupfer(II)-Ionen wirken als {5}. Die Reaktion findet nur im {6} Milieu statt. Die Tartrat-Ionen bilden mit den Kupfer(II)-Ionen einen löslichen {7}; dadurch fällt kein {8} aus.';
+$('#bank').innerHTML=BANK.map(w=>`<span>${esc(w)}</span>`).join('');
+$('#gapText').innerHTML=esc(GAPTEXT).replace(/\{(\d)\}/g,(m,i)=>`<select data-gap="${i}" aria-label="Lücke ${+i+1}"><option value="">……</option>${BANK.map(w=>`<option${S.ans['gap'+i]===w?' selected':''}>${esc(w)}</option>`).join('')}</select>`);
+$('#gapText').addEventListener('change',e=>{const s=e.target;if(s.dataset.gap!==undefined){S.ans['gap'+s.dataset.gap]=s.value;s.className='';save();}});
+$('#checkGap').addEventListener('click',()=>{
+  let n=0,empty=0;$$('#gapText select').forEach(s=>{const i=+s.dataset.gap;if(!s.value){empty++;s.className='';return;}const ok=s.value===GAPS[i];s.className=ok?'ok':'bad';if(ok)n++;});
+  const fb=$('#gapFb');
+  if(empty){fb.className='fb info';fb.textContent=`Noch ${empty} Lücke(n) offen. ${n} von ${GAPS.length} bisher richtig.`;return;}
+  if(n===GAPS.length){fb.className='fb ok';fb.textContent='richtig: Alle Lücken sind korrekt ausgefüllt.';S.ans.gapOk=true;}
+  else{fb.className='fb bad';fb.innerHTML=`falsch: <span class="n">${GAPS.length-n} Lücke(n) sind falsch ausgefüllt (rot markiert).</span>`;S.ans.gapOk=false;}
+  updateDeutDone();save();
+});
+function updateDeutDone(){S.done.deutung=!!(S.ans.oxOk&&S.ans.eqOk&&S.ans.gapOk);renderDots();}
+$('#schemeBox').innerHTML=`<svg class="scheme" viewBox="0 0 640 210" role="img" aria-label="Schema: Elektronenübertragung von Ethanal auf Kupfer(II)-Ionen">
+ <rect x="10" y="40" width="250" height="130" rx="10" fill="var(--hl-ald)" stroke="var(--brick)"/>
+ <rect x="380" y="40" width="250" height="130" rx="10" fill="var(--hl-keto)" stroke="var(--accent)"/>
+ <text x="135" y="68" text-anchor="middle" font-weight="700" font-size="16">Elektronendonator</text>
+ <text x="135" y="96" text-anchor="middle" font-size="15">Ethanal → Ethanoat-Ion</text>
+ <text x="135" y="122" text-anchor="middle" font-size="15">C: +I → +III</text>
+ <text x="135" y="150" text-anchor="middle" font-size="14" fill="var(--brick)">wird oxidiert</text>
+ <text x="505" y="68" text-anchor="middle" font-weight="700" font-size="16">Elektronenakzeptor</text>
+ <text x="505" y="96" text-anchor="middle" font-size="15">2 Cu²⁺ → Cu₂O</text>
+ <text x="505" y="122" text-anchor="middle" font-size="15">Cu: +II → +I</text>
+ <text x="505" y="150" text-anchor="middle" font-size="14" fill="var(--accent)">wird reduziert</text>
+ <path d="M268 105 L368 105" stroke="var(--ink)" stroke-width="2" fill="none"/>
+ <path d="M368 105 l-10 -6 v12 z" fill="var(--ink)"/>
+ <text x="318" y="94" text-anchor="middle" font-size="15" font-weight="700">2 e⁻</text>
+ <text x="318" y="128" text-anchor="middle" font-size="12" fill="var(--muted)">Elektronenübertragung</text>
+ <text x="320" y="198" text-anchor="middle" font-size="13" fill="var(--muted)">im alkalischen Milieu, Cu²⁺ als Tartrat-Komplex</text>
+</svg>`;
+
+/* ---------- Transfer ---------- */
+$('#fructoseFig').innerHTML=`<div class="groups-always">${mol(MOL.fructose)}</div><figcaption class="small muted">Fructose, offenkettige Form</figcaption>`;
+$('#saccFig').innerHTML=`<div class="groups-always">${mol(MOL.saccharose)}</div><figcaption class="small muted">Saccharose, vereinfacht ohne Substituenten; markiert: glycosidische Bindung zwischen C1 und C2</figcaption>`;
+$('#benzFig').innerHTML=`<div class="groups-always">${mol(MOL.benzaldehyd)}</div><figcaption class="small muted">Benzaldehyd</figcaption>`;
+$('#endiolChain').innerHTML=`<figure>${mol(MOL.fruTop)}<figcaption>Fructose</figcaption></figure><span class="eqarrow">⇌</span><figure>${mol(MOL.endiol)}<figcaption>Endiol</figcaption></figure><span class="eqarrow">⇌</span><figure>${mol(MOL.gluTop)}<figcaption>Glucose</figcaption></figure><p class="small muted" style="width:100%;text-align:center;margin:4px 0 0">R = Rest des Moleküls (C3 bis C6)</p>`;
+function chip(ok,txt){return `<span class="chip ${ok?'ok':'neutral'}">${txt}</span>`;}
+function renderTestedChips(){
+  $$('[data-tested]').forEach(el=>{
+    const ks=el.dataset.tested.split(',');
+    if(ks[0]==='trommer'){const w=!!S.tested['trommer:wasser'],g=!!S.tested['trommer:glucose'];el.innerHTML=chip(w,'ohne Tartrat + Wasser: '+(w?'untersucht':'offen'))+' '+chip(g,'ohne Tartrat + Glucose: '+(g?'untersucht':'offen'));return;}
+    el.innerHTML=ks.map(k=>chip(!!S.tested[k],(SUBS[k].short||SUBS[k].n)+': '+(S.tested[k]?'im Labor untersucht':'noch nicht untersucht'))).join(' ');
+  });
+  $('#unkStatus').innerHTML=chip(!!S.tested.probeA,'Probe A: '+(S.tested.probeA?'untersucht':'offen'))+' '+chip(!!S.tested.probeB,'Probe B: '+(S.tested.probeB?'untersucht':'offen'));
+}
+['unkA','unkB'].forEach(id=>{const s=$('#'+id);if(S.ans[id])s.value=S.ans[id];s.addEventListener('change',()=>{S.ans[id]=s.value;save();});});
+$('#checkUnk').addEventListener('click',()=>{
+  const fb=$('#unkFb'),a=$('#unkA').value,b=$('#unkB').value;
+  if(!S.tested.probeA||!S.tested.probeB){fb.className='fb info';fb.textContent='Untersuche zuerst beide Proben im Labor (Fehling-Probe mit mindestens 3 min Heizdauer).';return;}
+  if(!a||!b){fb.className='fb info';fb.textContent='Bitte beide Proben zuordnen.';return;}
+  if(a===b){fb.className='fb bad';fb.innerHTML='falsch: <span class="n">Die beiden Flaschen enthalten verschiedene Stoffe.</span>';return;}
+  if(a===S.unknown.A&&b===S.unknown.B){fb.className='fb ok';fb.innerHTML='richtig: <span class="n">Propanal besitzt eine Aldehydgruppe und reagiert positiv (ziegelroter Niederschlag). Propanon ist ein Keton und reagiert nicht. Die Fehling-Probe unterscheidet damit zwei Isomere.</span>';S.done.tA=true;}
+  else{fb.className='fb bad';fb.innerHTML='falsch: <span class="n">Vergleiche deine Beobachtungen: Welche Probe ergab einen ziegelroten Niederschlag, und welcher Stoff besitzt eine Aldehydgruppe?</span>';S.done.tA=false;}
+  updateTransferDone();save();renderDots();
+});
+function updateTransferDone(){S.done.transfer=!!(S.done.tA&&S.done.tE&&S.done.tF);}
+['merksatz','unkText','fruText','saccText','benzText'].forEach(id=>{const t=$('#'+id);t.value=S.ans[id]||'';t.addEventListener('input',()=>{S.ans[id]=t.value;save();});});
+
+/* ---------- Zurücksetzen ---------- */
+let resetArmed=false;
+$('#resetBtn').addEventListener('click',()=>{
+  if(!resetArmed){resetArmed=true;$('#resetBtn').textContent='Wirklich alles löschen? Erneut klicken zum Bestätigen';$('#resetFb').className='fb info';$('#resetFb').textContent='Protokoll, Antworten und Laborergebnisse werden gelöscht.';setTimeout(()=>{if(resetArmed){resetArmed=false;$('#resetBtn').textContent='Alle Eingaben zurücksetzen';$('#resetFb').textContent='';$('#resetFb').className='fb';}},6000);return;}
+  try{localStorage.removeItem(KEY);}catch(e){}
+  location.reload();
+});
+
+/* ---------- Start ---------- */
+renderSelector();renderSamples();renderProto();renderScene();renderStatus();renderTestedChips();renderDots();
+let start=S.station;try{const h=(location.hash||'').slice(1);if(STATIONS.includes(h))start=h;}catch(e){}
+show(start,false);
+window.__fehling={S,step,look,describe,balance:id=>balance(EQS.find(e=>e.id===id)),EQS,expected,kick};
+})();
+</script>
+
+</body></html>
