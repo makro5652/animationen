@@ -1,0 +1,1156 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>EPA-Modell Lernlabor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: Laborplatz – großes Modell links, Messprotokoll rechts; Reiter wie Registerkarten eines Laborhefts. */
+:root{
+  --bg:#edf0f4; --surface:#ffffff; --sunk:#e4e9f0; --ink:#14203a; --muted:#56627a; --line:#cfd6e2;
+  --accent:#2f43c0; --accent-ink:#ffffff; --accent-soft:#e2e6fb;
+  --bp:#1c8c87; --lp:#d47a14; --stick:#8a94a6; --knot:#6b5640; --shadow:rgba(20,32,58,.16);
+  --ok:#21794a; --ok-soft:#e0f1e6; --bad:#bd3329; --bad-soft:#f8e2df; --warn:#9c6300; --warn-soft:#fbefd8;
+  --der:#2456d3; --die:#c3362f; --das:#1f7f46;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f141d; --surface:#171e2b; --sunk:#1f2838; --ink:#e7ecf4; --muted:#9aa6ba; --line:#2d384c;
+    --accent:#8d9cff; --accent-ink:#0f141d; --accent-soft:#242d4f;
+    --bp:#3fc0b9; --lp:#f2a444; --stick:#7d889c; --knot:#c9ab8b; --shadow:rgba(0,0,0,.45);
+    --ok:#62cf8c; --ok-soft:#163124; --bad:#ff7d72; --bad-soft:#3a1c1b; --warn:#f0b24a; --warn-soft:#382a11;
+    --der:#86a7ff; --die:#ff8d86; --das:#6fd69a; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f141d; --surface:#171e2b; --sunk:#1f2838; --ink:#e7ecf4; --muted:#9aa6ba; --line:#2d384c;
+  --accent:#8d9cff; --accent-ink:#0f141d; --accent-soft:#242d4f;
+  --bp:#3fc0b9; --lp:#f2a444; --stick:#7d889c; --knot:#c9ab8b; --shadow:rgba(0,0,0,.45);
+  --ok:#62cf8c; --ok-soft:#163124; --bad:#ff7d72; --bad-soft:#3a1c1b; --warn:#f0b24a; --warn-soft:#382a11;
+  --der:#86a7ff; --die:#ff8d86; --das:#6fd69a; color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;padding:0 16px;padding-block:0 48px}
+.wrap{max-width:1180px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);line-height:1.15;text-wrap:balance;margin:0}
+h2{font-size:1.55rem;font-weight:700;letter-spacing:-.01em}
+h3{font-size:1.08rem;font-weight:700}
+p{margin:0}
+.muted{color:var(--muted)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+button,select,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+/* Kopf */
+.top{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px 24px;padding-block:22px 14px}
+.brand{display:flex;flex-direction:column;gap:4px;min-width:0}
+.brand .eyebrow{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.brand h1{font-size:clamp(1.9rem,4.6vw,2.7rem);font-weight:800;letter-spacing:-.025em}
+.brand h1 span{color:var(--accent)}
+.brand .thesis{max-width:60ch;color:var(--muted)}
+.btn-ws{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--ink);background:var(--surface);border-radius:999px;padding:8px 16px;font-weight:700;cursor:pointer}
+.btn-ws:hover{background:var(--ink);color:var(--surface)}
+.btn-ws svg{width:18px;height:18px}
+
+.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:2px solid var(--line);margin-bottom:20px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{appearance:none;border:0;background:none;padding:10px 14px 9px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;display:flex;gap:8px;align-items:baseline}
+.tab .n{font-family:var(--f-mono);font-size:.78rem;font-weight:600}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab:hover{color:var(--ink)}
+
+/* Labor */
+.lab{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:900px){.lab{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:12px;min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;cursor:pointer;font-weight:700;display:inline-flex;gap:6px;align-items:baseline;font-size:.95rem}
+.chip small{font-weight:400;color:var(--muted);font-size:.8rem}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.chip[aria-pressed="true"] small{color:inherit;opacity:.75}
+.chip.ext{border-style:dashed}
+.chip-label{font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700;align-self:center;margin-right:4px}
+
+.stage{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+  background-image:radial-gradient(circle at 1px 1px,var(--line) 1px,transparent 1.4px);background-size:22px 22px}
+.stage canvas{display:block;width:100%;touch-action:none;cursor:grab}
+.stage canvas.grabbing{cursor:grabbing}
+.stage .hint{position:absolute;left:10px;top:10px;font-size:.74rem;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:4px 8px;color:var(--muted);max-width:calc(100% - 20px);pointer-events:none}
+.stage .status{font-size:.88rem;background:var(--surface);border-top:1px solid var(--line);padding:8px 12px;display:flex;gap:8px;align-items:center;min-height:2.6em}
+.dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--ok)}
+.dot.busy{background:var(--warn)}
+.dot.drag{background:var(--bad)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.85rem;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:5px}
+
+.controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:9px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:6px 11px;cursor:pointer;font-weight:700;font-size:.9rem;color:var(--muted)}
+.seg button+button{border-left:1.5px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.tog{display:inline-flex;align-items:center;gap:6px;font-size:.92rem;cursor:pointer;user-select:none}
+.tog input{width:17px;height:17px;accent-color:var(--accent)}
+.btn{border:1.5px solid var(--line);background:var(--surface);border-radius:9px;padding:6px 12px;font-weight:700;cursor:pointer;font-size:.92rem}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card h3 .sub{font-family:var(--f-body);font-weight:400;color:var(--muted);font-size:.85rem}
+.kicker{font-size:.74rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.lewis{display:flex;justify-content:center;background:var(--sunk);border-radius:10px;padding:6px}
+.lewis svg{width:100%;max-width:260px;height:auto}
+.lewis-note{font-size:.88rem;color:var(--muted)}
+.count{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:.95rem;margin:0}
+.count dt{color:var(--muted)}
+.count dd{margin:0;font-weight:700}
+.count .sep{border-top:1px dashed var(--line);padding-top:8px;margin-top:2px}
+.pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:.82rem;font-weight:700}
+.pill.bp{background:color-mix(in srgb,var(--bp) 18%,transparent);color:var(--bp)}
+.pill.lp{background:color-mix(in srgb,var(--lp) 20%,transparent);color:var(--lp)}
+
+.meas{display:flex;flex-direction:column;gap:6px}
+.meas-row{display:flex;justify-content:space-between;gap:10px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:5px}
+.meas-row:last-child{border-bottom:0}
+.meas-row b{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:1.05rem}
+.meter{height:12px;border-radius:999px;background:var(--sunk);overflow:hidden;border:1px solid var(--line)}
+.meter>span{display:block;height:100%;width:0;background:var(--ok);transition:width .12s linear,background .2s}
+.meter-lab{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted)}
+
+.free{display:flex;flex-direction:column;gap:8px;border:1.5px dashed var(--line);border-radius:10px;padding:10px}
+.free label{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.93rem}
+.free select{border:1.5px solid var(--line);border-radius:7px;background:var(--surface);padding:4px 8px}
+
+.term{appearance:none;border:0;background:none;padding:0;font-weight:700;color:inherit;text-decoration:underline;text-decoration-style:dotted;text-decoration-color:var(--accent);text-underline-offset:3px;cursor:help}
+.term:hover{color:var(--accent)}
+
+/* Lernweg */
+.section-head{display:flex;flex-direction:column;gap:6px;margin:34px 0 14px;max-width:70ch}
+.steps{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.steps li{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.steps .no{font-family:var(--f-mono);font-weight:600;color:var(--accent);font-size:.85rem}
+.steps h3{font-size:1rem}
+.steps p{font-size:.93rem}
+.steps .btn{align-self:flex-start;margin-top:auto;font-size:.85rem}
+.pit{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.pit div{border-left:4px solid var(--bad);background:var(--surface);border-radius:4px 12px 12px 4px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.pit .wrong{font-weight:700}
+.pit .wrong::before{content:"Falsch: ";color:var(--bad)}
+.pit .right::before{content:"Richtig: ";color:var(--ok);font-weight:700}
+.pit p{font-size:.93rem}
+
+/* Ballon */
+.twocol{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:900px){.twocol{grid-template-columns:minmax(0,1fr)}}
+.versuch ol{margin:0;padding-left:1.25em;display:flex;flex-direction:column;gap:4px}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table.cmp{border-collapse:collapse;width:100%;min-width:560px;font-size:.93rem}
+table.cmp th,table.cmp td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+table.cmp th{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+table.cmp tr:last-child td{border-bottom:0}
+.fit{font-weight:700;font-size:.8rem;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.fit.yes{background:var(--ok-soft);color:var(--ok)}
+.fit.part{background:var(--warn-soft);color:var(--warn)}
+.fit.no{background:var(--bad-soft);color:var(--bad)}
+
+/* Tetraeder */
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;text-align:center}
+.facts div{background:var(--sunk);border-radius:10px;padding:10px 6px}
+.facts b{display:block;font-family:var(--f-display);font-size:1.9rem;line-height:1}
+.facts span{font-size:.85rem;color:var(--muted)}
+.big-angle{font-family:var(--f-display);font-size:2.4rem;font-weight:800;color:var(--accent);line-height:1}
+.expert{border:1.5px dashed var(--line);border-radius:12px;padding:12px 14px;background:transparent}
+.expert summary{cursor:pointer;font-weight:700}
+.expert p{margin-top:8px;font-size:.93rem}
+
+/* Arbeitsplatz */
+.subnav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.task{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.task-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.task-head .no{font-family:var(--f-mono);font-weight:600;color:var(--muted)}
+.op{font-weight:700;background:var(--accent-soft);color:var(--accent);border-radius:6px;padding:1px 8px;font-size:.85rem}
+.afb{font-size:.78rem;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:1px 7px}
+.task textarea{width:100%;min-height:96px;resize:vertical;border:1.5px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);line-height:1.5}
+.task details{font-size:.93rem}
+.task details summary{cursor:pointer;color:var(--accent);font-weight:700}
+.task details ul{margin:6px 0 0;padding-left:1.2em}
+.list{display:flex;flex-direction:column;gap:14px}
+.saved{font-size:.82rem;color:var(--muted)}
+
+.q{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;border-left:5px solid var(--line)}
+.q.ok{border-left-color:var(--ok)}
+.q.no{border-left-color:var(--bad)}
+.q-head{display:flex;gap:10px;align-items:baseline}
+.q-head .no{font-family:var(--f-mono);font-weight:600;color:var(--muted);flex:none}
+.q-head p{font-weight:700}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;cursor:pointer}
+.opt input{margin-top:4px;accent-color:var(--accent);flex:none}
+.opt:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.match{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 12px;align-items:center}
+.match select,.gap select,.q input[type=number]{border:1.5px solid var(--line);border-radius:8px;padding:5px 8px;background:var(--bg);max-width:100%}
+.gap{line-height:2.3}
+.bank{display:flex;flex-wrap:wrap;gap:6px;background:var(--sunk);border-radius:10px;padding:8px 10px}
+.bank span{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1px 8px;font-size:.92rem}
+.bank-lab{font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700;width:100%}
+.tf{display:flex;gap:8px}
+.tf button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.fb{border-radius:10px;padding:8px 12px;font-size:.93rem}
+.fb.ok{background:var(--ok-soft)}
+.fb.no{background:var(--bad-soft)}
+.fb b{text-transform:uppercase;letter-spacing:.05em;font-size:.82rem}
+.fb.ok b{color:var(--ok)}
+.fb.no b{color:var(--bad)}
+.score{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:14px}
+.score b{font-family:var(--f-mono);font-size:1.15rem}
+.scorebar{flex:1 1 160px;height:10px;background:var(--sunk);border-radius:999px;overflow:hidden;min-width:120px}
+.scorebar span{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+
+.gl-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px}
+.gl-tools input[type=search]{flex:1 1 220px;border:1.5px solid var(--line);border-radius:9px;padding:8px 10px;background:var(--surface);min-width:0}
+.gl{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.gl.narrow{grid-template-columns:minmax(0,1fr)}
+.ent{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:5px;min-width:0;scroll-margin-top:80px}
+.ent.flash{outline:3px solid var(--accent);outline-offset:1px}
+.ent .w{font-weight:700;font-size:1.05rem}
+.art{font-weight:700}
+.art.der{color:var(--der)}.art.die{color:var(--die)}.art.das{color:var(--das)}.art.x{color:var(--muted);font-weight:400;font-size:.85rem}
+.ent .pl{font-size:.85rem;color:var(--muted)}
+.ent .en{font-size:.85rem;color:var(--muted);font-style:italic}
+.ent .ex{font-size:.9rem;border-left:3px solid var(--line);padding-left:8px}
+.artkey{display:flex;gap:12px;font-size:.85rem;flex-wrap:wrap}
+.phr{display:flex;flex-direction:column;gap:6px;margin-top:16px}
+.phr h3{margin-bottom:4px}
+.phr button{text-align:left;border:1px dashed var(--line);background:var(--surface);border-radius:9px;padding:7px 10px;cursor:pointer;font-size:.93rem}
+.phr button:hover{border-color:var(--accent)}
+
+.self{display:flex;flex-direction:column;gap:8px}
+.self-row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.self-row p{flex:1 1 260px;min-width:0}
+.self-row .seg button[data-v="2"][aria-pressed="true"]{background:var(--ok);color:var(--surface)}
+.self-row .seg button[data-v="1"][aria-pressed="true"]{background:var(--warn);color:var(--surface)}
+.self-row .seg button[data-v="0"][aria-pressed="true"]{background:var(--bad);color:var(--surface)}
+
+.copybox{width:100%;min-height:160px;margin-top:10px;border:1.5px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);font-family:var(--f-mono);font-size:.85rem}
+
+.teacher{margin-top:36px;border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:14px 16px}
+.teacher summary{cursor:pointer;font-weight:700}
+.teacher div{margin-top:10px;display:flex;flex-direction:column;gap:8px;font-size:.93rem;max-width:80ch}
+.teacher ul{margin:0;padding-left:1.2em}
+
+/* Drawer */
+.scrim{position:fixed;inset:0;background:rgba(10,14,22,.45);z-index:40}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--bg);z-index:41;border-left:1px solid var(--line);display:flex;flex-direction:column;
+  padding:calc(14px + env(safe-area-inset-top,0px)) 16px calc(14px + env(safe-area-inset-bottom,0px));gap:10px;box-shadow:-10px 0 30px var(--shadow)}
+.drawer-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.drawer-body{overflow-y:auto;flex:1;min-height:0;padding-right:2px}
+.x{border:1.5px solid var(--line);background:var(--surface);border-radius:9px;width:36px;height:36px;cursor:pointer;font-size:1.2rem;line-height:1}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:8px 14px;border-radius:10px;z-index:60;font-weight:700;font-size:.92rem}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="brand">
+    <span class="eyebrow">Chemie · Klasse 9/10 · Elektronenpaarabstoßung</span>
+    <h1>EPA-<span>Modell</span> Lernlabor</h1>
+    <p class="thesis">Warum ist das Wassermolekül gewinkelt? Verschiebe die Elektronenpaare im Modell, lass los und beobachte, welche Anordnung sich einstellt.</p>
+  </div>
+  <button class="btn-ws" id="open-ws" type="button" aria-haspopup="dialog">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 5.5v16M9 8h7M9 12h5"/></svg>
+    Wortspeicher
+  </button>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Bereiche">
+  <button class="tab" role="tab" id="t-entdecken" aria-controls="entdecken" aria-selected="true"><span class="n">1</span>Entdecken</button>
+  <button class="tab" role="tab" id="t-ballon" aria-controls="ballon" aria-selected="false"><span class="n">2</span>Ballon-Modell</button>
+  <button class="tab" role="tab" id="t-tetraeder" aria-controls="tetraeder" aria-selected="false"><span class="n">3</span>Tetraeder</button>
+  <button class="tab" role="tab" id="t-arbeitsplatz" aria-controls="arbeitsplatz" aria-selected="false"><span class="n">4</span>Arbeitsplatz &amp; Test</button>
+</nav>
+
+<main>
+<!-- ============ 1 ENTDECKEN ============ -->
+<section id="entdecken" role="tabpanel" aria-labelledby="t-entdecken">
+  <div class="lab">
+    <div class="col">
+      <div class="chips" id="mol-chips" aria-label="Molekül wählen">
+        <span class="chip-label">Molekül</span>
+      </div>
+      <div class="stage">
+        <canvas id="cv-main" tabindex="0" aria-label="3D-Modell des Moleküls. Elektronenpaare mit Maus oder Finger ziehen, Hintergrund ziehen zum Drehen. Pfeiltasten drehen, Leertaste stößt das Modell an."></canvas>
+        <div class="hint">Paar ziehen = verschieben · Fläche ziehen = drehen</div>
+        <div class="status" aria-live="polite"><span class="dot" id="st-dot"></span><span id="st-text">Gleichgewicht: größtmöglicher Abstand.</span></div>
+      </div>
+      <div class="legend" id="legend-main">
+        <span><i style="background:var(--bp)"></i>bindendes Elektronenpaar</span>
+        <span><i style="background:var(--lp)"></i>freies Elektronenpaar</span>
+        <span><i style="background:var(--accent)"></i>Bindungswinkel / Tetraeder</span>
+      </div>
+      <div class="controls">
+        <div class="seg" role="group" aria-label="Darstellung" id="style-seg">
+          <button type="button" data-s="cloud" aria-pressed="true">Elektronenwolken</button>
+          <button type="button" data-s="ball" aria-pressed="false">Kugel-Stab</button>
+          <button type="button" data-s="balloon" aria-pressed="false">Ballons</button>
+        </div>
+        <label class="tog"><input type="checkbox" id="o-angles" checked> Winkel</label>
+        <label class="tog"><input type="checkbox" id="o-tetra"> Tetraeder</label>
+        <label class="tog"><input type="checkbox" id="o-only"> Nur Atome</label>
+        <label class="tog"><input type="checkbox" id="o-labels" checked> Beschriftung</label>
+        <label class="tog"><input type="checkbox" id="o-rotate"> Drehen</label>
+      </div>
+      <div class="btnrow">
+        <button class="btn primary" type="button" id="b-kick">Anstoßen</button>
+        <button class="btn" type="button" id="b-flat">Flach drücken</button>
+        <button class="btn" type="button" id="b-view">Ansicht zurücksetzen</button>
+      </div>
+    </div>
+
+    <aside class="col">
+      <div class="card">
+        <span class="kicker">Lewis-Formel (Valenzstrichformel)</span>
+        <h3 id="mol-title">Wasser <span class="sub">H₂O</span></h3>
+        <div class="lewis" id="lewis"></div>
+        <p class="lewis-note">Die Lewis-Formel zeigt, welche Atome verbunden sind und wo freie Elektronenpaare liegen. Sie ist flach gezeichnet und zeigt <b>nicht</b> die räumliche Gestalt.</p>
+        <div class="free" id="free-box" hidden>
+          <span class="kicker">Eigenes Molekül bauen</span>
+          <label for="f-bp">Bindende Elektronenpaare (Atome H)
+            <select id="f-bp"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></label>
+          <label for="f-lp">Freie Elektronenpaare am Zentralatom X
+            <select id="f-lp"><option>0</option><option>1</option><option selected>2</option><option>3</option></select></label>
+          <p class="muted" style="font-size:.85rem" id="f-msg">Insgesamt 2 bis 4 Elektronenpaarbereiche.</p>
+        </div>
+      </div>
+      <div class="card">
+        <span class="kicker">Zählen und vorhersagen</span>
+        <dl class="count" id="count"></dl>
+      </div>
+      <div class="card">
+        <span class="kicker">Messung im Modell</span>
+        <div class="meas" id="meas"></div>
+        <div>
+          <div class="meter-lab"><span>Abstoßung zwischen den Elektronenpaaren</span><span id="meter-txt">gering</span></div>
+          <div class="meter" role="meter" aria-label="Abstoßung" aria-valuemin="0" aria-valuemax="100" id="meter"><span></span></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="section-head">
+    <span class="kicker">Lernweg</span>
+    <h2>In fünf Schritten zur Molekülgestalt</h2>
+    <p class="muted">Gehe die Schritte der Reihe nach durch. Jeder Schritt lässt sich im Modell oben ausprobieren.</p>
+  </div>
+  <ol class="steps" id="steps"></ol>
+
+  <div class="section-head">
+    <span class="kicker">Achtung</span>
+    <h2>Typische Fehlvorstellungen</h2>
+  </div>
+  <div class="pit">
+    <div><p class="wrong">„In der Formel H–O–H steht alles in einer Reihe, also ist Wasser linear.“</p><p class="right">Die Lewis-Formel ist eine flache Schreibweise. Erst das EPA-Modell sagt etwas über die räumliche Anordnung aus.</p></div>
+    <div><p class="wrong">„Die Elektronenpaare wollen möglichst weit weg voneinander.“</p><p class="right">Elektronen haben keinen Willen. Gleichnamige Ladungen stoßen sich ab. Die Anordnung mit der geringsten Abstoßung ist energetisch am günstigsten und stellt sich ein.</p></div>
+    <div><p class="wrong">„Freie Elektronenpaare spielen für die Form keine Rolle.“</p><p class="right">Sie bestimmen die Anordnung mit. Beim Namen der Molekülgestalt zählen aber nur die Positionen der Atome.</p></div>
+    <div><p class="wrong">„Elektronenwolken sind feste Kugeln mit einer Haut.“</p><p class="right">Eine Elektronenwolke hat keinen scharfen Rand. Sie beschreibt, wo sich die Elektronen mit hoher Wahrscheinlichkeit befinden.</p></div>
+  </div>
+</section>
+
+<!-- ============ 2 BALLON ============ -->
+<section id="ballon" role="tabpanel" aria-labelledby="t-ballon" hidden>
+  <div class="section-head" style="margin-top:0">
+    <span class="kicker">Analogie-Modell</span>
+    <h2>Das Wasserballon-Modell</h2>
+    <p class="muted">Verknotet man mehrere aufgeblasene Ballons an einem Punkt, nehmen sie eine ganz bestimmte Anordnung ein. Jeder Ballon steht für einen Elektronenpaarbereich, der Knoten für das Zentralatom.</p>
+  </div>
+  <div class="twocol">
+    <div class="col">
+      <div class="stage">
+        <canvas id="cv-ball" tabindex="0" aria-label="3D-Modell aus Ballons. Ballons ziehen zum Verschieben, Hintergrund ziehen zum Drehen."></canvas>
+        <div class="hint">Ballon ziehen und loslassen</div>
+        <div class="status" aria-live="polite"><span class="dot" id="bst-dot"></span><span id="bst-text">Ruhelage erreicht.</span></div>
+      </div>
+      <div class="controls">
+        <span class="chip-label">Ballons</span>
+        <div class="seg" role="group" aria-label="Anzahl Ballons" id="b-n">
+          <button type="button" data-v="2" aria-pressed="false">2</button>
+          <button type="button" data-v="3" aria-pressed="false">3</button>
+          <button type="button" data-v="4" aria-pressed="true">4</button>
+        </div>
+        <span class="chip-label">davon groß</span>
+        <div class="seg" role="group" aria-label="Anzahl großer Ballons" id="b-big">
+          <button type="button" data-v="0" aria-pressed="true">0</button>
+          <button type="button" data-v="1" aria-pressed="false">1</button>
+          <button type="button" data-v="2" aria-pressed="false">2</button>
+        </div>
+        <label class="tog"><input type="checkbox" id="b-angles" checked> Winkel</label>
+      </div>
+      <div class="btnrow"><button class="btn primary" type="button" id="b-kick2">Anstoßen</button><button class="btn" type="button" id="b-flat2">Flach drücken</button></div>
+      <div class="legend"><span><i style="background:var(--bp)"></i>normaler Ballon = bindendes Elektronenpaar</span><span><i style="background:var(--lp)"></i>großer Ballon = freies Elektronenpaar</span></div>
+    </div>
+    <div class="col">
+      <div class="card versuch">
+        <span class="kicker">Versuch</span>
+        <h3>Ballons verknoten</h3>
+        <p><b>Material:</b> vier kleine Luftballons (Wasserballons), mit Luft aufgeblasen</p>
+        <ol>
+          <li>Blase zwei Ballons gleich groß auf und verknote sie miteinander.</li>
+          <li>Wiederhole das mit zwei weiteren Ballons.</li>
+          <li>Verdrehe die beiden Paare an den Knoten fest miteinander.</li>
+          <li>Lege das Modell ab und betrachte es von mehreren Seiten.</li>
+          <li>Ersetze einen Ballon durch einen stärker aufgeblasenen Ballon.</li>
+        </ol>
+        <p><b>Beobachtung:</b> Vier gleich große Ballons zeigen in die Ecken eines <button class="term" data-g="tetraeder" type="button">Tetraeders</button>. Ein größerer Ballon drückt die drei anderen etwas enger zusammen.</p>
+      </div>
+      <div class="card">
+        <span class="kicker">Übertragung</span>
+        <p>Der größere Ballon entspricht einem <button class="term" data-g="freies" type="button">freien Elektronenpaar</button>: Es wird nur von einem Atomkern angezogen. Seine Elektronenwolke liegt näher am Zentralatom und ist breiter. Deshalb nimmt es mehr Raum ein als ein <button class="term" data-g="bindendes" type="button">bindendes Elektronenpaar</button>.</p>
+        <p class="muted" style="font-size:.9rem">In der Animation werden die Ballons nach derselben Regel bewegt wie die Elektronenpaare im EPA-Modell. Echte Ballons verschieben sich dagegen nur, wenn sie sich berühren.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <span class="kicker">Modellkritik</span>
+    <h2>Was passt am Ballon-Modell und was nicht?</h2>
+    <p class="muted">Jedes Modell vereinfacht. Wer ein Modell nutzt, muss seine Grenzen kennen.</p>
+  </div>
+  <div class="tablewrap">
+    <table class="cmp">
+      <thead><tr><th>Ballon-Modell</th><th>EPA-Modell</th><th>Passt?</th></tr></thead>
+      <tbody>
+        <tr><td>ein Ballon</td><td>ein Elektronenpaarbereich (freies Elektronenpaar oder Bindung)</td><td><span class="fit yes">passt</span></td></tr>
+        <tr><td>Knoten in der Mitte</td><td>Zentralatom</td><td><span class="fit yes">passt</span></td></tr>
+        <tr><td>2, 3 oder 4 Ballons ergeben linear, trigonal-planar oder tetraedrisch</td><td>2, 3 oder 4 Elektronenpaarbereiche ergeben dieselben Anordnungen</td><td><span class="fit yes">passt</span></td></tr>
+        <tr><td>größerer Ballon drückt die anderen enger zusammen</td><td>freies Elektronenpaar nimmt mehr Raum ein, Bindungswinkel werden kleiner</td><td><span class="fit part">passt teilweise</span></td></tr>
+        <tr><td>Ballons verschieben sich durch Berührung (Druck der Hüllen)</td><td>Elektronenpaare stoßen sich wegen ihrer negativen Ladung ab, auch ohne Berührung</td><td><span class="fit no">passt nicht</span></td></tr>
+        <tr><td>Ballons haben eine feste Haut und einen scharfen Rand</td><td>Elektronenwolken haben keinen scharfen Rand</td><td><span class="fit no">passt nicht</span></td></tr>
+        <tr><td>keine Atomkerne, keine Bindungspartner</td><td>bindende Elektronenpaare liegen zwischen zwei Atomkernen</td><td><span class="fit no">passt nicht</span></td></tr>
+        <tr><td>Schwerkraft verformt die Ballons</td><td>Schwerkraft spielt für die Molekülgestalt keine Rolle</td><td><span class="fit no">passt nicht</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 3 TETRAEDER ============ -->
+<section id="tetraeder" role="tabpanel" aria-labelledby="t-tetraeder" hidden>
+  <div class="section-head" style="margin-top:0">
+    <span class="kicker">Geometrie</span>
+    <h2>Was ist ein Tetraeder?</h2>
+    <p class="muted">Tetra heißt im Griechischen „vier“, hedra heißt „Fläche“. Ein Tetraeder ist also ein Vierflächner.</p>
+  </div>
+  <div class="twocol">
+    <div class="col">
+      <div class="stage">
+        <canvas id="cv-tet" tabindex="0" aria-label="3D-Modell des Methan-Moleküls mit eingezeichnetem Tetraeder. Ziehen zum Drehen oder Verschieben."></canvas>
+        <div class="hint">Drehen und von allen Seiten betrachten</div>
+        <div class="status" aria-live="polite"><span class="dot" id="tst-dot"></span><span id="tst-text">Ruhelage erreicht.</span></div>
+      </div>
+      <div class="controls">
+        <label class="tog"><input type="checkbox" id="t-faces" checked> Tetraeder</label>
+        <label class="tog"><input type="checkbox" id="t-cube"> Würfel</label>
+        <label class="tog"><input type="checkbox" id="t-angles" checked> Winkel</label>
+        <label class="tog"><input type="checkbox" id="t-rot"> Drehen</label>
+      </div>
+      <div class="btnrow"><button class="btn primary" type="button" id="t-flat">Flach drücken (90°)</button><button class="btn" type="button" id="t-kick">Anstoßen</button></div>
+    </div>
+    <div class="col">
+      <div class="card">
+        <span class="kicker">Steckbrief</span>
+        <h3>Der Körper</h3>
+        <div class="facts"><div><b>4</b><span>Flächen (gleichseitige Dreiecke)</span></div><div><b>4</b><span>Ecken</span></div><div><b>6</b><span>Kanten</span></div></div>
+        <p>Im Methan-Molekül sitzt das Kohlenstoffatom im <b>Mittelpunkt</b> des Tetraeders. Die vier Wasserstoffatome sitzen in den <b>Ecken</b>.</p>
+      </div>
+      <div class="card">
+        <span class="kicker">Tetraederwinkel</span>
+        <div class="big-angle">109,5°</div>
+        <p>So groß ist der Winkel zwischen zwei Ecken, vom Mittelpunkt aus gemessen. Genauer: 109,47°.</p>
+        <p><b>Warum nicht 90°?</b> Auf einem Blatt Papier liegen vier Bindungen als Kreuz bei 90°. Im Raum ist mehr Platz: Beim Tetraeder sind alle vier Bereiche gleich weit voneinander entfernt und der Abstand ist größer. Die Abstoßung ist dann am geringsten.</p>
+        <div>
+          <div class="meter-lab"><span>Abstoßung</span><span id="t-meter-txt">gering</span></div>
+          <div class="meter" id="t-meter" role="meter" aria-label="Abstoßung" aria-valuemin="0" aria-valuemax="100"><span></span></div>
+        </div>
+        <p class="muted" style="font-size:.9rem">Probiere es aus: Drücke das Modell flach und beobachte den Balken und den Winkel.</p>
+      </div>
+      <details class="expert">
+        <summary>Für Expertinnen und Experten: Woher kommen die 109,47°?</summary>
+        <p>Ein Tetraeder passt genau in einen Würfel: Seine Ecken sind jede zweite Würfelecke. Liegt der Mittelpunkt im Ursprung, zeigen zwei Ecken in die Richtungen (1|1|1) und (1|−1|−1). Für den Winkel α gilt cos α = (1 − 1 − 1) : 3 = −1/3. Daraus folgt α ≈ 109,47°. Schalte „Würfel“ ein, um das zu sehen.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4 ARBEITSPLATZ ============ -->
+<section id="arbeitsplatz" role="tabpanel" aria-labelledby="t-arbeitsplatz" hidden>
+  <div class="section-head" style="margin-top:0">
+    <span class="kicker">Digitaler Arbeitsplatz</span>
+    <h2>Aufgaben, Test und Wortspeicher</h2>
+    <p class="muted">Deine Antworten und dein Selbstcheck werden nur in diesem Browser gespeichert.</p>
+  </div>
+  <div class="subnav" role="group" aria-label="Arbeitsplatz-Bereiche" id="subnav">
+    <button class="chip" type="button" data-p="p-aufg" aria-pressed="true">Aufgaben</button>
+    <button class="chip" type="button" data-p="p-test" aria-pressed="false">Test</button>
+    <button class="chip" type="button" data-p="p-wort" aria-pressed="false">Wortspeicher</button>
+    <button class="chip" type="button" data-p="p-self" aria-pressed="false">Selbstcheck</button>
+  </div>
+
+  <div id="p-aufg" class="panel">
+    <div class="list" id="tasks"></div>
+    <div class="btnrow" style="margin-top:14px">
+      <button class="btn primary" type="button" id="copy-notes">Antworten kopieren</button>
+      <button class="btn" type="button" id="clear-notes">Antworten löschen</button>
+    </div>
+    <p class="muted" id="clear-confirm" hidden style="margin-top:8px">Wirklich alle Antworten löschen? <button class="btn" type="button" id="clear-yes">Ja, löschen</button> <button class="btn" type="button" id="clear-no">Abbrechen</button></p>
+    <textarea class="copybox" id="copy-fallback" hidden readonly aria-label="Antworten zum Kopieren"></textarea>
+  </div>
+
+  <div id="p-test" class="panel" hidden>
+    <div class="score"><span>Ergebnis: <b id="score-txt">0 / 0</b></span><div class="scorebar"><span id="score-bar"></span></div>
+      <span class="btnrow"><button class="btn primary" type="button" id="q-all">Alle prüfen</button><button class="btn" type="button" id="q-new">Neu mischen</button></span></div>
+    <div class="list" id="quiz"></div>
+  </div>
+
+  <div id="p-wort" class="panel" hidden>
+    <div class="gl-tools">
+      <input type="search" id="gl-search" placeholder="Begriff suchen …" aria-label="Begriff suchen">
+      <label class="tog"><input type="checkbox" id="gl-en" checked> Englisch zeigen</label>
+      <span class="artkey"><span class="art der">der</span><span class="art die">die</span><span class="art das">das</span></span>
+    </div>
+    <div class="gl" id="gl-main"></div>
+    <div class="phr" id="phr-main"></div>
+  </div>
+
+  <div id="p-self" class="panel" hidden>
+    <p class="muted" style="margin-bottom:10px">Schätze ehrlich ein, was du schon kannst. Bei „noch nicht“ hilft dir der Hinweis rechts.</p>
+    <div class="self" id="self"></div>
+  </div>
+
+  <details class="teacher">
+    <summary>Hinweise für Lehrkräfte</summary>
+    <div>
+      <p><b>Einordnung:</b> Sekundarstufe I (Klasse 9/10), Basiskonzept Struktur–Eigenschaft. Voraussetzung: Elektronenpaarbindung und Lewis-Formeln.</p>
+      <ul>
+        <li><b>Modellierung:</b> Die Abstoßung wird als Coulomb-ähnliche Kraft zwischen Richtungsvektoren auf einer Kugel simuliert. Freie Elektronenpaare und Doppelbindungen erhalten ein größeres Gewicht. Die Gewichte sind so kalibriert, dass sich etwa 107° (NH₃), 104,5° (H₂O) und 116° (H–C–H in Methanal) einstellen. Die Werte sind ein Ergebnis der Kalibrierung, keine Rechnung aus ersten Prinzipien.</li>
+        <li><b>Elektronenpaargeometrie und Molekülgestalt</b> werden konsequent getrennt („Nur Atome“).</li>
+        <li><b>Sprache:</b> Formulierungen vermeiden Vermenschlichung („wollen“, „möchten“). Fachbegriffe sind mit dem Wortspeicher verknüpft; Artikel sind farbig markiert (der/die/das), englische Übersetzungen sind zuschaltbar.</li>
+        <li><b>Erweiterung:</b> CO₂ und Methanal (gestrichelte Schaltflächen) führen die Regel „Doppelbindung = ein Elektronenpaarbereich“ ein.</li>
+        <li><b>Grenze:</b> Das EPA-Modell sagt Gestalten voraus, erklärt aber nicht die Bindung selbst. Die Ballon-Animation nutzt dieselbe Fernabstoßung; echte Ballons wirken nur über Kontakt.</li>
+      </ul>
+    </div>
+  </details>
+</section>
+</main>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dr-title" hidden>
+  <div class="drawer-head"><h2 id="dr-title" style="font-size:1.3rem">Wortspeicher</h2><button class="x" type="button" id="close-ws" aria-label="Wortspeicher schließen">×</button></div>
+  <div class="gl-tools" style="margin:0">
+    <input type="search" id="dr-search" placeholder="Begriff suchen …" aria-label="Begriff im Wortspeicher suchen">
+    <span class="artkey"><span class="art der">der</span><span class="art die">die</span><span class="art das">das</span></span>
+  </div>
+  <div class="drawer-body"><div class="gl narrow" id="gl-drawer"></div><div class="phr" id="phr-drawer"></div></div>
+</aside>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+"use strict";
+/* ---------- Hilfen ---------- */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const deg=x=>x.toFixed(1).replace('.',',')+'°';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,2200)}
+
+/* ---------- Vektoren ---------- */
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const norm=a=>{const l=Math.hypot(a[0],a[1],a[2])||1;return [a[0]/l,a[1]/l,a[2]/l]};
+const mul=(a,s)=>[a[0]*s,a[1]*s,a[2]*s];
+const add=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]];
+const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]];
+const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const angleOf=(a,b)=>Math.acos(Math.max(-1,Math.min(1,dot(a,b))))*180/Math.PI;
+const randDir=()=>{let v;do{v=[Math.random()*2-1,Math.random()*2-1,Math.random()*2-1]}while(dot(v,v)>1||dot(v,v)<.01);return norm(v)};
+
+/* ---------- Farben aus dem Theme ---------- */
+let TH={};
+function readTheme(){const cs=getComputedStyle(document.documentElement);const g=n=>cs.getPropertyValue(n).trim();
+  TH={font:getComputedStyle(document.body).fontFamily,mono:g('--f-mono'),bp:g('--bp'),lp:g('--lp'),stick:g('--stick'),ink:g('--ink'),muted:g('--muted'),surface:g('--surface'),accent:g('--accent'),knot:g('--knot'),shadow:g('--shadow'),line:g('--line'),dark:g('color-scheme')==='dark'||matchMedia('(prefers-color-scheme: dark)').matches&&document.documentElement.dataset.theme!=='light'};
+  if(document.documentElement.dataset.theme==='dark')TH.dark=true;}
+readTheme();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',readTheme);
+new MutationObserver(readTheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+function hexToRgb(h){h=h.replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');const n=parseInt(h,16);return [n>>16&255,n>>8&255,n&255]}
+function shade(h,t){/* t>0 heller, t<0 dunkler */const [r,g,b]=hexToRgb(h);const f=c=>Math.round(t>0?c+(255-c)*t:c*(1+t));return `rgb(${f(r)},${f(g)},${f(b)})`}
+function rgba(h,a){const [r,g,b]=hexToRgb(h);return `rgba(${r},${g},${b},${a})`}
+const EL={H:'#eef1f5',C:'#4a5161',N:'#3157d4',O:'#d43a33',Cl:'#36a14b',X:'#8a5fd0'};
+const ELR={H:.19,C:.27,N:.27,O:.28,Cl:.33,X:.28};
+const BOND={H:.98,O:1.12,Cl:1.15,X:1.0};
+
+/* ---------- Abstoßung: Gewichte (kalibriert) ---------- */
+const WT={'bp|bp':1,'bp|lp':1.225,'lp|lp':1.42,'bp|db':1.15,'db|db':1.3225,'db|lp':1.41};
+const wOf=(a,b)=>WT[a<b?a+'|'+b:b+'|'+a];
+
+/* ---------- Simulator ---------- */
+const PROF={
+  bp:t=>Math.pow(Math.sin(Math.PI*Math.min(1,t)),.7),
+  lp:t=>Math.pow(t,.55)*Math.pow(Math.max(0,1-t),.45)/.5026,
+  balloon:t=>{if(t<.13)return .07;const s=(t-.13)/.87;return Math.max(.07,Math.sqrt(Math.max(0,1-Math.pow((s-.52)/.5,2))))}
+};
+const SIMS=[];
+class EPASim{
+  constructor(canvas,o){
+    this.c=canvas;this.ctx=canvas.getContext('2d');
+    this.o=Object.assign({style:'cloud',angles:true,tetra:false,cube:false,onlyAtoms:false,labels:false,rotate:false,maxH:520,ratio:.78},o||{});
+    this.yaw=.55;this.pitch=-.32;this.updR();this.cam=4.6;
+    this.u=[];this.v=[];this.types=[];this.ligs=[];this.center='C';
+    this.drag=-1;this.hover=-1;this.rot=null;this.active=false;this.frame=0;this.maxv=0;this.released=0;this.Umin=1;
+    this.off=document.createElement('canvas');this.octx=this.off.getContext('2d');
+    this.bind();SIMS.push(this);
+    new ResizeObserver(()=>this.resize()).observe(canvas);
+  }
+  updR(){const cy=Math.cos(this.yaw),sy=Math.sin(this.yaw),cp=Math.cos(this.pitch),sp=Math.sin(this.pitch);
+    this.R=[cy,0,sy, sp*sy,cp,-sp*cy, -cp*sy,sp,cp*cy];}
+  toView(p){const R=this.R;return [R[0]*p[0]+R[1]*p[1]+R[2]*p[2],R[3]*p[0]+R[4]*p[1]+R[5]*p[2],R[6]*p[0]+R[7]*p[1]+R[8]*p[2]]}
+  toModel(v){const R=this.R;return [R[0]*v[0]+R[3]*v[1]+R[6]*v[2],R[1]*v[0]+R[4]*v[1]+R[7]*v[2],R[2]*v[0]+R[5]*v[1]+R[8]*v[2]]}
+  proj(p){const v=this.toView(p);const f=this.cam/(this.cam-v[2]);return {x:this.cx+v[0]*this.sc*f,y:this.cy-v[1]*this.sc*f,z:v[2],f}}
+  resize(){
+    const w=this.c.clientWidth;if(!w)return;
+    const h=Math.round(Math.max(w<560?340:300,Math.min(this.o.maxH,w*this.o.ratio)));
+    this.c.style.height=h+'px';
+    this.dpr=Math.min(2,window.devicePixelRatio||1);this.w=w;this.h=h;
+    this.c.width=Math.round(w*this.dpr);this.c.height=Math.round(h*this.dpr);
+    this.cx=w/2;this.cy=h*(w<560?.55:.5);
+    this.sc=Math.min(w,h)*(this.o.style==='balloon'?.25:.29)*(w<560?1.12:1);
+  }
+  setMolecule(center,types,ligs,scramble=true){
+    const keep=!scramble&&this.u.length===types.length;
+    this.center=center;this.types=types.slice();this.ligs=ligs.slice();
+    if(!keep){this.u=types.map(()=>randDir());this.v=types.map(()=>[0,0,0]);}
+    this.drag=-1;this.hover=-1;
+    // minimale Energie durch stille Relaxation bestimmen
+    const save=[this.u.map(a=>a.slice()),this.v.map(a=>a.slice())];
+    this.u=types.map(()=>randDir());this.v=types.map(()=>[0,0,0]);
+    for(let i=0;i<1500;i++)this.step();
+    this.Umin=this.energy()||1;this.eqU=this.canon(this.u);
+    [this.u,this.v]=save;
+    if(!keep){this.u=this.eqU.map(a=>a.slice());this.kick(.45)}
+    this.released=performance.now();
+  }
+  canon(U){/* Gleichgewichtslage in eine lehrbuchartige Ausrichtung drehen */
+    const L=[];this.types.forEach((t,i)=>{if(t!=='lp')L.push(i)});const A=L.length?L:U.map((_,i)=>i);
+    let s=[0,0,0];A.forEach(i=>s=add(s,U[i]));let ey,ex;
+    if(Math.hypot(...s)>.25){ey=norm(mul(s,-1));ex=A.length>1?sub(U[A[0]],U[A[1]]):cross(ey,[.3,.2,.9])}
+    else if(A.length===2){ex=U[A[0]];ey=cross(ex,[.3,.9,.2])}
+    else{ey=U[A[0]];ex=U[A[1]]}
+    ey=norm(ey);ex=norm(sub(ex,mul(ey,dot(ex,ey))));const ez=cross(ex,ey);
+    let R=U.map(u=>norm([dot(u,ex),dot(u,ey),dot(u,ez)]));
+    if(A.reduce((q,i)=>q+R[i][2],0)>.05)R=R.map(u=>[u[0],u[1],-u[2]]);
+    return R;}
+  energy(){let U=0;for(let i=0;i<this.u.length;i++)for(let j=i+1;j<this.u.length;j++){const d=Math.max(.01,Math.hypot(...sub(this.u[i],this.u[j])));U+=wOf(this.types[i],this.types[j])/d}return U}
+  step(){
+    const n=this.u.length;if(n<2){this.maxv=0;return}
+    const F=this.u.map(()=>[0,0,0]);
+    for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){
+      const d=sub(this.u[i],this.u[j]);const d2=Math.max(1e-4,dot(d,d));const f=wOf(this.types[i],this.types[j])/(d2*Math.sqrt(d2));
+      for(let k=0;k<3;k++){F[i][k]+=d[k]*f;F[j][k]-=d[k]*f}
+    }
+    let mv=0;
+    for(let i=0;i<n;i++){
+      if(i===this.drag){this.v[i]=[0,0,0];continue}
+      const u=this.u[i],r=dot(F[i],u);let v=this.v[i];
+      for(let k=0;k<3;k++)v[k]=v[k]*.8+(F[i][k]-r*u[k])*.01;
+      const vm=Math.hypot(v[0],v[1],v[2]);if(vm>.08)v=this.v[i]=mul(v,.08/vm);
+      mv=Math.max(mv,vm);
+      this.u[i]=norm(add(u,v));
+      const rr=dot(this.v[i],this.u[i]);this.v[i]=sub(this.v[i],mul(this.u[i],rr));
+    }
+    this.maxv=mv;
+  }
+  kick(s=.75){this.u=this.u.map(u=>norm(add(u,mul(randDir(),s))));this.released=performance.now()}
+  flatten(){const n=this.u.length;
+    this.u=this.u.map((_,i)=>norm([Math.cos(2*Math.PI*i/n)+(Math.random()-.5)*.03,(Math.random()-.5)*.03,Math.sin(2*Math.PI*i/n)]));
+    this.v=this.u.map(()=>[0,0,0]);this.flatT=performance.now();this.released=performance.now()}
+  resetView(){this.yaw=.55;this.pitch=-.32;this.updR()}
+  isLig(i){return this.types[i]!=='lp'}
+  handleLen(i){const t=this.types[i];if(this.o.style==='balloon')return (t==='lp'?1.42:1.22)*.6;if(t==='lp')return .78*.62;return BOND[this.ligs[i]]||1}
+  stats(){
+    const L=[];this.types.forEach((t,i)=>{if(t!=='lp')L.push(i)});
+    const pairs=[];for(let a=0;a<L.length;a++)for(let b=a+1;b<L.length;b++)pairs.push({i:L[a],j:L[b],a:angleOf(this.u[L[a]],this.u[L[b]])});
+    const E=this.energy(),rel=(E-this.Umin)/this.Umin;const ratio=Math.max(0,Math.min(1,rel/.05));
+    let state='rest';if(this.drag>=0)state='drag';else if(this.maxv>3e-4||rel>.002)state='move';
+    return {pairs,ratio,state,flatAgo:this.flatT?performance.now()-this.flatT:1e9};
+  }
+  /* --- Eingabe --- */
+  bind(){
+    const c=this.c;
+    const pos=e=>{const r=c.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top}};
+    c.addEventListener('pointerdown',e=>{
+      const p=pos(e);const h=this.hit(p);c.setPointerCapture(e.pointerId);
+      if(h>=0){this.drag=h;const vz=this.toView(this.u[h])[2];this.dragSign=vz<0?-1:1;this.wasOut=false;c.classList.add('grabbing')}
+      else{this.rot={x:p.x,y:p.y}}
+      e.preventDefault();
+    });
+    c.addEventListener('pointermove',e=>{
+      const p=pos(e);
+      if(this.drag>=0){
+        const Lh=this.handleLen(this.drag);
+        const x=(p.x-this.cx)/(this.sc*Lh),y=-(p.y-this.cy)/(this.sc*Lh);const d2=x*x+y*y;let v;
+        if(d2<1){if(this.wasOut){this.dragSign*=-1;this.wasOut=false}v=[x,y,this.dragSign*Math.sqrt(1-d2)]}
+        else{this.wasOut=true;const l=Math.sqrt(d2);v=[x/l,y/l,0]}
+        this.u[this.drag]=norm(this.toModel(v));
+      }else if(this.rot){
+        this.yaw+=(p.x-this.rot.x)*.01;this.pitch=Math.max(-1.45,Math.min(1.45,this.pitch+(p.y-this.rot.y)*.01));
+        this.rot={x:p.x,y:p.y};this.updR();
+      }else{const h=this.hit(p);if(h!==this.hover){this.hover=h;c.style.cursor=h>=0?'pointer':''}}
+    });
+    const up=()=>{if(this.drag>=0){this.released=performance.now()}this.drag=-1;this.rot=null;c.classList.remove('grabbing')};
+    c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up);
+    c.addEventListener('pointerleave',()=>{if(this.drag<0&&!this.rot)this.hover=-1});
+    c.addEventListener('keydown',e=>{
+      const k=e.key;let used=true;
+      if(k==='ArrowLeft')this.yaw-=.12;else if(k==='ArrowRight')this.yaw+=.12;
+      else if(k==='ArrowUp')this.pitch=Math.max(-1.45,this.pitch-.12);else if(k==='ArrowDown')this.pitch=Math.min(1.45,this.pitch+.12);
+      else if(k===' ')this.kick();else used=false;
+      if(used){e.preventDefault();this.updR()}
+    });
+  }
+  hit(p){let best=-1,bz=-9;
+    for(let i=0;i<this.u.length;i++){
+      if(this.o.onlyAtoms&&this.types[i]==='lp')continue;
+      const P=this.proj(mul(this.u[i],this.handleLen(i)));const r=Math.max(22,this.sc*.2*P.f);
+      if(Math.hypot(P.x-p.x,P.y-p.y)<r&&P.z>bz){bz=P.z;best=i}}
+    return best}
+  /* --- Zeichnen --- */
+  sphere(p,r,col,label){
+    const ctx=this.ctx,P=this.proj(p),R=r*this.sc*P.f;
+    const g=ctx.createRadialGradient(P.x-R*.35,P.y-R*.4,R*.1,P.x,P.y,R);
+    g.addColorStop(0,shade(col,.55));g.addColorStop(.55,col);g.addColorStop(1,shade(col,-.35));
+    ctx.beginPath();ctx.arc(P.x,P.y,R,0,7);ctx.fillStyle=g;ctx.fill();
+    ctx.lineWidth=1;ctx.strokeStyle=rgba(TH.ink.startsWith('#')?TH.ink:'#14203a',.35);ctx.stroke();
+    if(label){ctx.font=`700 ${Math.max(11,R*.85)}px ${TH.font}`;ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillStyle=(label==='H')?'#1d2638':'#ffffff';ctx.fillText(label,P.x,P.y+1)}
+  }
+  stick(u,L,double){
+    const ctx=this.ctx,A=this.proj(mul(u,.2)),B=this.proj(mul(u,L*.9));
+    const wd=Math.max(3,.075*this.sc*(A.f+B.f)/2);
+    const draw=(ox,oy,w)=>{ctx.beginPath();ctx.moveTo(A.x+ox,A.y+oy);ctx.lineTo(B.x+ox,B.y+oy);ctx.lineWidth=w;ctx.lineCap='round';ctx.strokeStyle=TH.stick;ctx.stroke();
+      ctx.lineWidth=w*.35;ctx.strokeStyle='rgba(255,255,255,.35)';ctx.beginPath();ctx.moveTo(A.x+ox-w*.15,A.y+oy-w*.15);ctx.lineTo(B.x+ox-w*.15,B.y+oy-w*.15);ctx.stroke()};
+    if(double){let dx=B.x-A.x,dy=B.y-A.y;const l=Math.hypot(dx,dy)||1;const nx=-dy/l*wd*.75,ny=dx/l*wd*.75;draw(nx,ny,wd*.7);draw(-nx,-ny,wd*.7)}
+    else draw(0,0,wd);
+  }
+  lobe(u,L,W,prof,col,alpha,hl){
+    const pts=[];const N=18;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+    for(let k=0;k<=N;k++){const t=.05+.97*k/N;const r=W*prof(t);if(r<=.002)continue;
+      const P=this.proj(mul(u,L*t));const R=r*this.sc*P.f;pts.push([P.x,P.y,R]);
+      x0=Math.min(x0,P.x-R);y0=Math.min(y0,P.y-R);x1=Math.max(x1,P.x+R);y1=Math.max(y1,P.y+R)}
+    if(!pts.length)return;
+    x0=Math.floor(x0-3);y0=Math.floor(y0-3);x1=Math.ceil(x1+3);y1=Math.ceil(y1+3);
+    const bw=x1-x0,bh=y1-y0,d=this.dpr;
+    if(this.off.width<bw*d||this.off.height<bh*d){this.off.width=Math.ceil(bw*d)+20;this.off.height=Math.ceil(bh*d)+20}
+    const o=this.octx;o.setTransform(1,0,0,1,0,0);o.globalCompositeOperation='source-over';o.clearRect(0,0,Math.ceil(bw*d)+2,Math.ceil(bh*d)+2);
+    o.setTransform(d,0,0,d,-x0*d,-y0*d);
+    o.fillStyle=shade(col,-.3);for(const [x,y,R] of pts){o.beginPath();o.arc(x,y,R+1.4,0,7);o.fill()}
+    o.fillStyle=col;for(const [x,y,R] of pts){o.beginPath();o.arc(x,y,R,0,7);o.fill()}
+    o.globalCompositeOperation='source-atop';
+    const tip=this.proj(mul(u,L*.62));const rad=W*this.sc*tip.f*1.25;
+    const g=o.createRadialGradient(tip.x-rad*.35,tip.y-rad*.45,rad*.05,tip.x,tip.y,rad*1.15);
+    g.addColorStop(0,`rgba(255,255,255,${hl?.75:.45})`);g.addColorStop(.45,'rgba(255,255,255,.08)');g.addColorStop(1,'rgba(0,0,0,.18)');
+    o.fillStyle=g;o.fillRect(x0,y0,bw,bh);o.globalCompositeOperation='source-over';
+    const ctx=this.ctx;ctx.globalAlpha=alpha;ctx.drawImage(this.off,0,0,bw*d,bh*d,x0,y0,bw,bh);ctx.globalAlpha=1;
+  }
+  label(p,txt,col){const ctx=this.ctx,P=this.proj(p);ctx.font=`700 12px ${TH.font}`;ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.lineWidth=4;ctx.strokeStyle=TH.surface;ctx.lineJoin='round';ctx.strokeText(txt,P.x,P.y);ctx.fillStyle=col;ctx.fillText(txt,P.x,P.y)}
+  arc(a,b,r){
+    const ang=Math.acos(Math.max(-1,Math.min(1,dot(a,b))));let w;
+    if(Math.sin(ang)<1e-3){const vdir=this.toModel([0,0,1]);w=norm(cross(a,vdir));if(!isFinite(w[0])||Math.hypot(...cross(a,vdir))<1e-3)w=norm(cross(a,[0,1,0]))}
+    else w=norm(sub(b,mul(a,dot(a,b))));
+    const pt=t=>add(mul(a,Math.cos(ang*t)*r),mul(w,Math.sin(ang*t)*r));
+    const ctx=this.ctx;ctx.beginPath();for(let k=0;k<=24;k++){const P=this.proj(pt(k/24));k?ctx.lineTo(P.x,P.y):ctx.moveTo(P.x,P.y)}
+    ctx.strokeStyle=TH.accent;ctx.lineWidth=2.2;ctx.stroke();
+    const m=this.proj(add(mul(a,Math.cos(ang/2)*(r+.24)),mul(w,Math.sin(ang/2)*(r+.24))));
+    const txt=deg(ang*180/Math.PI);ctx.font=`600 12.5px ${TH.mono}`;
+    const tw=ctx.measureText(txt).width;ctx.fillStyle=TH.surface;ctx.strokeStyle=TH.accent;ctx.lineWidth=1.2;
+    ctx.beginPath();ctx.roundRect?ctx.roundRect(m.x-tw/2-5,m.y-10,tw+10,20,6):ctx.rect(m.x-tw/2-5,m.y-10,tw+10,20);ctx.fill();ctx.stroke();
+    ctx.fillStyle=TH.accent;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,m.x,m.y+.5);
+  }
+  overlayPoly(){
+    const n=this.u.length;if(n<3)return;const ctx=this.ctx;const P=this.u.map(u=>this.proj(u));
+    if(n===4){const faces=[[0,1,2],[0,1,3],[0,2,3],[1,2,3]];
+      ctx.fillStyle=rgba(TH.accent.startsWith('#')?TH.accent:'#2f43c0',.07);
+      for(const f of faces){ctx.beginPath();f.forEach((k,q)=>q?ctx.lineTo(P[k].x,P[k].y):ctx.moveTo(P[k].x,P[k].y));ctx.closePath();ctx.fill()}}
+    ctx.setLineDash([6,5]);ctx.strokeStyle=TH.accent;ctx.lineWidth=1.6;
+    for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){if(n===3||n===4){ctx.beginPath();ctx.moveTo(P[i].x,P[i].y);ctx.lineTo(P[j].x,P[j].y);ctx.stroke()}}
+    ctx.setLineDash([]);
+    for(const p of P){ctx.beginPath();ctx.arc(p.x,p.y,3.2,0,7);ctx.fillStyle=TH.accent;ctx.fill()}
+  }
+  overlayCube(){
+    if(this.u.length!==4)return;const u=this.u;
+    let e1=norm(add(u[0],u[1])),e2=norm(add(u[0],u[2]));e2=norm(sub(e2,mul(e1,dot(e1,e2))));let e3=cross(e1,e2);if(dot(e3,u[0])<0)e3=mul(e3,-1);
+    const s=1/Math.sqrt(3);const C=[];for(const a of[-1,1])for(const b of[-1,1])for(const c of[-1,1])C.push({k:[a,b,c],p:add(add(mul(e1,a*s),mul(e2,b*s)),mul(e3,c*s))});
+    const ctx=this.ctx;ctx.strokeStyle=TH.muted;ctx.lineWidth=1.2;
+    for(let i=0;i<8;i++)for(let j=i+1;j<8;j++){const d=C[i].k.reduce((q,v,x)=>q+(v!==C[j].k[x]?1:0),0);if(d===1){const A=this.proj(C[i].p),B=this.proj(C[j].p);ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.stroke()}}
+  }
+  render(){
+    const ctx=this.ctx;ctx.setTransform(this.dpr,0,0,this.dpr,0,0);ctx.clearRect(0,0,this.w,this.h);
+    // Bodenschatten
+    ctx.save();ctx.translate(this.cx,this.cy+this.sc*1.42);ctx.scale(1,.2);const sg=ctx.createRadialGradient(0,0,0,0,0,this.sc*1.1);
+    sg.addColorStop(0,TH.shadow);sg.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=sg;ctx.beginPath();ctx.arc(0,0,this.sc*1.1,0,7);ctx.fill();ctx.restore();
+    const st=this.o.style,only=this.o.onlyAtoms,items=[];const vz=p=>this.toView(p)[2];
+    if(st==='balloon')items.push({z:0,f:()=>this.sphere([0,0,0],.075,TH.knot.startsWith('#')?TH.knot:'#6b5640')});
+    else items.push({z:0,f:()=>this.sphere([0,0,0],ELR[this.center]||.28,EL[this.center]||'#888',this.center)});
+    this.u.forEach((u,i)=>{
+      const t=this.types[i],hl=i===this.hover||i===this.drag;
+      if(st==='balloon'){const big=t==='lp',L=big?1.42:1.22,W=big?.62:.5;items.push({z:vz(mul(u,L*.55)),f:()=>this.lobe(u,L,W,PROF.balloon,big?TH.lp:TH.bp,.94,hl)});return}
+      if(t==='lp'){if(!only)items.push({z:vz(mul(u,.4)),f:()=>this.lobe(u,.78,.5,PROF.lp,TH.lp,st==='cloud'?.66:.42,hl)});return}
+      const lig=this.ligs[i],bl=BOND[lig]||1;
+      if(st==='cloud'&&!only)items.push({z:vz(mul(u,bl*.5))-.001,f:()=>this.lobe(u,bl*1.02,t==='db'?.38:.29,PROF.bp,TH.bp,t==='db'?.62:.5,hl)});
+      else items.push({z:vz(mul(u,bl*.5)),f:()=>this.stick(u,bl,t==='db')});
+      items.push({z:vz(mul(u,bl)),f:()=>{this.sphere(mul(u,bl),ELR[lig]||.2,EL[lig]||'#ccc',lig);if(hl){const P=this.proj(mul(u,bl));this.ctx.beginPath();this.ctx.arc(P.x,P.y,(ELR[lig]||.2)*this.sc*P.f+5,0,7);this.ctx.strokeStyle=TH.accent;this.ctx.lineWidth=2.5;this.ctx.stroke()}}});
+    });
+    items.sort((a,b)=>a.z-b.z).forEach(it=>it.f());
+    if(this.o.cube)this.overlayCube();
+    if(this.o.tetra)this.overlayPoly();
+    if(this.o.angles){const L=[];this.types.forEach((t,i)=>{if(t!=='lp'||st==='balloon')L.push(i)});
+      for(let k=1;k<L.length&&k<4;k++)this.arc(this.u[L[0]],this.u[L[k]],st==='balloon'?.5:.42)}
+    if(this.o.labels&&st!=='balloon'){
+      this.u.forEach((u,i)=>{const t=this.types[i];
+        if(t==='lp'&&!only)this.label(mul(u,.98),'frei',TH.lp);
+        else if(t!=='lp'&&!only&&st==='cloud')this.label(mul(u,(BOND[this.ligs[i]]||1)+.42),t==='db'?'Doppelbindung':'bindend',TH.bp)})}
+  }
+  tick(){
+    if(!this.w)this.resize();if(!this.w)return;
+    for(let s=0;s<2;s++)this.step();
+    if(this.o.rotate&&this.drag<0&&!this.rot){this.yaw+=.004;this.updR()}
+    this.render();this.frame++;
+    if(this.onUpdate&&this.frame%4===0)this.onUpdate(this.stats());
+  }
+}
+function loop(){if(!document.hidden)for(const s of SIMS)if(s.active)s.tick();requestAnimationFrame(loop)}
+
+/* ---------- Moleküle ---------- */
+const MOLS={
+  h2o:{name:'Wasser',f:'H₂O',center:'O',types:['bp','bp','lp','lp'],ligs:['H','H','',''],ve:6,epg:'tetraedrisch',shape:'gewinkelt',lit:'104,5°',litN:104.5,
+    lewis:{atoms:[{s:'O',x:110,y:70,lp:[-90,90]},{s:'H',x:55,y:70},{s:'H',x:165,y:70}],bonds:[[0,1,1],[0,2,1]]},
+    why:'Die zwei freien Elektronenpaare nehmen mehr Raum ein. Der H–O–H-Winkel wird deshalb kleiner als 109,5°.'},
+  nh3:{name:'Ammoniak',f:'NH₃',center:'N',types:['bp','bp','bp','lp'],ligs:['H','H','H',''],ve:5,epg:'tetraedrisch',shape:'trigonal-pyramidal',lit:'107°',litN:107,
+    lewis:{atoms:[{s:'N',x:110,y:62,lp:[-90]},{s:'H',x:55,y:62},{s:'H',x:165,y:62},{s:'H',x:110,y:118}],bonds:[[0,1,1],[0,2,1],[0,3,1]]},
+    why:'Das freie Elektronenpaar nimmt mehr Raum ein. Die H–N–H-Winkel werden etwas kleiner als 109,5°.'},
+  ch4:{name:'Methan',f:'CH₄',center:'C',types:['bp','bp','bp','bp'],ligs:['H','H','H','H'],ve:4,epg:'tetraedrisch',shape:'tetraedrisch',lit:'109,5°',litN:109.5,
+    lewis:{atoms:[{s:'C',x:110,y:70},{s:'H',x:55,y:70},{s:'H',x:165,y:70},{s:'H',x:110,y:20},{s:'H',x:110,y:120}],bonds:[[0,1,1],[0,2,1],[0,3,1],[0,4,1]]},
+    why:'Alle vier Elektronenpaarbereiche sind gleich. Alle Winkel sind gleich groß: 109,5°.'},
+  hcl:{name:'Chlorwasserstoff',f:'HCl',center:'Cl',types:['bp','lp','lp','lp'],ligs:['H','','',''],ve:7,epg:'tetraedrisch',shape:'linear (zweiatomig)',lit:'kein Bindungswinkel',litN:null,
+    lewis:{atoms:[{s:'Cl',x:122,y:70,lp:[-90,0,90]},{s:'H',x:62,y:70}],bonds:[[0,1,1]]},
+    why:'Ein Molekül aus nur zwei Atomen ist immer linear. Die Elektronenpaare sind trotzdem tetraedrisch angeordnet.'},
+  co2:{name:'Kohlenstoffdioxid',f:'CO₂',ext:true,center:'C',types:['db','db'],ligs:['O','O'],ve:4,epg:'linear',shape:'linear',lit:'180°',litN:180,
+    lewis:{atoms:[{s:'C',x:110,y:70},{s:'O',x:50,y:70,lp:[-135,135]},{s:'O',x:170,y:70,lp:[-45,45]}],bonds:[[0,1,2],[0,2,2]]},
+    why:'Jede Doppelbindung zählt als ein Elektronenpaarbereich. Zwei Bereiche liegen sich gegenüber: 180°.'},
+  h2co:{name:'Methanal',f:'H₂CO',ext:true,center:'C',types:['db','bp','bp'],ligs:['O','H','H'],ve:4,epg:'trigonal-planar',shape:'trigonal-planar',lit:'H–C–H ca. 116°',litN:116.5,
+    lewis:{atoms:[{s:'C',x:110,y:82},{s:'O',x:110,y:28,lp:[-150,-30]},{s:'H',x:62,y:112},{s:'H',x:158,y:112}],bonds:[[0,1,2],[0,2,1],[0,3,1]]},
+    why:'Drei Bereiche liegen in einer Ebene, etwa 120° auseinander. Die Doppelbindung nimmt mehr Raum ein, deshalb ist der H–C–H-Winkel kleiner (gemessen etwa 116°).'},
+  free:{name:'Eigenes Molekül',f:'XHₙ',center:'X'}
+};
+const FREE_SHAPES={'2,0':['linear','linear',180],'3,0':['trigonal-planar','trigonal-planar',120],'4,0':['tetraedrisch','tetraedrisch',109.5],
+  '2,1':['trigonal-planar','gewinkelt',null],'3,1':['tetraedrisch','trigonal-pyramidal',107],'2,2':['tetraedrisch','gewinkelt',104.5],
+  '1,1':['linear','linear (zweiatomig)',null],'1,2':['trigonal-planar','linear (zweiatomig)',null],'1,3':['tetraedrisch','linear (zweiatomig)',null]};
+
+/* ---------- Lewis-Formel als SVG ---------- */
+function lewisSVG(spec){
+  const R=a=>a.s.length>1?17:13;let s='';
+  for(const [i,j,o] of spec.bonds){const A=spec.atoms[i],B=spec.atoms[j];let dx=B.x-A.x,dy=B.y-A.y;const l=Math.hypot(dx,dy);dx/=l;dy/=l;
+    const x1=A.x+dx*R(A),y1=A.y+dy*R(A),x2=B.x-dx*R(B),y2=B.y-dy*R(B);
+    const offs=o===2?[-3.6,3.6]:[0];for(const q of offs)s+=`<line x1="${x1-dy*q}" y1="${y1+dx*q}" x2="${x2-dy*q}" y2="${y2+dx*q}"/>`}
+  for(const a of spec.atoms){for(const t of(a.lp||[])){const r=t*Math.PI/180,cx=a.x+Math.cos(r)*(R(a)+5),cy=a.y+Math.sin(r)*(R(a)+5),px=-Math.sin(r)*7.5,py=Math.cos(r)*7.5;
+      s+=`<line class="lp" x1="${cx-px}" y1="${cy-py}" x2="${cx+px}" y2="${cy+py}"/>`}
+    s+=`<text x="${a.x}" y="${a.y}">${a.s}</text>`}
+  return `<svg viewBox="0 0 220 140" role="img" aria-label="Lewis-Formel"><g style="stroke:var(--ink);fill:var(--ink);font-family:var(--f-body);font-size:24px;font-weight:700" stroke-width="2.4" stroke-linecap="round" text-anchor="middle" dominant-baseline="central">${s.replace(/<line class="lp"/g,'<line style="stroke:var(--lp)" stroke-width="3"').replace(/<text /g,'<text style="stroke:none" ')}</g></svg>`;
+}
+function freeLewis(bp,lp){const slots=[[55,70,180],[165,70,0],[110,122,90],[110,18,-90]];const atoms=[{s:'X',x:110,y:70,lp:[]}];const bonds=[];
+  for(let i=0;i<bp;i++){atoms.push({s:'H',x:slots[i][0],y:slots[i][1]});bonds.push([0,i+1,1])}
+  for(let k=0;k<lp;k++)atoms[0].lp.push(slots[bp+k][2]);return {atoms,bonds}}
+
+/* ---------- Haupt-Simulator ---------- */
+const sim=new EPASim($('#cv-main'),{labels:true,rotate:false});
+let cur='h2o';
+const chipBox=$('#mol-chips');
+for(const [k,m] of Object.entries(MOLS)){const b=document.createElement('button');b.type='button';b.className='chip'+(m.ext?' ext':'');b.dataset.k=k;b.setAttribute('aria-pressed',k===cur);
+  b.innerHTML=`${esc(m.name)} <small>${esc(m.f)}</small>`;if(m.ext)b.title='Erweiterung: Doppelbindungen';b.onclick=()=>selectMol(k);chipBox.appendChild(b)}
+function curDef(){
+  const m=MOLS[cur];
+  if(cur!=='free')return m;
+  const bp=+$('#f-bp').value,lp=+$('#f-lp').value;const sh=FREE_SHAPES[bp+','+lp];
+  return {name:'Eigenes Molekül',f:'XH'+(bp>1?String.fromCharCode(0x2080+bp):''),center:'X',types:[...Array(bp).fill('bp'),...Array(lp).fill('lp')],ligs:[...Array(bp).fill('H'),...Array(lp).fill('')],
+    ve:bp+2*lp,epg:sh[0],shape:sh[1],lit:sh[2]?'ca. '+deg(sh[2]):(bp>1?'größer als 109,5°, kleiner als 120°':'kein Bindungswinkel'),litN:sh[2],lewis:freeLewis(bp,lp),
+    why:lp?'Freie Elektronenpaare nehmen mehr Raum ein und verkleinern die Bindungswinkel.':'Alle Bereiche sind gleich. Sie liegen gleich weit voneinander entfernt.'};
+}
+function selectMol(k){cur=k;$$('#mol-chips .chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===k));$('#free-box').hidden=k!=='free';applyMol(true)}
+function applyMol(scramble){
+  const m=curDef();
+  sim.setMolecule(m.center,m.types,m.ligs,scramble);
+  $('#mol-title').innerHTML=`${esc(m.name)} <span class="sub">${esc(m.f)}</span>`;
+  $('#lewis').innerHTML=lewisSVG(m.lewis);
+  const bp=m.types.filter(t=>t!=='lp').length,lp=m.types.filter(t=>t==='lp').length,db=m.types.filter(t=>t==='db').length;
+  $('#count').innerHTML=`
+    <dt>Zentralatom</dt><dd>${esc(m.center)} (${m.ve} Valenzelektronen)</dd>
+    <dt>Bindungen</dt><dd><span class="pill bp">${bp} bindend</span>${db?` <span class="muted" style="font-weight:400">(davon ${db} Doppelbindung${db>1?'en':''}, zählt als 1 Bereich)</span>`:''}</dd>
+    <dt>Freie Paare</dt><dd><span class="pill lp">${lp} frei</span></dd>
+    <dt>Bereiche</dt><dd>${bp+lp} <button class="term" data-g="bereich" type="button">Elektronenpaarbereiche</button></dd>
+    <dt class="sep">Anordnung</dt><dd class="sep">${esc(m.epg)} <span class="muted" style="font-weight:400">(Elektronenpaare)</span></dd>
+    <dt>Gestalt</dt><dd>${esc(m.shape)} <span class="muted" style="font-weight:400">(nur Atome)</span></dd>
+    <dt>Begründung</dt><dd style="font-weight:400">${esc(m.why)}</dd>`;
+  bindTerms($('#count'));
+}
+$('#f-bp').onchange=$('#f-lp').onchange=()=>{let bp=+$('#f-bp').value,lp=+$('#f-lp').value;
+  if(bp+lp>4){lp=4-bp;$('#f-lp').value=lp;$('#f-msg').textContent='Mehr als 4 Bereiche sind in Klasse 9/10 nicht vorgesehen (Oktettregel). Die freien Paare wurden angepasst.'}
+  else if(bp+lp<2){lp=1;$('#f-lp').value=1;$('#f-msg').textContent='Mindestens 2 Bereiche nötig, sonst gibt es keine Anordnung.'}
+  else $('#f-msg').textContent='Insgesamt 2 bis 4 Elektronenpaarbereiche.';applyMol(true)};
+
+sim.onUpdate=s=>{
+  const m=curDef();
+  const rows=[];
+  if(s.pairs.length===0)rows.push(['Bindungswinkel','–']);
+  else if(s.pairs.length<=3)s.pairs.forEach(p=>rows.push([`${m.ligs[p.i]}–${m.center}–${m.ligs[p.j]}`,deg(p.a)]));
+  else{const a=s.pairs.map(p=>p.a);rows.push(['H–C–H (Mittelwert)',deg(a.reduce((x,y)=>x+y,0)/a.length)]);rows.push(['kleinster / größter',deg(Math.min(...a))+' / '+deg(Math.max(...a))])}
+  rows.push(['Messwert (Literatur)',m.lit]);
+  $('#meas').innerHTML=rows.map(r=>`<div class="meas-row"><span>${esc(r[0])}</span><b>${esc(r[1])}</b></div>`).join('');
+  setMeter($('#meter'),$('#meter-txt'),s.ratio);
+  setStatus($('#st-dot'),$('#st-text'),s,'Elektronenpaar');
+};
+function setMeter(el,txt,r){const sp=el.firstElementChild;sp.style.width=Math.max(3,r*100)+'%';
+  sp.style.background=r<.12?'var(--ok)':r<.5?'var(--warn)':'var(--bad)';txt.textContent=r<.04?'gering (Minimum)':r<.12?'gering':r<.45?'erhöht':'hoch';el.setAttribute('aria-valuenow',Math.round(r*100))}
+function setStatus(dotEl,txtEl,s,what){
+  dotEl.className='dot'+(s.state==='drag'?' drag':s.state==='move'?' busy':'');
+  txtEl.textContent=s.state==='drag'?`Du verschiebst ein ${what}. Die Abstoßung steigt.`:
+    s.state==='move'?(s.flatAgo<3200?'Flache Anordnung ist instabil: Die Bereiche bewegen sich in den Raum.':'Die Abstoßung verschiebt die Bereiche in die Anordnung mit dem größten Abstand.'):
+    'Gleichgewicht: größtmöglicher Abstand, geringste Abstoßung.';
+}
+
+/* Steuerung */
+function setStyle(st){$$('#style-seg button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.s===st));sim.o.style=st;sim.resize();
+  $('#legend-main').innerHTML=sim.o.style==='balloon'?'<span><i style="background:var(--bp)"></i>Ballon = bindendes Elektronenpaar</span><span><i style="background:var(--lp)"></i>großer Ballon = freies Elektronenpaar</span><span><i style="background:var(--accent)"></i>Winkel / Tetraeder</span>':'<span><i style="background:var(--bp)"></i>bindendes Elektronenpaar</span><span><i style="background:var(--lp)"></i>freies Elektronenpaar</span><span><i style="background:var(--accent)"></i>Bindungswinkel / Tetraeder</span>'}
+$$('#style-seg button').forEach(b=>b.onclick=()=>setStyle(b.dataset.s));
+const bindTog=(id,key,s=sim)=>{const el=$(id);s.o[key]=el.checked;el.onchange=()=>s.o[key]=el.checked};
+bindTog('#o-angles','angles');bindTog('#o-tetra','tetra');bindTog('#o-only','onlyAtoms');bindTog('#o-labels','labels');bindTog('#o-rotate','rotate');
+$('#b-kick').onclick=()=>sim.kick();
+$('#b-flat').onclick=()=>{sim.flatten();if(sim.u.length<4)toast('Bei 2 oder 3 Bereichen ist die flache Anordnung schon die beste.')};
+$('#b-view').onclick=()=>sim.resetView();
+
+/* Lernweg */
+const STEPS=[
+  {h:'Lewis-Formel aufstellen',p:'Zeichne die Valenzstrichformel. Jeder Strich steht für ein Elektronenpaar.',b:'Lewis-Formel ansehen',a:()=>{$('#lewis').scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'center'})}},
+  {h:'Elektronenpaarbereiche zählen',p:'Zähle am Zentralatom alle Bindungen und alle freien Elektronenpaare. Eine Doppelbindung zählt als ein Bereich.',b:'Beschriftung zeigen',a:()=>{$('#o-labels').checked=true;sim.o.labels=true;sim.o.onlyAtoms=false;$('#o-only').checked=false}},
+  {h:'Größten Abstand finden',p:'Elektronenpaare sind negativ geladen und stoßen sich ab. Am stabilsten ist die Anordnung mit dem größten Abstand: 2 → linear, 3 → trigonal-planar, 4 → tetraedrisch.',b:'Anstoßen und beobachten',a:()=>{sim.o.tetra=true;$('#o-tetra').checked=true;sim.kick(1.1)}},
+  {h:'Freie Elektronenpaare beachten',p:'Ein freies Elektronenpaar nimmt mehr Raum ein als ein bindendes. Die Bindungswinkel werden kleiner: 109,5° → 107° → 104,5°.',b:'Methan, Ammoniak, Wasser vergleichen',a:()=>{const seq=['ch4','nh3','h2o'];let i=0;const go=()=>{selectMol(seq[i]);i++;if(i<seq.length)setTimeout(go,3200)};go();toast('Achte auf den Winkel rechts.')}},
+  {h:'Molekülgestalt benennen',p:'Schau jetzt nur auf die Atome. Die freien Elektronenpaare bestimmen die Anordnung mit, zählen aber beim Namen der Gestalt nicht.',b:'Nur Atome zeigen',a:()=>{sim.o.onlyAtoms=true;$('#o-only').checked=true;setStyle('ball')}}
+];
+$('#steps').innerHTML=STEPS.map((s,i)=>`<li><span class="no">Schritt ${i+1}</span><h3>${s.h}</h3><p>${s.p}</p><button class="btn" type="button" data-step="${i}">${s.b}</button></li>`).join('');
+$$('#steps [data-step]').forEach(b=>b.onclick=()=>{STEPS[+b.dataset.step].a();if(+b.dataset.step>0)$('#cv-main').scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'center'})});
+
+/* ---------- Ballon-Simulator ---------- */
+const bsim=new EPASim($('#cv-ball'),{style:'balloon',angles:true,maxH:480,ratio:.8});
+let bN=4,bBig=0;
+function applyBalloon(){if(bBig>bN)bBig=bN;$$('#b-big button').forEach(x=>x.setAttribute('aria-pressed',+x.dataset.v===bBig));
+  const types=[...Array(bN-bBig).fill('bp'),...Array(bBig).fill('lp')];bsim.setMolecule('',types,types.map(()=>''),true)}
+$$('#b-n button').forEach(b=>b.onclick=()=>{bN=+b.dataset.v;$$('#b-n button').forEach(x=>x.setAttribute('aria-pressed',x===b));applyBalloon()});
+$$('#b-big button').forEach(b=>b.onclick=()=>{bBig=+b.dataset.v;applyBalloon()});
+bindTog('#b-angles','angles',bsim);
+$('#b-kick2').onclick=()=>bsim.kick();$('#b-flat2').onclick=()=>bsim.flatten();
+bsim.onUpdate=s=>setStatus($('#bst-dot'),$('#bst-text'),s,'Ballon');
+applyBalloon();
+
+/* ---------- Tetraeder-Simulator ---------- */
+const tsim=new EPASim($('#cv-tet'),{style:'ball',tetra:true,angles:true,maxH:480,ratio:.8});
+tsim.setMolecule('C',['bp','bp','bp','bp'],['H','H','H','H'],true);
+bindTog('#t-faces','tetra',tsim);bindTog('#t-cube','cube',tsim);bindTog('#t-angles','angles',tsim);bindTog('#t-rot','rotate',tsim);
+$('#t-flat').onclick=()=>tsim.flatten();$('#t-kick').onclick=()=>tsim.kick();
+tsim.onUpdate=s=>{setMeter($('#t-meter'),$('#t-meter-txt'),s.ratio);setStatus($('#tst-dot'),$('#tst-text'),s,'Elektronenpaar')};
+
+/* ---------- Tabs ---------- */
+const TABS={entdecken:[sim],ballon:[bsim],tetraeder:[tsim],arbeitsplatz:[]};
+function showTab(id,push=true){
+  if(!TABS[id])id='entdecken';
+  $$('.tab').forEach(t=>t.setAttribute('aria-selected',t.getAttribute('aria-controls')===id));
+  for(const k in TABS){$('#'+k).hidden=k!==id;TABS[k].forEach(s=>s.active=k===id)}
+  TABS[id].forEach(s=>s.resize());
+  store.set('epa-tab',id);if(push)try{history.replaceState(null,'','#'+id)}catch(e){}
+}
+$$('.tab').forEach(t=>t.onclick=()=>showTab(t.getAttribute('aria-controls')));
+document.querySelector('.tabs').addEventListener('keydown',e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;const ts=$$('.tab');const i=ts.findIndex(t=>t.getAttribute('aria-selected')==='true');
+  const n=ts[(i+(e.key==='ArrowRight'?1:ts.length-1))%ts.length];n.focus();n.click()});
+
+/* ---------- Wortspeicher ---------- */
+const GL=[
+  {id:'epa',a:'das',w:'EPA-Modell',pl:'Abkürzung für Elektronenpaarabstoßungsmodell',en:'VSEPR model',d:'Ein Modell, mit dem man die räumliche Gestalt von Molekülen vorhersagt.',ex:'Mit dem EPA-Modell kann ich erklären, warum Wasser gewinkelt ist.'},
+  {id:'molekuel',a:'das',w:'Molekül',pl:'die Moleküle',en:'molecule',d:'Ein Teilchen aus zwei oder mehr Atomen, die durch Elektronenpaarbindungen verbunden sind.',ex:'Ein Wassermolekül besteht aus drei Atomen.'},
+  {id:'zentral',a:'das',w:'Zentralatom',pl:'die Zentralatome',en:'central atom',d:'Das Atom in der Mitte eines Moleküls. Andere Atome sind daran gebunden.',ex:'Im Wassermolekül ist das Sauerstoffatom das Zentralatom.'},
+  {id:'valenz',a:'die',w:'Valenzelektronen',pl:'nur Plural',en:'valence electrons',d:'Die Elektronen auf der äußersten Schale eines Atoms. Sie bilden Bindungen und freie Elektronenpaare.',ex:'Sauerstoff hat sechs Valenzelektronen.'},
+  {id:'paar',a:'das',w:'Elektronenpaar',pl:'die Elektronenpaare',en:'electron pair',d:'Zwei Elektronen, die zusammengehören. In der Lewis-Formel ist das ein Strich.',ex:'Ein Strich steht für ein Elektronenpaar.'},
+  {id:'bindendes',a:'das',w:'bindende Elektronenpaar',pl:'die bindenden Elektronenpaare',en:'bonding pair',d:'Ein Elektronenpaar zwischen zwei Atomen. Es verbindet die beiden Atome.',ex:'Zwischen O und H liegt ein bindendes Elektronenpaar.'},
+  {id:'freies',a:'das',w:'freie Elektronenpaar',pl:'die freien Elektronenpaare; auch: nichtbindendes Elektronenpaar',en:'lone pair',d:'Ein Elektronenpaar, das nur zu einem Atom gehört. Es bildet keine Bindung. Es nimmt mehr Raum ein als ein bindendes Elektronenpaar.',ex:'Das Sauerstoffatom im Wasser hat zwei freie Elektronenpaare.'},
+  {id:'bereich',a:'der',w:'Elektronenpaarbereich',pl:'die Elektronenpaarbereiche',en:'electron domain',d:'Jedes freie Elektronenpaar und jede Bindung am Zentralatom ist ein Bereich. Eine Doppelbindung zählt auch nur als ein Bereich.',ex:'Ammoniak hat vier Elektronenpaarbereiche: drei bindende und einen freien.'},
+  {id:'wolke',a:'die',w:'Elektronenwolke',pl:'die Elektronenwolken',en:'electron cloud',d:'Modellvorstellung für den Raum, in dem sich Elektronen mit hoher Wahrscheinlichkeit befinden. Eine Elektronenwolke hat keinen scharfen Rand.',ex:'Die Elektronenwolke eines freien Elektronenpaars ist breiter.'},
+  {id:'ladung',a:'die',w:'Ladung',pl:'die Ladungen',en:'charge',d:'Teilchen können positiv oder negativ geladen sein. Elektronen sind negativ geladen.',ex:'Gleiche Ladungen stoßen sich ab, ungleiche ziehen sich an.'},
+  {id:'abstossung',a:'die',w:'Abstoßung',pl:'die Abstoßungen',en:'repulsion',d:'Kraft zwischen gleich geladenen Teilchen, die sie auseinanderdrückt.',ex:'Die Abstoßung zwischen den Elektronenpaaren bestimmt die Gestalt.'},
+  {id:'abstossen',a:'Verb',w:'abstoßen',pl:'stößt ab – stieß ab – hat abgestoßen',en:'to repel',d:'Gleiche Ladungen stoßen sich ab. Trennbares Verb: Die Vorsilbe „ab“ steht am Satzende.',ex:'Die Elektronenpaare stoßen sich gegenseitig ab.'},
+  {id:'lewis',a:'die',w:'Lewis-Formel',pl:'die Lewis-Formeln; auch: Valenzstrichformel',en:'Lewis structure',d:'Schreibweise für Moleküle: Striche zeigen Elektronenpaare. Sie ist flach und zeigt keine räumliche Gestalt.',ex:'In der Lewis-Formel von Wasser stehen zwei Striche am O-Atom für die freien Elektronenpaare.'},
+  {id:'winkel',a:'der',w:'Bindungswinkel',pl:'die Bindungswinkel',en:'bond angle',d:'Der Winkel zwischen zwei Bindungen am Zentralatom.',ex:'Der Bindungswinkel im Wassermolekül beträgt 104,5°.'},
+  {id:'tetraeder',a:'das',w:'Tetraeder',pl:'die Tetraeder; auch: der Tetraeder',en:'tetrahedron',d:'Ein Körper aus vier gleichseitigen Dreiecken. Er hat 4 Ecken, 6 Kanten und 4 Flächen.',ex:'Die vier Wasserstoffatome im Methan sitzen in den Ecken eines Tetraeders.'},
+  {id:'tetraedrisch',a:'Adj.',w:'tetraedrisch',pl:'',en:'tetrahedral',d:'Wie ein Tetraeder angeordnet. Winkel: 109,5°.',ex:'Das Methan-Molekül ist tetraedrisch gebaut.'},
+  {id:'pyramidal',a:'Adj.',w:'trigonal-pyramidal',pl:'',en:'trigonal pyramidal',d:'Wie eine Pyramide mit dreieckiger Grundfläche. Das Zentralatom bildet die Spitze.',ex:'Das Ammoniak-Molekül ist trigonal-pyramidal.'},
+  {id:'gewinkelt',a:'Adj.',w:'gewinkelt',pl:'',en:'bent, angular',d:'Drei Atome liegen nicht auf einer Linie, sondern bilden einen Winkel.',ex:'Das Wassermolekül ist gewinkelt.'},
+  {id:'linear',a:'Adj.',w:'linear',pl:'',en:'linear',d:'Alle Atome liegen auf einer Geraden. Winkel: 180°.',ex:'Das Kohlenstoffdioxid-Molekül ist linear.'},
+  {id:'planar',a:'Adj.',w:'trigonal-planar',pl:'',en:'trigonal planar',d:'Drei Bereiche liegen in einer Ebene, wie ein Dreieck. Winkel: etwa 120°.',ex:'Im Methanal-Molekül ist das C-Atom trigonal-planar umgeben.'},
+  {id:'gestalt',a:'die',w:'Molekülgestalt',pl:'die Molekülgestalten; auch: Molekülgeometrie',en:'molecular shape',d:'Die räumliche Anordnung der Atome. Freie Elektronenpaare zählen beim Namen der Gestalt nicht mit.',ex:'Die Molekülgestalt von Wasser ist gewinkelt.'},
+  {id:'doppel',a:'die',w:'Doppelbindung',pl:'die Doppelbindungen',en:'double bond',d:'Zwei bindende Elektronenpaare zwischen denselben zwei Atomen. Im EPA-Modell zählt sie als ein Bereich.',ex:'Im CO₂-Molekül gibt es zwei Doppelbindungen.'},
+  {id:'modell',a:'das',w:'Modell',pl:'die Modelle',en:'model',d:'Eine vereinfachte Darstellung der Wirklichkeit. Ein Modell erklärt manches, aber nicht alles.',ex:'Das Ballon-Modell hat Grenzen.'},
+  {id:'grenze',a:'die',w:'Modellgrenze',pl:'die Modellgrenzen',en:'limitation of a model',d:'Etwas, das ein Modell nicht richtig darstellt.',ex:'Eine Modellgrenze ist, dass Ballons eine feste Haut haben.'}
+];
+const PHRASES=[
+  'Das Zentralatom hat … Elektronenpaarbereiche: … bindende und … freie Elektronenpaare.',
+  'Elektronenpaare sind negativ geladen. Deshalb stoßen sie sich gegenseitig ab.',
+  'Die Elektronenpaarbereiche liegen so weit wie möglich voneinander entfernt. So ist die Abstoßung am geringsten.',
+  'Bei vier Elektronenpaarbereichen ergibt sich eine tetraedrische Anordnung mit 109,5°.',
+  'Ein freies Elektronenpaar nimmt mehr Raum ein als ein bindendes, weil es nur von einem Atomkern angezogen wird.',
+  'Dadurch wird der Bindungswinkel kleiner als 109,5°.',
+  'Die Molekülgestalt ist …, weil man nur die Lage der Atome betrachtet.',
+  'Das Ballon-Modell stimmt mit dem EPA-Modell darin überein, dass …',
+  'Eine Grenze des Ballon-Modells ist, dass …'
+];
+let glEN=store.get('epa-gl-en',true);
+function artHTML(a){const c={der:'der',die:'die',das:'das'}[a];return c?`<span class="art ${c}">${a}</span>`:`<span class="art x">${esc(a)}</span>`}
+function renderGL(box,q,idPrefix){
+  q=(q||'').toLowerCase().trim();
+  const list=GL.filter(g=>!q||(g.w+' '+g.en+' '+g.d+' '+g.pl).toLowerCase().includes(q));
+  box.innerHTML=list.length?list.map(g=>`<article class="ent" id="${idPrefix}${g.id}"><div class="w">${artHTML(g.a)} ${esc(g.w)}</div>${g.pl?`<div class="pl">${esc(g.pl)}</div>`:''}${glEN?`<div class="en" lang="en">${esc(g.en)}</div>`:''}<p>${esc(g.d)}</p><p class="ex">${esc(g.ex)}</p></article>`).join(''):'<p class="muted">Kein Begriff gefunden. Versuche ein kürzeres Suchwort.</p>';
+}
+function renderPhr(box){box.innerHTML='<h3>Satzbausteine</h3><p class="muted" style="font-size:.85rem">Antippen kopiert den Satzanfang.</p>'+PHRASES.map(p=>`<button type="button">${esc(p)}</button>`).join('');
+  box.querySelectorAll('button').forEach(b=>b.onclick=()=>copyText(b.textContent,'Satzbaustein kopiert'))}
+renderGL($('#gl-main'),'','g-');renderPhr($('#phr-main'));renderGL($('#gl-drawer'),'','d-');renderPhr($('#phr-drawer'));
+$('#gl-en').checked=glEN;$('#gl-en').onchange=e=>{glEN=e.target.checked;store.set('epa-gl-en',glEN);renderGL($('#gl-main'),$('#gl-search').value,'g-');renderGL($('#gl-drawer'),$('#dr-search').value,'d-')};
+$('#gl-search').oninput=e=>renderGL($('#gl-main'),e.target.value,'g-');
+$('#dr-search').oninput=e=>renderGL($('#gl-drawer'),e.target.value,'d-');
+let lastFocus=null;
+function openWS(id){lastFocus=document.activeElement;$('#dr-search').value='';renderGL($('#gl-drawer'),'','d-');$('#drawer').hidden=false;$('#scrim').hidden=false;
+  if(id){const el=$('#d-'+id);if(el){el.scrollIntoView({block:'center'});el.classList.add('flash');setTimeout(()=>el.classList.remove('flash'),1600)}}
+  $('#close-ws').focus()}
+function closeWS(){$('#drawer').hidden=true;$('#scrim').hidden=true;if(lastFocus)lastFocus.focus()}
+$('#open-ws').onclick=()=>openWS();$('#close-ws').onclick=closeWS;$('#scrim').onclick=closeWS;
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#drawer').hidden)closeWS()});
+function bindTerms(root){root.querySelectorAll('.term').forEach(t=>{if(!t.dataset.bound){t.dataset.bound=1;t.addEventListener('click',()=>openWS(t.dataset.g))}})}
+bindTerms(document);
+
+function copyText(txt,msg){
+  const done=()=>toast(msg||'Kopiert');
+  const fallback=()=>{const ta=$('#copy-fallback');ta.hidden=false;ta.value=txt;ta.focus();ta.select();toast('Text markiert: jetzt mit Strg+C bzw. ⌘+C kopieren')};
+  try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(e){fallback()}
+}
+
+/* ---------- Aufgaben ---------- */
+const TASKS=[
+  {op:'Nenne',afb:'AFB I',t:'Nenne für Methan, Ammoniak und Wasser die Anzahl der bindenden und der freien Elektronenpaare am Zentralatom. Nutze die Lewis-Formeln im Bereich „Entdecken“.',help:['Methan: Das C-Atom hat … bindende und … freie Elektronenpaare.','Ammoniak: …','Wasser: …']},
+  {op:'Beschreibe',afb:'AFB I–II',t:'Verschiebe im Simulator ein Elektronenpaar und lass es los. Beschreibe deine Beobachtung. Achte auch auf den Balken „Abstoßung“.',help:['Wenn ich ein Elektronenpaar verschiebe, …','Nach dem Loslassen …','Der Balken „Abstoßung“ zeigt …']},
+  {op:'Erkläre',afb:'AFB II',t:'Erkläre mit dem EPA-Modell, warum das Wassermolekül gewinkelt ist und warum der Bindungswinkel 104,5° statt 109,5° beträgt.',help:['Das Sauerstoffatom hat vier Elektronenpaarbereiche: …','Elektronenpaare sind negativ geladen. Deshalb …','Ein freies Elektronenpaar nimmt mehr Raum ein, weil …','Die Molekülgestalt ist gewinkelt, weil man nur …']},
+  {op:'Vergleiche',afb:'AFB II',t:'Vergleiche das Ballon-Modell mit dem EPA-Modell. Nenne zwei Gemeinsamkeiten und zwei Grenzen des Ballon-Modells.',help:['Gemeinsamkeit: Ein Ballon steht für …','Gemeinsamkeit: Vier Ballons ergeben …','Grenze: Echte Ballons verschieben sich nur, wenn …','Grenze: Elektronenwolken haben …']},
+  {op:'Beurteile',afb:'AFB III',t:'Ein Mitschüler sagt: „Die Lewis-Formel H–O–H zeigt, dass Wasser linear ist.“ Beurteile diese Aussage.',help:['Die Aussage ist richtig / falsch, weil …','Die Lewis-Formel zeigt …, aber nicht …','Nach dem EPA-Modell …']},
+  {op:'Begründe',afb:'AFB III · Erweiterung',t:'Sage die Gestalt von Kohlenstoffdioxid (CO₂) und Methanal (H₂CO) voraus. Begründe mit der Anzahl der Elektronenpaarbereiche. Überprüfe deine Vorhersage im Simulator.',help:['Eine Doppelbindung zählt als …','CO₂: Das C-Atom hat … Bereiche, deshalb …','H₂CO: …']}
+];
+let notes=store.get('epa-notes',{});
+function renderTasks(){
+  $('#tasks').innerHTML=TASKS.map((t,i)=>`<article class="task"><div class="task-head"><span class="no">Aufgabe ${i+1}</span><span class="op">${t.op}</span><span class="afb">${t.afb}</span></div>
+    <p>${esc(t.t)}</p><details><summary>Hilfe: Satzanfänge</summary><ul>${t.help.map(h=>`<li>${esc(h)}</li>`).join('')}</ul></details>
+    <label class="muted" for="n${i}" style="font-size:.85rem">Deine Antwort</label><textarea id="n${i}" data-i="${i}">${esc(notes[i]||'')}</textarea><span class="saved" id="s${i}"></span></article>`).join('');
+  $$('#tasks textarea').forEach(ta=>ta.addEventListener('input',()=>{notes[ta.dataset.i]=ta.value;store.set('epa-notes',notes);$('#s'+ta.dataset.i).textContent='Gespeichert in diesem Browser.'}));
+}
+renderTasks();
+$('#copy-notes').onclick=()=>{const txt='EPA-Modell – meine Antworten\n\n'+TASKS.map((t,i)=>`Aufgabe ${i+1} (${t.op}, ${t.afb})\n${t.t}\nAntwort: ${(notes[i]||'–').trim()}\n`).join('\n');copyText(txt,'Antworten kopiert')};
+$('#clear-notes').onclick=()=>{$('#clear-confirm').hidden=false};
+$('#clear-no').onclick=()=>{$('#clear-confirm').hidden=true};
+$('#clear-yes').onclick=()=>{notes={};store.set('epa-notes',notes);renderTasks();$('#clear-confirm').hidden=true;toast('Antworten gelöscht')};
+
+/* ---------- Test ---------- */
+const QUIZ=[
+  {type:'mc',q:'Warum stoßen sich Elektronenpaare gegenseitig ab?',o:['Elektronen sind negativ geladen. Gleiche Ladungen stoßen sich ab.','Elektronenpaare möchten möglichst viel Platz haben.','Der Atomkern stößt die Elektronen nach außen.','Elektronenpaare sind magnetisch.'],c:0,
+    e:'Ursache ist die elektrische Abstoßung gleichnamiger, also negativer Ladungen. Elektronen „möchten“ nichts – sie haben keinen Willen.'},
+  {type:'num',q:'Wie viele Elektronenpaarbereiche hat das Stickstoffatom im Ammoniak-Molekül (NH₃)?',c:4,tol:0,unit:'',e:'Drei bindende Elektronenpaare (zu den H-Atomen) und ein freies Elektronenpaar ergeben vier Bereiche.'},
+  {type:'mc',q:'Wie groß ist der Bindungswinkel im Methan-Molekül (CH₄)?',o:['90°','104,5°','109,5°','120°'],c:2,e:'Vier gleiche Bereiche ergeben einen Tetraeder mit 109,5°.'},
+  {type:'match',q:'Ordne jedem Molekül die Molekülgestalt zu.',rows:[['CH₄','tetraedrisch'],['NH₃','trigonal-pyramidal'],['H₂O','gewinkelt'],['CO₂','linear']],extra:['trigonal-planar'],e:'Die Gestalt richtet sich nur nach der Lage der Atome. Freie Elektronenpaare zählen beim Namen nicht mit.'},
+  {type:'mc',q:'Warum ist der H–O–H-Winkel im Wasser kleiner als 109,5°?',o:['Die zwei freien Elektronenpaare nehmen mehr Raum ein. Ihre Abstoßung auf die bindenden Elektronenpaare ist größer.','Die Wasserstoffatome ziehen sich gegenseitig an.','Das Sauerstoffatom hat keine freien Elektronenpaare.','Das Wassermolekül ist flach, deshalb ist kein Platz.'],c:0,
+    e:'Freie Elektronenpaare werden nur von einem Atomkern angezogen. Ihre Elektronenwolke ist breiter und liegt näher am Zentralatom.'},
+  {type:'gap',q:'Fülle die Lücken. Nicht alle Wörter werden gebraucht.',text:'Elektronenpaare sind negativ {0}. Deshalb {1} sie sich ab. Bei vier Elektronenpaarbereichen entsteht ein {2} mit einem Winkel von {3}. Ein freies Elektronenpaar nimmt {4} Raum ein als ein bindendes.',
+    ans:['geladen','stoßen','Tetraeder','109,5°','mehr'],bank:['weniger','ziehen','Würfel','90°','neutral'],e:'Vollständig: geladen – stoßen – Tetraeder – 109,5° – mehr.'},
+  {type:'tf',q:'„Die Lewis-Formel H–O–H zeigt, dass das Wassermolekül linear ist.“',c:false,e:'Die Lewis-Formel ist flach gezeichnet. Sie zeigt nur, welche Atome verbunden sind. Das Wassermolekül ist gewinkelt.'},
+  {type:'tf',q:'„Ein Tetraeder hat vier Ecken, sechs Kanten und vier Flächen.“',c:true,e:'Richtig: vier gleichseitige Dreiecke bilden 4 Flächen, 4 Ecken und 6 Kanten.'},
+  {type:'mc',q:'Welche Aussage beschreibt eine Grenze des Ballon-Modells?',o:['Echte Ballons verschieben sich nur bei Berührung. Elektronenpaare stoßen sich wegen ihrer Ladung ab.','Ballons zeigen nicht, dass vier Bereiche einen Tetraeder bilden.','Ballons können nicht unterschiedlich groß sein.','Mit Ballons kann man keine Winkel erkennen.'],c:0,
+    e:'Die Anordnung stimmt überein, die Ursache nicht: Ballons wirken über Kontakt, Elektronenpaare über elektrische Abstoßung.'},
+  {type:'mc',q:'Ordne nach der Größe des Bindungswinkels (groß → klein).',o:['CH₄ > NH₃ > H₂O','H₂O > NH₃ > CH₄','NH₃ > CH₄ > H₂O','Alle gleich: 109,5°'],c:0,e:'109,5° (kein freies Paar) > 107° (ein freies Paar) > 104,5° (zwei freie Paare).'},
+  {type:'num',q:'Wähle im Simulator „Ammoniak“ und warte, bis das Modell ruht. Wie groß ist der H–N–H-Winkel? Gib die Zahl in Grad an (eine Nachkommastelle reicht).',c:107,tol:2,unit:'°',e:'Erwartet sind etwa 107°. Werte zwischen 105° und 109° werden als richtig gewertet.'},
+  {type:'mc',q:'Erweiterung: Welche Gestalt hat das Kohlenstoffdioxid-Molekül (CO₂)?',o:['linear, 180°','gewinkelt, 104,5°','tetraedrisch, 109,5°','trigonal-planar, 120°'],c:0,e:'Zwei Doppelbindungen sind zwei Elektronenpaarbereiche. Am C-Atom gibt es keine freien Elektronenpaare. Zwei Bereiche liegen sich gegenüber.'}
+];
+let qState=[];
+function buildQuiz(){
+  qState=QUIZ.map(q=>({res:null,order:q.o?shuffle(q.o.map((_,i)=>i)):null,opts:q.type==='match'?shuffle([...q.rows.map(r=>r[1]),...q.extra]):q.type==='gap'?shuffle([...q.ans,...q.bank]):null,tf:null}));
+  $('#quiz').innerHTML=QUIZ.map((q,i)=>{const s=qState[i];let body='';
+    if(q.type==='mc')body=`<div class="opts" role="radiogroup">${s.order.map(k=>`<label class="opt"><input type="radio" name="q${i}" value="${k}"><span>${esc(q.o[k])}</span></label>`).join('')}</div>`;
+    else if(q.type==='num')body=`<label class="tog">Antwort: <input type="number" step="0.1" id="qn${i}" style="width:7em" inputmode="decimal"> ${q.unit}</label>`;
+    else if(q.type==='tf')body=`<div class="tf" role="group"><button type="button" class="btn" data-v="1" aria-pressed="false">wahr</button><button type="button" class="btn" data-v="0" aria-pressed="false">falsch</button></div>`;
+    else if(q.type==='match')body=`<div class="match">${q.rows.map((r,k)=>`<b>${r[0]}</b><select id="qm${i}_${k}" aria-label="Gestalt für ${r[0]}"><option value="">– wählen –</option>${s.opts.map(o=>`<option>${o}</option>`).join('')}</select>`).join('')}</div>`;
+    else if(q.type==='gap'){let k=0;body=`<div class="bank"><span class="bank-lab">Wortspeicher</span>${s.opts.map(o=>`<span>${esc(o)}</span>`).join('')}</div><p class="gap">${esc(q.text).replace(/\{(\d)\}/g,(_,n)=>`<select id="qg${i}_${n}" aria-label="Lücke ${+n+1}"><option value="">…</option>${s.opts.map(o=>`<option>${esc(o)}</option>`).join('')}</select>`)}</p>`}
+    return `<article class="q" id="q${i}"><div class="q-head"><span class="no">${String(i+1).padStart(2,'0')}</span><p>${esc(q.q)}</p></div>${body}<div class="btnrow"><button class="btn" type="button" data-check="${i}">Prüfen</button></div><div class="fb" id="fb${i}" hidden></div></article>`}).join('');
+  $$('#quiz .tf').forEach(g=>g.querySelectorAll('button').forEach(b=>b.onclick=()=>{g.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b))}));
+  $$('#quiz [data-check]').forEach(b=>b.onclick=()=>checkQ(+b.dataset.check));
+  updScore();
+}
+function checkQ(i){
+  const q=QUIZ[i],el=$('#q'+i);let ok=false,answered=true,detail='';
+  if(q.type==='mc'){const r=el.querySelector('input:checked');if(!r)answered=false;else ok=+r.value===q.c}
+  else if(q.type==='num'){const raw=$('#qn'+i).value.replace(',','.');if(raw==='')answered=false;else ok=Math.abs(parseFloat(raw)-q.c)<=q.tol}
+  else if(q.type==='tf'){const b=el.querySelector('.tf [aria-pressed="true"]');if(!b)answered=false;else ok=(b.dataset.v==='1')===q.c}
+  else if(q.type==='match'){const v=q.rows.map((r,k)=>$(`#qm${i}_${k}`).value);if(v.some(x=>!x))answered=false;else{const wrong=q.rows.filter((r,k)=>v[k]!==r[1]);ok=!wrong.length;if(!ok)detail=` Falsch zugeordnet: ${wrong.map(r=>r[0]).join(', ')}.`}}
+  else if(q.type==='gap'){const v=q.ans.map((_,k)=>$(`#qg${i}_${k}`).value);if(v.some(x=>!x))answered=false;else{const n=v.filter((x,k)=>x===q.ans[k]).length;ok=n===q.ans.length;if(!ok)detail=` ${n} von ${q.ans.length} Lücken richtig.`}}
+  const fb=$('#fb'+i);fb.hidden=false;
+  if(!answered){fb.className='fb no';fb.innerHTML='<b>Noch keine Antwort</b> – wähle oder trage zuerst etwas ein.';return}
+  qState[i].res=ok;el.classList.toggle('ok',ok);el.classList.toggle('no',!ok);
+  fb.className='fb '+(ok?'ok':'no');fb.innerHTML=`<b>${ok?'richtig':'falsch'}</b>${esc(detail)}<br>${esc(q.e)}`;updScore();
+}
+function updScore(){const n=qState.filter(s=>s.res===true).length,d=qState.filter(s=>s.res!==null).length;$('#score-txt').textContent=`${n} richtig · ${d} von ${QUIZ.length} geprüft`;$('#score-bar').style.width=(n/QUIZ.length*100)+'%'}
+$('#q-all').onclick=()=>QUIZ.forEach((_,i)=>checkQ(i));
+$('#q-new').onclick=()=>{buildQuiz();toast('Test neu gemischt')};
+buildQuiz();
+
+/* ---------- Selbstcheck ---------- */
+const SELF=[
+  ['Ich kann aus der Lewis-Formel die Anzahl der Elektronenpaarbereiche bestimmen.','Lernweg Schritt 1 und 2'],
+  ['Ich kann erklären, warum sich Elektronenpaare abstoßen.','Wortspeicher: Ladung, Abstoßung'],
+  ['Ich kann beschreiben, was ein Tetraeder ist.','Bereich 3: Tetraeder'],
+  ['Ich kann erklären, warum das Wassermolekül gewinkelt ist.','Simulator: „Nur Atome“ einschalten'],
+  ['Ich kann erklären, warum der Winkel im Wasser 104,5° und nicht 109,5° beträgt.','Lernweg Schritt 4'],
+  ['Ich kann die Molekülgestalt mit dem richtigen Fachbegriff benennen.','Wortspeicher: tetraedrisch, trigonal-pyramidal, gewinkelt, linear'],
+  ['Ich kann das Ballon-Modell mit dem EPA-Modell vergleichen und eine Modellgrenze nennen.','Bereich 2: Tabelle „Was passt?“']
+];
+let selfV=store.get('epa-self',{});
+function renderSelf(){$('#self').innerHTML=SELF.map((s,i)=>`<div class="self-row"><p>${esc(s[0])}${selfV[i]===0||selfV[i]===1?`<br><span class="muted" style="font-size:.85rem">Tipp: ${esc(s[1])}</span>`:''}</p>
+  <div class="seg" role="group" aria-label="Einschätzung">${[[2,'sicher'],[1,'teilweise'],[0,'noch nicht']].map(([v,l])=>`<button type="button" data-i="${i}" data-v="${v}" aria-pressed="${selfV[i]===v}">${l}</button>`).join('')}</div></div>`).join('');
+  $$('#self button').forEach(b=>b.onclick=()=>{selfV[b.dataset.i]=+b.dataset.v;store.set('epa-self',selfV);renderSelf()})}
+renderSelf();
+
+/* ---------- Arbeitsplatz-Navigation ---------- */
+$$('#subnav .chip').forEach(b=>b.onclick=()=>{$$('#subnav .chip').forEach(x=>x.setAttribute('aria-pressed',x===b));$$('#arbeitsplatz .panel').forEach(p=>p.hidden=p.id!==b.dataset.p)});
+
+/* ---------- Start ---------- */
+applyMol(true);
+if(!reduceMotion){sim.o.rotate=false}
+const startTab=(location.hash||'').slice(1)||store.get('epa-tab','entdecken');
+showTab(startTab,false);
+requestAnimationFrame(loop);
+</script>
+
+</body></html>
