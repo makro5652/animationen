@@ -1,0 +1,1174 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Bindungslabor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Schibsted+Grotesk:wght@500;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Laborbank: Kopf mit Niveau-Schalter und Reitern; darunter Simulation (links) neben Erklärung (rechts), dann Arbeitsaufträge, Modellkritik, Lehrkräftehinweise */
+:root{
+  --bg:#F1F4F5; --surface:#FFFFFF; --sunken:#E6ECEE; --stage:#FAFBFB;
+  --ink:#14212A; --ink-2:#4A5A65; --ink-3:#7B8A93; --line:#CDD7DC;
+  --accent:#0C6964; --accent-soft:#D4EAE8; --on-accent:#FFFFFF;
+  --cation:#2F62C8; --anion:#C93F3A; --electron:#D69408; --electron-2:#7B4FC4;
+  --ok:#1B7A3A; --ok-soft:#DCF0E2; --bad:#B42318; --bad-soft:#FADFDB; --note:#8A6100; --note-soft:#FBF0D2;
+  --der:#1F5FD1; --die:#C0392B; --das:#1E8449;
+  --zone-ion:#E2A23A; --zone-cov:#2FA295; --zone-met:#6787E0;
+  --f-display:"Schibsted Grotesk","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --radius:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E161B; --surface:#152129; --sunken:#1B2A33; --stage:#111C22;
+    --ink:#E2EBEE; --ink-2:#A3B4BD; --ink-3:#71838D; --line:#2A3B45;
+    --accent:#45BDB2; --accent-soft:#16383A; --on-accent:#08201F;
+    --cation:#6F9BFF; --anion:#FF7B70; --electron:#F2BE45; --electron-2:#B592FF;
+    --ok:#5CCB80; --ok-soft:#163323; --bad:#FF8A7D; --bad-soft:#3A1C1A; --note:#E9C062; --note-soft:#33290F;
+    --der:#79A6FF; --die:#FF8C7F; --das:#6FD08F;
+    --zone-ion:#C98A24; --zone-cov:#2A8F84; --zone-met:#5571C6;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E161B; --surface:#152129; --sunken:#1B2A33; --stage:#111C22;
+  --ink:#E2EBEE; --ink-2:#A3B4BD; --ink-3:#71838D; --line:#2A3B45;
+  --accent:#45BDB2; --accent-soft:#16383A; --on-accent:#08201F;
+  --cation:#6F9BFF; --anion:#FF7B70; --electron:#F2BE45; --electron-2:#B592FF;
+  --ok:#5CCB80; --ok-soft:#163323; --bad:#FF8A7D; --bad-soft:#3A1C1A; --note:#E9C062; --note-soft:#33290F;
+  --der:#79A6FF; --die:#FF8C7F; --das:#6FD08F;
+  --zone-ion:#C98A24; --zone-cov:#2A8F84; --zone-met:#5571C6;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;padding-inline:16px;padding-block:0 48px}
+.wrap{max-width:1240px;margin-inline:auto}
+h1,h2,h3,h4{font-family:var(--f-display);text-wrap:balance;line-height:1.2;margin:0}
+button,select,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+sub,sup{line-height:0}
+
+/* Kopf */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;padding-block:22px 14px}
+.brand .eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.brand h1{font-size:clamp(28px,4.4vw,42px);font-weight:800;letter-spacing:-.01em}
+.brand h1 span{color:var(--accent)}
+.level{display:flex;flex-direction:column;gap:6px}
+.level label{font-size:13px;color:var(--ink-2)}
+.seg{display:inline-flex;background:var(--sunken);border-radius:999px;padding:4px;gap:4px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:700;font-size:14px;color:var(--ink-2)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.tabs{display:flex;gap:2px;border-bottom:2px solid var(--line);overflow-x:auto;scrollbar-width:thin}
+.tabs button{flex:0 0 auto;border:0;background:transparent;padding:12px 16px 10px;font-family:var(--f-display);font-weight:700;font-size:16px;color:var(--ink-2);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tabs .sym{font-family:var(--f-mono);font-size:12px;color:var(--ink-3);margin-left:6px;font-weight:400}
+
+/* Laborbank */
+.bench{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:24px;margin-top:20px}
+@media (max-width:980px){.bench{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:12px;min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{border:1.5px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px;cursor:pointer;font-weight:700;font-size:15px}
+.chips button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.chips button small{display:block;font-weight:400;font-size:11.5px;color:var(--ink-2)}
+.views{display:flex;flex-wrap:wrap;gap:6px}
+.views button{border:0;background:var(--sunken);border-radius:6px;padding:6px 12px;cursor:pointer;font-size:14px;color:var(--ink-2)}
+.views button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.views button:disabled{opacity:.45;cursor:not-allowed}
+.stage{position:relative;aspect-ratio:4/3;background:var(--stage);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+@media (max-width:560px){.stage{aspect-ratio:1/1.08}}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:50%;display:inline-block;flex:0 0 auto}
+.legend i.line{border-radius:0;height:3px;width:16px}
+.controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.btn{border:1.5px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 12px;cursor:pointer;font-weight:700;font-size:14px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.stepper{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dots{display:flex;gap:6px}
+.dots button{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);font-family:var(--f-mono);font-size:12px;cursor:pointer;padding:0}
+.dots button[aria-current="step"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.slider{display:flex;align-items:center;gap:8px;font-size:14px}
+.slider input{width:170px;accent-color:var(--accent)}
+.slider output{font-family:var(--f-mono);font-size:13px;min-width:74px}
+.caption{margin:0;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);font-size:15px}
+.caption b{font-family:var(--f-display)}
+.facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin:0}
+.facts div{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0}
+.facts dt{font-size:12px;color:var(--ink-2);letter-spacing:.02em}
+.facts dd{margin:0;font-family:var(--f-mono);font-size:14px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+
+/* Text */
+.explain{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px}
+.explain h3{font-size:22px;margin-bottom:8px}
+.explain h4{font-size:16px;margin:14px 0 4px}
+.explain p,.explain li{max-width:66ch}
+.explain p{margin:8px 0}
+.explain ol,.explain ul{padding-left:20px;margin:6px 0}
+.merke{background:var(--accent-soft);border-radius:8px;padding:10px 12px}
+.formula{font-family:var(--f-mono);font-size:14px;background:var(--sunken);border-radius:6px;padding:8px 10px;overflow-x:auto;white-space:nowrap}
+.wordbank{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+.wordbank h4{font-size:15px;margin-bottom:2px}
+.wordbank p.hint{font-size:13px;color:var(--ink-2);margin:0 0 8px}
+.wb{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px 14px;list-style:none;margin:0;padding:0}
+.wb li{font-size:15px}
+.art{display:inline-block;min-width:34px;font-weight:700;font-size:13px;border-radius:4px;padding:0 5px;margin-right:6px;text-align:center;color:#fff}
+.art.der{background:var(--der)} .art.die{background:var(--die)} .art.das{background:var(--das)}
+.art.x{background:var(--ink-3)}
+:root[data-theme="dark"] .art{color:#0E161B}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .art{color:#0E161B}}
+.wb .pl{color:var(--ink-2);font-size:13px}
+
+/* Aufgaben */
+section.tasks{margin-top:28px}
+.sec-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:12px}
+.sec-head h2{font-size:24px}
+.sec-head p{margin:0;color:var(--ink-2);font-size:14px}
+.task-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,460px),1fr));gap:14px}
+.task{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.task-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px}
+.task-meta .no{font-family:var(--f-display);font-weight:800;font-size:16px;margin-right:4px}
+.tag{font-family:var(--f-mono);font-size:11.5px;border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:var(--ink-2)}
+.tag.op{background:var(--sunken);color:var(--ink);border-color:transparent;cursor:help}
+.opdef{font-size:13px;color:var(--ink-2);margin:-4px 0 0}
+.task p{margin:0;max-width:70ch}
+.task textarea{width:100%;min-height:110px;border:1.5px solid var(--line);border-radius:8px;padding:10px;background:var(--stage);resize:vertical}
+.task .opts{display:flex;flex-direction:column;gap:6px}
+.task .opts label{display:flex;gap:8px;align-items:flex-start;padding:6px 8px;border-radius:6px;border:1px solid var(--line);cursor:pointer}
+.task .opts input{margin-top:5px;accent-color:var(--accent)}
+.gaptext{line-height:2.3}
+.gaptext select{border:1.5px solid var(--line);border-radius:6px;padding:1px 4px;background:var(--stage);max-width:100%}
+.gaptext select.ok{border-color:var(--ok);background:var(--ok-soft)}
+.gaptext select.bad{border-color:var(--bad);background:var(--bad-soft)}
+.words{display:flex;flex-wrap:wrap;gap:6px}
+.words span{background:var(--sunken);border-radius:4px;padding:2px 8px;font-size:14px}
+.numrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.numrow label{flex:1 1 220px;font-size:15px}
+.numrow input{width:130px;border:1.5px solid var(--line);border-radius:6px;padding:6px 8px;background:var(--stage);font-family:var(--f-mono)}
+.numrow .unit{font-family:var(--f-mono);font-size:13px;color:var(--ink-2)}
+.tbl-wrap{overflow-x:auto}
+table.fill{border-collapse:collapse;font-size:14px;min-width:560px}
+table.fill th,table.fill td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+table.fill th{background:var(--sunken);font-family:var(--f-display)}
+table.fill select{width:100%;border:1.5px solid var(--line);border-radius:6px;padding:2px 4px;background:var(--stage)}
+table.fill select.ok{border-color:var(--ok);background:var(--ok-soft)}
+table.fill select.bad{border-color:var(--bad);background:var(--bad-soft)}
+.task-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.fb{font-weight:700;font-size:14px;border-radius:6px;padding:3px 10px}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.bad{background:var(--bad-soft);color:var(--bad)}
+.fb.part{background:var(--note-soft);color:var(--note)}
+details.help,details.sol{border-radius:8px;padding:8px 12px;font-size:14.5px}
+details.help{background:var(--sunken)}
+details.sol{background:var(--note-soft)}
+details.help summary,details.sol summary{cursor:pointer;font-weight:700}
+details.help ul{margin:6px 0 2px;padding-left:18px}
+
+/* Modellkritik & Lehrkräfte */
+details.critique,details.teacher{margin-top:22px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:4px 20px}
+details.critique{border-left:6px solid var(--note)}
+details.critique>summary,details.teacher>summary{cursor:pointer;padding:14px 0;font-family:var(--f-display);font-weight:800;font-size:20px}
+details.critique>summary small,details.teacher>summary small{font-family:var(--f-body);font-weight:400;font-size:14px;color:var(--ink-2);margin-left:8px}
+.crit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:14px;padding-bottom:18px}
+.crit{background:var(--stage);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.crit h4{font-size:15.5px;margin-bottom:4px}
+.crit p{margin:4px 0;font-size:14.5px}
+.teacher-body{padding-bottom:18px}
+.teacher-body h4{font-size:16px;margin:14px 0 4px}
+.teacher-body p,.teacher-body li{font-size:14.5px;max-width:80ch}
+.teacher-body ul{padding-left:20px;margin:4px 0}
+.switch{display:inline-flex;gap:8px;align-items:center;font-weight:700;background:var(--sunken);padding:8px 12px;border-radius:8px}
+.switch input{accent-color:var(--accent);width:18px;height:18px}
+.export{margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+.export input{border:1.5px solid var(--line);border-radius:6px;padding:7px 10px;background:var(--stage);min-width:0;flex:1 1 200px}
+.export textarea{width:100%;min-height:140px;font-family:var(--f-mono);font-size:12.5px;border:1px solid var(--line);border-radius:6px;padding:8px;background:var(--stage)}
+.export .msg{font-size:14px;color:var(--ok);font-weight:700}
+footer{margin-top:18px;font-size:12.5px;color:var(--ink-3)}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="eyebrow">Chemie · Simulation und digitales Arbeitsblatt</div>
+      <h1>Bindungs<span>labor</span></h1>
+    </div>
+    <div class="level">
+      <label id="lvl-label">Niveau</label>
+      <div class="seg" role="group" aria-labelledby="lvl-label" id="levelSeg">
+        <button type="button" data-level="I">Sekundarstufe I</button>
+        <button type="button" data-level="II">Sekundarstufe II</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Bindungsart" id="tabs">
+    <button role="tab" data-tab="ion" id="tab-ion">Ionenbindung<span class="sym">Na⁺ Cl⁻</span></button>
+    <button role="tab" data-tab="cov" id="tab-cov">Elektronenpaarbindung<span class="sym">H–O–H</span></button>
+    <button role="tab" data-tab="met" id="tab-met">Metallbindung<span class="sym">Mg²⁺ e⁻</span></button>
+    <button role="tab" data-tab="cmp" id="tab-cmp">Vergleich<span class="sym">ΔEN</span></button>
+  </nav>
+
+  <main role="tabpanel" id="panel">
+    <section class="bench">
+      <div class="col">
+        <div class="chips" id="examples" aria-label="Beispiele"></div>
+        <div class="views" id="views" aria-label="Ansicht"></div>
+        <div class="stage" id="stage"><canvas id="cv" aria-label="Simulation"></canvas></div>
+        <div class="legend" id="legend"></div>
+        <div class="controls" id="controls"></div>
+        <p class="caption" id="caption" aria-live="polite"></p>
+        <dl class="facts" id="facts"></dl>
+      </div>
+      <div class="col">
+        <article class="explain" id="explain"></article>
+        <aside class="wordbank" id="wordbank"></aside>
+      </div>
+    </section>
+
+    <section class="tasks" aria-labelledby="tasks-h">
+      <div class="sec-head">
+        <h2 id="tasks-h">Arbeitsaufträge</h2>
+        <p id="tasks-sub"></p>
+      </div>
+      <div class="task-list" id="tasks"></div>
+    </section>
+
+    <details class="critique" id="critique">
+      <summary>Modellkritik<small id="crit-sub">Erst öffnen, wenn die Aufgaben bearbeitet sind.</small></summary>
+      <div class="crit-grid" id="critGrid"></div>
+    </details>
+  </main>
+
+  <div class="export">
+    <input id="studentName" placeholder="Name, Klasse" aria-label="Name und Klasse">
+    <button class="btn primary" id="copyBtn" type="button">Antworten kopieren</button>
+    <span class="msg" id="copyMsg" aria-live="polite"></span>
+    <textarea id="copyArea" readonly hidden aria-label="Antworten zum Kopieren"></textarea>
+  </div>
+
+  <details class="teacher" id="teacher">
+    <summary>Hinweise für Lehrkräfte<small>Didaktische Einordnung, Plausibilitätsprüfung, Datenquellen</small></summary>
+    <div class="teacher-body" id="teacherBody"></div>
+  </details>
+
+  <footer>Werte: CRC Handbook of Chemistry and Physics, NIST Chemistry WebBook, Shannon (1976) für Ionenradien, Pauling-Elektronegativitäten. Alle Werte gerundet. Antworten werden nur in diesem Browser gespeichert.</footer>
+</div>
+
+<script>
+'use strict';
+/* ================= Grundlagen ================= */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+function anim(t,dur,delay=0){ if(RM) return 1; return ease(clamp((t-delay)/dur,0,1)); }
+const fmt=(v,d=1)=>Number(v).toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d});
+const sgn=(v,d=1)=>(v>0?'+':v<0?'−':'')+fmt(Math.abs(v),d);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const LS_KEY='bindungslabor-v1';
+const store=(()=>{let d={};try{d=JSON.parse(localStorage.getItem(LS_KEY)||'{}')||{};}catch(e){d={};}
+  return{get:(k,def)=>(k in d?d[k]:def),set:(k,v)=>{d[k]=v;try{localStorage.setItem(LS_KEY,JSON.stringify(d));}catch(e){}}};})();
+
+/* ================= Fachdaten ================= */
+const EN={H:2.20,Li:0.98,C:2.55,N:3.04,O:3.44,F:3.98,Na:0.93,Mg:1.31,Al:1.61,Si:1.90,Cl:3.16,Ca:1.00,Cu:1.90,Cs:0.79,K:0.82,Br:2.96};
+
+const IONIC={
+  NaCl:{label:'NaCl',name:'Natriumchlorid',
+    cat:{el:'Na',name:'Natrium',ionName:'Natrium',ion:'Na⁺',Z:11,shells:[2,8,1],q:1,rAtom:186,rIon:102,gas:'Neon',conf:'[Ne] 3s¹',ionConf:'[Ne]'},
+    an:{el:'Cl',name:'Chlor',ionName:'Chlorid',ion:'Cl⁻',Z:17,shells:[2,8,7],q:-1,rAtom:99,rIon:181,gas:'Argon',conf:'[Ne] 3s² 3p⁵',ionConf:'[Ar]'},
+    nAn:1,lattice:'rocksalt',a:564,typ:'Natriumchlorid-Typ',kz:'6 : 6',mp:'801 °C',fH:-411.2,start:'Na(s) + ½ Cl₂(g)',
+    bh:[{k:'Sublimation von Na',dH:107.5,to:'Na(g) + ½ Cl₂(g)'},{k:'Dissoziation von ½ Cl₂',dH:121.7,to:'Na(g) + Cl(g)'},{k:'1. Ionisierungsenergie Na',dH:495.8,to:'Na⁺(g) + e⁻ + Cl(g)'},{k:'Elektronenaffinität Cl',dH:-348.6,to:'Na⁺(g) + Cl⁻(g)'},{k:'Gitterenthalpie',lattice:true,to:'NaCl(s)'}],
+    bl:{M:1.74756,n:8,r0:282}},
+  MgO:{label:'MgO',name:'Magnesiumoxid',
+    cat:{el:'Mg',name:'Magnesium',ionName:'Magnesium',ion:'Mg²⁺',Z:12,shells:[2,8,2],q:2,rAtom:160,rIon:72,gas:'Neon',conf:'[Ne] 3s²',ionConf:'[Ne]'},
+    an:{el:'O',name:'Sauerstoff',ionName:'Oxid',ion:'O²⁻',Z:8,shells:[2,6],q:-2,rAtom:66,rIon:140,gas:'Neon',conf:'[He] 2s² 2p⁴',ionConf:'[Ne]'},
+    nAn:1,lattice:'rocksalt',a:421,typ:'Natriumchlorid-Typ',kz:'6 : 6',mp:'≈ 2830 °C (Literatur 2825–2852 °C)',fH:-601.6,start:'Mg(s) + ½ O₂(g)',
+    bh:[{k:'Sublimation von Mg',dH:147.1,to:'Mg(g) + ½ O₂(g)'},{k:'Dissoziation von ½ O₂',dH:249.2,to:'Mg(g) + O(g)'},{k:'1. Ionisierungsenergie Mg',dH:737.7,to:'Mg⁺(g) + e⁻ + O(g)'},{k:'2. Ionisierungsenergie Mg',dH:1450.7,to:'Mg²⁺(g) + 2 e⁻ + O(g)'},{k:'1. Elektronenaffinität O',dH:-141.0,to:'Mg²⁺(g) + e⁻ + O⁻(g)'},{k:'2. Elektronenaffinität O (unsicher)',dH:744.0,to:'Mg²⁺(g) + O²⁻(g)',unsure:true},{k:'Gitterenthalpie',lattice:true,to:'MgO(s)'}],
+    bl:{M:1.74756,n:7,r0:210.5}},
+  LiF:{label:'LiF',name:'Lithiumfluorid',
+    cat:{el:'Li',name:'Lithium',ionName:'Lithium',ion:'Li⁺',Z:3,shells:[2,1],q:1,rAtom:152,rIon:76,gas:'Helium',conf:'[He] 2s¹',ionConf:'[He]'},
+    an:{el:'F',name:'Fluor',ionName:'Fluorid',ion:'F⁻',Z:9,shells:[2,7],q:-1,rAtom:64,rIon:133,gas:'Neon',conf:'[He] 2s² 2p⁵',ionConf:'[Ne]'},
+    nAn:1,lattice:'rocksalt',a:403,typ:'Natriumchlorid-Typ',kz:'6 : 6',mp:'845 °C',fH:-616.0,start:'Li(s) + ½ F₂(g)',
+    bh:[{k:'Sublimation von Li',dH:159.3,to:'Li(g) + ½ F₂(g)'},{k:'Dissoziation von ½ F₂',dH:79.4,to:'Li(g) + F(g)'},{k:'1. Ionisierungsenergie Li',dH:520.2,to:'Li⁺(g) + e⁻ + F(g)'},{k:'Elektronenaffinität F',dH:-328.2,to:'Li⁺(g) + F⁻(g)'},{k:'Gitterenthalpie',lattice:true,to:'LiF(s)'}],
+    bl:{M:1.74756,n:6,r0:201.5}},
+  CaF2:{label:'CaF₂',name:'Calciumfluorid',
+    cat:{el:'Ca',name:'Calcium',ionName:'Calcium',ion:'Ca²⁺',Z:20,shells:[2,8,8,2],q:2,rAtom:197,rIon:112,gas:'Argon',conf:'[Ar] 4s²',ionConf:'[Ar]'},
+    an:{el:'F',name:'Fluor',ionName:'Fluorid',ion:'F⁻',Z:9,shells:[2,7],q:-1,rAtom:64,rIon:131,gas:'Neon',conf:'[He] 2s² 2p⁵',ionConf:'[Ne]'},
+    nAn:2,lattice:'fluorite',a:546,typ:'Fluorit-Typ',kz:'8 : 4',mp:'1418 °C',fH:-1228.0,start:'Ca(s) + F₂(g)',
+    bh:[{k:'Sublimation von Ca',dH:178.2,to:'Ca(g) + F₂(g)'},{k:'Dissoziation von F₂',dH:158.8,to:'Ca(g) + 2 F(g)'},{k:'1. Ionisierungsenergie Ca',dH:589.8,to:'Ca⁺(g) + e⁻ + 2 F(g)'},{k:'2. Ionisierungsenergie Ca',dH:1145.4,to:'Ca²⁺(g) + 2 e⁻ + 2 F(g)'},{k:'2 × Elektronenaffinität F',dH:-656.4,to:'Ca²⁺(g) + 2 F⁻(g)'},{k:'Gitterenthalpie',lattice:true,to:'CaF₂(s)'}],
+    bl:null}
+};
+for(const ex of Object.values(IONIC)){
+  const s=ex.bh.filter(b=>!b.lattice).reduce((a,b)=>a+b.dH,0);
+  ex.bh.find(b=>b.lattice).dH=ex.fH-s; ex.latticeH=ex.fH-s; ex.sumUp=s;
+  if(ex.bl){const K=1.38935e5;ex.blU=-K*ex.bl.M*Math.abs(ex.cat.q*ex.an.q)/ex.bl.r0*(1-1/ex.bl.n);}
+  const ie=ex.bh.filter(b=>/Ionisierung/.test(b.k)).reduce((a,b)=>a+b.dH,0);
+  const ea=ex.bh.filter(b=>/affinität/.test(b.k)).reduce((a,b)=>a+b.dH,0);
+  ex.gasTransfer=ie+ea;
+}
+
+const ELC={H:{name:'Wasserstoff',ve:1,vdw:120,cov:31,col:'#EEF1F3',gas:'Helium'},C:{name:'Kohlenstoff',ve:4,vdw:170,cov:76,col:'#41464C',gas:'Neon'},N:{name:'Stickstoff',ve:5,vdw:155,cov:71,col:'#3557DE',gas:'Neon'},O:{name:'Sauerstoff',ve:6,vdw:152,cov:66,col:'#D83A34',gas:'Neon'},Cl:{name:'Chlor',ve:7,vdw:175,cov:102,col:'#2E9E3A',gas:'Argon'}};
+
+const MOL={
+  H2:{label:'H₂',name:'Wasserstoff',atoms:[['H',-.42,0],['H',.42,0]],bonds:[[0,1,1]],lp:[[],[]],geom:{t:'dia',r:74.1},bondTxt:'Einfachbindung',d:'74 pm',E:'436 kJ/mol',angle:'–',shape:'linear',mu:'0 D',dia:{re:74.1,De:458.4,D0:432.1,a:0.01944}},
+  Cl2:{label:'Cl₂',name:'Chlor',atoms:[['Cl',-.6,0],['Cl',.6,0]],bonds:[[0,1,1]],lp:[[90,180,270],[90,0,270]],geom:{t:'dia',r:198.8},bondTxt:'Einfachbindung',d:'199 pm',E:'243 kJ/mol',angle:'–',shape:'linear',mu:'0 D',dia:{re:198.8,De:242.5,D0:239.2,a:0.02002}},
+  HCl:{label:'HCl',name:'Chlorwasserstoff',atoms:[['Cl',.42,0],['H',-.62,0]],bonds:[[0,1,1]],lp:[[90,0,270],[]],geom:{t:'dia',r:127.5},bondTxt:'Einfachbindung (polar)',d:'127 pm',E:'431 kJ/mol',angle:'–',shape:'linear',mu:'1,08 D',dia:{re:127.5,De:445.5,D0:427.6,a:0.01868}},
+  H2O:{label:'H₂O',name:'Wasser',atoms:[['O',0,.18],['H',-.82,-.42],['H',.82,-.42]],bonds:[[0,1,1],[0,2,1]],lp:[[135,45],[],[]],geom:{t:'bent',r:95.8,ang:104.5},bondTxt:'2 Einfachbindungen (polar)',d:'96 pm (O–H)',E:'463 kJ/mol (mittlere O–H)',angle:'104,5°',shape:'gewinkelt',mu:'1,85 D'},
+  NH3:{label:'NH₃',name:'Ammoniak',atoms:[['N',0,.1],['H',-1,.1],['H',1,.1],['H',0,-.9]],bonds:[[0,1,1],[0,2,1],[0,3,1]],lp:[[90],[],[],[]],geom:{t:'pyr',r:101.2,ang:106.7},bondTxt:'3 Einfachbindungen (polar)',d:'101 pm (N–H)',E:'391 kJ/mol (mittlere N–H)',angle:'106,7°',shape:'trigonal-pyramidal',mu:'1,47 D'},
+  CH4:{label:'CH₄',name:'Methan',atoms:[['C',0,0],['H',-1,0],['H',1,0],['H',0,1],['H',0,-1]],bonds:[[0,1,1],[0,2,1],[0,3,1],[0,4,1]],lp:[[],[],[],[],[]],geom:{t:'tet',r:108.7},bondTxt:'4 Einfachbindungen (kaum polar)',d:'109 pm (C–H)',E:'416 kJ/mol (mittlere C–H in CH₄)',angle:'109,5°',shape:'tetraedrisch',mu:'0 D'},
+  CO2:{label:'CO₂',name:'Kohlenstoffdioxid',atoms:[['C',0,0],['O',-1.05,0],['O',1.05,0]],bonds:[[0,1,2],[0,2,2]],lp:[[],[120,240],[60,300]],geom:{t:'lin3',r:116.0},bondTxt:'2 Doppelbindungen (polar)',d:'116 pm (C=O)',E:'804 kJ/mol (mittlere C=O in CO₂)',angle:'180°',shape:'linear',mu:'0 D'},
+  N2:{label:'N₂',name:'Stickstoff',atoms:[['N',-.55,0],['N',.55,0]],bonds:[[0,1,3]],lp:[[180],[0]],geom:{t:'dia',r:109.8},bondTxt:'Dreifachbindung',d:'110 pm',E:'945 kJ/mol',angle:'–',shape:'linear',mu:'0 D',dia:{re:109.8,De:955.7,D0:941.6,a:0.02689}},
+  O2:{label:'O₂',name:'Sauerstoff',atoms:[['O',-.6,0],['O',.6,0]],bonds:[[0,1,2]],lp:[[120,240],[60,300]],geom:{t:'dia',r:120.8},bondTxt:'Doppelbindung (Lewis-Formel)',d:'121 pm',E:'498 kJ/mol',angle:'–',shape:'linear',mu:'0 D',dia:{re:120.8,De:503.1,D0:493.6,a:0.02654},special:'O2'}
+};
+
+/* 3D-Koordinaten (pm) aus Bindungslänge und Winkel */
+function buildXYZ(m){
+  const g=m.geom, r=g.r, d2r=Math.PI/180;
+  if(g.t==='dia') return [[-r/2,0,0],[r/2,0,0]];
+  if(g.t==='bent'){const h=g.ang/2*d2r;return [[0,0,0],[-r*Math.sin(h),-r*Math.cos(h),0],[r*Math.sin(h),-r*Math.cos(h),0]];}
+  if(g.t==='pyr'){const s2=(1-Math.cos(g.ang*d2r))/1.5, s=Math.sqrt(s2), c=Math.sqrt(1-s2);
+    const P=[[0,0,0]];for(let i=0;i<3;i++){const f=(90+i*120)*d2r;P.push([r*s*Math.cos(f),-r*c,r*s*Math.sin(f)]);}return P;}
+  if(g.t==='tet'){const k=r/Math.sqrt(3);return [[0,0,0],[k,k,k],[k,-k,-k],[-k,k,-k],[-k,-k,k]];}
+  if(g.t==='lin3') return [[0,0,0],[-r,0,0],[r,0,0]];
+}
+for(const m of Object.values(MOL)){
+  m.xyz=buildXYZ(m);
+  m.homo=m.atoms.every(a=>a[0]===m.atoms[0][0]);
+  m.valid=m.atoms.map((a,i)=>{const ord=m.bonds.reduce((s,b)=>s+((b[0]===i||b[1]===i)?b[2]:0),0);return ord+2*m.lp[i].length===ELC[a[0]].ve;});
+  m.count=m.atoms.map((a,i)=>2*m.bonds.reduce((s,b)=>s+((b[0]===i||b[1]===i)?b[2]:0),0)+2*m.lp[i].length);
+  const q=m.atoms.map(()=>0); let maxD=0;
+  for(const [a,b] of m.bonds){const ea=EN[m.atoms[a][0]],eb=EN[m.atoms[b][0]],d=Math.abs(ea-eb);maxD=Math.max(maxD,d);
+    if(ea>eb){q[a]-=d;q[b]+=d;}else if(eb>ea){q[b]-=d;q[a]+=d;}}
+  m.q=q;m.dEN=maxD;
+  const cen=(sign)=>{let w=0,p=[0,0,0];q.forEach((v,i)=>{if(v*sign>0){w+=Math.abs(v);for(let k=0;k<3;k++)p[k]+=Math.abs(v)*m.xyz[i][k];}});return w?p.map(x=>x/w):null;};
+  m.cPos=cen(1);m.cNeg=cen(-1);
+  m.dipole=!!(m.cPos&&m.cNeg&&Math.hypot(m.cPos[0]-m.cNeg[0],m.cPos[1]-m.cNeg[1],m.cPos[2]-m.cNeg[2])>2);
+}
+
+const METALS={
+  Na:{name:'Natrium',el:'Na',ve:1,core:'Na⁺',shells:[2,8,1],grid:'square',lat:'kubisch-raumzentriert (krz)',rMet:186,rIon:102,mp:'97,8 °C',sigma:'21,0 MS/m',atomH:'107,5 kJ/mol',
+    bands:[{n:'3s',E:.30,lo:.10,hi:.52},{n:'3p',E:.66,lo:.46,hi:.94}],EF:.31,bandNote:'3s-Band halb besetzt'},
+  Mg:{name:'Magnesium',el:'Mg',ve:2,core:'Mg²⁺',shells:[2,8,2],grid:'hex',lat:'hexagonal-dichteste Packung (hdp)',rMet:160,rIon:72,mp:'650 °C',sigma:'22,7 MS/m',atomH:'147,1 kJ/mol',
+    bands:[{n:'3s',E:.30,lo:.08,hi:.56},{n:'3p',E:.64,lo:.38,hi:.95}],EF:.48,bandNote:'3s- und 3p-Band überlappen; beide teilweise besetzt'},
+  Al:{name:'Aluminium',el:'Al',ve:3,core:'Al³⁺',shells:[2,8,3],grid:'hex',lat:'kubisch-flächenzentriert (kfz)',rMet:143,rIon:53.5,mp:'660,3 °C',sigma:'37,7 MS/m',atomH:'330,0 kJ/mol',
+    bands:[{n:'3s',E:.24,lo:.05,hi:.50},{n:'3p',E:.58,lo:.30,hi:.95}],EF:.56,bandNote:'3s-/3p-Bänder überlappen; teilweise besetzt'},
+  Cu:{name:'Kupfer',el:'Cu',ve:1,core:'Cu⁺',shells:[2,8,18,1],grid:'hex',lat:'kubisch-flächenzentriert (kfz)',rMet:128,rIon:77,mp:'1084,6 °C',sigma:'59,6 MS/m',atomH:'337,4 kJ/mol',
+    bands:[{n:'3d',E:.32,lo:.25,hi:.39},{n:'4s',E:.45,lo:.16,hi:.86}],EF:.50,bandNote:'3d-Band voll, 4s-Band etwa halb besetzt; d-Elektronen tragen zur Bindung bei'}
+};
+
+const CMP_POINTS=[
+  {f:'NaCl',a:'Na',b:'Cl',g:'ion',t:'Ionenbindung'},{f:'MgO',a:'Mg',b:'O',g:'ion',t:'Ionenbindung'},{f:'LiF',a:'Li',b:'F',g:'ion',t:'Ionenbindung',dx:-26,dy:-2},{f:'CaF₂',a:'Ca',b:'F',g:'ion',t:'Ionenbindung',dx:26,dy:-2},
+  {f:'HCl',a:'H',b:'Cl',g:'cov',t:'polare Elektronenpaarbindung',dx:-18,dy:-8},{f:'H₂O',a:'H',b:'O',g:'cov',t:'polare Elektronenpaarbindung (O–H)',dy:-12},{f:'NH₃',a:'N',b:'H',g:'cov',t:'polare Elektronenpaarbindung (N–H)',dx:-20,dy:8},{f:'CO₂',a:'C',b:'O',g:'cov',t:'polare Elektronenpaarbindung (C=O)',dx:20,dy:6},{f:'CH₄',a:'C',b:'H',g:'cov',t:'weitgehend unpolare Elektronenpaarbindung (C–H)',dy:-12},
+  {f:'H₂',a:'H',b:'H',g:'cov',t:'unpolare Elektronenpaarbindung',dy:-12},{f:'N₂',a:'N',b:'N',g:'cov',t:'unpolare Elektronenpaarbindung',dy:-26},{f:'Cl₂',a:'Cl',b:'Cl',g:'cov',t:'unpolare Elektronenpaarbindung',dy:-12},{f:'O₂',a:'O',b:'O',g:'cov',t:'unpolare Elektronenpaarbindung',dy:-12},
+  {f:'Na',a:'Na',b:'Na',g:'met',t:'Metallbindung',dy:-12},{f:'Mg',a:'Mg',b:'Mg',g:'met',t:'Metallbindung',dy:-12},{f:'Al',a:'Al',b:'Al',g:'met',t:'Metallbindung',dy:-12},{f:'Cu / Si',a:'Cu',b:'Cu',g:'met',t:'Cu: Metallbindung · Si: Elektronenpaarbindung im Atomgitter (Halbleiter) – gleiche Lage im Diagramm!',dy:-12,border:true},
+  {f:'AlCl₃',a:'Al',b:'Cl',g:'bor',t:'Grenzfall: großer ΔEN, aber deutliche kovalente Anteile (sublimiert bei ca. 180 °C, Dimere Al₂Cl₆ in der Gasphase)',border:true,dy:-12},
+  {f:'SiO₂',a:'Si',b:'O',g:'bor',t:'Elektronenpaarbindung im Atomgitter (polar); hohe Schmelztemperatur trotz kovalenter Bindung',border:true,dx:22,dy:10}
+];
+for(const p of CMP_POINTS){p.x=(EN[p.a]+EN[p.b])/2;p.y=Math.abs(EN[p.a]-EN[p.b]);}
+
+/* ================= Zustand ================= */
+const S={
+  level:store.get('level','I'), tab:store.get('tab','ion'),
+  ex:Object.assign({ion:'NaCl',cov:'H2O',met:'Mg'},store.get('ex',{})),
+  view:{ion:'transfer',cov:'lewis',met:'gas',cmp:'tri'},
+  step:0, stepT:0, time:0, playing:false,
+  opt:{ionModel:'pack',ionCoord:false,rotate:!RM,covModel:'stick',covLP:true,covQ:true,covCen:false,originColors:true,covR:null,covPlay:false,covPlayT:0,cmpBorder:true,cmpSel:null},
+  rot:{yaw:.6,pitch:-.42}, deform:{on:false,t:0}
+};
+if(!IONIC[S.ex.ion])S.ex.ion='NaCl'; if(!MOL[S.ex.cov])S.ex.cov='H2O'; if(!METALS[S.ex.met])S.ex.met='Mg';
+if(!['I','II'].includes(S.level))S.level='I'; if(!['ion','cov','met','cmp'].includes(S.tab))S.tab='ion';
+
+const VIEWS={
+  ion:[{id:'transfer',n:'Elektronenübergang',steps:5},{id:'lattice',n:'Ionengitter'},{id:'deform',n:'Verformung'},{id:'energy',n:'Born-Haber',lv:'II'}],
+  cov:[{id:'lewis',n:'Valenzstrichformel',steps:5},{id:'space',n:'Räumlicher Bau'},{id:'energy',n:'Energie und Abstand',dia:true}],
+  met:[{id:'gas',n:'Elektronengas',steps:2},{id:'band',n:'Bändermodell',lv:'II'}],
+  cmp:[{id:'tri',n:'Bindungsdreieck'}]
+};
+function curView(){return VIEWS[S.tab].find(v=>v.id===S.view[S.tab]);}
+function stepCount(){const v=curView();if(S.tab==='ion'&&v.id==='energy')return IONIC[S.ex.ion].bh.length+1;return v.steps||0;}
+function viewAllowed(tab,v){if(v.lv&&v.lv!==S.level)return false;if(v.dia&&!MOL[S.ex.cov].dia)return false;return true;}
+
+/* ================= Canvas ================= */
+const cv=$('#cv'),ctx=cv.getContext('2d');
+let W=300,H=225,DPR=1;
+function resize(){const r=cv.getBoundingClientRect();DPR=Math.min(2,window.devicePixelRatio||1);W=Math.max(10,r.width);H=Math.max(10,r.height);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);ctx.setTransform(DPR,0,0,DPR,0,0);MET.dirty=true;TRI.cache=null;}
+new ResizeObserver(resize).observe(cv);
+const C={};
+function readColors(){const cs=getComputedStyle(document.documentElement);['bg','surface','sunken','stage','ink','ink-2','ink-3','line','accent','accent-soft','cation','anion','electron','electron-2','ok','bad','note','zone-ion','zone-cov','zone-met'].forEach(k=>C[k]=cs.getPropertyValue('--'+k).trim()||'#888888');TRI.cache=null;}
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',readColors);
+new MutationObserver(readColors).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+const FB='"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif', FM='"JetBrains Mono",ui-monospace,Menlo,monospace', FD='"Schibsted Grotesk","Segoe UI",system-ui,sans-serif';
+
+function hexRgb(h){h=String(h).replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');const n=parseInt(h,16);return[n>>16&255,n>>8&255,n&255];}
+function mix(a,b,t){const A=hexRgb(a),B=hexRgb(b);return'#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('');}
+function rgba(h,al){const A=hexRgb(h);return`rgba(${A[0]},${A[1]},${A[2]},${al})`;}
+function txt(s,x,y,o={}){ctx.save();ctx.font=`${o.w||400} ${o.s||13}px ${o.f||FB}`;ctx.fillStyle=o.c||C.ink;ctx.textAlign=o.a||'center';ctx.textBaseline=o.b||'middle';ctx.globalAlpha=o.al??1;if(o.rot){ctx.translate(x,y);ctx.rotate(o.rot);ctx.fillText(s,0,0);}else ctx.fillText(s,x,y);ctx.restore();}
+function ball(x,y,r,col,al=1,stroke=true){if(!(r>0.3))return;const g=ctx.createRadialGradient(x-r*.35,y-r*.4,r*.08,x,y,r);g.addColorStop(0,mix(col,'#ffffff',.55));g.addColorStop(.6,col);g.addColorStop(1,mix(col,'#000000',.3));ctx.save();ctx.globalAlpha=al;ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();if(stroke){ctx.strokeStyle=rgba(C.ink,.28);ctx.lineWidth=1;ctx.stroke();}ctx.restore();}
+function dot(x,y,r,col,al=1){ctx.save();ctx.globalAlpha=al;ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.restore();}
+function ring(x,y,r,col,w=1,dash=null,al=1){ctx.save();ctx.globalAlpha=al;ctx.strokeStyle=col;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.stroke();ctx.restore();}
+function line(x1,y1,x2,y2,col,w=1.5,dash=null,al=1){ctx.save();ctx.globalAlpha=al;ctx.strokeStyle=col;ctx.lineWidth=w;ctx.lineCap='round';if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();}
+function arrow(x1,y1,x2,y2,col,w=2,head=8,al=1,dash=null){const a=Math.atan2(y2-y1,x2-x1);ctx.save();ctx.globalAlpha=al;ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2-Math.cos(a)*head*.6,y2-Math.sin(a)*head*.6);ctx.stroke();ctx.setLineDash([]);ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-head*Math.cos(a-.42),y2-head*Math.sin(a-.42));ctx.lineTo(x2-head*Math.cos(a+.42),y2-head*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore();}
+function pill(s,x,y,o={}){ctx.save();ctx.font=`${o.w||700} ${o.s||12}px ${o.f||FB}`;const tw=ctx.measureText(s).width,ph=(o.s||12)+8,pw=tw+14;const x0=o.a==='left'?x:o.a==='right'?x-pw:x-pw/2;ctx.fillStyle=o.bg||C.surface;ctx.strokeStyle=o.bd||C.line;ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(x0,y-ph/2,pw,ph,6);ctx.fill();ctx.stroke();ctx.fillStyle=o.c||C.ink;ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(s,x0+7,y+.5);ctx.restore();return pw;}
+
+/* 3D-Projektion */
+function proj(p,sc,cx,cy,persp=.0016){const cyw=Math.cos(S.rot.yaw),syw=Math.sin(S.rot.yaw);const x1=p[0]*cyw+p[2]*syw,z1=-p[0]*syw+p[2]*cyw;const cp=Math.cos(S.rot.pitch),sp=Math.sin(S.rot.pitch);const y1=p[1]*cp-z1*sp,z2=p[1]*sp+z1*cp;const f=1/(1+z2*sc*persp);return{x:cx+x1*sc*f,y:cy-y1*sc*f,z:z2,f};}
+let drag=null;
+cv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,moved:false};});
+window.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>3)drag.moved=true;if(is3D()){S.rot.yaw+=dx*.01;S.rot.pitch=clamp(S.rot.pitch+dy*.01,-1.4,1.4);}drag.x=e.clientX;drag.y=e.clientY;});
+window.addEventListener('pointerup',e=>{if(drag&&!drag.moved)canvasClick(e);drag=null;});
+function is3D(){return(S.tab==='ion'&&S.view.ion==='lattice')||(S.tab==='cov'&&S.view.cov==='space');}
+
+/* ================= Ionenbindung ================= */
+function ionColors(){return{cat:C.cation,an:C.anion};}
+function shellR(i,u){return(13+i*14)*u;}
+function drawNucleus(x,y,u,el,col){ball(x,y,10*u,col,1,false);txt(el,x,y+.5,{s:10*u,w:700,c:'#ffffff',f:FB});}
+
+function ionTransfer(){
+  const ex=IONIC[S.ex.ion],st=S.step,t=S.stepT,u=clamp(Math.min(W/400,H/300),.62,1.4),cy=H*.46,cat=ex.cat,an=ex.an,col=ionColors();
+  const catX=ex.nAn===1?W*.29:W*.5, anXs=ex.nAn===1?[W*.71]:[W*.16,W*.84];
+  if(st<=2){
+    const nC=cat.shells.length, nA=an.shells.length, k=cat.shells[nC-1], need=8-an.shells[nA-1];
+    // Übergänge definieren
+    const tr=[];
+    anXs.forEach((ax,j)=>{const dCat=Math.atan2(0,catX-ax), dAn=Math.atan2(0,ax-catX);for(let v=0;v<need;v++){const slot=dCat+(v===0?1:-1)*Math.PI/8;const off=need===2?(v===0?-.35:.35):0;tr.push({j,ax,slot,start:dAn+off,rA:shellR(nA-1,u),rC:shellR(nC-1,u),side:v===0?-1:1});}});
+    const p=st===0?0:st===1?anim(t,1.7,.3):1;
+    // Kation
+    const cFade=st===2?1-anim(t,.8):st>2?0:1;
+    for(let i=0;i<nC;i++){const r=shellR(i,u);const isOuter=i===nC-1;ring(catX,cy,r,C.line,1.2,isOuter&&st===2?[3,4]:null,isOuter?Math.max(.25,cFade):1);
+      if(!isOuter){const n=cat.shells[i];for(let e=0;e<n;e++){const a=-Math.PI/2+e*2*Math.PI/n;dot(catX+r*Math.cos(a),cy+r*Math.sin(a),2.6*u,C['ink-3']);}}}
+    drawNucleus(catX,cy,u,cat.el,st>=2?C.cation:mix(C.cation,C['ink-3'],.55));
+    // Anionen
+    anXs.forEach((ax,j)=>{for(let i=0;i<nA;i++){const r=shellR(i,u);ring(ax,cy,r,C.line,1.2);const n=an.shells[i];
+      if(i<nA-1){for(let e=0;e<n;e++){const a=-Math.PI/2+e*2*Math.PI/n;dot(ax+r*Math.cos(a),cy+r*Math.sin(a),2.6*u,C['ink-3']);}}
+      else{const dCat=Math.atan2(0,catX-ax);const slots=[];for(let s=0;s<8;s++)slots.push(dCat+Math.PI/8+s*Math.PI/4);
+        const vac=need===1?[0]:[0,7];slots.forEach((a,s)=>{const x=ax+r*Math.cos(a),y=cy+r*Math.sin(a);if(vac.includes(s)){if(p<1)ring(x,y,3.2*u,C['ink-3'],1,[2,2],.9);}else dot(x,y,3.1*u,S.opt.originColors?C['electron-2']:C.electron);});}}
+      drawNucleus(ax,cy,u,an.el,st>=2?C.anion:mix(C.anion,C['ink-3'],.55));});
+    // übertragene Elektronen
+    tr.forEach((e,i)=>{const pi=st===1?anim(t,1.5,.3+i*.35):p;const sx=catX+e.rC*Math.cos(e.start),sy=cy+e.rC*Math.sin(e.start);const tx=e.ax+e.rA*Math.cos(e.slot),ty=cy+e.rA*Math.sin(e.slot);
+      const mx=(sx+tx)/2,my=cy+e.side*62*u;const x=(1-pi)*(1-pi)*sx+2*(1-pi)*pi*mx+pi*pi*tx,y=(1-pi)*(1-pi)*sy+2*(1-pi)*pi*my+pi*pi*ty;
+      if(st===1&&pi>0&&pi<1){ctx.save();ctx.setLineDash([3,4]);ctx.strokeStyle=rgba(C.electron,.6);ctx.beginPath();ctx.moveTo(sx,sy);ctx.quadraticCurveTo(mx,my,tx,ty);ctx.stroke();ctx.restore();}
+      dot(x,y,3.6*u,C.electron);});
+    // Beschriftung
+    const ly=cy+shellR(Math.max(nC,nA)-1,u)+26*u;
+    const ionz=st>=2||(st===1&&anim(t,1.5,.3+(tr.length-1)*.35)>=.999);const catE=ionz?cat.Z-cat.q:cat.Z, anE=ionz?an.Z-an.q:an.Z;
+    txt(ionz?`${cat.ion}-Ion`:`${cat.el}-Atom`,catX,ly,{s:15,w:700,f:FD,c:ionz?C.cation:C.ink});
+    txt(`${cat.Z} p⁺ · ${catE} e⁻`,catX,ly+18,{s:12.5,f:FM,c:C['ink-2']});
+    if(S.level==='II')txt(ionz?cat.ionConf:cat.conf,catX,ly+35,{s:12,f:FM,c:C['ink-2']});
+    anXs.forEach(ax=>{txt(ionz?`${an.ion}-Ion`:`${an.el}-Atom`,ax,ly,{s:15,w:700,f:FD,c:ionz?C.anion:C.ink});txt(`${an.Z} p⁺ · ${anE} e⁻`,ax,ly+18,{s:12.5,f:FM,c:C['ink-2']});if(S.level==='II')txt(ionz?an.ionConf:an.conf,ax,ly+35,{s:12,f:FM,c:C['ink-2']});});
+    if(st===1&&S.level==='II')pill(`isoliert in der Gasphase: ΔH = ${sgn(ex.gasTransfer,0)} kJ/mol (endotherm)`,W/2,22,{s:12,bd:C.note,c:C.note});
+    if(st===2)pill(`Edelgaskonfiguration: ${cat.ion} wie ${cat.gas}, ${an.ion} wie ${an.gas}`,W/2,22,{s:12});
+    return;
+  }
+  if(st===3){ // Größenvergleich, maßstäblich
+    const maxR=Math.max(cat.rAtom,an.rAtom,cat.rIon,an.rIon), k=Math.min(H*.2,W*.105)/maxR, y=H*.45;
+    const xs=[W*.14,W*.36,W*.64,W*.86]; const p=anim(t,1.0);
+    txt('Atome',(xs[0]+xs[1])/2,H*.12,{s:14,w:700,f:FD,c:C['ink-2']});txt('Ionen',(xs[2]+xs[3])/2,H*.12,{s:14,w:700,f:FD,c:C['ink-2']});
+    arrow(W*.47,y,W*.53,y,C['ink-3'],2,9);
+    const items=[[cat.el+'-Atom',cat.rAtom,mix(C.cation,C['ink-3'],.6)],[an.el+'-Atom',an.rAtom,mix(C.anion,C['ink-3'],.6)],[cat.ion,cat.rIon,C.cation],[an.ion,an.rIon,C.anion]];
+    items.forEach((it,i)=>{const r=it[1]*k*(i<2?1:lerp(i===2?cat.rAtom/cat.rIon:an.rAtom/an.rIon,1,p));ball(xs[i],y,r,it[2]);txt(it[0],xs[i],y+maxR*k+18,{s:14,w:700,f:FD});txt(`r = ${it[1]} pm`,xs[i],y+maxR*k+36,{s:12,f:FM,c:C['ink-2']});});
+    txt('maßstäblich: gleicher Maßstab für alle vier Teilchen',W/2,H-16,{s:11.5,c:C['ink-3']});
+    return;
+  }
+  // Schritt 4: Anziehung im 2D-Ausschnitt
+  const p=anim(t,1.4),k=Math.min(W,H)/(ex.nAn===2?11.5:9.5)/((cat.rIon+an.rIon)/2),d=(cat.rIon+an.rIon)*k;
+  const pts=[];
+  if(ex.nAn===1){for(let i=-2;i<=2;i++)for(let j=-1;j<=1;j++)pts.push({i,j,c:(i+j)%2===0});}
+  else{for(let i=-2;i<=2;i++)for(let j=-2;j<=2;j++){const ev=v=>v%2===0;if(ev(i)&&ev(j))pts.push({i,j,c:true});else if(ev(i)!==ev(j))pts.push({i,j,c:false});}}
+  const cx=W/2,cy2=H*.47,spread=1+.7*(1-p);
+  for(const q of pts){const x=cx+q.i*d*spread,y=cy2+q.j*d*spread;if(x<-40||x>W+40||y<-40||y>H+40)continue;const r=(q.c?cat.rIon:an.rIon)*k;const far=Math.abs(q.i)+Math.abs(q.j)>1;ball(x,y,r,q.c?C.cation:C.anion,far?.75:1);
+    txt(q.c?(cat.q===1?'+':cat.q+'+'):(an.q===-1?'−':Math.abs(an.q)+'−'),x,y+.5,{s:Math.max(10,r*.6),w:700,c:'#ffffff'});}
+  if(p>.85){const a=anim(t,.6,1.3);[[1,0],[-1,0],[0,1],[0,-1]].forEach(([i,j])=>{const x2=cx+i*d,y2=cy2+j*d;const rr=cat.rIon*k+4;arrow(x2-i*(an.rIon*k+2),y2-j*(an.rIon*k+2),cx+i*rr,cy2+j*rr,C.electron,2.2,8,a);});}
+  txt(ex.nAn===2?'schematischer 2D-Ausschnitt (Verhältnis 1 : 2)':'schematischer 2D-Ausschnitt',W/2,H-16,{s:11.5,c:C['ink-3']});
+}
+
+function latticePoints(ex){
+  const P=[];
+  if(ex.lattice==='rocksalt'){for(let i=0;i<3;i++)for(let j=0;j<3;j++)for(let k=0;k<3;k++)P.push({p:[i/2,j/2,k/2],c:(i+j+k)%2===0});}
+  else{const f=[[0,0,0],[.5,.5,0],[.5,0,.5],[0,.5,.5]];const seen=new Set();for(const b of f)for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++)for(let k=-1;k<=1;k++){const q=[b[0]+i,b[1]+j,b[2]+k];if(q.every(v=>v>=-1e-6&&v<=1+1e-6)){const key=q.map(v=>v.toFixed(2)).join();if(!seen.has(key)){seen.add(key);P.push({p:q,c:true});}}}
+    for(const a of[.25,.75])for(const b of[.25,.75])for(const c of[.25,.75])P.push({p:[a,b,c],c:false});}
+  return P;
+}
+function ionLattice(){
+  const ex=IONIC[S.ex.ion],P=latticePoints(ex),sc=Math.min(W,H)*.36,cx=W/2,cy=H*.5,pack=S.opt.ionModel==='pack';
+  const center=ex.lattice==='rocksalt'?[.5,.5,.5]:[.25,.25,.25];
+  const nnD=ex.lattice==='rocksalt'?.5:Math.sqrt(3)/4;
+  const isN=q=>Math.abs(Math.hypot(q[0]-center[0],q[1]-center[1],q[2]-center[2])-nnD)<1e-3;
+  const isC=q=>Math.hypot(q[0]-center[0],q[1]-center[1],q[2]-center[2])<1e-3;
+  const items=P.map(o=>{const pr=proj([o.p[0]-.5,o.p[1]-.5,o.p[2]-.5],sc,cx,cy,.14/sc);return{...o,pr};});
+  // Zellkanten
+  const E=[];for(const a of[0,1])for(const b of[0,1]){E.push([[0,a,b],[1,a,b]]);E.push([[a,0,b],[a,1,b]]);E.push([[a,b,0],[a,b,1]]);}
+  for(const[a,b]of E){const A=proj([a[0]-.5,a[1]-.5,a[2]-.5],sc,cx,cy,.14/sc),B=proj([b[0]-.5,b[1]-.5,b[2]-.5],sc,cx,cy,.14/sc);line(A.x,A.y,B.x,B.y,C['ink-3'],1,[4,4],.7);}
+  if(!pack){for(let i=0;i<items.length;i++)for(let j=i+1;j<items.length;j++){const a=items[i],b=items[j];if(a.c===b.c)continue;const d=Math.hypot(a.p[0]-b.p[0],a.p[1]-b.p[1],a.p[2]-b.p[2]);if(Math.abs(d-nnD)<1e-3)line(a.pr.x,a.pr.y,b.pr.x,b.pr.y,C['ink-3'],1,[2,3],.8);}}
+  items.sort((a,b)=>b.pr.z-a.pr.z);
+  for(const o of items){const r=(o.c?ex.cat.rIon:ex.an.rIon)/ex.a*sc*o.pr.f*(pack?1:.36);let al=1;
+    if(S.opt.ionCoord){al=(isC(o.p)||isN(o.p))?1:.14;}
+    ball(o.pr.x,o.pr.y,r,o.c?C.cation:C.anion,al);
+    if(S.opt.ionCoord&&isC(o.p))ring(o.pr.x,o.pr.y,r+3,C.electron,2.5);}
+  txt(pack?'Kugelpackungsmodell (Radien maßstäblich)':'Gittermodell (Kugeln verkleinert; Linien sind Hilfslinien, keine Bindungsstriche)',W/2,H-14,{s:11.5,c:C['ink-3']});
+  txt('Ziehen zum Drehen',W-10,16,{s:11,a:'right',c:C['ink-3']});
+  if(S.opt.ionCoord){const cz=ex.lattice==='rocksalt'?ex.an.ion:ex.an.ion;pill(ex.lattice==='rocksalt'?`${cz} mit 6 nächsten ${ex.cat.ion}-Nachbarn (oktaedrisch)`:`${cz} mit 4 nächsten ${ex.cat.ion}-Nachbarn (tetraedrisch); ${ex.cat.ion} hat 8 F⁻-Nachbarn`,W/2,20,{s:11.5});}
+  if(S.opt.rotate&&!drag)S.rot.yaw+=.006;
+}
+
+function ionDeform(){
+  const ex=IONIC[S.ex.ion],cols=9,rows=6,d=Math.min((W-30)/cols,(H-60)/rows),k=d/(ex.cat.rIon+ex.an.rIon),x0=W/2-(cols-1)*d/2,y0=H*.12+d/2;
+  const t=S.deform.on?S.deform.t:0, pShift=anim(t,1.3), pRep=anim(t,.6,1.4), pCrack=anim(t,1.2,2.2);
+  const top=Math.floor(rows/2);
+  ctx.save();ctx.beginPath();ctx.rect(0,0,W,H);ctx.clip();
+  for(let i=-1;i<=cols;i++)for(let j=0;j<rows;j++){const upper=j<top;const sx=upper?pShift*d:0;const lift=upper?-pCrack*d*.9:0;const rot=upper?-pCrack*.05:0;
+    let x=x0+i*d+sx,y=y0+j*d+lift;if(upper&&rot){const px=W*.9,py=y0+top*d;const dx=x-px,dy=y-py;x=px+dx*Math.cos(rot)-dy*Math.sin(rot);y=py+dx*Math.sin(rot)+dy*Math.cos(rot);}
+    const isC=((i+j)%2+2)%2===0;if(x<-d||x>W+d)continue;const r=(isC?ex.cat.rIon:ex.an.rIon)*k*.92;ball(x,y,r,isC?C.cation:C.anion);
+    txt(isC?'+':'−',x,y+.5,{s:Math.max(10,r*.7),w:700,c:'#ffffff'});}
+  if(pRep>0&&pCrack<1){for(let i=0;i<cols;i++){const xa=x0+i*d+pShift*d,ya=y0+(top-1)*d,yb=y0+top*d;const mid=(ya+yb)/2;arrow(xa,mid-2,xa,ya+d*.25,C.bad,2.2,7,pRep*(1-pCrack));arrow(xa,mid+2,xa,yb-d*.25,C.bad,2.2,7,pRep*(1-pCrack));}}
+  ctx.restore();
+  if(!S.deform.on){arrow(16,y0+d*(top-1),16+d*.9,y0+d*(top-1),C.ink,2.5,9);txt('Kraft',18,y0+d*(top-1)-16,{s:12,a:'left',w:700});}
+  const msg=!S.deform.on?'Ausgangszustand: Kation neben Anion in jeder Richtung':pCrack>.05?'Abstoßung gleich geladener Ionen: Der Kristall bricht (spröde).':pRep>0?'Gleich geladene Ionen liegen übereinander und stoßen sich ab.':'Eine Ionenschicht wird um einen Ionenabstand verschoben …';
+  pill(msg,W/2,H-20,{s:12,bd:pRep>0?C.bad:C.line,c:pRep>0?C.bad:C.ink});
+  if(ex.nAn===2)txt('schematisch: Anordnung vereinfacht wie im NaCl-Typ',W/2,14,{s:11,c:C['ink-3']});
+}
+
+function ionEnergy(){
+  const ex=IONIC[S.ex.ion],steps=ex.bh,n=steps.length,shown=S.step;
+  const lv=[0];steps.forEach(s=>lv.push(lv[lv.length-1]+s.dH));
+  const maxE=Math.max(...lv)*1.04,minE=Math.min(...lv,ex.fH)*1.12;
+  const L=50,R=Math.min(170,W*.36),T=18,B=H-26;const y=E=>T+(maxE-E)/(maxE-minE)*(B-T);
+  const xA=L+22,x0=L+48,dx=(W-R-x0-14)/(n);
+  // Achse
+  line(L,T,L,B,C['ink-3'],1);const stepT=[250,500,1000,2000][[1500,3000,6000,99999].findIndex(v=>maxE-minE<v)];
+  for(let e=Math.ceil(minE/stepT)*stepT;e<=maxE;e+=stepT){line(L-4,y(e),L,y(e),C['ink-3'],1);txt(String(e).replace('-','−'),L-7,y(e),{s:10.5,f:FM,a:'right',c:C['ink-2']});}
+  txt('ΔH in kJ/mol',6,T-4,{s:10.5,a:'left',c:C['ink-2'],b:'top'});
+  // Niveaus
+  const labels=[];
+  const drawLevel=(k,x1,x2,al=1)=>{line(x1,y(lv[k]),x2,y(lv[k]),C.ink,2,null,al);};
+  drawLevel(0,xA-14,x0+6);labels.push({y:y(0),s:ex.start,x:x0+6});
+  for(let i=1;i<=Math.min(shown,n-1);i++){drawLevel(i,x0+(i-1)*dx-6,x0+i*dx+6);labels.push({y:y(lv[i]),s:steps[i-1].to,x:x0+i*dx+6});}
+  // Produkt
+  const closed=shown>=n;line(xA-14,y(ex.fH),W-R-6,y(ex.fH),C.ink,2,closed?null:[5,4],closed?1:.6);labels.push({y:y(ex.fH),s:steps[n-1].to,x:W-R-6,bold:true});
+  // ΔfH-Pfeil
+  arrow(xA,y(0),xA,y(ex.fH),C.accent,2.5,9);txt(`ΔfH = ${sgn(ex.fH)}`,xA-8,(y(0)+y(ex.fH))/2,{s:11,f:FM,c:C.accent,rot:-Math.PI/2});
+  // Schrittpfeile
+  for(let i=1;i<=Math.min(shown,n);i++){const s=steps[i-1],x=x0+(i-1)*dx+dx*.5;const ya=y(lv[i-1]),yb=y(lv[i]);
+    const col=s.lattice?C.bad:s.dH>0?C.anion:C.cation;const a=i===shown?anim(S.stepT,.6):1;
+    arrow(x,ya,x,lerp(ya,yb,a),col,2.6,9);txt(`${sgn(s.dH)}${s.unsure?' ?':''}`,x+11,(ya+yb)/2,{s:10.5,f:FM,c:col,rot:-Math.PI/2,w:600});}
+  // Beschriftungen ohne Überlappung
+  labels.sort((a,b)=>a.y-b.y);const gap=14;for(let i=1;i<labels.length;i++)if(labels[i].y-labels[i-1].ly<gap)labels[i].ly=labels[i-1].ly+gap;else labels[i].ly=labels[i].y;labels[0].ly=labels[0].y;
+  for(let i=1;i<labels.length;i++){labels[i].ly=Math.max(labels[i].y,labels[i-1].ly+gap);}
+  const lx=W-R+4;for(const l of labels){line(l.x,l.y,lx-2,l.ly,C['ink-3'],.8,[2,2]);txt(l.s,lx,l.ly,{s:11,a:'left',f:FM,w:l.bold?700:400});}
+  if(closed)pill(`ΔH(Gitter) = ${sgn(ex.latticeH)} kJ/mol`,x0+(n-1)*dx+dx*.5,Math.min(B-12,y(ex.fH)+22),{s:12,c:C.bad,bd:C.bad});
+}
+
+/* ================= Elektronenpaarbindung ================= */
+function eColor(m,i){if(!S.opt.originColors)return C.electron;if(m.homo)return i===0?C.electron:C['electron-2'];return m.atoms[i][0]===m.atoms[0][0]?C.electron:C['electron-2'];}
+function covLewis(){
+  const m=MOL[S.ex.cov],st=S.step,t=S.stepT;
+  const span=Math.max(...m.atoms.map(a=>Math.abs(a[1])))*2+1.2, spanY=Math.max(...m.atoms.map(a=>Math.abs(a[2])))*2+1.2;
+  const L=Math.min(W/(span*1.9),H/(spanY*1.9),W*.24);
+  const cx=W/2,cy=H*.47;const mx=m.atoms.reduce((s,a)=>s+a[1],0)/m.atoms.length,my=m.atoms.reduce((s,a)=>s+a[2],0)/m.atoms.length;
+  const p1=st===0?0:st===1?anim(t,1.5,.2):1,sep=1+.9*(1-p1);
+  const P=m.atoms.map(a=>({x:cx+(a[1]-mx)*L*sep,y:cy-(a[2]-my)*L*sep}));
+  const Re=Math.max(19,L*.3),half=4.4,dr=3.3;
+  const qLines=st<3?0:st===3?anim(t,.8):1;
+  // Edelgasregel: Kreise
+  if(st===4){const cyc=Math.floor(t/1.8)%m.atoms.length;m.atoms.forEach((a,i)=>{const act=RM?true:i===cyc;const R=L*.66;ring(P[i].x,P[i].y,R,act?C.accent:C['ink-3'],act?2.2:1,[5,4],act?1:.35);
+    if(act||RM){pill(`${m.count[i]} e⁻ → wie ${ELC[a[0]].gas}`,P[i].x,P[i].y-R-12,{s:11.5,bd:C.accent});}});}
+  // Bindungen
+  m.bonds.forEach(([a,b,k])=>{const A=P[a],B=P[b];const len=Math.hypot(B.x-A.x,B.y-A.y);const ux=(B.x-A.x)/len,uy=(B.y-A.y)/len,px=-uy,py=ux;
+    const offs=k===1?[0]:k===2?[-.38,.38]:[-.6,0,.6];
+    for(let j=0;j<k;j++){
+      const sepA={x:A.x+Re*(ux*Math.cos(offs[j])-uy*Math.sin(offs[j])),y:A.y+Re*(uy*Math.cos(offs[j])+ux*Math.sin(offs[j]))};
+      const sepB={x:B.x-Re*(ux*Math.cos(offs[j])+uy*Math.sin(offs[j])),y:B.y-Re*(uy*Math.cos(offs[j])-ux*Math.sin(offs[j]))};
+      const o=(j-(k-1)/2)*8;const M={x:(A.x+B.x)/2+px*o,y:(A.y+B.y)/2+py*o};
+      const ea={x:lerp(sepA.x,M.x-ux*half,p1),y:lerp(sepA.y,M.y-uy*half,p1)},eb={x:lerp(sepB.x,M.x+ux*half,p1),y:lerp(sepB.y,M.y+uy*half,p1)};
+      if(st===2&&j===0){ctx.save();ctx.fillStyle=rgba(C.accent,.16);ctx.strokeStyle=rgba(C.accent,.6);ctx.beginPath();const cxm=(A.x+B.x)/2,cym=(A.y+B.y)/2;ctx.ellipse(cxm,cym,13,6+4*k,Math.atan2(uy,ux),0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();}
+      if(qLines<1){dot(ea.x,ea.y,dr,eColor(m,a),1-qLines);dot(eb.x,eb.y,dr,eColor(m,b),1-qLines);}
+      if(qLines>0){const o2=(j-(k-1)/2)*6;line(A.x+ux*15+px*o2,A.y+uy*15+py*o2,B.x-ux*15+px*o2,B.y-uy*15+py*o2,C.ink,2.2,null,qLines);}
+    }});
+  // freie Elektronenpaare
+  m.lp.forEach((angs,i)=>angs.forEach(ad=>{const a=-ad*Math.PI/180;const ux=Math.cos(a),uy=Math.sin(a),px=-uy,py=ux;const c={x:P[i].x+ux*Re,y:P[i].y+uy*Re};
+    if(st===2){ctx.save();ctx.fillStyle=rgba(C['electron-2'],.12);ctx.strokeStyle=rgba(C['ink-3'],.6);ctx.beginPath();ctx.ellipse(c.x,c.y,6,10,a,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();}
+    if(qLines<1){dot(c.x+px*half,c.y+py*half,dr,eColor(m,i),1-qLines);dot(c.x-px*half,c.y-py*half,dr,eColor(m,i),1-qLines);}
+    if(qLines>0)line(c.x+px*7,c.y+py*7,c.x-px*7,c.y-py*7,C.ink,2.2,null,qLines);}));
+  // Atome
+  m.atoms.forEach((a,i)=>{if(st<3)ball(P[i].x,P[i].y,14,ELC[a[0]].col,.22,false);txt(a[0],P[i].x,P[i].y+1,{s:22,w:700,f:FD});
+    if(S.level==='II'&&st<=1)txt(`${ELC[a[0]].ve} VE`,P[i].x,P[i].y+Re+16,{s:11,f:FM,c:C['ink-2']});});
+  if(st===4&&m.special==='O2'&&S.level==='II')pill('Lewis-Formel: alle Elektronen gepaart. Messung: O₂ ist paramagnetisch!',W/2,H-18,{s:11.5,bd:C.note,c:C.note});
+}
+
+function lpDirs(m){
+  const xyz=m.xyz,res=[];const norm=v=>{const l=Math.hypot(...v)||1;return v.map(x=>x/l);};const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+  m.atoms.forEach((a,i)=>{const k=m.lp[i].length;if(!k)return;const nb=m.bonds.filter(b=>b[0]===i||b[1]===i).map(b=>b[0]===i?b[1]:b[0]);const ds=nb.map(j=>norm([xyz[j][0]-xyz[i][0],xyz[j][1]-xyz[i][1],xyz[j][2]-xyz[i][2]]));
+    if(ds.length===1){const d=ds[0];let p=norm(cross(d,[0,0,1]));if(Math.hypot(...p)<.1)p=norm(cross(d,[0,1,0]));const q=norm(cross(d,p));
+      if(k===1)res.push({i,d:d.map(x=>-x)});
+      else if(k===2)for(const s of[1,-1])res.push({i,d:d.map((x,n)=>-.5*x+s*.866*p[n])});
+      else for(let f=0;f<3;f++){const ph=f*2*Math.PI/3,c=Math.cos(109.47*Math.PI/180),sn=Math.sin(109.47*Math.PI/180);res.push({i,d:d.map((x,n)=>c*x+sn*(Math.cos(ph)*p[n]+Math.sin(ph)*q[n]))});}}
+    else{const b=norm(ds.reduce((s,d)=>s.map((x,n)=>x-d[n]),[0,0,0]));if(k===1)res.push({i,d:b});else{const nn=norm(cross(ds[0],ds[1]));const al=54.74*Math.PI/180;for(const s of[1,-1])res.push({i,d:b.map((x,n)=>x*Math.cos(al)+s*nn[n]*Math.sin(al))});}}});
+  return res;
+}
+function covSpace(){
+  const m=MOL[S.ex.cov],fill=S.opt.covModel==='fill';const ext=Math.max(...m.xyz.map((p,i)=>Math.hypot(...p)+(fill?ELC[m.atoms[i][0]].vdw:ELC[m.atoms[i][0]].vdw*.3)));
+  const sc=Math.min(W,H)*.34/ext,cx=W/2,cy=H*.5;
+  const pr=m.xyz.map(p=>proj(p,sc,cx,cy));
+  const items=[];
+  m.atoms.forEach((a,i)=>items.push({k:'a',i,z:pr[i].z}));
+  if(!fill)m.bonds.forEach((b,j)=>items.push({k:'b',b,z:(pr[b[0]].z+pr[b[1]].z)/2+1}));
+  if(S.opt.covLP&&!fill)lpDirs(m).forEach(l=>{const c=m.xyz[l.i].map((x,n)=>x+l.d[n]*ELC[m.atoms[l.i][0]].vdw*.45);items.push({k:'l',p:proj(c,sc,cx,cy),r:ELC[m.atoms[l.i][0]].vdw*.15,z:proj(c,sc,cx,cy).z});});
+  items.sort((a,b)=>b.z-a.z);
+  for(const it of items){
+    if(it.k==='b'){const[a,b,k]=it.b;const A=pr[a],B=pr[b];const len=Math.hypot(B.x-A.x,B.y-A.y)||1;const px=-(B.y-A.y)/len,py=(B.x-A.x)/len;const offs=k===1?[0]:k===2?[-4,4]:[-6,0,6];
+      for(const o of offs){line(A.x+px*o,A.y+py*o,B.x+px*o,B.y+py*o,mix(C['ink-3'],C.ink,.3),k===1?7*A.f:3.4*A.f);}}
+    else if(it.k==='a'){const a=m.atoms[it.i][0],r=(fill?ELC[a].vdw:ELC[a].vdw*.25)*sc*pr[it.i].f;ball(pr[it.i].x,pr[it.i].y,r,ELC[a].col);txt(a,pr[it.i].x,pr[it.i].y+.5,{s:Math.max(10,Math.min(18,r*.7)),w:700,c:(a==='H')?'#1d2730':'#ffffff'});}
+    else{ctx.save();ctx.globalAlpha=.22;ctx.fillStyle=C['electron-2'];ctx.beginPath();ctx.arc(it.p.x,it.p.y,it.r*sc*it.p.f,0,Math.PI*2);ctx.fill();ctx.restore();ring(it.p.x,it.p.y,it.r*sc*it.p.f,C['electron-2'],1,null,.7);}
+  }
+  if(S.opt.covQ&&m.dEN>=0.4){m.atoms.forEach((a,i)=>{const q=m.q[i];if(Math.abs(q)<1e-6)return;const r=(fill?ELC[a[0]].vdw:ELC[a[0]].vdw*.25)*sc*pr[i].f;
+    pill(q>0?'δ+':(Math.abs(q)>1.5*m.dEN?'2δ−':'δ−'),pr[i].x+r*.75,pr[i].y-r*.75-8,{s:12,c:q>0?C.cation:C.anion,bd:q>0?C.cation:C.anion});
+    if(q>0&&m.atoms.length>2&&m.q.filter(v=>v>0).length===1&&Math.abs(q)>1.5*m.dEN){}});}
+  if(S.opt.covQ&&S.level==='II')m.atoms.forEach((a,i)=>{const r=(fill?ELC[a[0]].vdw:ELC[a[0]].vdw*.25)*sc*pr[i].f;txt('EN '+fmt(EN[a[0]],2),pr[i].x,pr[i].y+r+11,{s:10.5,f:FM,c:C['ink-2']});});
+  if(S.opt.covCen&&m.cPos&&m.cNeg){const P=proj(m.cPos,sc,cx,cy),N=proj(m.cNeg,sc,cx,cy);
+    const mark=(Q,s,col)=>{ctx.save();ctx.fillStyle=C.surface;ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.arc(Q.x,Q.y,9,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();txt(s,Q.x,Q.y+.5,{s:14,w:700,c:col});};
+    if(m.dipole){line(P.x,P.y,N.x,N.y,C.note,1.5,[3,3]);mark(P,'+',C.cation);mark(N,'−',C.anion);pill('Ladungsschwerpunkte fallen nicht zusammen: Dipolmolekül',W/2,H-18,{s:11.5,bd:C.note,c:C.note});}
+    else{mark(P,'±',C.ink);pill('Ladungsschwerpunkte fallen zusammen: kein Dipolmolekül',W/2,H-18,{s:11.5});}}
+  else if(S.opt.covQ&&m.dEN<0.4&&m.dEN>0)pill(`ΔEN(C–H) = ${fmt(m.dEN,2)}: Bindungen gelten als weitgehend unpolar`,W/2,H-18,{s:11.5});
+  // Bindungswinkel
+  if(m.atoms.length>2){const c=pr[0],a=pr[1],b=pr[2];const a1=Math.atan2(a.y-c.y,a.x-c.x),a2=Math.atan2(b.y-c.y,b.x-c.x);let d=a2-a1;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;
+    ctx.save();ctx.strokeStyle=C.accent;ctx.lineWidth=1.6;ctx.beginPath();ctx.arc(c.x,c.y,30,a1,a1+d,d<0);ctx.stroke();ctx.restore();const am=a1+d/2;pill(m.angle,c.x+Math.cos(am)*50,c.y+Math.sin(am)*50,{s:11.5,c:C.accent,bd:C.accent});
+    if(m.angle!=='180°')txt('Winkel in der Projektion verzerrt; Wert gilt räumlich',W-10,H-40,{s:10.5,a:'right',c:C['ink-3']});}
+  txt('Ziehen zum Drehen',W-10,16,{s:11,a:'right',c:C['ink-3']});
+  if(S.opt.rotate&&!drag)S.rot.yaw+=.008;
+}
+
+function morse(d,r){return d.De*Math.pow(1-Math.exp(-d.a*(r-d.re)),2)-d.De;}
+function covEnergy(){
+  const m=MOL[S.ex.cov],d=m.dia;if(!d){txt('Nur für zweiatomige Moleküle',W/2,H/2,{s:14});return;}
+  const rmin=d.re*.55,rmax=d.re+5/d.a;
+  if(S.opt.covR==null||S.opt.covR<rmin||S.opt.covR>rmax)S.opt.covR=rmax*.85;
+  if(S.opt.covPlay){S.opt.covPlayT+=1/60;const tt=S.opt.covPlayT;const r0=rmax*.95;S.opt.covR=d.re+(r0-d.re)*Math.exp(-tt*1.1)*Math.cos(tt*(tt<2.6?0:3.2)*0+0)+(tt>2.6?Math.sin((tt-2.6)*6)*d.re*.07*Math.exp(-(tt-2.6)*.25):0);if(tt>9){S.opt.covPlay=false;syncCovSlider();}else syncCovSlider();}
+  const r=S.opt.covR;
+  // oben: Atome
+  const topH=H*.3,el1=m.atoms[0][0],el2=m.atoms[1][0];const cloud1=ELC[el1].cov*1.7,cloud2=ELC[el2].cov*1.7;
+  const k=Math.min((W-40)/(rmax+cloud1+cloud2),topH*.95/(2*Math.max(cloud1,cloud2)));
+  const mid=W/2,y0=topH*.55;const x1=mid-r*k/2,x2=mid+r*k/2;
+  [[x1,cloud1,el1],[x2,cloud2,el2]].forEach(([x,cr,el])=>{const g=ctx.createRadialGradient(x,y0,0,x,y0,cr*k);g.addColorStop(0,rgba(C.electron,.55));g.addColorStop(1,rgba(C.electron,0));ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y0,cr*k,0,Math.PI*2);ctx.fill();dot(x,y0,4,C.ink);txt(el,x,y0-14,{s:13,w:700,f:FD});});
+  line(x1,y0+cloud1*k*.5+8,x2,y0+cloud1*k*.5+8,C['ink-3'],1);txt(`r = ${fmt(r,0)} pm`,mid,y0+cloud1*k*.5+20,{s:11.5,f:FM,c:C['ink-2']});
+  // Diagramm
+  const L=58,R=W-16,T=topH+14,B=H-34;const eTop=d.De*.9,eBot=-d.De*1.12;
+  const X=v=>L+(v-rmin)/(rmax-rmin)*(R-L),Y=E=>T+(eTop-E)/(eTop-eBot)*(B-T);
+  line(L,T,L,B,C['ink-3'],1);line(L,Y(0),R,Y(0),C['ink-3'],1);
+  txt('E in kJ/mol',L+4,T-2,{s:10.5,a:'left',c:C['ink-2'],b:'bottom'});txt('Kernabstand r in pm',R,B+20,{s:10.5,a:'right',c:C['ink-2']});
+  const st=d.De>700?200:100;for(let e=Math.ceil(eBot/st)*st;e<=eTop;e+=st){line(L-4,Y(e),L,Y(e),C['ink-3'],1);txt(String(e).replace('-','−'),L-7,Y(e),{s:10,f:FM,a:'right',c:C['ink-2']});}
+  const rs=rmax-rmin>300?100:50;for(let v=Math.ceil(rmin/rs)*rs;v<=rmax;v+=rs){line(X(v),B,X(v),B+4,C['ink-3'],1);txt(String(v),X(v),B+11,{s:10,f:FM,c:C['ink-2']});}
+  ctx.save();ctx.beginPath();ctx.rect(L,T,R-L,B-T);ctx.clip();ctx.strokeStyle=C.accent;ctx.lineWidth=2.5;ctx.beginPath();for(let i=0;i<=240;i++){const v=rmin+(rmax-rmin)*i/240;const y=Y(morse(d,v));i?ctx.lineTo(X(v),y):ctx.moveTo(X(v),y);}ctx.stroke();ctx.restore();
+  line(X(d.re),Y(-d.De),X(d.re),B,C['ink-3'],1,[3,3]);txt(S.level==='II'?`rₑ = ${fmt(d.re,1)} pm`:`Bindungslänge ${fmt(d.re,0)} pm`,X(d.re)+4,B-8,{s:10.5,a:'left',f:FM,c:C['ink-2']});
+  if(S.level==='II'){line(X(d.re)-30,Y(-d.D0),X(d.re)+60,Y(-d.D0),C.note,1.5,[4,3]);txt('v = 0',X(d.re)+64,Y(-d.D0),{s:10,a:'left',f:FM,c:C.note});
+    const xa=X(rmax)-30;arrow(xa,Y(0),xa,Y(-d.De),C.bad,1.6,7);txt(`Dₑ = ${fmt(d.De,0)}`,xa-6,Y(-d.De/2),{s:10.5,f:FM,a:'right',c:C.bad});
+    const xb=X(rmax)-90;arrow(xb,Y(0),xb,Y(-d.D0),C.note,1.6,7);txt(`D₀ = ${fmt(d.D0,0)}`,xb-6,Y(-d.D0/2),{s:10.5,f:FM,a:'right',c:C.note});}
+  else{txt('Abstoßung überwiegt',X(rmin+(d.re-rmin)*.45),Y(eTop*.55),{s:11,c:C.bad,rot:-1.2});txt('Anziehung überwiegt',X(d.re+(rmax-d.re)*.35),Y(-d.De*.35),{s:11,c:C.cation});}
+  const E=morse(d,r);dot(X(r),Y(clamp(E,eBot,eTop)),6,C.electron);ring(X(r),Y(clamp(E,eBot,eTop)),6,C.ink,1.2);
+  {const right=X(r)>(L+R)/2;pill(`E = ${sgn(E,0)} kJ/mol`,X(r)+(right?-12:12),clamp(Y(clamp(E,eBot,eTop))-20,T+10,B-10),{s:11.5,a:right?'right':'left',f:FM});}
+}
+
+/* ================= Metallbindung ================= */
+const MET={dirty:true,key:'',cores:[],els:[],s:40,box:null,I:0,T:20,volt:false,bound:true};
+function ensureMet(){if(MET.dirty||!MET.box||MET.key!==S.ex.met)metInit();}
+function metInit(){
+  const ex=METALS[S.ex.met];MET.key=S.ex.met;MET.dirty=false;
+  const s=clamp(Math.min(W,H)/7.4,30,64);MET.s=s;
+  const cols=Math.max(4,Math.floor((W-80)/s)),hex=ex.grid==='hex',rowH=hex?s*.866:s;const rows=Math.max(3,Math.floor((H*.66)/rowH));
+  const width=cols*s,x0=(W-width)/2,y0=H*.15;MET.box={x0,x1:x0+width,y0:y0-rowH*.45,y1:y0+(rows-1)*rowH+rowH*.45,rows,cols,rowH};
+  MET.cores=[];for(let j=0;j<rows;j++)for(let i=0;i<cols;i++)MET.cores.push({bx:x0+(i+.5)*s+(hex&&j%2?s/2:0),by:y0+j*rowH,row:j,ph:[Math.random()*6.28,Math.random()*6.28],f:[5+Math.random()*3,5+Math.random()*3]});
+  MET.els=[];MET.cores.forEach((c,ci)=>{for(let n=0;n<ex.ve;n++)MET.els.push({ci,n,x:c.bx,y:c.by,vx:0,vy:0,free:false});});
+  MET.bound=S.step===0;if(!MET.bound)metRelease(true);
+}
+function corePos(c,t){const tk=MET.T+273.15,A=MET.s*.055*Math.sqrt(tk/293.15)*(MET.bound?.6:1);const sh=(c.row<MET.box.rows/2)?MET.shift:0;let x=c.bx+sh;const w=MET.box.x1-MET.box.x0;if(x>MET.box.x1)x-=w;return{x:x+A*Math.sin(c.f[0]*t+c.ph[0]),y:c.by+A*Math.sin(c.f[1]*t+c.ph[1])};}
+function metRelease(instant){ensureMet();const ex=METALS[S.ex.met],v0=MET.s*2.2;MET.bound=false;MET.els.forEach(e=>{const c=corePos(MET.cores[e.ci],S.time);const a=S.time*2+e.n*2*Math.PI/ex.ve+e.ci;const r=MET.s*.3;e.x=c.x+r*Math.cos(a);e.y=c.y+r*Math.sin(a);if(instant){e.x=MET.box.x0+Math.random()*(MET.box.x1-MET.box.x0);e.y=MET.box.y0+Math.random()*(MET.box.y1-MET.box.y0);}const th=Math.random()*6.283;e.vx=v0*Math.cos(th);e.vy=v0*Math.sin(th);e.free=true;});}
+MET.shift=0;
+function gammaOf(T){return 1.6*(0.1+0.9*(T+273.15)/293.15);}
+function metUpdate(dt){
+  ensureMet();const ex=METALS[S.ex.met],b=MET.box,v0=MET.s*2.2,w=b.x1-b.x0;
+  const target=S.deform.on?MET.s:0;MET.shift+=(target-MET.shift)*Math.min(1,dt*2.2);
+  if(MET.bound)return;
+  const g=gammaOf(MET.T),aD=MET.volt?MET.s*1.6:0;let sum=0;
+  for(const e of MET.els){e.vx+=aD*dt;if(Math.random()<g*dt){const th=Math.random()*6.283;e.vx=v0*Math.cos(th);e.vy=v0*Math.sin(th);}
+    e.x+=e.vx*dt;e.y+=e.vy*dt;if(e.x>b.x1)e.x-=w;if(e.x<b.x0)e.x+=w;if(e.y<b.y0){e.y=2*b.y0-e.y;e.vy=Math.abs(e.vy);}if(e.y>b.y1){e.y=2*b.y1-e.y;e.vy=-Math.abs(e.vy);}sum+=e.vx;}
+  const mean=sum/MET.els.length,ref=MET.s*1.6/gammaOf(20);MET.I+=(mean/ref*100-MET.I)*Math.min(1,dt*1.5);
+}
+function metDraw(){
+  const ex=METALS[S.ex.met];ensureMet();const b=MET.box,t=S.time;
+  ctx.save();ctx.fillStyle=rgba(C.electron,MET.bound?.03:.08);ctx.strokeStyle=C.line;ctx.beginPath();ctx.roundRect(b.x0,b.y0,b.x1-b.x0,b.y1-b.y0,8);ctx.fill();ctx.stroke();ctx.clip();
+  const rC=Math.max(5,ex.rIon/(2*ex.rMet)*MET.s*1.25);
+  const cp=MET.cores.map(c=>corePos(c,t));
+  const chg=ex.ve===1?'+':ex.ve+'+';
+  cp.forEach(p=>{ball(p.x,p.y,rC,C.cation);txt(chg,p.x,p.y+.5,{s:Math.max(9,rC*.85),w:700,c:'#ffffff'});
+    if(MET.bound)ring(p.x,p.y,MET.s*.3,C['ink-3'],1,[2,3],.6);});
+  for(const e of MET.els){let x=e.x,y=e.y;if(MET.bound){const p=cp[e.ci];const a=t*2+e.n*2*Math.PI/ex.ve+e.ci;x=p.x+MET.s*.3*Math.cos(a);y=p.y+MET.s*.3*Math.sin(a);}dot(x,y,2.7,C.electron);}
+  ctx.restore();
+  if(MET.volt&&!MET.bound){const yb=(b.y0+b.y1)/2;ctx.fillStyle=C.ink;ctx.fillRect(b.x0-12,b.y0,6,b.y1-b.y0);ctx.fillRect(b.x1+6,b.y0,6,b.y1-b.y0);txt('−',b.x0-24,yb,{s:22,w:700});txt('+',b.x1+24,yb,{s:22,w:700});
+    arrow(W/2-60,b.y1+18,W/2+60,b.y1+18,C.electron,2.4,9);txt('Bewegungsrichtung der Elektronen',W/2,b.y1+32,{s:11.5,c:C['ink-2']});
+    if(S.level==='II'){arrow(W/2+60,b.y1+48,W/2-60,b.y1+48,C['ink-3'],1.6,8);txt('technische Stromrichtung',W/2,b.y1+62,{s:11,c:C['ink-3']});}}
+  if(!MET.bound){pill(`T = ${MET.T} °C`,10,16,{s:11.5,a:'left',f:FM});pill(MET.volt?`Strom (relativ): ${Math.max(0,Math.round(MET.I))} %`:'keine Spannung',W-10,16,{s:11.5,a:'right',f:FM,bd:MET.volt?C.accent:C.line});}
+  if(S.deform.on&&MET.shift>MET.s*.5)pill('Schichten gleiten; jedes Rumpf-Ion bleibt vom Elektronengas umgeben',W/2,b.y0-14<20?H-14:b.y0-14,{s:11.5,bd:C.ok,c:C.ok});
+  if(MET.bound)pill(`${ex.el}-Atome: je ${ex.ve} Valenzelektron${ex.ve>1?'en':''} am Atom`,W/2,H-16,{s:11.5});
+}
+function metBand(){
+  const ex=METALS[S.ex.met],T=26,B=H-34,Ey=e=>B-(B-T)*e,xa=W*.16,xf=W*.42,cw=Math.min(90,W*.18);
+  line(28,T,28,B,C['ink-3'],1);arrow(28,B,28,T-4,C['ink-3'],1.2,7);txt('Energie',34,T-6,{s:11,a:'left',c:C['ink-2']});
+  txt('Atom',xa,B+16,{s:12,w:700,f:FD});txt('Festkörper',xf+cw*.95,B+16,{s:12,w:700,f:FD});
+  ex.bands.forEach((bd,i)=>{const x=xf+i*(cw*.95);line(xa-26,Ey(bd.E),xa+26,Ey(bd.E),C.ink,2);txt(bd.n,xa-32,Ey(bd.E),{s:12,a:'right',f:FM});
+    line(xa+26,Ey(bd.E),x,Ey(bd.lo),C['ink-3'],.8,[2,3]);line(xa+26,Ey(bd.E),x,Ey(bd.hi),C['ink-3'],.8,[2,3]);
+    ctx.save();ctx.strokeStyle=C.ink;ctx.fillStyle=rgba(C.ink,.04);ctx.lineWidth=1.4;ctx.beginPath();ctx.rect(x,Ey(bd.hi),cw*.85,Ey(bd.lo)-Ey(bd.hi));ctx.fill();ctx.stroke();
+    const top=Math.min(ex.EF,bd.hi);if(top>bd.lo){ctx.fillStyle=rgba(C.electron,.6);ctx.fillRect(x,Ey(top),cw*.85,Ey(bd.lo)-Ey(top));}ctx.restore();
+    txt(bd.n+'-Band',x+cw*.42,Ey(bd.hi)-9,{s:11,f:FM});});
+  const xe=xf+ex.bands.length*cw*.95+6;line(xf-8,Ey(ex.EF),xe,Ey(ex.EF),C.bad,1.6,[6,4]);txt('E_F',xe+4,Ey(ex.EF),{s:11.5,a:'left',f:FM,c:C.bad,w:700});
+  const nx=Math.min(W-12,xe+44);
+  txt('qualitativ, nicht maßstäblich',W-10,T-8,{s:10.5,a:'right',c:C['ink-3']});
+  ctx.save();ctx.font=`400 12px ${FB}`;ctx.fillStyle=C['ink-2'];ctx.textAlign='left';const words=ex.bandNote.split(' ');let lineS='',y=T+30;const maxW=W-nx-10;if(maxW>90){for(const w of words){const tst=lineS?lineS+' '+w:w;if(ctx.measureText(tst).width>maxW){ctx.fillText(lineS,nx,y);y+=16;lineS=w;}else lineS=tst;}ctx.fillText(lineS,nx,y);}ctx.restore();
+  if(W-nx-10<=90)pill(ex.bandNote,W/2,H-12,{s:10.5,w:400});
+}
+
+/* ================= Vergleich ================= */
+const TRI={cache:null,hit:[]};
+function cmpDraw(){
+  const L=52,R=W-18,T=26,B=H-40;const xMin=.6,xMax=4.15,yMax=3.4;
+  const sx=(R-L)/(xMax-xMin),sy=(B-T)/yMax;const X=v=>L+(v-xMin)*sx,Y=v=>B-v*sy;
+  const vM=[.79,0],vC=[3.98,0],vI=[2.385,3.19];
+  if(!TRI.cache){const oc=document.createElement('canvas');oc.width=Math.ceil(W);oc.height=Math.ceil(H);const o=oc.getContext('2d');const img=o.createImageData(oc.width,oc.height);
+    const cM=hexRgb(C['zone-met']),cC=hexRgb(C['zone-cov']),cI=hexRgb(C['zone-ion']);
+    const det=(vC[1]-vI[1])*(vM[0]-vI[0])+(vI[0]-vC[0])*(vM[1]-vI[1]);
+    for(let py=0;py<oc.height;py+=2)for(let px=0;px<oc.width;px+=2){const x=xMin+(px-L)/sx,y=(B-py)/sy;const l1=((vC[1]-vI[1])*(x-vI[0])+(vI[0]-vC[0])*(y-vI[1]))/det,l2=((vI[1]-vM[1])*(x-vI[0])+(vM[0]-vI[0])*(y-vI[1]))/det,l3=1-l1-l2;
+      if(l1<-.001||l2<-.001||l3<-.001)continue;for(let dy=0;dy<2;dy++)for(let dx=0;dx<2;dx++){const ix=((py+dy)*oc.width+(px+dx))*4;if(ix>=img.data.length)continue;img.data[ix]=cM[0]*l1+cC[0]*l2+cI[0]*l3;img.data[ix+1]=cM[1]*l1+cC[1]*l2+cI[1]*l3;img.data[ix+2]=cM[2]*l1+cC[2]*l2+cI[2]*l3;img.data[ix+3]=95;}}
+    o.putImageData(img,0,0);TRI.cache=oc;}
+  ctx.drawImage(TRI.cache,0,0,W,H);
+  ctx.save();ctx.strokeStyle=C['ink-3'];ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(X(vM[0]),Y(0));ctx.lineTo(X(vI[0]),Y(vI[1]));ctx.lineTo(X(vC[0]),Y(0));ctx.closePath();ctx.stroke();ctx.restore();
+  line(L,B,X(xMax),B,C['ink-3'],1);line(L,B,L,Y(yMax),C['ink-3'],1);
+  for(let v=1;v<=4;v++){line(X(v),B,X(v),B+4,C['ink-3'],1);txt(String(v),X(v),B+12,{s:10.5,f:FM,c:C['ink-2']});}
+  for(let v=1;v<=3;v++){line(L-4,Y(v),L,Y(v),C['ink-3'],1);txt(String(v),L-8,Y(v),{s:10.5,f:FM,c:C['ink-2'],a:'right'});}
+  txt(S.level==='II'?'mittlere Elektronegativität (EN_A + EN_B)/2':'mittlere Elektronegativität',X(xMax),B+28,{s:11,a:'right',c:C['ink-2']});
+  txt(S.level==='II'?'ΔEN = |EN_A − EN_B|':'Elektronegativitätsdifferenz ΔEN',12,T-12,{s:11,a:'left',c:C['ink-2']});
+  txt('Ionenbindung',X(vI[0]),Y(vI[1])-12,{s:13,w:700,f:FD});txt('Metall-',X(1.0),Y(1.05),{s:12,w:700,f:FD,a:'right'});txt('bindung',X(1.0),Y(1.05)+15,{s:12,w:700,f:FD,a:'right'});txt('Elektronenpaar-',R,Y(1.05),{s:12,w:700,f:FD,a:'right'});txt('bindung',R,Y(1.05)+15,{s:12,w:700,f:FD,a:'right'});
+  TRI.hit=[];
+  for(const p of CMP_POINTS){if(p.border&&!S.opt.cmpBorder&&p.g==='bor')continue;const x=X(p.x),y=Y(p.y);const col=p.g==='ion'?C.anion:p.g==='met'?C.cation:p.g==='cov'?C.accent:C.note;const sel=S.opt.cmpSel===p.f;
+    if(p.g==='bor'){ctx.save();ctx.strokeStyle=col;ctx.lineWidth=2.2;ctx.beginPath();ctx.rect(x-5,y-5,10,10);ctx.stroke();ctx.restore();}else dot(x,y,sel?7:5,col);if(sel)ring(x,y,11,C.ink,2);
+    if(!(p.y===0&&p.g==='cov'&&['N₂','Cl₂'].includes(p.f)&&W<420&&false))if(p.y===0)txt(p.f,x,y-9,{s:10.5,w:700,f:FM,c:C.ink,a:'left',rot:-Math.PI/2});else txt(p.f,x+(p.dx||0),y+(p.dy||-12),{s:11.5,w:700,f:FM,c:C.ink});
+    TRI.hit.push({p,x,y});}
+  txt('Antippen eines Punktes zeigt Details',W-10,14,{s:11,a:'right',c:C['ink-3']});
+}
+function canvasClick(e){if(S.tab!=='cmp')return;const r=cv.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;let best=null,bd=22;for(const h of TRI.hit){const d=Math.hypot(h.x-x,h.y-y);if(d<bd){bd=d;best=h.p;}}if(best){S.opt.cmpSel=best.f;renderCaption();renderFacts();}}
+
+/* ================= Hauptschleife ================= */
+let last=performance.now();
+function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;S.stepT+=dt;S.time+=dt;if(S.deform.on)S.deform.t+=dt;
+  if(S.playing){const n=stepCount();if(S.stepT>stepDur()){if(S.step<n-1)setStep(S.step+1,true);else{S.playing=false;renderControls();}}}
+  try{draw(dt);}catch(err){console.error(err);}
+  requestAnimationFrame(frame);}
+function stepDur(){if(S.tab==='ion'&&S.view.ion==='transfer')return[2.2,3.4,2.6,2.6,3][S.step]||2.5;if(S.tab==='cov')return[2,2.6,2.6,2,4][S.step]||2.5;if(S.tab==='ion'&&S.view.ion==='energy')return 1.4;return 3;}
+function draw(dt){ctx.clearRect(0,0,W,H);const v=S.view[S.tab];
+  if(S.tab==='ion'){if(v==='transfer')ionTransfer();else if(v==='lattice')ionLattice();else if(v==='deform')ionDeform();else ionEnergy();}
+  else if(S.tab==='cov'){if(v==='lewis')covLewis();else if(v==='space')covSpace();else covEnergy();}
+  else if(S.tab==='met'){if(v==='gas'){metUpdate(dt);metDraw();}else metBand();}
+  else cmpDraw();}
+
+/* ================= Texte ================= */
+const EXPLAIN={
+ion:{I:`<h3>Ionenbindung</h3>
+<p>Ein <b>Metall</b> reagiert mit einem <b>Nichtmetall</b>. Im Modell werden dabei Elektronen vom Metallatom auf das Nichtmetallatom übertragen.</p>
+<p>So entstehen <b>Ionen</b>. Aus dem Metallatom wird ein positiv geladenes <b>Kation</b>. Aus dem Nichtmetallatom wird ein negativ geladenes <b>Anion</b>. Beide Ionen haben danach eine voll besetzte Außenschale wie ein Edelgas-Atom.</p>
+<p>Kationen und Anionen ziehen sich <b>elektrostatisch</b> an. Diese Anziehung wirkt in alle Richtungen. Darum ordnen sich sehr viele Ionen zu einem <b>Ionengitter</b> an. Es gibt keine einzelnen „NaCl-Moleküle“. Die Formel NaCl ist eine <b>Verhältnisformel</b>: Auf ein Na⁺-Ion kommt ein Cl⁻-Ion.</p>
+<p class="merke"><b>Merke:</b> Die Ionenbindung ist die elektrostatische Anziehung zwischen entgegengesetzt geladenen Ionen in einem Ionengitter.</p>
+<h4>So arbeitest du</h4><ol><li>Wähle oben ein Beispiel.</li><li>Gehe in der Ansicht „Elektronenübergang“ Schritt für Schritt vor.</li><li>Sieh dir danach „Ionengitter“ und „Verformung“ an.</li><li>Bearbeite die Arbeitsaufträge unten.</li></ol>`,
+II:`<h3>Ionenbindung: Coulomb-Wechselwirkung im Gitter</h3>
+<p>Die Ionenbindung beruht auf der ungerichteten Coulomb-Wechselwirkung zwischen Kationen und Anionen. Für zwei Punktladungen gilt <span class="formula">E = z₊·z₋·e² / (4π·ε₀·r)</span> Im Gitter erfasst die <b>Madelung-Konstante</b> A die Summe aller Anziehungs- und Abstoßungsterme (NaCl-Typ: A = 1,748).</p>
+<p>Die Bildung isolierter Ionen aus Atomen ist für alle Beispiele <b>endotherm</b>: Die Ionisierungsenergie übersteigt den Betrag der Elektronenaffinität (NaCl: +496 − 349 ≈ +147 kJ/mol). Triebkraft der Salzbildung ist die stark exotherme <b>Gitterbildung</b>. Die Edelgaskonfiguration beschreibt das Ergebnis, sie ist keine energetische Ursache.</p>
+<p>Die Gitterenthalpie ist nicht direkt messbar. Sie wird über den <b>Born-Haber-Kreisprozess</b> (Satz von Hess) bestimmt oder nach Born-Landé berechnet:</p>
+<p class="formula">U = −N_A·A·|z₊·z₋|·e² / (4π·ε₀·r₀) · (1 − 1/n)</p>
+<p>Der Betrag der Gitterenergie steigt mit den Ionenladungen und sinkt mit dem Ionenabstand r₀ = r₊ + r₋. Dies korreliert mit Schmelztemperatur und Härte. Abweichungen zwischen Born-Haber- und Born-Landé-Werten zeigen die Grenzen des Punktladungsmodells (Polarisierbarkeit, kovalente Anteile, Dispersion).</p>`},
+cov:{I:`<h3>Elektronenpaarbindung</h3>
+<p>Zwischen <b>Nichtmetallatomen</b> bildet sich meist eine Elektronenpaarbindung (auch: Atombindung oder kovalente Bindung).</p>
+<p>Zwei Atome nähern sich an. Jedes Atom bringt ein ungepaartes Valenzelektron (Außenelektron) ein. Daraus wird ein <b>gemeinsames, bindendes Elektronenpaar</b>. Beide Atomkerne werden von diesem Elektronenpaar angezogen. So halten die Atome zusammen. Es entsteht ein <b>Molekül</b>.</p>
+<p>Elektronenpaare, die nur zu einem Atom gehören, heißen <b>freie (nichtbindende) Elektronenpaare</b>. In der <b>Valenzstrichformel</b> steht für jedes Elektronenpaar ein Strich.</p>
+<p>Zählt man alle Elektronen um ein Atom (bindende und freie Paare), sind es oft 8, beim Wasserstoff 2. Das entspricht der Elektronenzahl auf der Außenschale eines Edelgas-Atoms (<b>Edelgasregel</b>, Oktettregel).</p>
+<p>Atome verschiedener Elemente ziehen das bindende Elektronenpaar unterschiedlich stark an. Das Maß dafür ist die <b>Elektronegativität (EN)</b>. Ist die Differenz groß genug, ist die Bindung <b>polar</b>: Es entstehen Teilladungen δ+ und δ−.</p>
+<p class="merke"><b>Merke:</b> Bei der Elektronenpaarbindung halten zwei Atome durch ein oder mehrere gemeinsame Elektronenpaare zusammen.</p>`,
+II:`<h3>Kovalente Bindung: Überlappung, Energie, Geometrie</h3>
+<p>Nähern sich zwei Atome, überlappen ihre Atomorbitale. Die Elektronendichte zwischen den Kernen nimmt zu; die Anziehung beider Kerne zu diesem Bereich senkt die Energie. Bei kleinem Abstand dominiert die Abstoßung der Kerne (und der inneren Elektronen). Das Minimum der Potenzialkurve bestimmt die Bindungslänge rₑ; die Muldentiefe ist die Dissoziationsenergie Dₑ.</p>
+<p class="formula">E(r) = Dₑ·(1 − e^(−a(r − rₑ)))² − Dₑ   (Morse-Näherung)</p>
+<p>Messbar ist D₀ = Dₑ − Nullpunktsenergie, da das Molekül auch im Grundzustand schwingt (v = 0). Tabellierte Bindungsenthalpien beziehen sich meist auf 298 K.</p>
+<p>Die Molekülgeometrie folgt näherungsweise dem <b>Elektronenpaarabstoßungsmodell (VSEPR)</b>: Elektronendomänen ordnen sich mit maximalem Abstand an; freie Elektronenpaare beanspruchen mehr Raum als bindende (CH₄ 109,5° &gt; NH₃ 106,7° &gt; H₂O 104,5°).</p>
+<p>Die Polarität einer Bindung folgt aus ΔEN; ob ein <b>Dipolmolekül</b> vorliegt, entscheidet die Vektorsumme der Bindungsdipole bzw. die Lage der Ladungsschwerpunkte. Die Grenzen der Lewis-Darstellung zeigt O₂: Die Formel enthält nur gepaarte Elektronen, O₂ ist jedoch paramagnetisch – erst das MO-Modell erklärt zwei ungepaarte Elektronen in π*-Orbitalen.</p>`},
+met:{I:`<h3>Metallbindung</h3>
+<p>Metalle bestehen aus Metallatomen. Im <b>Elektronengasmodell</b> denkt man sich jedes Metallatom in zwei Teile zerlegt:</p>
+<ul><li>den <b>Atomrumpf</b> (Atomkern und innere Elektronen), er ist positiv geladen,</li><li>die <b>Valenzelektronen</b> (Außenelektronen).</li></ul>
+<p>Die Atomrümpfe sind regelmäßig im <b>Metallgitter</b> angeordnet. Die Valenzelektronen gehören nicht zu einem bestimmten Atom. Sie sind zwischen den Atomrümpfen frei beweglich. Man nennt sie <b>Elektronengas</b>.</p>
+<p>Die positiven Atomrümpfe und das negative Elektronengas ziehen sich elektrostatisch an. Das hält das Metall zusammen.</p>
+<p>Mit diesem Modell kann man Eigenschaften erklären: Metalle <b>leiten elektrischen Strom</b> und sind <b>verformbar</b>.</p>
+<p class="merke"><b>Merke:</b> Die Metallbindung ist die Anziehung zwischen positiv geladenen Atomrümpfen und frei beweglichen Valenzelektronen (Elektronengas).</p>`,
+II:`<h3>Metallbindung: Delokalisierung und Bänder</h3>
+<p>Im Elektronengasmodell sind die Valenzelektronen über das gesamte Gitter delokalisiert; die Bindung ist ungerichtet. Das erklärt Leitfähigkeit, Duktilität, Glanz und Wärmeleitung qualitativ.</p>
+<p>Leitfähigkeit nach dem Drude-Ansatz: σ = n·e²·τ / mₑ. Mit steigender Temperatur nehmen die Gitterschwingungen (Phononen) zu, die mittlere Stoßzeit τ sinkt, der Widerstand steigt (näherungsweise linear oberhalb der Debye-Temperatur). Die Driftgeschwindigkeit ist sehr klein (Größenordnung 0,1 mm/s), die Elektronen bewegen sich jedoch mit der Fermi-Geschwindigkeit von etwa 10⁶ m/s ungeordnet.</p>
+<p>Im <b>Bändermodell</b> spalten die Atomorbitale von N Atomen in N dicht liegende Energieniveaus auf. Metalle besitzen ein teilweise besetztes Band oder überlappende Bänder; am Fermi-Niveau E_F stehen freie Zustände zur Verfügung. Mg (3s²) leitet nur, weil 3s- und 3p-Band überlappen.</p>
+<p>Bindungsstärke (Atomisierungsenthalpie) und Schmelztemperatur hängen von Zahl der Valenzelektronen, Rumpfladung, Radius und Gittertyp ab; bei Übergangsmetallen tragen d-Elektronen wesentlich bei.</p>`},
+cmp:{I:`<h3>Welche Bindung liegt vor?</h3>
+<p>Eine erste Faustregel nutzt die Stellung der Elemente im Periodensystem:</p>
+<ul><li><b>Metall + Nichtmetall</b> → Ionenbindung (z. B. NaCl)</li><li><b>Nichtmetall + Nichtmetall</b> → Elektronenpaarbindung (z. B. H₂O)</li><li><b>Metall + Metall</b> → Metallbindung (z. B. Kupfer, Messing)</li></ul>
+<p>Genauer ist der Blick auf die <b>Elektronegativität</b>. Je größer die Differenz ΔEN, desto stärker ist die Bindung polar bis ionisch. Sind beide Elektronegativitäten klein, liegt eine Metallbindung vor.</p>
+<p>Das Diagramm zeigt: Die Übergänge sind <b>fließend</b>. Es gibt keine scharfen Grenzen zwischen den Bindungsarten.</p>`,
+II:`<h3>Bindungsdreieck nach van Arkel und Ketelaar</h3>
+<p>Trägt man ΔEN gegen die mittlere Elektronegativität auf, liegen alle binären Stoffe in einem Dreieck mit den Eckpunkten Cs (metallisch), F₂ (kovalent) und CsF (ionisch). Die Lage beschreibt die Anteile der drei Grenztypen; die Farbübergänge sollen die fließenden Grenzen andeuten.</p>
+<p>Das Diagramm ist eine Heuristik mit zwei Parametern. Es berücksichtigt weder Stöchiometrie noch Struktur, Ionengröße oder Polarisierbarkeit. Cu und Si besitzen dieselbe Pauling-EN (1,90) und liegen am selben Punkt, obwohl Cu ein Metall und Si ein kovalent gebundener Halbleiter ist. Erweiterte Modelle (z. B. Bindungstetraeder nach Allen) nutzen daher weitere Größen.</p>
+<p>Die häufig genannte Grenze ΔEN ≈ 1,7 für „ionisch“ ist eine Konvention (Paulings Abschätzung von 50 % Ionencharakter), kein Naturgesetz.</p>`}
+};
+
+const WORDS={
+  ion:[['das','Ion','die Ionen'],['das','Kation','die Kationen'],['das','Anion','die Anionen'],['das','Elektron','die Elektronen'],['die','Ladung','die Ladungen'],['die','Anziehung','—'],['das','Ionengitter','die Ionengitter'],['die','Verhältnisformel','die Verhältnisformeln'],['die','Außenschale','die Außenschalen'],['der','Atomkern','die Atomkerne'],['x','übertragen','Verb: wird übertragen'],['x','spröde','Adjektiv: zerbricht leicht']],
+  cov:[['die','Elektronenpaarbindung','die Elektronenpaarbindungen'],['das','Elektronenpaar','die Elektronenpaare'],['x','bindend / frei','Adjektive'],['das','Molekül','die Moleküle'],['die','Valenzstrichformel','die Valenzstrichformeln'],['das','Valenzelektron','die Valenzelektronen'],['die','Elektronegativität','—'],['x','polar / unpolar','Adjektive'],['die','Teilladung','die Teilladungen'],['der','Dipol','die Dipole'],['der','Bindungswinkel','die Bindungswinkel'],['die','Edelgasregel','—']],
+  met:[['der','Atomrumpf','die Atomrümpfe'],['das','Valenzelektron','die Valenzelektronen'],['das','Elektronengas','—'],['das','Metallgitter','die Metallgitter'],['die','Leitfähigkeit','—'],['die','Spannung','die Spannungen'],['der','Pluspol','die Pluspole'],['der','Minuspol','die Minuspole'],['x','frei beweglich','Adjektiv'],['x','verformbar','Adjektiv'],['x','leiten','Verb: Metalle leiten Strom'],['x','schwingen','Verb: die Rümpfe schwingen']],
+  cmp:[['die','Eigenschaft','die Eigenschaften'],['die','Schmelztemperatur','die Schmelztemperaturen'],['der','Feststoff','die Feststoffe'],['die','Schmelze','die Schmelzen'],['die','Elektronegativität','—'],['die','Differenz','die Differenzen'],['x','leiten','Verb'],['x','fließend','Adjektiv: ohne scharfe Grenze']]
+};
+
+const CAPTIONS={
+  ionTransfer(ex){const c=ex.cat,a=ex.an,n=ex.nAn,k=c.q,II=S.level==='II';return[
+    `<b>Schritt 1 · Atome:</b> ${c.name}-Atom (${c.shells.join('·')}) und ${n===2?'zwei ':''}${a.name}-Atom${n===2?'e':''} (${a.shells.join('·')}) im Schalenmodell. Farbig: Außenelektronen. Leere Kreise markieren freie Plätze auf der Außenschale.`,
+    `<b>Schritt 2 · Elektronenübergang:</b> ${k===1?'Das Außenelektron':'Die beiden Außenelektronen'} des ${c.name}-Atoms ${k===1?'wird':'werden'} auf ${n===2?'die zwei '+a.name+'-Atome':'das '+a.name+'-Atom'} übertragen.${II?` Isoliert in der Gasphase ist dieser Schritt endotherm (ΔH = ${sgn(ex.gasTransfer,0)} kJ/mol).`:''}`,
+    `<b>Schritt 3 · Ionen:</b> Es entstehen ${c.ion} (${c.Z} Protonen, ${c.Z-c.q} Elektronen) und ${n===2?'2 ':''}${a.ion} (${a.Z} Protonen, ${a.Z-a.q} Elektronen). ${c.ion} hat die Elektronenkonfiguration von ${c.gas}, ${a.ion} die von ${a.gas}.${II?` Konfigurationen: ${c.conf} → ${c.ionConf}; ${a.conf} → ${a.ionConf}.`:''}`,
+    `<b>Schritt 4 · Größenvergleich (maßstäblich):</b> Das Kation ist kleiner als das Atom (äußere Schale fehlt). Das Anion ist größer als das Atom (mehr Elektronen bei gleicher Kernladung).${II?' Radien: Ionenradien nach Shannon, Atomradien als Metall- bzw. Kovalenzradius; alle Radien sind Konventionen.':''}`,
+    `<b>Schritt 5 · Anziehung:</b> Kationen und Anionen ziehen sich elektrostatisch an, und zwar in alle Richtungen (ungerichtet). So entsteht ein Ionengitter.${II?` Im ${ex.typ} beträgt die Koordinationszahl ${ex.kz}.`:''} Weiter mit der Ansicht „Ionengitter“.`]},
+  covLewis(m){const II=S.level==='II';const v=m.atoms.map(a=>a[0]).filter((x,i,arr)=>arr.indexOf(x)===i).map(e=>`${ELC[e].name}: ${ELC[e].ve} VE`).join(', ');return[
+    `<b>Schritt 1 · Atome:</b> Die Atome mit ihren Valenzelektronen (Punktschreibweise; ein Punkt = ein Elektron). ${v}.`,
+    `<b>Schritt 2 · Annäherung:</b> Die Atome nähern sich an. Je ein ungepaartes Elektron beider Bindungspartner bildet ein gemeinsames Elektronenpaar.${S.opt.originColors?' Die Farben zeigen die Herkunft der Elektronen.':''}`,
+    `<b>Schritt 3 · Elektronenpaare:</b> Bindende Elektronenpaare liegen zwischen den Atomkernen (grün umrandet), freie Elektronenpaare gehören nur zu einem Atom (violett umrandet).`,
+    `<b>Schritt 4 · Valenzstrichformel:</b> Jedes Elektronenpaar wird als Strich geschrieben. ${m.name}: ${m.bondTxt}.`,
+    `<b>Schritt 5 · Edelgasregel:</b> Gezählt werden alle Elektronen in der Umgebung eines Atoms; bindende Paare zählen für beide Atome.${m.special==='O2'?(II?' Achtung: O₂ ist paramagnetisch (zwei ungepaarte Elektronen im Triplett-Grundzustand). Die Lewis-Formel gibt das nicht wieder.':' Achtung: Diese Formel ist ein Modell. Bei O₂ stimmt sie nicht mit allen Messungen überein (siehe Modellkritik).'):''}`]}
+};
+
+/* ================= Aufgaben ================= */
+const OPS={'Beschreibe':'Gib in ganzen Sätzen wieder, was du siehst. Nutze Fachbegriffe.','Erkläre':'Gib Gründe an: Warum ist das so? Nutze dein Fachwissen.','Begründe':'Stütze eine Aussage mit Argumenten.','Vergleiche':'Nenne Gemeinsamkeiten und Unterschiede.','Ergänze':'Wähle für jede Lücke das passende Wort.','Wähle aus':'Entscheide dich für die richtige Aussage.','Ermittle':'Finde den Wert mithilfe der Simulation heraus.','Ordne zu':'Entscheide, was zusammengehört.','Berechne':'Bestimme den Wert mit einer Rechnung.','Erläutere':'Erkläre ausführlich und mit Beispielen.','Beurteile':'Prüfe die Aussage und komme zu einem begründeten Urteil.','Schätze ab':'Bestimme einen ungefähren Wert mit einem vereinfachten Ansatz.','Deute':'Erkläre die Beobachtung mit einem Modell.'};
+
+const TASKS={
+ion:{I:[
+ {id:'i1-1',afb:'I',op:'Beschreibe',type:'text',text:'Wähle <b>Natriumchlorid</b>. Beschreibe mithilfe der Schritte 1 bis 3, was mit dem Außenelektron des Natrium-Atoms geschieht und welche Teilchen entstehen.',
+  help:['Das Natrium-Atom hat … Außenelektron.','Das Elektron wird auf … übertragen.','Es entstehen ein …-Ion und ein …-Ion.','Das Natrium-Ion ist … geladen, weil …'],
+  sol:'Das Natrium-Atom (2·8·1) hat ein Außenelektron. Dieses wird auf die Außenschale des Chlor-Atoms (2·8·7) übertragen. Es entstehen ein Natrium-Ion Na⁺ (11 Protonen, 10 Elektronen, einfach positiv geladen) und ein Chlorid-Ion Cl⁻ (17 Protonen, 18 Elektronen, einfach negativ geladen). Beide Ionen haben eine voll besetzte Außenschale wie Neon bzw. Argon.'},
+ {id:'i1-2',afb:'I',op:'Ergänze',type:'gap',text:'Nach der Elektronenübertragung hat das Natrium-Ion die Elektronenkonfiguration von [[1]]. Das Natrium-Ion ist [[2]] geladen, das Chlorid-Ion ist [[3]] geladen. Die Ionen halten durch [[4]] zusammen. Im Feststoff bilden sehr viele Ionen ein [[5]]. Das Chlorid-Ion ist [[6]] als das Chlor-Atom.',
+  gaps:{1:'Neon',2:'positiv',3:'negativ',4:'elektrostatische Anziehung',5:'Ionengitter',6:'größer'},words:['Ionengitter','negativ','größer','Argon','elektrostatische Anziehung','Molekül','Neon','kleiner','positiv']},
+ {id:'i1-3',afb:'II',op:'Wähle aus',type:'mc',text:'Wähle <b>Magnesiumoxid</b> und spiele den Elektronenübergang ab. Welche Aussage ist richtig?',
+  opts:['Ein Elektron wird übertragen. Es entstehen Mg⁺ und O⁻.','Vom Sauerstoff-Atom werden zwei Elektronen auf das Magnesium-Atom übertragen.','Vom Magnesium-Atom werden zwei Elektronen auf das Sauerstoff-Atom übertragen. Es entstehen Mg²⁺ und O²⁻.','Es entstehen MgO-Moleküle aus je einem Mg- und einem O-Atom.'],ans:2,hint:'Zähle die Außenelektronen des Magnesium-Atoms (Schritt 1).'},
+ {id:'i1-4',afb:'II',op:'Erkläre',type:'text',text:'Öffne die Ansicht <b>Verformung</b> und starte die Simulation. Erkläre, warum ein Kochsalzkristall bei einem Hammerschlag zerspringt.',
+  help:['Durch den Schlag wird eine Ionenschicht …','Danach liegen gleich geladene Ionen …','Gleich geladene Ionen stoßen sich …','Deshalb …'],
+  sol:'Durch die Krafteinwirkung werden Ionenschichten gegeneinander verschoben. Schon nach einer Verschiebung um einen Ionenabstand liegen gleich geladene Ionen (Kation über Kation, Anion über Anion) übereinander. Sie stoßen sich elektrostatisch ab. Der Kristall bricht entlang dieser Ebene: Salze sind spröde.'},
+ {id:'i1-5',afb:'II',op:'Begründe',type:'text',text:'Wähle <b>Calciumfluorid</b>. Begründe mit der Simulation, warum die Verhältnisformel CaF₂ lautet und nicht CaF.',
+  help:['Ein Calcium-Atom hat … Außenelektronen.','Ein Fluor-Atom hat auf der Außenschale … freien Platz.','Deshalb werden die Elektronen auf … Fluor-Atome übertragen.','Der Feststoff ist insgesamt elektrisch …'],
+  sol:'Ein Calcium-Atom (2·8·8·2) hat zwei Außenelektronen. Ein Fluor-Atom (2·7) hat auf der Außenschale einen freien Platz bis zur Achterbesetzung. Die zwei Elektronen werden daher auf zwei Fluor-Atome übertragen: Es entstehen ein Ca²⁺ und zwei F⁻. Nur im Verhältnis 1 : 2 ist der Feststoff elektrisch neutral (+2 − 2·1 = 0).'}
+],II:[
+ {id:'i2-1',afb:'II',op:'Berechne',type:'num',text:'Wähle <b>Natriumchlorid</b>, Ansicht <b>Born-Haber</b>. Gehe bis Schritt 5 und berechne die Gitterenthalpie ΔH(Gitter), <i>bevor</i> du den letzten Schritt öffnest. ΔfH(NaCl) = −411,2 kJ/mol.',
+  fields:[{l:'ΔH(Gitter) von NaCl',ans:-787.6,tol:3,unit:'kJ/mol'}],hint:'Satz von Hess: ΔfH = Summe aller Teilschritte. Achte auf das Vorzeichen.',
+  sol:'ΔH(Gitter) = ΔfH − (ΔsubH + ½ ΔdissH + IE₁ + ΔH(EA)) = −411,2 − (107,5 + 121,7 + 495,8 − 348,6) kJ/mol = −411,2 − 376,4 kJ/mol ≈ −787,6 kJ/mol.'},
+ {id:'i2-2',afb:'II',op:'Erläutere',type:'text',text:'Die Bildung von Na⁺(g) und Cl⁻(g) aus Na(g) und Cl(g) ist endotherm (≈ +147 kJ/mol). Erläutere, warum die Bildung von NaCl(s) aus den Elementen dennoch stark exotherm verläuft, und beurteile die Aussage „Natrium gibt sein Elektron ab, um ein Oktett zu erreichen“.',
+  sol:'Die Ionisierungsenergie von Na (+495,8 kJ/mol) ist größer als der Betrag der Elektronenaffinität von Cl (−348,6 kJ/mol); zusammen mit Sublimation und Dissoziation sind +376,4 kJ/mol aufzuwenden. Die Gitterbildung setzt −787,6 kJ/mol frei und überkompensiert dies; daraus folgt ΔfH = −411,2 kJ/mol. Die Aussage ist fachlich falsch: Sie unterstellt Absicht (Anthropomorphismus) und verwechselt Beschreibung und Ursache. Die Edelgaskonfiguration der Ionen ist Folge, nicht Triebkraft; energetisch entscheidend ist die Coulomb-Wechselwirkung im Gitter.'},
+ {id:'i2-3',afb:'II',op:'Schätze ab',type:'num',text:'Schätze mit dem Ansatz U ∝ |z₊·z₋| / r₀ ab, um welchen Faktor der Betrag der Gitterenergie von MgO größer ist als der von NaCl. r₀(MgO) = 210,5 pm, r₀(NaCl) = 282 pm, gleiche Madelung-Konstante.',
+  fields:[{l:'Faktor U(MgO) / U(NaCl)',ans:5.36,tol:.12,unit:''}],hint:'Bilde den Quotienten (2·2/210,5) : (1·1/282).',
+  sol:'(4 / 210,5) / (1 / 282) ≈ 5,36.'},
+ {id:'i2-4',afb:'II',op:'Vergleiche',type:'text',text:'Vergleiche deine Abschätzung mit dem Born-Haber-Verhältnis (MgO: ≈ −3789 kJ/mol; NaCl: ≈ −788 kJ/mol). Erkläre die Abweichung und setze die Gitterenergien mit den Schmelztemperaturen (NaCl 801 °C, MgO ≈ 2830 °C) in Beziehung.',
+  sol:'Born-Haber-Verhältnis ≈ 4,8 statt 5,4. Gründe: unterschiedlicher Abstoßungsterm (Born-Exponent n = 7 bzw. 8), Polarisationseffekte, vor allem aber ist EA₂(O) nicht direkt messbar und stark unsicher; der Born-Haber-Wert für MgO ist deshalb selbst mit großer Unsicherheit behaftet. Qualitativ gilt: höhere Ionenladungen und kleinere Abstände ergeben eine deutlich höhere Gitterenergie und eine höhere Schmelztemperatur. Quantitativ ist die Beziehung nicht proportional, da beim Schmelzen das Gitter nicht in Gasionen zerlegt wird (Schmelzenthalpie ≪ Gitterenthalpie).'},
+ {id:'i2-5',afb:'III',op:'Beurteile',type:'text',text:'Born-Landé liefert für NaCl −753 kJ/mol und für LiF −1004 kJ/mol, Born-Haber −788 bzw. −1047 kJ/mol. Beurteile die Leistungsfähigkeit des Punktladungsmodells.',
+  sol:'Die Abweichung beträgt etwa 4 %. Das reine Ionenmodell (starre Punktladungen + empirischer Abstoßungsterm) erfasst die Bindungsenergie also überwiegend. Die Born-Landé-Werte sind systematisch kleiner: nicht berücksichtigt sind Dispersionswechselwirkungen, Polarisation und kovalente Anteile, außerdem ist der Abstoßungsterm nur genähert und r₀ wird als Gleichgewichtsabstand bei 0 K angesetzt. Für MgO ist ein Vergleich nur eingeschränkt möglich, weil EA₂(O) nicht unabhängig bestimmt ist.'}
+]},
+cov:{I:[
+ {id:'c1-1',afb:'I',op:'Beschreibe',type:'text',text:'Wähle <b>Wasser</b>. Beschreibe mithilfe der Schritte 1 bis 4, wie die Valenzstrichformel des Wasser-Moleküls entsteht.',
+  help:['Das Sauerstoff-Atom hat … Valenzelektronen.','Jedes Wasserstoff-Atom hat …','Es entstehen … bindende Elektronenpaare.','Am Sauerstoff-Atom bleiben … freie Elektronenpaare.'],
+  sol:'Das Sauerstoff-Atom hat 6 Valenzelektronen (2 Paare, 2 ungepaarte Elektronen), jedes Wasserstoff-Atom 1. Jedes ungepaarte Elektron des O-Atoms bildet mit dem Elektron eines H-Atoms ein gemeinsames Elektronenpaar. So entstehen 2 bindende Elektronenpaare (O–H). Am O-Atom bleiben 2 freie Elektronenpaare. In der Valenzstrichformel wird jedes Paar als Strich geschrieben.'},
+ {id:'c1-2',afb:'I',op:'Ergänze',type:'gap',text:'Bei der Elektronenpaarbindung bilden zwei Atome ein gemeinsames [[1]]. Zwischen dem O-Atom und den H-Atomen liegen zwei [[2]] Elektronenpaare. Nur zum O-Atom gehören zwei [[3]] Elektronenpaare. Jedes H-Atom ist von zwei Elektronen umgeben wie ein [[4]]-Atom. Das O-Atom ist von acht Elektronen umgeben wie ein [[5]]-Atom. Sauerstoff hat eine größere [[6]] als Wasserstoff. Deshalb ist die O–H-Bindung [[7]].',
+  gaps:{1:'Elektronenpaar',2:'bindende',3:'freie',4:'Helium',5:'Neon',6:'Elektronegativität',7:'polar'},words:['polar','Neon','Ion','freie','Elektronenpaar','unpolar','Helium','Elektronegativität','Argon','bindende']},
+ {id:'c1-3',afb:'II',op:'Ermittle',type:'num',text:'Wähle <b>Ammoniak</b> und gehe zu Schritt 5. Ermittle die Werte für das Stickstoff-Atom.',
+  fields:[{l:'Anzahl der Elektronen in der Umgebung des N-Atoms',ans:8,tol:0,unit:''},{l:'Anzahl der freien Elektronenpaare am N-Atom',ans:1,tol:0,unit:''}],hint:'Bindende Paare zählen für beide Atome.',
+  sol:'3 bindende Paare (6 Elektronen) + 1 freies Paar (2 Elektronen) = 8 Elektronen.'},
+ {id:'c1-4',afb:'II',op:'Begründe',type:'text',text:'Öffne <b>Räumlicher Bau</b> und schalte „Ladungsschwerpunkte“ ein. Vergleiche Wasser und Kohlenstoffdioxid. Begründe, warum Wasser ein Dipolmolekül ist, Kohlenstoffdioxid aber nicht.',
+  help:['Beide Moleküle haben polare Bindungen, weil …','Das Wasser-Molekül ist gewinkelt. Deshalb …','Das CO₂-Molekül ist linear. Deshalb …'],
+  sol:'Beide Moleküle enthalten polare Bindungen, weil Sauerstoff eine größere Elektronegativität hat als Wasserstoff bzw. Kohlenstoff. Das H₂O-Molekül ist gewinkelt: Der positive Ladungsschwerpunkt (zwischen den H-Atomen) und der negative (am O-Atom) liegen an verschiedenen Orten, es ist ein Dipolmolekül. Das CO₂-Molekül ist linear und symmetrisch: Beide Ladungsschwerpunkte liegen am C-Atom, die Bindungsdipole heben sich auf.'},
+ {id:'c1-5',afb:'I',op:'Wähle aus',type:'mc',text:'Welches Molekül enthält eine Dreifachbindung?',opts:['O₂','CO₂','HCl','N₂'],ans:3,hint:'Sieh dir die Valenzstrichformeln der Beispiele an.'}
+],II:[
+ {id:'c2-1',afb:'II',op:'Erläutere',type:'text',text:'Wähle <b>H₂</b>, Ansicht <b>Energie und Abstand</b>. Verschiebe den Kernabstand und erläutere den Verlauf der Potenzialkurve.',
+  sol:'Bei großem Abstand keine Wechselwirkung (E ≈ 0). Bei Annäherung überlappen die 1s-Orbitale; die Elektronendichte zwischen den Kernen steigt, die Anziehung beider Kerne zu dieser Elektronendichte senkt die Energie. Im Minimum (rₑ = 74 pm) ist die Energie um Dₑ ≈ 458 kJ/mol abgesenkt. Bei weiterer Annäherung überwiegt die Kern-Kern-Abstoßung, die Energie steigt steil an. Die Bindungslänge ist der Abstand minimaler Energie.'},
+ {id:'c2-2',afb:'II',op:'Berechne',type:'num',text:'Für H₂ gilt Dₑ = 458,4 kJ/mol und D₀ = 432,1 kJ/mol. Berechne die Nullpunktsenergie.',fields:[{l:'Nullpunktsenergie von H₂',ans:26.3,tol:.6,unit:'kJ/mol'}],hint:'D₀ = Dₑ − Nullpunktsenergie.',
+  sol:'E(v = 0) = Dₑ − D₀ = 26,3 kJ/mol (entspricht ½ h·c·ω̃ₑ mit ω̃ₑ ≈ 4401 cm⁻¹). Tabellenwert 436 kJ/mol ist die Dissoziationsenthalpie bei 298 K.'},
+ {id:'c2-3',afb:'II',op:'Erkläre',type:'text',text:'Vergleiche in der Ansicht <b>Räumlicher Bau</b> CH₄, NH₃ und H₂O (freie Elektronenpaare einblenden). Erkläre die Abnahme des Bindungswinkels von 109,5° über 106,7° auf 104,5°.',
+  sol:'Alle drei Zentralatome sind von vier Elektronendomänen umgeben, die sich näherungsweise tetraedrisch anordnen (VSEPR). Freie Elektronenpaare werden nur von einem Kern angezogen, ihre Elektronendichte ist näher am Zentralatom und breiter verteilt; sie beanspruchen mehr Raum und drücken die bindenden Paare zusammen. CH₄ hat kein, NH₃ ein, H₂O zwei freie Paare: Der Bindungswinkel nimmt entsprechend ab.'},
+ {id:'c2-4',afb:'III',op:'Beurteile',type:'text',text:'Flüssiger Sauerstoff wird von einem starken Magneten angezogen (Paramagnetismus). Beurteile die Valenzstrichformel von O₂ im Licht dieser Beobachtung.',
+  sol:'Die Lewis-Formel O=O mit zwei freien Paaren je Atom enthält ausschließlich gepaarte Elektronen und sagt Diamagnetismus voraus. Die Beobachtung widerlegt das. Das MO-Modell liefert die Elektronenkonfiguration (σ2s)²(σ*2s)²(σ2p)²(π2p)⁴(π*2p)² mit zwei ungepaarten Elektronen in entarteten π*-Orbitalen (Hundsche Regel, Triplett) und Bindungsordnung 2. Die Lewis-Formel ist für Bindungsordnung und Bindungslänge brauchbar, versagt aber bei den magnetischen Eigenschaften. Modelle haben einen Gültigkeitsbereich.'},
+ {id:'c2-5',afb:'II',op:'Wähle aus',type:'mc',text:'Welches Molekül besitzt polare Bindungen, ist aber kein Dipolmolekül?',opts:['H₂O','NH₃','CO₂','HCl'],ans:2,hint:'Achte auf die Symmetrie und die Ladungsschwerpunkte.'}
+]},
+met:{I:[
+ {id:'m1-1',afb:'I',op:'Beschreibe',type:'text',text:'Wähle <b>Magnesium</b>. Gehe von Schritt 1 zu Schritt 2. Beschreibe das Elektronengasmodell mit den Fachbegriffen aus dem Wortspeicher.',
+  help:['Ein Magnesium-Atom hat … Valenzelektronen.','Im Metall bleiben die Atomrümpfe …','Die Valenzelektronen …','Die Atomrümpfe sind … geladen.'],
+  sol:'Ein Magnesium-Atom (2·8·2) hat zwei Valenzelektronen. Im Modell wird es in einen zweifach positiv geladenen Atomrumpf Mg²⁺ und zwei Valenzelektronen aufgeteilt. Die Atomrümpfe sind regelmäßig im Metallgitter angeordnet. Die Valenzelektronen gehören zu keinem bestimmten Atom, sondern sind zwischen den Rümpfen frei beweglich (Elektronengas). Rümpfe und Elektronengas ziehen sich elektrostatisch an.'},
+ {id:'m1-2',afb:'I',op:'Ergänze',type:'gap',text:'Im Elektronengasmodell besteht ein Metall aus [[1]] und frei beweglichen [[2]]. Die Atomrümpfe sind [[3]] geladen. Die Valenzelektronen sind nicht an ein bestimmtes Atom gebunden, sie bilden das [[4]]. Wird eine Spannung angelegt, bewegen sich die Elektronen gerichtet zum [[5]]. Bei höherer Temperatur schwingen die Atomrümpfe stärker, die elektrische Leitfähigkeit wird [[6]].',
+  gaps:{1:'Atomrümpfen',2:'Valenzelektronen',3:'positiv',4:'Elektronengas',5:'Pluspol',6:'kleiner'},words:['Pluspol','kleiner','Elektronengas','negativ','Atomrümpfen','größer','Valenzelektronen','Minuspol','positiv']},
+ {id:'m1-3',afb:'II',op:'Erkläre',type:'text',text:'Klicke auf „Spannung anlegen“ und beobachte die Anzeige „Strom (relativ)“. Erhöhe danach die Temperatur. Erkläre beide Beobachtungen.',
+  help:['Mit Spannung bewegen sich die Elektronen …','Bei höherer Temperatur schwingen …','Die Elektronen werden dadurch häufiger …','Deshalb wird der Strom …'],
+  sol:'Ohne Spannung bewegen sich die Elektronen ungeordnet; im Mittel fließt kein Strom. Mit Spannung kommt eine gerichtete Bewegung zum Pluspol hinzu: Es fließt Strom. Bei höherer Temperatur schwingen die Atomrümpfe stärker. Die Elektronen werden häufiger abgelenkt (gestreut), die gerichtete Bewegung wird gebremst. Die Stromstärke sinkt, der elektrische Widerstand steigt.'},
+ {id:'m1-4',afb:'II',op:'Vergleiche',type:'text',text:'Klicke hier auf „Verformen“ und im Reiter Ionenbindung in der Ansicht „Verformung“ auf „Kraft einwirken lassen“. Vergleiche das Verhalten von Metall und Salz.',
+  help:['Beim Metall gleiten die Schichten …','Die Atomrümpfe bleiben …','Beim Salz liegen nach dem Verschieben …','Deshalb ist ein Metall …, ein Salz …'],
+  sol:'In beiden Fällen werden Schichten gegeneinander verschoben. Beim Metall bleibt jeder Atomrumpf vom Elektronengas umgeben, es entstehen keine neuen Abstoßungen: Das Metall ist verformbar. Beim Salz liegen nach dem Verschieben gleich geladene Ionen übereinander, sie stoßen sich ab: Der Kristall bricht, das Salz ist spröde.'},
+ {id:'m1-5',afb:'I',op:'Wähle aus',type:'mc',text:'Wie viele Valenzelektronen gibt ein Magnesium-Atom im Modell an das Elektronengas ab? Wie ist der Atomrumpf geladen?',opts:['1 Elektron; Rumpf Mg⁺','2 Elektronen; Rumpf Mg²⁺','12 Elektronen; Rumpf Mg¹²⁺','2 Elektronen; Rumpf Mg²⁻'],ans:1,hint:'Elektronenverteilung von Mg: 2·8·2.'}
+],II:[
+ {id:'m2-1',afb:'II',op:'Erkläre',type:'text',text:'Vergleiche Na, Mg und Al (Steckbrief): Schmelztemperaturen 97,8 °C / 650 °C / 660 °C, Atomisierungsenthalpien 107,5 / 147,1 / 330,0 kJ/mol. Erkläre den Trend mit dem Elektronengasmodell und beurteile, welche Größe die Bindungsstärke besser abbildet.',
+  sol:'Von Na über Mg zu Al steigt die Zahl der Valenzelektronen (1 → 2 → 3) und damit die Ladung der Atomrümpfe und die Elektronendichte des Elektronengases; zugleich sinkt der Radius (186 → 160 → 143 pm). Die elektrostatische Anziehung nimmt zu, die Atomisierungsenthalpie steigt deutlich. Die Schmelztemperatur ist ein schwächerer Indikator: Mg und Al schmelzen fast gleich hoch, weil beim Schmelzen die Bindung nur teilweise gelöst wird und Gittertyp sowie Struktur der Schmelze eingehen. Die Atomisierungsenthalpie bildet die Bindungsstärke direkter ab.'},
+ {id:'m2-2',afb:'III',op:'Beurteile',type:'text',text:'Kupfer stellt im einfachen Modell nur ein Valenzelektron (4s¹) zur Verfügung, hat aber eine höhere Schmelztemperatur als Aluminium (3 Valenzelektronen). Beurteile das Elektronengasmodell.',
+  sol:'Nach dem einfachen Modell müsste Cu (Rumpf Cu⁺, 1 Elektron) schwächer gebunden sein als Al. Tatsächlich liegen Schmelztemperatur (1085 °C) und Atomisierungsenthalpie (337 kJ/mol) höher. Ursache: Die 3d-Orbitale des Kupfers überlappen und mischen mit dem 4s-Band; d-Elektronen tragen gerichtete, teilweise kovalente Bindungsanteile bei. Die Zahl „Valenzelektronen = Gruppennummer“ ist für Übergangsmetalle nicht definiert. Das Elektronengasmodell erklärt Leitfähigkeit und Duktilität qualitativ, liefert aber keine verlässlichen Vorhersagen zur Bindungsstärke von Übergangsmetallen.'},
+ {id:'m2-3',afb:'II',op:'Berechne',type:'num',text:'Ein Kupferdraht (A = 1,5 mm²) führt I = 10 A. Die Dichte freier Elektronen beträgt n = 8,5·10²⁸ m⁻³, e = 1,602·10⁻¹⁹ C. Berechne die Driftgeschwindigkeit nach I = n·e·A·v_d und bewerte die Darstellung in der Simulation.',
+  fields:[{l:'Driftgeschwindigkeit v_d',ans:.49,tol:.03,unit:'mm/s'}],hint:'A = 1,5·10⁻⁶ m²; Ergebnis in m/s in mm/s umrechnen.',
+  sol:'v_d = I / (n·e·A) = 10 / (8,5·10²⁸ · 1,602·10⁻¹⁹ · 1,5·10⁻⁶) m/s ≈ 4,9·10⁻⁴ m/s ≈ 0,49 mm/s. In der Simulation ist die Drift um viele Größenordnungen übertrieben und mit der ungeordneten Bewegung vergleichbar; real ist die Fermi-Geschwindigkeit (≈ 1,6·10⁶ m/s) etwa 10⁹-mal größer als v_d.'},
+ {id:'m2-4',afb:'II',op:'Erkläre',type:'text',text:'Öffne das <b>Bändermodell</b> für Magnesium. Mg hat die Konfiguration [Ne] 3s². Erkläre, warum Magnesium trotz voll besetzter 3s-Orbitale ein elektrischer Leiter ist.',
+  sol:'Aus den 3s-Orbitalen von N Atomen entsteht ein 3s-Band mit N Orbitalen bzw. 2N Plätzen; mit 2N Elektronen wäre es voll besetzt, Mg wäre ein Isolator. Das 3s-Band überlappt jedoch mit dem leeren 3p-Band. Die Elektronen verteilen sich auf beide Bänder bis zum Fermi-Niveau; unmittelbar oberhalb von E_F gibt es freie Zustände. Schon kleine Energiezufuhr durch ein elektrisches Feld kann Elektronen in diese Zustände anheben: Mg leitet.'}
+]},
+cmp:{I:[
+ {id:'v1-1',afb:'I',op:'Ergänze',type:'table',text:'Ergänze die Tabelle mithilfe der drei Reiter.',
+  cols:['Teilchen im Feststoff','Schmelztemperatur','Leitfähigkeit fest','Leitfähigkeit als Schmelze','Verhalten beim Verformen'],
+  rows:[['Salze (Ionenbindung)',['Ionen','meist hoch','leitet nicht','leitet','spröde']],['Molekülsubstanzen (Elektronenpaarbindung)',['Moleküle','meist niedrig','leitet nicht','leitet nicht',null]],['Metalle (Metallbindung)',['Atomrümpfe und Elektronengas','meist hoch','leitet','leitet','verformbar']]],
+  choices:[['Moleküle','Atomrümpfe und Elektronengas','Ionen'],['meist niedrig','meist hoch'],['leitet','leitet nicht'],['leitet nicht','leitet'],['verformbar','spröde']]},
+ {id:'v1-2',afb:'II',op:'Ordne zu',type:'sort',text:'Ordne jedem Stoff die Bindungsart zu.',
+  items:[['KBr','ion'],['CH₄','cov'],['Fe','met'],['CaO','ion'],['NH₃','cov'],['Messing (Cu/Zn)','met'],['Li₂O','ion'],['Cl₂','cov']],choices:[['cov','Elektronenpaarbindung'],['met','Metallbindung'],['ion','Ionenbindung']]},
+ {id:'v1-3',afb:'II',op:'Erkläre',type:'text',text:'Ein Kochsalzkristall leitet keinen Strom, eine Kochsalzschmelze aber schon. Kupfer leitet fest und flüssig. Erkläre beide Beobachtungen mit den Modellen.',
+  help:['Für Strom braucht man frei bewegliche …','Im Salzkristall sind die Ionen …','In der Schmelze …','Im Metall gibt es immer …'],
+  sol:'Für elektrischen Strom braucht man frei bewegliche geladene Teilchen. Im Salzkristall sind die Ionen auf ihren Gitterplätzen festgehalten, sie können nur schwingen. In der Schmelze ist das Gitter aufgelöst; die Ionen sind beweglich und bewegen sich im elektrischen Feld gerichtet zu den Elektroden. Im Metall sind die Valenzelektronen im festen und im flüssigen Zustand frei beweglich.'}
+],II:[
+ {id:'v2-1',afb:'I',op:'Ergänze',type:'table',text:'Ergänze die Tabelle.',
+  cols:['Teilchen im Feststoff','Schmelztemperatur','Leitfähigkeit fest','Leitfähigkeit als Schmelze','Verhalten beim Verformen'],
+  rows:[['Salze (Ionenbindung)',['Ionen','meist hoch','leitet nicht','leitet','spröde']],['Molekülsubstanzen (Elektronenpaarbindung)',['Moleküle','meist niedrig','leitet nicht','leitet nicht',null]],['Metalle (Metallbindung)',['Atomrümpfe und Elektronengas','meist hoch','leitet','leitet','verformbar']]],
+  choices:[['Moleküle','Atomrümpfe und Elektronengas','Ionen'],['meist niedrig','meist hoch'],['leitet','leitet nicht'],['leitet nicht','leitet'],['verformbar','spröde']]},
+ {id:'v2-2',afb:'II',op:'Deute',type:'text',text:'Aluminiumchlorid (ΔEN = 1,55) sublimiert bereits bei etwa 180 °C und liegt im Gaszustand als Al₂Cl₆ vor. Ordne AlCl₃ im Bindungsdreieck ein und deute die Eigenschaften mit dem Konzept der Polarisierung (Fajans).',
+  sol:'Mittlere EN 2,39, ΔEN 1,55: AlCl₃ liegt im Übergangsbereich zwischen ionischer und kovalenter Bindung. Das kleine, hoch geladene Al³⁺ (r ≈ 54 pm) hat eine hohe Ladungsdichte und polarisiert die großen, leicht polarisierbaren Cl⁻-Ionen stark; die Elektronendichte wird zwischen die Kerne verschoben, die Bindung erhält erhebliche kovalente Anteile. Folge: molekulare Einheiten (Al₂Cl₆), niedrige Sublimationstemperatur, kaum Leitfähigkeit der Schmelze. ΔEN allein reicht zur Einordnung nicht aus.'},
+ {id:'v2-3',afb:'III',op:'Beurteile',type:'text',text:'Cu und Si liegen im Bindungsdreieck am selben Punkt (mittlere EN 1,90; ΔEN 0). Beurteile die Aussagekraft des Diagramms.',
+  sol:'Das Diagramm nutzt nur zwei Parameter aus der Pauling-Skala. Gleiche Lage bei Cu (Metall) und Si (kovalentes Atomgitter, Halbleiter) zeigt, dass Elektronegativität allein die Bindungsart nicht festlegt; maßgeblich sind auch Valenzelektronenzahl, Orbitalüberlappung, Bandstruktur (Bandlücke bei Si) und Struktur. Zudem ist die EN keine Messgröße, sondern ein abgeleitetes Konzept mit verschiedenen Skalen. Als Heuristik zur groben Einordnung ist das Dreieck nützlich, für Grenzfälle nicht entscheidungsfähig.'},
+ {id:'v2-4',afb:'II',op:'Ordne zu',type:'sort',text:'Ordne jedem Stoff den überwiegenden Bindungstyp zu.',
+  items:[['KBr','ion'],['SiO₂','cov'],['Fe','met'],['CaO','ion'],['NH₃','cov'],['Messing (Cu/Zn)','met'],['Li₂O','ion'],['Cl₂','cov']],choices:[['cov','Elektronenpaarbindung'],['met','Metallbindung'],['ion','Ionenbindung']]}
+]}
+};
+
+const CRITIQUE={
+ion:{I:[
+ ['Schalenmodell','Elektronen bewegen sich nicht auf festen Kreisbahnen. Das Schalenmodell ordnet sie nur Energiestufen zu. Genauer beschreibt das Orbitalmodell, wo sich Elektronen wahrscheinlich aufhalten.'],
+ ['Elektronenübergang als einzelner Schritt','Salze entstehen nicht aus einzelnen Atomen. Natrium (ein Metall) reagiert mit Chlor (Cl₂-Moleküle). Die Schritte in der Simulation sind eine gedankliche Zerlegung.'],
+ ['„Atome wollen ein Oktett“','Atome wollen nichts. Die Edelgaskonfiguration beschreibt das Ergebnis. Der Grund für die Reaktion ist die Energie, die beim Bilden des Ionengitters frei wird.'],
+ ['Ionen als Kugeln','Ionen haben keine feste Oberfläche. Die Radien sind festgelegte Werte und hängen von der Umgebung ab. Die Farben (blau = positiv, rot = negativ) sind frei gewählt.'],
+ ['Gittermodell','Die Linien im Gittermodell sind Hilfslinien und keine Bindungen. Die Anziehung wirkt in alle Richtungen. In echten Kristallen schwingen die Ionen und es gibt Fehlstellen.'],
+ ['Farbe der Elektronen','Alle Elektronen sind gleich. Die unterschiedlichen Farben zeigen nur, von welchem Atom ein Elektron im Modell stammt.']],
+II:[
+ ['Teilschrittzerlegung','Der Elektronenübergang zwischen isolierten Gasatomen ist endotherm und kein realer Reaktionsweg. Die Animation suggeriert eine Kausalität „Elektronenübertragung → Bindung“, die energetisch nicht trägt; treibend ist die Gitterenergie.'],
+ ['Punktladungsmodell','Born-Landé behandelt Ionen als starre Punktladungen mit empirischem Abstoßungsterm. Polarisierbarkeit, Dispersion und kovalente Anteile fehlen; Abweichung zu Born-Haber etwa 4 % (NaCl, LiF).'],
+ ['Datenlage Born-Haber','EA₂(O) ist nicht direkt messbar und wird selbst aus Kreisprozessen abgeleitet; Literaturwerte streuen stark. Energie- und Enthalpiegrößen (Differenzen von wenigen kJ/mol, z. B. 5/2 RT) werden hier nicht unterschieden.'],
+ ['Ionenradien','Radien nach Shannon sind auf r(O²⁻) = 140 pm bezogene Konventionen und abhängig von der Koordinationszahl. Summen r₊ + r₋ weichen vom gemessenen Abstand teils ab (LiF: 209 vs. 201 pm).'],
+ ['Ionenbindung als Grenzfall','Auch NaCl ist nicht „100 % ionisch“. Elektronendichtekarten zeigen eine geringe Restdichte zwischen den Ionen. Die Ionenbindung ist ein Grenztyp, kein vollständig realisierter Zustand.'],
+ ['2D-Darstellungen','Verformung und Anziehung sind 2D-Schnitte. Reale Sprödigkeit hängt von Gleitsystemen und Versetzungen ab; bei CaF₂ ist die Verformungsansicht schematisch im NaCl-Motiv dargestellt.']]},
+cov:{I:[
+ ['Punkte und Striche','Elektronen sind keine Punkte an festen Orten. Die Punkte und Striche sind eine Schreibweise, um Elektronen zu zählen.'],
+ ['Herkunft der Elektronen','Im Molekül kann man nicht sagen, welches Elektron von welchem Atom kommt. Die Farben sind nur eine Zählhilfe.'],
+ ['Edelgasregel','Die Regel gilt nicht immer. Es gibt Moleküle mit weniger oder mehr als 8 Elektronen am Atom. Bei O₂ passt die Formel nicht zu allen Messungen (O₂ wird von Magneten angezogen).'],
+ ['Kugel-Stab-Modell','Atome sind keine harten Kugeln, Bindungen keine Stäbe. Die Moleküle schwingen und drehen sich ständig.'],
+ ['Polarität','Die Grenze für „polar“ (ΔEN ≈ 0,4) ist eine Vereinbarung. Der Übergang von unpolar zu polar ist fließend.']],
+II:[
+ ['Lewis-Formel und MO-Modell','Lokalisierte Elektronenpaare sind eine Buchführung. Delokalisierung, Mesomerie und Spinzustände (O₂: Triplett) erfasst erst das MO-Modell.'],
+ ['VSEPR','Empirisches Modell ohne energetische Herleitung; versagt z. B. bei H₂S (92°) und vielen Übergangsmetallkomplexen. Die „Größe“ freier Paare ist eine Modellvorstellung.'],
+ ['Morse-Potenzial','Analytische Näherung aus Dₑ, rₑ und ω̃ₑ; im repulsiven Ast zu flach, Anharmonizität nur näherungsweise. Born-Oppenheimer-Näherung vorausgesetzt.'],
+ ['Partialladungen','Partialladungen sind keine Observablen; ihre Werte hängen vom Zerlegungsschema ab (Mulliken, NBO, Bader). Die Darstellung δ+/δ− und die Ladungsschwerpunkte sind qualitativ.'],
+ ['Elektronegativität','Pauling-EN ist eine abgeleitete, dimensionslose Größe mit Alternativskalen (Mulliken, Allred-Rochow, Allen). Schwellenwerte 0,4 / 1,7 sind Konventionen.'],
+ ['Kugelwolken in der Energieansicht','Die Wolkendarstellung ist symbolisch. Die Überlappung zeigt nicht die reale Elektronendichteverteilung oder Orbitalphasen.']]},
+met:{I:[
+ ['Elektronengas','Die Elektronen sind keine kleinen Kugeln. Das Modell erklärt Leitfähigkeit und Verformbarkeit gut, aber nicht alle Eigenschaften.'],
+ ['Geschwindigkeiten','In echten Metallen bewegen sich die Elektronen ungeordnet sehr schnell. Die gerichtete Bewegung beim Stromfluss ist dagegen sehr langsam. In der Simulation ist sie stark vergrößert dargestellt.'],
+ ['Ladung der Atomrümpfe','Die Ladung des Rumpfes ergibt sich im Modell aus der Zahl der Valenzelektronen. Bei Kupfer ist diese Zahl nicht eindeutig.'],
+ ['Verformung','In echten Metallen gleiten nicht ganze Schichten auf einmal. Die Verformung läuft über kleine Fehler im Gitter (Versetzungen).'],
+ ['Zweidimensional','Die Simulation zeigt nur eine Schicht. Echte Metallgitter sind dreidimensional.']],
+II:[
+ ['Klassisches Elektronengas','Das Drude-Bild behandelt Elektronen als klassisches Gas. Real gilt Fermi-Dirac-Statistik; nur Elektronen nahe E_F tragen zum Transport bei. Die spezifische Wärme des Elektronengases ist daher viel kleiner als klassisch erwartet.'],
+ ['Streuung','Ein ideales periodisches Gitter streut Bloch-Elektronen nicht. Widerstand entsteht durch Phononen, Fremdatome und Defekte. Die Simulation modelliert Streuung als zufällige Richtungsänderung mit temperaturabhängiger Rate.'],
+ ['Übertreibung','Driftgeschwindigkeit (≈ 0,5 mm/s) und Fermi-Geschwindigkeit (≈ 10⁶ m/s) unterscheiden sich um etwa neun Größenordnungen; die Simulation stellt beide in ähnlicher Größenordnung dar.'],
+ ['Rumpfladung und d-Elektronen','Die Zuordnung „Rumpfladung = Gruppennummer“ versagt bei Übergangsmetallen; d-Elektronen bewirken gerichtete Bindungsanteile (Cu, Fe, W).'],
+ ['Bändermodell','Das Banddiagramm ist qualitativ (keine Zustandsdichte, keine k-Abhängigkeit). Bandbreiten und Lagen sind nicht maßstäblich.']]},
+cmp:{I:[
+ ['Faustregel','Metall + Nichtmetall ergibt nicht immer eine Ionenbindung (z. B. AlCl₃). Die Faustregel ist ein erster Anhaltspunkt.'],
+ ['Fließende Übergänge','Die drei Bindungsarten sind Modelle für Grenzfälle. Echte Stoffe liegen oft dazwischen.'],
+ ['Elektronegativität','Die Elektronegativität ist ein Rechenwert und keine direkt messbare Größe.']],
+II:[
+ ['Zwei Parameter','Das Dreieck nutzt nur ΔEN und mittlere EN; Stöchiometrie, Struktur, Ionengröße und Polarisierbarkeit fehlen.'],
+ ['Gleiche Lage, verschiedene Bindung','Cu und Si (beide EN 1,90) zeigen, dass das Diagramm Metalle nicht von kovalenten Atomgittern trennt.'],
+ ['Mehrere Bindungen in einem Stoff','Bei Molekülsubstanzen bestimmen zwischenmolekulare Kräfte die Schmelztemperatur, nicht die kovalente Bindung im Molekül (SiO₂ als Atomgitter ist der Gegenfall).']]}
+};
+
+const TEACHER=`
+<h4>Didaktische Einordnung</h4>
+<ul>
+<li><b>Lernziele:</b> Die Lernenden beschreiben die Bildung von Ionen, Molekülen und Metallgittern im Modell, erklären typische Stoffeigenschaften (Sprödigkeit, Leitfähigkeit, Verformbarkeit, Polarität) mit den Bindungsmodellen und reflektieren Gültigkeitsgrenzen (Modellkompetenz).</li>
+<li><b>Sek I / Sek II:</b> Gleiche Simulationen, unterschiedliche Tiefe. Sek I arbeitet mit Schalenmodell, Lewis-Formeln und Elektronengasmodell; Sek II ergänzt Born-Haber, Born-Landé, Morse-Potenzial, VSEPR, Drude-Ansatz, Bändermodell und das Bindungsdreieck.</li>
+<li><b>Operatoren und AFB:</b> Aufgaben sind mit Operator und Anforderungsbereich gekennzeichnet; in Sek I wird jeder Operator in einfacher Sprache erläutert.</li>
+<li><b>DaF/DaZ:</b> Kurze Hauptsätze in den Sek-I-Texten, Wortspeicher mit farbcodiertem Artikel (der/die/das zusätzlich als Text, also nicht nur über Farbe), Pluralformen und Satzanfänge als Scaffolding. Bei Lückentexten sind die Wortlisten gemischt und enthalten Distraktoren.</li>
+<li><b>Sprache:</b> Anthropomorphismen werden vermieden („wird übertragen“, „gerichtete Bewegung“ statt „gibt ab“, „wandert“, „will“). Die Aufgabe i2-2 (Sek II) thematisiert die Fehlvorstellung „Atome wollen ein Oktett“ explizit.</li>
+</ul>
+<h4>Adressierte Fehlvorstellungen</h4>
+<ul>
+<li>„NaCl-Moleküle“ bzw. Ionenpaare statt Gitter (Schritt 5 der Ionenbindung, Gitteransicht).</li>
+<li>Gitterlinien als Bindungen (Hinweis in der Gitteransicht, Umschalten Kugelpackung/Gittermodell).</li>
+<li>Edelgaskonfiguration als Ursache der Bindung (Gasphasen-Hinweis in Sek II, Born-Haber).</li>
+<li>Kationen seien größer als Anionen bzw. Ionen gleich groß wie Atome (maßstäblicher Größenvergleich).</li>
+<li>Polare Bindungen bedeuten immer ein Dipolmolekül (CO₂, CH₄ mit Ladungsschwerpunkten).</li>
+<li>Elektronen „rasen“ beim Stromfluss durch den Draht (Driftgeschwindigkeit in Sek II).</li>
+</ul>
+<h4>Einsatzvorschlag</h4>
+<p>Erarbeitung in Partnerarbeit (je ein Reiter pro Doppelstunde in Sek I), anschließend Reiter „Vergleich“ zur Sicherung. Die Modellkritik ist eingeklappt, damit sie als Reflexionsphase nach der Bearbeitung genutzt wird. Antworten lassen sich über „Antworten kopieren“ gesammelt abgeben.</p>
+<h4>Plausibilitätsprüfung (durchgeführt)</h4>
+<ul>
+<li>Born-Haber: Alle Teilschritte sind aus Tabellenwerten berechnet; die Gitterenthalpie ergibt sich aus ΔfH (NaCl −787,6; LiF −1046,7; MgO −3789; CaF₂ −2643,8 kJ/mol) und stimmt mit Literaturwerten im Rahmen weniger Prozent überein.</li>
+<li>Born-Landé: NaCl −753, LiF −1004, MgO −3955 kJ/mol; für MgO liegt der Wert über dem Born-Haber-Wert, was die Unsicherheit von EA₂(O) widerspiegelt.</li>
+<li>Elektronenbilanz: Für jedes Molekül wird geprüft, dass Bindungsordnungen plus freie Elektronenpaare die Valenzelektronenzahl ergeben; Bindungswinkel der 3D-Koordinaten werden aus Bindungslänge und Winkel berechnet.</li>
+<li>Gitter: Koordinationszahl 6 (NaCl-Typ) und 4 bzw. 8 (Fluorit-Typ) aus den Koordinaten; Radien nach Shannon maßstäblich.</li>
+<li>Metall: Elektronenzahl = Rümpfe × Valenzelektronen; Elektronen bewegen sich zum Pluspol; Stromanzeige sinkt mit steigender Temperatur (Streurate ∝ T).</li>
+<li>Morse-Parameter a aus ω̃ₑ und Dₑ berechnet (H₂: a = 0,0194 pm⁻¹).</li>
+</ul>
+<h4>Bekannte Vereinfachungen</h4>
+<p>Driftgeschwindigkeit stark übertrieben; Metalle als 2D-Schicht; Bändermodell qualitativ; CaF₂ in der Verformungsansicht im NaCl-Motiv; Bindungswinkel in der 3D-Projektion perspektivisch verzerrt (der angezeigte Wert ist der räumliche).</p>
+<p><label class="switch"><input type="checkbox" id="solToggle"> Lösungsvorschläge für alle Aufgaben anzeigen</label></p>`;
+
+/* ================= Rendering der Oberfläche ================= */
+function renderAll(){
+  $$('#levelSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.level===S.level));
+  $$('#tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===S.tab));
+  const v=curView();if(!viewAllowed(S.tab,v)){S.view[S.tab]=VIEWS[S.tab][0].id;S.step=0;S.stepT=0;}
+  renderExamples();renderViews();renderLegend();renderControls();renderCaption();renderFacts();
+  $('#explain').innerHTML=EXPLAIN[S.tab][S.level];
+  renderWordbank();renderTasks();renderCritique();
+}
+function renderExamples(){const el=$('#examples');let list=[];
+  if(S.tab==='ion')list=Object.entries(IONIC).map(([k,v])=>[k,v.label,v.name]);
+  else if(S.tab==='cov')list=Object.entries(MOL).map(([k,v])=>[k,v.label,v.name]);
+  else if(S.tab==='met')list=Object.entries(METALS).map(([k,v])=>[k,v.el,v.name]);
+  el.hidden=!list.length;
+  el.innerHTML=list.map(([k,l,n])=>`<button type="button" data-ex="${k}" aria-pressed="${S.ex[S.tab]===k}">${l}<small>${n}</small></button>`).join('');}
+function renderViews(){const el=$('#views');const vs=VIEWS[S.tab];el.hidden=vs.length<2;
+  el.innerHTML=vs.filter(v=>!v.lv||v.lv===S.level).map(v=>`<button type="button" data-view="${v.id}" aria-pressed="${S.view[S.tab]===v.id}" ${viewAllowed(S.tab,v)?'':'disabled title="nur für zweiatomige Moleküle"'}>${v.n}</button>`).join('');}
+function lg(c,s,cls=''){return`<span><i class="${cls}" style="background:${c}"></i>${s}</span>`;}
+function renderLegend(){const v=S.view[S.tab];let h='';
+  if(S.tab==='ion'){const ex=IONIC[S.ex.ion];if(v==='energy')h=lg('var(--anion)','endotherm','line')+lg('var(--cation)','exotherm','line')+lg('var(--accent)','Bildungsenthalpie','line')+lg('var(--bad)','Gitterenthalpie','line');
+    else{h=lg('var(--cation)',`Kation ${ex.cat.ion}`)+lg('var(--anion)',`Anion ${ex.an.ion}`);if(v==='transfer')h+=lg('var(--electron)','übertragene(s) Elektron(en)')+(S.opt.originColors?lg('var(--electron-2)','eigene Außenelektronen des Nichtmetalls'):'')+lg('var(--ink-3)','innere Elektronen');}}
+  else if(S.tab==='cov'){const m=MOL[S.ex.cov];if(v==='space'){const els=[...new Set(m.atoms.map(a=>a[0]))];h=els.map(e=>lg(ELC[e].col,`${e} (${ELC[e].name})`)).join('')+(S.opt.covLP?lg('var(--electron-2)','freies Elektronenpaar'):'');}
+    else if(v==='lewis'){if(S.opt.originColors){const els=m.homo?['linkes Atom','rechtes Atom']:[...new Set(m.atoms.map(a=>a[0]))].map(e=>'Elektron von '+e);h=lg('var(--electron)',els[0])+lg('var(--electron-2)',els[1]);}else h=lg('var(--electron)','Elektron');}
+    else h=lg('var(--electron)','Elektronenwolke (symbolisch)')+lg('var(--accent)','Potenzialkurve','line');}
+  else if(S.tab==='met'){if(v==='gas')h=lg('var(--cation)',`Atomrumpf ${METALS[S.ex.met].core}`)+lg('var(--electron)','Valenzelektron');else h=lg('var(--electron)','besetzte Zustände')+lg('var(--bad)','Fermi-Niveau','line');}
+  else h=lg('var(--anion)','Ionenverbindungen')+lg('var(--accent)','Molekülsubstanzen / Elemente')+lg('var(--cation)','Metalle')+'<span><i style="background:transparent;border:2px solid var(--note);border-radius:2px"></i>Grenzfälle</span>';
+  $('#legend').innerHTML=h;}
+function renderControls(){const el=$('#controls'),v=S.view[S.tab],n=stepCount();let h='';
+  if(n>1){h+=`<div class="stepper"><button class="btn" data-act="prev" ${S.step===0?'disabled':''}>‹ Zurück</button><div class="dots" role="group" aria-label="Schritte">${Array.from({length:n},(_,i)=>`<button data-step="${i}" ${i===S.step?'aria-current="step"':''} aria-label="Schritt ${i+1}">${i+1}</button>`).join('')}</div><button class="btn" data-act="next" ${S.step>=n-1?'disabled':''}>Weiter ›</button><button class="btn" data-act="play" aria-pressed="${S.playing}">${S.playing?'Anhalten':'Abspielen'}</button></div>`;}
+  if(S.tab==='ion'&&v==='lattice')h+=tg('ionModel','pack','Kugelpackung',S.opt.ionModel==='pack')+tg('ionModel','grid','Gittermodell',S.opt.ionModel==='grid')+tg('ionCoord',null,'Koordination zeigen',S.opt.ionCoord)+tg('rotate',null,'Drehen',S.opt.rotate);
+  if(S.tab==='ion'&&v==='deform')h+=`<button class="btn primary" data-act="deform">${S.deform.on?'Zurücksetzen':'Kraft einwirken lassen'}</button>`;
+  if(S.tab==='ion'&&v==='transfer')h+=tg('originColors',null,'Herkunft der Elektronen farbig',S.opt.originColors);
+  if(S.tab==='cov'&&v==='lewis')h+=tg('originColors',null,'Herkunft der Elektronen farbig',S.opt.originColors);
+  if(S.tab==='cov'&&v==='space')h+=tg('covModel','stick','Kugel-Stab',S.opt.covModel==='stick')+tg('covModel','fill','Kalotten',S.opt.covModel==='fill')+tg('covLP',null,'Freie Elektronenpaare',S.opt.covLP)+tg('covQ',null,'Teilladungen',S.opt.covQ)+tg('covCen',null,'Ladungsschwerpunkte',S.opt.covCen)+tg('rotate',null,'Drehen',S.opt.rotate);
+  if(S.tab==='cov'&&v==='energy'){const d=MOL[S.ex.cov].dia;if(d){const rmin=Math.ceil(d.re*.55),rmax=Math.floor(d.re+5/d.a);if(S.opt.covR==null)S.opt.covR=rmax*.85;h+=`<label class="slider">Kernabstand <input type="range" id="covR" min="${rmin}" max="${rmax}" step="1" value="${Math.round(clamp(S.opt.covR,rmin,rmax))}"><output id="covRout">${Math.round(S.opt.covR)} pm</output></label><button class="btn" data-act="covplay">Annäherung abspielen</button>`;}}
+  if(S.tab==='met'&&v==='gas'){const dis=S.step===0?'disabled':'';h+=`<button class="btn" data-act="volt" aria-pressed="${MET.volt}" ${dis}>${MET.volt?'Spannung aus':'Spannung anlegen'}</button><label class="slider">Temperatur <input type="range" id="metT" min="-200" max="600" step="10" value="${MET.T}" ${dis}><output id="metTout">${MET.T} °C</output></label><button class="btn" data-act="deform" aria-pressed="${S.deform.on}" ${dis}>${S.deform.on?'Zurücksetzen':'Verformen'}</button>`;}
+  if(S.tab==='cmp')h+=tg('cmpBorder',null,'Grenzfälle zeigen',S.opt.cmpBorder);
+  el.innerHTML=h;}
+function tg(key,val,label,on){return`<button class="btn" data-opt="${key}" ${val?`data-val="${val}"`:''} aria-pressed="${on}">${label}</button>`;}
+function syncCovSlider(){const i=$('#covR'),o=$('#covRout');if(i){i.value=Math.round(S.opt.covR);o.textContent=Math.round(S.opt.covR)+' pm';}}
+function renderCaption(){const el=$('#caption'),v=S.view[S.tab];let h='';
+  if(S.tab==='ion'){const ex=IONIC[S.ex.ion];
+    if(v==='transfer')h=CAPTIONS.ionTransfer(ex)[S.step];
+    else if(v==='lattice')h=ex.lattice==='rocksalt'?`<b>Ionengitter (${ex.typ}):</b> Jedes ${ex.cat.ion} ist von 6 ${ex.an.ion} umgeben und umgekehrt. Ziehe mit der Maus oder dem Finger, um das Gitter zu drehen.`:`<b>Ionengitter (${ex.typ}):</b> Jedes Ca²⁺ ist von 8 F⁻ umgeben, jedes F⁻ von 4 Ca²⁺. Auf ein Ca²⁺ kommen zwei F⁻. Ziehe, um das Gitter zu drehen.`;
+    else if(v==='deform')h='<b>Verformung:</b> Starte die Simulation. Beobachte, welche Ionen nach dem Verschieben übereinander liegen.';
+    else{const s=S.step;h=s===0?`<b>Born-Haber-Kreisprozess:</b> Ausgangspunkt sind die Elemente im Standardzustand (${ex.start}); der grüne Pfeil zeigt die gemessene Bildungsenthalpie. Gehe Schritt für Schritt weiter.`:(()=>{const b=ex.bh[s-1];return`<b>Schritt ${s}: ${b.k}</b> · ΔH = ${sgn(b.dH)} kJ/mol${b.lattice?` (aus dem Satz von Hess: ΔfH − Σ = ${sgn(ex.fH)} − (${sgn(ex.sumUp)}))`:''}${b.unsure?' · Wert nicht direkt messbar, Literaturangaben streuen stark.':''}`;})();}}
+  else if(S.tab==='cov'){const m=MOL[S.ex.cov];
+    if(v==='lewis')h=CAPTIONS.covLewis(m)[S.step];
+    else if(v==='space')h=`<b>Räumlicher Bau von ${m.label}:</b> ${m.shape}${m.angle!=='–'?`, Bindungswinkel ${m.angle}`:''}. ${m.dipole?'Die Ladungsschwerpunkte fallen nicht zusammen: Dipolmolekül.':m.dEN>0?'Die Bindungsdipole heben sich wegen der Symmetrie auf: kein Dipolmolekül.':'Unpolare Bindung, kein Dipolmolekül.'}`;
+    else h=S.level==='II'?'<b>Potenzialkurve (Morse-Näherung):</b> Verschiebe den Kernabstand. Das Minimum liegt bei rₑ; die Tiefe Dₑ ist größer als die messbare Dissoziationsenergie D₀ (Nullpunktsschwingung).':'<b>Energie und Abstand:</b> Verschiebe den Kernabstand. Bei großem Abstand ziehen sich die Atome an, bei sehr kleinem Abstand stoßen sich die Atomkerne ab. Am tiefsten Punkt der Kurve liegt die Bindungslänge.';}
+  else if(S.tab==='met'){const ex=METALS[S.ex.met];
+    if(v==='gas')h=S.step===0?`<b>Schritt 1 · Metallatome:</b> Jedes ${ex.name}-Atom (${ex.shells.join('·')}) hat ${ex.ve} Valenzelektron${ex.ve>1?'en':''}. Hier sind sie noch einzelnen Atomen zugeordnet.`:`<b>Schritt 2 · Elektronengas:</b> Die Valenzelektronen sind zwischen den Atomrümpfen ${ex.core} frei beweglich. Lege eine Spannung an, ändere die Temperatur oder verforme das Metall.${S.level==='II'?' Die Driftbewegung ist stark übertrieben dargestellt.':''}`;
+    else h=`<b>Bändermodell ${ex.name}:</b> ${ex.bandNote}. Am Fermi-Niveau grenzen besetzte an freie Zustände: elektrische Leitfähigkeit.`;}
+  else{const p=CMP_POINTS.find(q=>q.f===S.opt.cmpSel);h=p?`<b>${p.f}:</b> mittlere EN ${fmt(p.x,2)}, ΔEN ${fmt(p.y,2)} · ${p.t}`:'<b>Bindungsdreieck:</b> Tippe einen Punkt an. Je größer ΔEN, desto stärker ionisch; je kleiner die mittlere EN bei kleinem ΔEN, desto stärker metallisch.';}
+  el.innerHTML=h;}
+function renderFacts(){const el=$('#facts');let f=[];const II=S.level==='II';
+  if(S.tab==='ion'){const ex=IONIC[S.ex.ion];f=[['Verhältnisformel',ex.label],['Ionen',`${ex.cat.ion} und ${ex.an.ion}`],['Gittertyp',ex.typ],['Koordinationszahl',ex.kz],['Schmelztemperatur',ex.mp]];
+    if(II){f.push(['Ionenradien (Shannon)',`${ex.cat.rIon} pm / ${ex.an.rIon} pm`],['Gitterkonstante a',`${ex.a} pm`],['ΔH(Gitter) Born-Haber',`${sgn(ex.latticeH,1)} kJ/mol`]);
+      if(ex.blU)f.push(['U Born-Landé',`${sgn(ex.blU,0)} kJ/mol (${sgn((ex.blU-ex.latticeH)/Math.abs(ex.latticeH)*100,1)} %)`]);else f.push(['U Born-Landé','nicht berechnet (Fluorit-Typ)']);}}
+  else if(S.tab==='cov'){const m=MOL[S.ex.cov];f=[['Molekül',`${m.label} (${m.name})`],['Bindung',m.bondTxt],['Bindungslänge',m.d],['Bindungsenergie',m.E],['Bindungswinkel',m.angle],['Molekülgestalt',m.shape],['ΔEN (größte)',fmt(m.dEN,2)]];
+    if(II)f.push(['Dipolmoment',m.mu]);if(II&&m.dia)f.push(['Dₑ / D₀',`${fmt(m.dia.De,0)} / ${fmt(m.dia.D0,0)} kJ/mol`]);}
+  else if(S.tab==='met'){const ex=METALS[S.ex.met];f=[['Element',`${ex.name} (${ex.el})`],['Valenzelektronen (Modell)',String(ex.ve)],['Atomrumpf',ex.core],['Gitter',ex.lat],['Schmelztemperatur',ex.mp],['el. Leitfähigkeit (20 °C)',ex.sigma]];
+    if(II)f.push(['Atomisierungsenthalpie',ex.atomH],['Metallradius / Ionenradius',`${ex.rMet} / ${ex.rIon} pm`]);}
+  else{const p=CMP_POINTS.find(q=>q.f===S.opt.cmpSel);if(p)f=[['Stoff',p.f],['EN',p.a===p.b?fmt(EN[p.a],2):`${p.a} ${fmt(EN[p.a],2)} · ${p.b} ${fmt(EN[p.b],2)}`],['mittlere EN',fmt(p.x,2)],['ΔEN',fmt(p.y,2)]];}
+  el.innerHTML=f.map(([a,b])=>`<div><dt>${a}</dt><dd>${b}</dd></div>`).join('');el.hidden=!f.length;}
+function renderWordbank(){const el=$('#wordbank');if(S.level!=='I'){el.hidden=true;return;}el.hidden=false;
+  el.innerHTML=`<h4>Wortspeicher</h4><p class="hint">Artikel: <span class="art der">der</span><span class="art die">die</span><span class="art das">das</span> · daneben die Pluralform</p><ul class="wb">${WORDS[S.tab].map(([a,w,p])=>`<li><span class="art ${a==='x'?'x':a}">${a==='x'?'–':a}</span><b>${w}</b> <span class="pl">${p}</span></li>`).join('')}</ul>`;}
+function renderCritique(){$('#critGrid').innerHTML=CRITIQUE[S.tab][S.level].map(([h,p])=>`<div class="crit"><h4>${h}</h4><p>${p}</p></div>`).join('');}
+
+function renderTasks(){const list=TASKS[S.tab][S.level];const showSol=store.get('showSol',false);
+  $('#tasks-sub').textContent=S.level==='I'?'Bearbeite die Aufgaben mit der Simulation. Die Sprachhilfen helfen dir beim Formulieren.':'Bearbeiten Sie die Aufgaben mithilfe der Simulation und der Daten im Steckbrief.';
+  $('#tasks').innerHTML=list.map((t,i)=>{let body='';
+    if(t.type==='text')body=`<textarea data-tid="${t.id}" aria-label="Antwort zu Aufgabe ${i+1}">${esc(store.get('ans:'+t.id,''))}</textarea>`;
+    else if(t.type==='mc'){const v=store.get('ans:'+t.id,null);body=`<div class="opts">${t.opts.map((o,j)=>`<label><input type="radio" name="${t.id}" value="${j}" ${v===j?'checked':''}><span>${o}</span></label>`).join('')}</div>`;}
+    else if(t.type==='gap'){const v=store.get('ans:'+t.id,{});body=`<div class="words" aria-label="Wortliste">${t.words.map(w=>`<span>${w}</span>`).join('')}</div><p class="gaptext">${t.text.replace(/\[\[(\d+)\]\]/g,(_,n)=>`<select data-gap="${n}" aria-label="Lücke ${n}"><option value="">…</option>${t.words.map(w=>`<option ${v[n]===w?'selected':''}>${w}</option>`).join('')}</select>`)}</p>`;}
+    else if(t.type==='num'){const v=store.get('ans:'+t.id,{});body=t.fields.map((f,j)=>`<div class="numrow"><label for="${t.id}-${j}">${f.l}</label><input id="${t.id}-${j}" data-f="${j}" inputmode="decimal" value="${esc(v[j]??'')}"><span class="unit">${f.unit}</span></div>`).join('');}
+    else if(t.type==='table'){const v=store.get('ans:'+t.id,{});body=`<div class="tbl-wrap"><table class="fill"><thead><tr><th></th>${t.cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${t.rows.map((r,ri)=>`<tr><th>${r[0]}</th>${r[1].map((a,ci)=>a===null?'<td>—</td>':`<td><select data-cell="${ri}-${ci}" aria-label="${r[0]}: ${t.cols[ci]}"><option value="">…</option>${t.choices[ci].map(c=>`<option ${v[ri+'-'+ci]===c?'selected':''}>${c}</option>`).join('')}</select></td>`).join('')}</tr>`).join('')}</tbody></table></div>`;}
+    else if(t.type==='sort'){const v=store.get('ans:'+t.id,{});body=`<div class="tbl-wrap"><table class="fill" style="min-width:0"><tbody>${t.items.map(([s],ri)=>`<tr><th>${s}</th><td><select data-cell="${ri}" aria-label="Bindungsart von ${s}"><option value="">…</option>${t.choices.map(([k,l])=>`<option value="${k}" ${v[ri]===k?'selected':''}>${l}</option>`).join('')}</select></td></tr>`).join('')}</tbody></table></div>`;}
+    const needsCheck=t.type!=='text';
+    const help=(S.level==='I'&&t.help)?`<details class="help"><summary>Sprachhilfe: Satzanfänge</summary><ul>${t.help.map(h=>`<li>${h}</li>`).join('')}</ul></details>`:'';
+    const sol=showSol&&t.sol?`<details class="sol"><summary>Lösungsvorschlag</summary><p>${t.sol}</p></details>`:'';
+    const txt=t.type==='gap'?'':`<p>${t.text}</p>`;
+    return`<article class="task" data-task="${t.id}"><div class="task-meta"><span class="no">Aufgabe ${i+1}</span><span class="tag op" title="${OPS[t.op]||''}">${t.op}</span><span class="tag">AFB ${t.afb}</span></div>${S.level==='I'&&OPS[t.op]?`<p class="opdef">${t.op}: ${OPS[t.op]}</p>`:''}${txt}${body}${needsCheck?`<div class="task-actions"><button class="btn primary" data-check="${t.id}">Prüfen</button><span class="fb-slot" aria-live="polite"></span></div>`:''}${help}${sol}</article>`;}).join('');}
+function findTask(id){for(const tab of Object.values(TASKS))for(const lv of Object.values(tab)){const t=lv.find(x=>x.id===id);if(t)return t;}}
+function parseNum(s){if(s==null)return NaN;s=String(s).trim().replace(/\s/g,'').replace('−','-').replace(',','.');return s===''?NaN:Number(s);}
+function checkTask(id){const t=findTask(id),card=$(`[data-task="${id}"]`),slot=card.querySelector('.fb-slot');let ok=0,tot=0,extra='';
+  if(t.type==='mc'){const r=card.querySelector('input[type=radio]:checked');tot=1;if(r&&+r.value===t.ans)ok=1;else extra=r?` · Tipp: ${t.hint}`:' · Bitte eine Antwort auswählen.';}
+  else if(t.type==='gap'){card.querySelectorAll('select[data-gap]').forEach(s=>{tot++;const good=s.value===t.gaps[s.dataset.gap];s.classList.toggle('ok',good);s.classList.toggle('bad',!good);if(good)ok++;});}
+  else if(t.type==='num'){t.fields.forEach((f,j)=>{tot++;const inp=card.querySelector(`[data-f="${j}"]`);const v=parseNum(inp.value);const good=Math.abs(v-f.ans)<=f.tol+1e-9;if(good)ok++;else if(!isNaN(v)&&Math.abs(Math.abs(v)-Math.abs(f.ans))<=f.tol&&Math.sign(v)!==Math.sign(f.ans))extra=' · Prüfe das Vorzeichen.';});if(ok<tot&&!extra&&t.hint)extra=` · Tipp: ${t.hint}`;}
+  else if(t.type==='table'){t.rows.forEach((r,ri)=>r[1].forEach((a,ci)=>{if(a===null)return;tot++;const s=card.querySelector(`[data-cell="${ri}-${ci}"]`);const good=s.value===a;s.classList.toggle('ok',good);s.classList.toggle('bad',!good);if(good)ok++;}));}
+  else if(t.type==='sort'){t.items.forEach(([n,k],ri)=>{tot++;const s=card.querySelector(`[data-cell="${ri}"]`);const good=s.value===k;s.classList.toggle('ok',good);s.classList.toggle('bad',!good);if(good)ok++;});}
+  const res=ok===tot?'richtig':ok===0?'falsch':`${ok} von ${tot} richtig – die rot markierten Antworten sind falsch`;
+  const cls=ok===tot?'ok':ok===0?'bad':'part';
+  slot.innerHTML=`<span class="fb ${cls}">${tot>1&&ok>0&&ok<tot?res:res}${ok<tot?extra:''}</span>`;
+  store.set('res:'+id,`${ok}/${tot}`);}
+function saveInput(card){const id=card.dataset.task,t=findTask(id);if(!t)return;
+  if(t.type==='text')store.set('ans:'+id,card.querySelector('textarea').value);
+  else if(t.type==='mc'){const r=card.querySelector('input[type=radio]:checked');store.set('ans:'+id,r?+r.value:null);}
+  else if(t.type==='gap'){const v={};card.querySelectorAll('select[data-gap]').forEach(s=>v[s.dataset.gap]=s.value);store.set('ans:'+id,v);}
+  else if(t.type==='num'){const v={};card.querySelectorAll('[data-f]').forEach(i=>v[i.dataset.f]=i.value);store.set('ans:'+id,v);}
+  else{const v={};card.querySelectorAll('[data-cell]').forEach(s=>v[s.dataset.cell]=s.value);store.set('ans:'+id,v);}}
+
+/* ================= Ereignisse ================= */
+function setStep(n,fromPlay){S.step=clamp(n,0,Math.max(0,stepCount()-1));S.stepT=0;if(!fromPlay)S.playing=false;
+  if(S.tab==='met'&&S.view.met==='gas'){if(S.step===1&&MET.bound)metRelease(false);if(S.step===0){MET.bound=true;MET.volt=false;S.deform.on=false;}}
+  renderControls();renderCaption();renderLegend();}
+$('#levelSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.level=b.dataset.level;store.set('level',S.level);S.step=0;S.stepT=0;S.playing=false;renderAll();});
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.tab=b.dataset.tab;store.set('tab',S.tab);S.step=0;S.stepT=0;S.playing=false;S.deform.on=false;MET.dirty=true;renderAll();});
+$('#examples').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.ex[S.tab]=b.dataset.ex;store.set('ex',S.ex);S.step=0;S.stepT=0;S.playing=false;S.deform.on=false;S.opt.covR=null;S.opt.covPlay=false;MET.dirty=true;MET.volt=false;S.opt.cmpSel=null;renderAll();});
+$('#views').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;S.view[S.tab]=b.dataset.view;S.step=0;S.stepT=0;S.playing=false;S.deform.on=false;S.deform.t=0;if(S.tab==='met')MET.dirty=true;renderAll();});
+$('#controls').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.step!==undefined)return setStep(+b.dataset.step);
+  const a=b.dataset.act;
+  if(a==='prev')return setStep(S.step-1);if(a==='next')return setStep(S.step+1);
+  if(a==='play'){if(S.playing){S.playing=false;}else{if(S.step>=stepCount()-1)setStep(0);S.playing=true;S.stepT=0;}renderControls();return;}
+  if(a==='deform'){S.deform.on=!S.deform.on;S.deform.t=0;renderControls();renderCaption();return;}
+  if(a==='volt'){MET.volt=!MET.volt;renderControls();return;}
+  if(a==='covplay'){S.opt.covPlay=true;S.opt.covPlayT=0;return;}
+  const k=b.dataset.opt;if(k){if(b.dataset.val)S.opt[k]=b.dataset.val;else S.opt[k]=!S.opt[k];renderControls();renderLegend();renderCaption();}});
+$('#controls').addEventListener('input',e=>{if(e.target.id==='covR'){S.opt.covPlay=false;S.opt.covR=+e.target.value;$('#covRout').textContent=e.target.value+' pm';}if(e.target.id==='metT'){MET.T=+e.target.value;$('#metTout').textContent=MET.T+' °C';}});
+$('#tasks').addEventListener('input',e=>{const c=e.target.closest('.task');if(c)saveInput(c);});
+$('#tasks').addEventListener('change',e=>{const c=e.target.closest('.task');if(c)saveInput(c);});
+$('#tasks').addEventListener('click',e=>{const b=e.target.closest('[data-check]');if(b){saveInput(b.closest('.task'));checkTask(b.dataset.check);}});
+$('#teacherBody').innerHTML=TEACHER;
+$('#solToggle').checked=!!store.get('showSol',false);
+$('#solToggle').addEventListener('change',e=>{store.set('showSol',e.target.checked);renderTasks();});
+$('#studentName').value=store.get('name','');$('#studentName').addEventListener('input',e=>store.set('name',e.target.value));
+$('#copyBtn').addEventListener('click',()=>{const lines=[`Bindungslabor – Antworten (Sekundarstufe ${S.level})`,`Name: ${$('#studentName').value||'—'}`,''];const tabN={ion:'Ionenbindung',cov:'Elektronenpaarbindung',met:'Metallbindung',cmp:'Vergleich'};
+  for(const [tab,lv] of Object.entries(TASKS)){lines.push('== '+tabN[tab]+' ==');lv[S.level].forEach((t,i)=>{const a=store.get('ans:'+t.id,null),r=store.get('res:'+t.id,null);let s='';
+    if(t.type==='text')s=a||'—';else if(t.type==='mc')s=a==null?'—':t.opts[a];else if(t.type==='sort')s=a?t.items.map(([n],ri)=>`${n}: ${(t.choices.find(c=>c[0]===a[ri])||['','—'])[1]}`).join('; '):'—';else s=a?Object.entries(a).map(([k,v])=>`${k}: ${v||'—'}`).join('; '):'—';
+    lines.push(`Aufgabe ${i+1} (${t.op}): ${s}${r?` [geprüft: ${r}]`:''}`);});lines.push('');}
+  const text=lines.join('\n');const ta=$('#copyArea');ta.value=text;const done=m=>{$('#copyMsg').textContent=m;};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>done('Kopiert. In ein Dokument oder eine Nachricht einfügen.'),()=>{ta.hidden=false;ta.select();done('Text unten markieren und kopieren (Strg/Cmd + C).');});}
+  else{ta.hidden=false;ta.select();done('Text unten markieren und kopieren (Strg/Cmd + C).');}});
+
+window.BL={IONIC,MOL,METALS,CMP_POINTS,TASKS,S,MET,latticePoints,gammaOf,morse,lpDirs,setStep,renderAll};
+readColors();resize();renderAll();requestAnimationFrame(frame);
+</script>
+
+</body></html>
