@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interaktive Animationen – Chemie, Biologie &amp; Informatik</title>
+<meta name="description" content="Sammlung browserbasierter Modelle, Simulationen und Werkzeuge für den Chemie-, Biologie- und Informatikunterricht.">
+<script>
+  /* Farbschema vor dem ersten Rendern setzen (verhindert kurzes Aufblitzen) */
+  (function () {
+    try {
+      var t = localStorage.getItem('idx-theme-v2');
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
+<style>
+  /* Farbschema: Catppuccin – Latte (hell, Standard) und Frappé (dunkel) */
+  :root {
+    --ink: #EFF1F5;      /* Latte base */
+    --panel: #E6E9EF;    /* Latte mantle */
+    --panel2: #DCE0E8;   /* Latte crust */
+    --line: #CCD0DA;     /* Latte surface0 */
+    --line2: #ACB0BE;    /* Latte surface2 */
+    --txt: #4C4F69;      /* Latte text */
+    --dim: #6C6F85;      /* Latte subtext0 */
+    --accent: #8839EF;   /* Latte mauve */
+    --chem: #179299;     /* Latte teal */
+    --bio: #40A02B;      /* Latte green */
+    --inf: #1E66F5;      /* Latte blue */
+    --tool: #FE640B;     /* Latte peach */
+    --glow: #E5E6F8;     /* Latte base mit Lavender-Schimmer */
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color-scheme: light;
+  }
+  :root[data-theme="dark"] {
+    --ink: #303446;      /* Frappé base */
+    --panel: #414559;    /* Frappé surface0 */
+    --panel2: #51576D;   /* Frappé surface1 */
+    --line: #51576D;     /* Frappé surface1 */
+    --line2: #626880;    /* Frappé surface2 */
+    --txt: #C6D0F5;      /* Frappé text */
+    --dim: #A5ADCE;      /* Frappé subtext0 */
+    --accent: #CA9EE6;   /* Frappé mauve */
+    --chem: #81C8BE;     /* Frappé teal */
+    --bio: #A6D189;      /* Frappé green */
+    --inf: #8CAAEE;      /* Frappé blue */
+    --tool: #EF9F76;     /* Frappé peach */
+    --glow: #3A3D57;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: radial-gradient(1200px 700px at 20% -10%, var(--glow) 0%, transparent 60%), var(--ink);
+    color: var(--txt);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .sr {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 40px 16px 60px; }
+
+  /* Kopfbereich */
+  header { padding-bottom: 18px; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .2em;
+    text-transform: uppercase; color: var(--dim); margin: 0 0 8px;
+  }
+  h1 { font-size: clamp(24px, 4vw, 36px); margin: 0 0 10px; font-weight: 700; letter-spacing: -.02em; line-height: 1.15; }
+  h1 span { color: var(--accent); }
+  .sub { color: var(--dim); margin: 0 0 14px; max-width: 72ch; }
+
+  details.hinweis {
+    max-width: 72ch;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--panel);
+    font-size: 14px;
+  }
+  details.hinweis > summary {
+    cursor: pointer; list-style: none; padding: 9px 14px;
+    color: var(--dim); font-family: var(--mono); font-size: 12px;
+    letter-spacing: .1em; text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px;
+  }
+  details.hinweis ul { margin: 0; padding: 0 18px 12px 34px; color: var(--txt); }
+  details.hinweis li { margin: 4px 0; }
+  kbd {
+    font-family: var(--mono); font-size: 12px; padding: 1px 6px;
+    border: 1px solid var(--line2); border-radius: 4px; background: var(--panel2);
+  }
+
+  /* Werkzeugleiste */
+  .toolbar {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    padding: 12px 0;
+    margin: 6px 0 0;
+    background: color-mix(in srgb, var(--ink) 90%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .search { flex: 1 1 240px; position: relative; display: block; }
+  .search svg {
+    position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+    width: 15px; height: 15px; color: var(--dim); pointer-events: none;
+  }
+  .search input, .toolbar select {
+    width: 100%;
+    background: var(--panel); color: var(--txt);
+    border: 1px solid var(--line); border-radius: 8px;
+    font: 14px var(--sans);
+    padding: 8px 12px;
+  }
+  .search input { padding-left: 33px; }
+  .search input::placeholder { color: var(--dim); }
+  .toolbar select { width: auto; cursor: pointer; }
+
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .seg button { border: 0; border-radius: 0; border-right: 1px solid var(--line); }
+  .seg button:last-child { border-right: 0; }
+  .btn, .seg button {
+    background: var(--panel); color: var(--dim);
+    border: 1px solid var(--line); border-radius: 8px;
+    font: 500 13px var(--sans);
+    padding: 8px 11px; cursor: pointer;
+    transition: background-color .15s ease, color .15s ease;
+  }
+  .seg button { border-top: 0; border-bottom: 0; border-left: 0; }
+  .btn:hover, .seg button:hover { color: var(--txt); background: var(--panel2); }
+  .seg button[aria-pressed="true"] { color: var(--txt); background: var(--panel2); box-shadow: inset 0 -2px 0 var(--accent); }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .tools { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+
+  .status { font-family: var(--mono); font-size: 12px; color: var(--dim); margin: 10px 0 0; min-height: 1.5em; }
+
+  /* Gliederung: Fachgruppen und Themenfelder */
+  details > summary { list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  .chev { width: 14px; height: 14px; flex: none; transition: transform .15s ease; color: var(--dim); }
+  details[open] > summary > .chev { transform: rotate(90deg); }
+
+  details.gruppe { margin-top: 26px; }
+  details.gruppe > summary {
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer; padding: 8px 2px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  details.gruppe > summary h2 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex: none; }
+  .gruppe[data-farbe="chem"] { --c: var(--chem); }
+  .gruppe[data-farbe="bio"]  { --c: var(--bio); }
+  .gruppe[data-farbe="inf"]  { --c: var(--inf); }
+  .gruppe[data-farbe="tool"] { --c: var(--tool); }
+  .count { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--dim); white-space: nowrap; }
+
+  details.thema {
+    margin-top: 12px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--panel) 45%, transparent);
+  }
+  details.thema > summary {
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer; padding: 11px 14px;
+    font-family: var(--mono); font-size: 12.5px; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--dim);
+  }
+  details.thema > summary:hover { color: var(--txt); }
+  details.thema > .grid { padding: 2px 14px 14px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 12px; }
+
+  /* Kacheln */
+  .card {
+    --c: var(--chem);
+    position: relative;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px 18px 16px;
+    display: flex; flex-direction: column;
+    text-decoration: none; color: inherit;
+    overflow: hidden;
+    transition: transform .15s ease, border-color .15s ease, background-color .15s ease;
+  }
+  .card::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--c); opacity: .75;
+  }
+  .card[data-fach="Biologie"] { --c: var(--bio); }
+  .card[data-fach="Informatik"] { --c: var(--inf); }
+  .gruppe[data-farbe="tool"] .card { --c: var(--tool); }
+  .card:hover { transform: translateY(-2px); border-color: var(--line2); background: var(--panel2); }
+  .tag {
+    align-self: flex-start;
+    font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+    color: color-mix(in srgb, var(--c) 50%, var(--txt));
+    background: color-mix(in srgb, var(--c) 11%, transparent);
+    border: 1px solid color-mix(in srgb, var(--c) 30%, transparent);
+    padding: 3px 7px; border-radius: 6px; margin-bottom: 10px;
+  }
+  .card h3 { margin: 0 0 6px; font-size: 16px; line-height: 1.3; }
+  .card p { margin: 0; color: var(--dim); font-size: 13px; line-height: 1.45; }
+  .card-foot {
+    margin-top: auto; padding-top: 14px;
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 11.5px;
+  }
+  .card-foot .meta { color: var(--dim); }
+  .card-foot .arrow { color: var(--accent); white-space: nowrap; }
+
+  .leer { color: var(--dim); padding: 30px 0; text-align: center; }
+
+  /* Tabelle */
+  #tabelle { margin-top: 18px; }
+  .table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 760px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: 0; }
+  th {
+    font-family: var(--mono); font-size: 11px; font-weight: 500;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--dim);
+    background: var(--panel2); white-space: nowrap;
+  }
+  th button {
+    all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+  }
+  th button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  th button::after { content: "\2195"; opacity: .45; font-size: 11px; }
+  th[aria-sort="ascending"] button::after { content: "\25B2"; opacity: 1; color: var(--accent); }
+  th[aria-sort="descending"] button::after { content: "\25BC"; opacity: 1; color: var(--accent); }
+  tbody tr:hover td { background: var(--panel2); }
+  td a { color: var(--txt); font-weight: 600; text-decoration: none; border-bottom: 1px solid var(--line2); }
+  td a:hover { color: var(--accent); border-color: var(--accent); }
+  td.num { font-family: var(--mono); white-space: nowrap; }
+  td.desc { color: var(--dim); font-size: 13px; min-width: 260px; }
+  .pill {
+    --c: var(--chem);
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase;
+    color: color-mix(in srgb, var(--c) 50%, var(--txt)); border: 1px solid color-mix(in srgb, var(--c) 35%, transparent);
+    background: color-mix(in srgb, var(--c) 10%, transparent);
+    padding: 2px 6px; border-radius: 5px; white-space: nowrap;
+  }
+  .pill[data-fach="Biologie"] { --c: var(--bio); }
+  .pill[data-fach="Informatik"] { --c: var(--inf); }
+
+  footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--dim); font-size: 12.5px; }
+
+  @media (max-width: 640px) {
+    .tools { width: 100%; }
+    .toolbar { position: static; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+  @media print {
+    :root, :root[data-theme="dark"] {
+      --ink: #fff; --panel: #fff; --panel2: #f2f2f2; --line: #ccc; --line2: #999;
+      --txt: #000; --dim: #333; --glow: #fff;
+    }
+    body { background: #fff; }
+    .toolbar, .status, .hinweis, #kacheln { display: none !important; }
+    #tabelle, #tabelle[hidden] { display: block !important; }
+    .table-scroll { overflow: visible; border: 0; }
+    table { min-width: 0; font-size: 11px; }
+    td a { border: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Sammlung &middot; Unterrichtsmaterialien</p>
+    <h1>Interaktive <span>Animationen</span> &amp; Simulationen</h1>
+    <p class="sub">
+      Diese Sammlung bündelt browserbasierte Modelle, Simulationen und Werkzeuge für den Chemie-, Biologie- und
+      Informatikunterricht. Sie veranschaulichen Vorgänge auf Teilchen-, Zell- und Systemebene, die sich der direkten
+      Beobachtung entziehen, und lassen sich ohne Installation im Browser nutzen &ndash; per Beamer im Plenum oder in
+      Einzel- und Partnerarbeit.
+    </p>
+    <details class="hinweis">
+      <summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Hinweise zur Nutzung</summary>
+      <ul>
+        <li>Alle Darstellungen sind Modelle und damit zweckgebundene Vereinfachungen. Teilchengrößen, Farben, Abstände und Geschwindigkeiten sind in der Regel nicht maßstabsgetreu; die Grenzen des jeweiligen Modells sollten im Unterricht ausdrücklich thematisiert werden.</li>
+        <li>Die Angaben zur Jahrgangsstufe sind Orientierungswerte und hängen vom jeweiligen Lehrplan ab.</li>
+        <li>Die Bereiche lassen sich durch Anklicken der Überschriften ein- und ausblenden. Die Tabellenansicht ist nach jeder Spalte sortierbar und eignet sich auch zum Ausdrucken.</li>
+        <li>Mit <kbd>/</kbd> gelangt man direkt in das Suchfeld, mit <kbd>Esc</kbd> wird die Suche geleert.</li>
+      </ul>
+    </details>
+  </header>
+
+  <div class="toolbar" role="search">
+    <label class="search">
+      <span class="sr">Sammlung durchsuchen</span>
+      <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <input id="q" type="search" placeholder="Suchen, z. B. Redox, Mitose, Dipol …" autocomplete="off" spellcheck="false">
+    </label>
+
+    <div class="seg" role="group" aria-label="Nach Fach filtern">
+      <button type="button" data-filter-fach="alle" aria-pressed="true">Alle</button>
+      <button type="button" data-filter-fach="Chemie" aria-pressed="false">Chemie</button>
+      <button type="button" data-filter-fach="Biologie" aria-pressed="false">Biologie</button>
+      <button type="button" data-filter-fach="Informatik" aria-pressed="false">Informatik</button>
+    </div>
+
+    <label>
+      <span class="sr">Nach Stufe filtern</span>
+      <select id="stufe">
+        <option value="alle">Alle Stufen</option>
+        <option value="sek1">Sek I (Jgst. 5–10)</option>
+        <option value="sek2">Sek II (Jgst. 11–12)</option>
+      </select>
+    </label>
+
+    <div class="seg" role="group" aria-label="Ansicht">
+      <button type="button" data-view="kacheln" aria-pressed="true">Kacheln</button>
+      <button type="button" data-view="tabelle" aria-pressed="false">Tabelle</button>
+    </div>
+
+    <div class="tools">
+      <button type="button" class="btn" id="alle-auf">Alle aufklappen</button>
+      <button type="button" class="btn" id="alle-zu">Alle zuklappen</button>
+      <button type="button" class="btn" id="theme" title="Farbschema umschalten (Catppuccin Latte / Frappé)">Dunkel</button>
+    </div>
+  </div>
+  <p class="status" id="status" aria-live="polite"></p>
+
+  <!--
+    PFLEGEHINWEIS
+    Jeder Eintrag ist ein <a class="card"> mit:
+      href        = Dateiname der Animation (relativ, unverändert lassen)
+      data-fach   = Chemie | Biologie | Informatik
+      data-typ    = Modell | Simulation | Werkzeug | Übung
+      data-jg     = Jahrgangsstufe, z. B. "9" oder "10-12"
+    Etikett, Jahrgangszeile und Tabellenansicht werden daraus automatisch erzeugt.
+  -->
+  <main id="kacheln">
+
+    <!-- ===================== WERKZEUGE ===================== -->
+    <details class="gruppe" id="g-werkzeuge" data-label="Werkzeuge" data-farbe="tool" open>
+      <summary>
+        <svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="dot" aria-hidden="true"></span><h2>Werkzeuge</h2><span class="count"></span>
+      </summary>
+
+      <details class="thema" id="t-formelsprache" data-label="Formelsprache" open>
+        <summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Formeln &amp; Reaktionsgleichungen<span class="count"></span></summary>
+        <div class="grid">
+          <a class="card" href="reaktionsgleichungen.html" data-fach="Chemie" data-typ="Werkzeug" data-jg="7-10">
+            <h3>Reaktionsgleichungen</h3>
+            <p>Aufstellen und Ausgleichen chemischer Reaktionsgleichungen auf Grundlage der Erhaltung der Atomanzahl.</p>
+          </a>
+          <a class="card" href="strukturformel-editor.html" data-fach="Chemie" data-typ="Werkzeug" data-jg="10-12">
+            <h3>Strukturformel-Editor</h3>
+            <p>Erstellen und Zeichnen von Strukturformeln organischer Moleküle.</p>
+          </a>
+        </div>
+      </details>
+    </details>
+
+    <!-- ===================== CHEMIE ===================== -->
+    <details class="gruppe" id="g-chemie" data-label="Chemie" data-farbe="chem" open>
+      <summary>
+        <svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="dot" aria-hidden="true"></span><h2>Chemie</h2><span class="count"></span>
+      </summary>
+
+      <details class="thema" id="t-atombau" data-label="Teilchenmodell & Atombau" open>
+        <summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Teilchenmodell &amp; Atombau<span class="count"></span></summary>
+        <div class="grid">
+          <a class="card" href="Teilchenmodell_Anziehung.html" data-fach="Chemie" data-typ="Simulation" data-jg="7-9">
+            <h3>Teilchen- &amp; Gitter-Simulation</h3>
+            <p>Anziehungskräfte zwischen Teilchen und Ausbildung regelmäßiger Gitterstrukturen.</p>
+          </a>
+          <a class="card" href="schalenmodell.html" data-fach="Chemie" data-typ="Modell" data-jg="8-9">
+            <h3>Schalenmodell (nach Bohr)</h3>
+            <p>Besetzung der Hauptenergieniveaus und Elektronenkonfiguration im Zusammenhang mit dem Periodensystem.</p>
+          </a>
+        </div>
+      </details>
+
+      <details class="thema" id="t-bindung" data-label="Bindung & zwischenmolekulare Wechselwirkungen" open>
+        <summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Bindung &amp; zwischenmolekulare Wechselwirkungen<span class="count"></span></summary>
+        <div class="grid">
+          <a class="card" href="Bindungslabor.html" data-fach="Chemie" data-typ="Simulation" data-jg="8-10">
+            <h3>Bindungslabor</h3>
+            <p>Vergleich von Ionenbindung, Elektronenpaarbindung und Metallbindung; Einfluss der Elektronegativitätsdifferenz auf den Bindungstyp.</p>
+          </a>
+          <a class="card" href="dipollabor.html" data-fach="Chemie" data-typ="Simulation" data-jg="9-10">
+            <h3>Dipol-Labor</h3>
+            <p>Polare Elektronenpaarbindungen und Dipolmoleküle im interaktiven Vergleich.</p>
+          </a>
+          <a class="card" href="van-der-waals-modell.html" data-fach="Chemie" data-typ="Modell" data-jg="10">
+            <h3>Van-der-Waals-Wechselwirkungen</h3>
+            <p>Temporäre und induzierte Dipole; Einfluss von Kettenlänge und Verzweigung auf die Siedetemperaturen der Alkane.</p>
+          </a>
+        </div>
+      </details>
+
+      <details class="thema" id="t-kinetik" data-label="Reaktionskinetik & chemisches Gleichgewicht" open>
+        <summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Reaktionskinetik &amp; chemisches Gleichgewicht<span class="count"></span></summary>
+        <div class="grid">
+          <a class="card" href="Stoßtheorie_Animation.html" data-fach="Chemie" data-typ="Modell" data-jg="9-11">
+            <h3>Stoßtheorie</h3>
+            <p>Wirksame und unwirksame Zusammenstöße von Teilchen sowie Aktivierungsenergie.</p>
+          </a>
+          <a class="card" href="GGW_Veresterung_Stoßtheorie.html" data-fach="Chemie" data-typ="Modell" data-jg="11-12">
+            <h3>Veresterung &amp; Gleichgewicht</h3>
+            <p>Veresterung auf Teilchenebene und Einstellung des dynamischen Gleichgewichts.</p>
+          </a>
+          <a class="card" href="GGW_Veresterung_Stoßtheorie_Temperatur.html" data-fach="Chemie" data-typ="Simulation" data-jg="11-12">
+            <h3>Veresterung &amp; Gleichgewicht – mit Temperaturregler</h3>
+            <p>Erweiterte Variante der Veresterung auf Teilchenebene mit einstellbarer Temperatur.</p>
+          </a>
+        </div>
+      </details>
+
+      <details class="thema" id="t-redox" data-label="Redoxreaktionen & Elektrochemie" open>
+        <summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Redoxreaktionen &amp; Elektrochemie<span class="count"></span></summary>
+        <div class="grid">
+          <a class="card" href="redox_elektronenuebergang_jgst9_v3.html" data-fach="Chemie" data-typ="Modell" data-jg="9">
+            <h3>Redoxreaktion</h3>
+            <p>Elektronenübertragung als Donator-Akzeptor-Reaktion und Bildung von Ionen.</p>
+          </a>
+          <a class="card" href="Salzloesung_Leitfaehigkeit%20Elektrolyse.html" data-fach="Chemie" data-typ="Modell" data-jg="9">
+            <h3>Leitfähigkeit von Salzlösungen</h3>
+            <p>Gerichtete Bewegung frei beweglicher Ionen im elektrischen Feld als Grundlage der Elektrolyse.</p>
+          </a>
+          <a class="card" href="Elektrolyse_klasse9.html" data-fach="Chemie" data-typ="Modell" data-jg="9">
+            <h3>Elektrolyse</h3>
+            <p>Erzwungene Redoxreaktion durch Anlegen einer äußeren Gleichspannung.</p>
+          </a>
+        </div>
+      </details>
+
+      <details class="thema" id="t-saeure-base" data-label="Säure-Base-Reaktionen" open>
+        <summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Säure-Base-Reaktionen<span class="count"></span></summary>
+        <div class="grid">
+          <a class="card" href="Animation_Protolyse_HCL_in_Wasser.html" data-fach="Chemie" data-typ="Modell" data-jg="9-10">
+            <h3>Protolyse: HCl in Wasser</h3>
+            <p>Protonenübertragung von Chlorwasserstoff- auf Wassermoleküle unter Bildung von Oxonium- und Chlorid-Ionen.</p>
+          </a>
+        </div>
+      </details>
+
+      <details class="thema" id="t-nachweis" data-label="Nachweisreaktionen (organische Analytik)" open>
+        <summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Nachweisreaktionen (organische Analytik)<span class="count"></span></summary>
+        <div class="grid">
+          <a class="card" href="Animation_Fehling_Probe.html" data-fach="Chemie" data-typ="Modell" data-jg="10-12">
+            <h3>Fehling-Probe</h3>
+            <p>Nachweis von Aldehyden und reduzierenden Zuckern durch Reduktion von Kupfer(II)-Komplexen zu Kupfer(I)-oxid.</p>
+          </a>
+          <a class="card" href="Animation_Fehling_Probe_v2.html" data-fach="Chemie" data-typ="Modell" data-jg="10-12">
+            <h3>Fehling-Probe (Version 2)</h3>
+            <p>Alternative Darstellung der Fehling-Probe.</p>
+          </a>
+          <a class="card" href="Animation_Silberspiegel_Tollens_Probe.html" data-fach="Chemie" data-typ="Modell" data-jg="10-12">
+            <h3>Tollens-Probe (Silberspiegel)</h3>
+            <p>Reduktion von Diamminsilber(I)-Ionen zu elementarem Silber als Nachweis reduzierender Carbonylverbindungen.</p>
+          </a>
+        </div>
+      </details>
+    </details>
+
+    <!-- ===================== BIOLOGIE ===================== -->
+    <details class="gruppe" id="g-biologie" data-label="Biologie" data-farbe="bio" open>
+      <summary>
+        <svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="dot" aria-hidden="true"></span><h2>Biologie</h2><span class="count"></span>
+      </summary>
+
+      <details class="thema" id="t-cytologie" data-label="Cytologie" open>
+        <summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Cytologie<span class="count"></span></summary>
+        <div class="grid">
+          <a class="card" href="zelle-interaktiv.html" data-fach="Biologie" data-typ="Modell" data-jg="6-11">
+            <h3>Interaktive Zelle</h3>
+            <p>Bau und Funktion der Zellorganellen tierischer und pflanzlicher Zellen.</p>
+          </a>
+          <a class="card" href="Membranfluss.html" data-fach="Biologie" data-typ="Modell" data-jg="10-12">
+            <h3>Membranfluss</h3>
+            <p>Vesikeltransport zwischen ER, Golgi-Apparat und Plasmamembran; Endocytose und Exocytose.</p>
+          </a>
+          <a class="card" href="mitose-red.html" data-fach="Biologie" data-typ="Modell" data-jg="9-10">
+            <h3>Mitose</h3>
+            <p>Phasen der Kernteilung und Verteilung der Chromatiden auf die Tochterkerne.</p>
+          </a>
+          <a class="card" href="meiose.html" data-fach="Biologie" data-typ="Modell" data-jg="9-11">
+            <h3>Meiose</h3>
+            <p>Reduktion des Chromosomensatzes von diploid zu haploid; Neukombination durch zufällige Verteilung homologer Chromosomen und Crossing-over.</p>
+          </a>
+        </div>
+      </details>
+
+      <details class="thema" id="t-vererbung" data-label="Vererbung & Humangenetik" open>
+        <summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Vererbung &amp; Humangenetik<span class="count"></span></summary>
+        <div class="grid">
+          <a class="card" href="stammbaumanalyse.html" data-fach="Biologie" data-typ="Übung" data-jg="9-12">
+            <h3>Stammbaumanalyse</h3>
+            <p>Ermittlung des Erbgangs aus Familienstammbäumen (autosomal oder gonosomal, dominant oder rezessiv) und Ableitung der Genotypen einzelner Personen.</p>
+          </a>
+        </div>
+      </details>
+
+      <details class="thema" id="t-genetik" data-label="Molekulargenetik" open>
+        <summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Molekulargenetik<span class="count"></span></summary>
+        <div class="grid">
+          <a class="card" href="DNA-Baukasten.html" data-fach="Biologie" data-typ="Modell" data-jg="9-10">
+            <h3>DNA-Baukasten</h3>
+            <p>Aufbau der DNA-Doppelhelix aus Nucleotiden und komplementäre Basenpaarung.</p>
+          </a>
+          <a class="card" href="dns-replikation.html" data-fach="Biologie" data-typ="Modell" data-jg="10-11">
+            <h3>DNA-Replikation</h3>
+            <p>Semikonservative Verdopplung der DNA als Voraussetzung der Zellteilung.</p>
+          </a>
+          <a class="card" href="genexpression.html" data-fach="Biologie" data-typ="Modell" data-jg="10-12">
+            <h3>Genexpression</h3>
+            <p>Transkription und Translation im Rahmen der Proteinbiosynthese.</p>
+          </a>
+        </div>
+      </details>
+
+      <details class="thema" id="t-regulation" data-label="Regulation & Homöostase" open>
+        <summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Regulation &amp; Homöostase<span class="count"></span></summary>
+        <div class="grid">
+          <a class="card" href="negative_Rückkopplung_min.html" data-fach="Biologie" data-typ="Modell" data-jg="9-11">
+            <h3>Negative Rückkopplung – kompakt</h3>
+            <p>Reduzierte Darstellung eines Regelkreises mit negativer Rückkopplung.</p>
+          </a>
+          <a class="card" href="negative_Rückkopplung_full.html" data-fach="Biologie" data-typ="Modell" data-jg="9-11">
+            <h3>Negative Rückkopplung – vollständig</h3>
+            <p>Vollständige Darstellung eines Regelkreises mit negativer Rückkopplung.</p>
+          </a>
+          <a class="card" href="Animation_Blutzuckerregulation.html" data-fach="Biologie" data-typ="Modell" data-jg="9-11">
+            <h3>Blutzuckerregulation</h3>
+            <p>Antagonistische Wirkung von Insulin und Glucagon auf die Blutglucosekonzentration.</p>
+          </a>
+        </div>
+      </details>
+
+      <details class="thema" id="t-immunbiologie" data-label="Immunbiologie" open>
+        <summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Immunbiologie<span class="count"></span></summary>
+        <div class="grid">
+          <a class="card" href="immunsystem-klasse9.html" data-fach="Biologie" data-typ="Modell" data-jg="9">
+            <h3>Immunsystem</h3>
+            <p>Zelluläre und humorale Komponenten sowie Ablauf der Immunantwort.</p>
+          </a>
+        </div>
+      </details>
+    </details>
+
+    <!-- ===================== INFORMATIK ===================== -->
+    <details class="gruppe" id="g-informatik" data-label="Informatik & Technik" data-farbe="inf" open>
+      <summary>
+        <svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="dot" aria-hidden="true"></span><h2>Informatik &amp; Technik</h2><span class="count"></span>
+      </summary>
+
+      <details class="thema" id="t-digitaltechnik" data-label="Digitaltechnik" open>
+        <summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Digitaltechnik<span class="count"></span></summary>
+        <div class="grid">
+          <a class="card" href="schaltlogik_simulation.html" data-fach="Informatik" data-typ="Simulation" data-jg="8-10">
+            <h3>Schaltlogik-Simulation</h3>
+            <p>Logikgatter (UND, ODER, NICHT) und einfache digitale Schaltungen.</p>
+          </a>
+        </div>
+      </details>
+    </details>
+
+    <p class="leer" id="leer" hidden>Keine Einträge gefunden. Suchbegriff oder Filter anpassen.</p>
+  </main>
+
+  <section id="tabelle" hidden aria-label="Tabellarische Übersicht">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col" data-key="titel"><button type="button">Titel</button></th>
+            <th scope="col" data-key="fach"><button type="button">Fach</button></th>
+            <th scope="col" data-key="thema"><button type="button">Themenfeld</button></th>
+            <th scope="col" data-key="jg"><button type="button" title="Orientierungswert, lehrplanabhängig">Jgst.</button></th>
+            <th scope="col" data-key="typ"><button type="button">Typ</button></th>
+            <th scope="col">Beschreibung</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="leer" id="leer-tab" hidden>Keine Einträge gefunden. Suchbegriff oder Filter anpassen.</p>
+  </section>
+
+  <footer>
+    <span id="anzahl"></span> Einträge &middot; Jahrgangsangaben sind Orientierungswerte.
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var KEY_OPEN = 'idx-open', KEY_VIEW = 'idx-view', KEY_THEME = 'idx-theme-v2';
+  function sGet(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
+  function sSet(k, v) { try { window.localStorage.setItem(k, v); } catch (e) {} }
+  function $all(sel, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(sel)); }
+
+  var root = document.documentElement;
+  var kacheln = document.getElementById('kacheln');
+  var tabelle = document.getElementById('tabelle');
+  var tbody = tabelle.querySelector('tbody');
+  var statusEl = document.getElementById('status');
+  var leer = document.getElementById('leer');
+  var leerTab = document.getElementById('leer-tab');
+  var qInput = document.getElementById('q');
+  var stufeSel = document.getElementById('stufe');
+  var btnAuf = document.getElementById('alle-auf');
+  var btnZu = document.getElementById('alle-zu');
+
+  var gruppen = $all('details.gruppe', kacheln);
+  var themen = $all('details.thema', kacheln);
+  var alleDetails = gruppen.concat(themen);
+
+  /* Suchnormalisierung: "Rückkopplung" findet man mit "rück", "rueck" und "ruck" */
+  function fold(s) {
+    return s.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
+  }
+  function strip(s) {
+    return s.toLowerCase().replace(/ß/g, 'ss').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  /* ---------- Einträge aus den Kacheln einlesen ---------- */
+  var items = $all('a.card', kacheln).map(function (el, i) {
+    var jg = (el.getAttribute('data-jg') || '').split('-').map(Number);
+    var min = jg[0] || 0, max = jg[1] || min;
+    var thema = el.closest('details.thema');
+    var gruppe = el.closest('details.gruppe');
+    var it = {
+      el: el, i: i,
+      href: el.getAttribute('href'),           /* Rohwert, unverändert */
+      titel: el.querySelector('h3').textContent.trim(),
+      text: el.querySelector('p').textContent.trim(),
+      fach: el.getAttribute('data-fach') || '',
+      typ: el.getAttribute('data-typ') || '',
+      thema: thema ? thema.getAttribute('data-label') : '',
+      gruppe: gruppe ? gruppe.getAttribute('data-label') : '',
+      min: min, max: max,
+      jg: min === max ? String(min) : min + '\u2013' + max
+    };
+    var raw = [it.titel, it.text, it.fach, it.typ, it.thema, it.gruppe].join(' ');
+    it.hay = fold(raw) + ' ' + strip(raw);
+
+    /* Etikett und Fußzeile der Kachel */
+    var tag = document.createElement('span');
+    tag.className = 'tag';
+    tag.textContent = it.typ;
+    el.insertBefore(tag, el.firstChild);
+
+    var foot = document.createElement('span');
+    foot.className = 'card-foot';
+    var meta = document.createElement('span');
+    meta.className = 'meta';
+    meta.textContent = 'Jgst. ' + it.jg;
+    var arrow = document.createElement('span');
+    arrow.className = 'arrow';
+    arrow.textContent = 'Öffnen \u2192';
+    foot.appendChild(meta);
+    foot.appendChild(arrow);
+    el.appendChild(foot);
+
+    /* Tabellenzeile */
+    var tr = document.createElement('tr');
+    function cell(txt, cls) {
+      var td = document.createElement('td');
+      if (cls) td.className = cls;
+      td.textContent = txt;
+      return td;
+    }
+    var tdT = document.createElement('td');
+    var a = document.createElement('a');
+    a.setAttribute('href', it.href);
+    a.textContent = it.titel;
+    tdT.appendChild(a);
+    var tdF = document.createElement('td');
+    var pill = document.createElement('span');
+    pill.className = 'pill';
+    pill.setAttribute('data-fach', it.fach);
+    pill.textContent = it.fach;
+    tdF.appendChild(pill);
+    tr.appendChild(tdT);
+    tr.appendChild(tdF);
+    tr.appendChild(cell(it.gruppe === 'Werkzeuge' ? 'Werkzeuge: ' + it.thema : it.thema));
+    tr.appendChild(cell(it.jg, 'num'));
+    tr.appendChild(cell(it.typ));
+    tr.appendChild(cell(it.text, 'desc'));
+    it.row = tr;
+    return it;
+  });
+
+  document.getElementById('anzahl').textContent = items.length;
+
+  /* ---------- Tabelle: Sortierung (aufsteigend, absteigend, Gliederung) ---------- */
+  var sortKey = null, sortDir = 1;
+  var ths = $all('th[data-key]', tabelle);
+
+  function cmp(a, b) {
+    var r;
+    if (sortKey === 'jg') r = (a.min - b.min) || (a.max - b.max);
+    else r = a[sortKey].localeCompare(b[sortKey], 'de', { sensitivity: 'base' });
+    return (r * sortDir) || (a.i - b.i);
+  }
+  function renderTable() {
+    var list = items.slice();
+    if (sortKey) list.sort(cmp);
+    var frag = document.createDocumentFragment();
+    list.forEach(function (it) { frag.appendChild(it.row); });
+    tbody.appendChild(frag);
+    ths.forEach(function (th) {
+      if (th.getAttribute('data-key') === sortKey) th.setAttribute('aria-sort', sortDir === 1 ? 'ascending' : 'descending');
+      else th.removeAttribute('aria-sort');
+    });
+  }
+  ths.forEach(function (th) {
+    th.querySelector('button').addEventListener('click', function () {
+      var k = th.getAttribute('data-key');
+      if (sortKey === k) {
+        if (sortDir === 1) sortDir = -1;
+        else { sortKey = null; sortDir = 1; }
+      } else { sortKey = k; sortDir = 1; }
+      renderTable();
+    });
+  });
+  renderTable();
+
+  /* ---------- Auf-/Zuklappzustand merken ---------- */
+  var state = { q: '', fach: 'alle', stufe: 'alle' };
+  function filterAktiv() { return state.q !== '' || state.fach !== 'alle' || state.stufe !== 'alle'; }
+
+  function saveOpen() {
+    if (filterAktiv()) return;
+    var m = {};
+    alleDetails.forEach(function (d) { if (d.id) m[d.id] = d.open; });
+    sSet(KEY_OPEN, JSON.stringify(m));
+  }
+  try {
+    var saved = JSON.parse(sGet(KEY_OPEN) || 'null');
+    if (saved) alleDetails.forEach(function (d) {
+      if (d.id && typeof saved[d.id] === 'boolean') d.open = saved[d.id];
+    });
+  } catch (e) {}
+  alleDetails.forEach(function (d) { d.addEventListener('toggle', saveOpen); });
+
+  /* ---------- Filtern ---------- */
+  var STUFEN = { alle: null, sek1: [5, 10], sek2: [11, 13] };
+  var snapshot = null;
+
+  function matches(it) {
+    if (state.fach !== 'alle' && it.fach !== state.fach) return false;
+    var r = STUFEN[state.stufe];
+    if (r && (it.max < r[0] || it.min > r[1])) return false;
+    if (state.q) {
+      var terms = fold(state.q).split(/\s+/).filter(Boolean);
+      for (var t = 0; t < terms.length; t++) if (it.hay.indexOf(terms[t]) === -1) return false;
+    }
+    return true;
+  }
+
+  function apply() {
+    var aktiv = filterAktiv();
+    if (aktiv && !snapshot) snapshot = alleDetails.map(function (d) { return d.open; });
+
+    var n = 0;
+    items.forEach(function (it) {
+      var ok = matches(it);
+      it.el.hidden = !ok;
+      it.row.hidden = !ok;
+      if (ok) n++;
+    });
+
+    alleDetails.forEach(function (d) {
+      var total = d.querySelectorAll('a.card').length;
+      var sichtbar = d.querySelectorAll('a.card:not([hidden])').length;
+      var cnt = d.querySelector(':scope > summary .count');
+      if (cnt) cnt.textContent = aktiv ? sichtbar + ' / ' + total : String(total);
+      d.hidden = sichtbar === 0;
+      if (aktiv && sichtbar > 0) d.open = true;
+    });
+
+    if (!aktiv && snapshot) {
+      alleDetails.forEach(function (d, i) { d.open = snapshot[i]; });
+      snapshot = null;
+    }
+
+    leer.hidden = n > 0;
+    leerTab.hidden = n > 0;
+    statusEl.textContent = aktiv ? n + ' von ' + items.length + ' Einträgen' : items.length + ' Einträge';
+  }
+
+  qInput.addEventListener('input', function () { state.q = qInput.value.trim(); apply(); });
+  qInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { qInput.value = ''; state.q = ''; apply(); }
+  });
+  stufeSel.addEventListener('change', function () { state.stufe = stufeSel.value; apply(); });
+
+  var fachBtns = $all('[data-filter-fach]');
+  fachBtns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      state.fach = b.getAttribute('data-filter-fach');
+      fachBtns.forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      apply();
+    });
+  });
+
+  btnAuf.addEventListener('click', function () { alleDetails.forEach(function (d) { d.open = true; }); });
+  /* Zuklappen schließt die Themenfelder; die Fachgruppen bleiben offen und zeigen so die Gliederung */
+  btnZu.addEventListener('click', function () {
+    themen.forEach(function (d) { d.open = false; });
+    gruppen.forEach(function (d) { d.open = true; });
+  });
+
+  /* ---------- Ansicht ---------- */
+  var viewBtns = $all('[data-view]');
+  function setView(v) {
+    var tab = v === 'tabelle';
+    kacheln.hidden = tab;
+    tabelle.hidden = !tab;
+    btnAuf.disabled = tab;
+    btnZu.disabled = tab;
+    viewBtns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-view') === v)); });
+    sSet(KEY_VIEW, v);
+  }
+  viewBtns.forEach(function (b) {
+    b.addEventListener('click', function () { setView(b.getAttribute('data-view')); });
+  });
+  setView(sGet(KEY_VIEW) === 'tabelle' ? 'tabelle' : 'kacheln');
+
+  /* ---------- Farbschema ---------- */
+  var themeBtn = document.getElementById('theme');
+  function syncTheme() {
+    var hell = root.getAttribute('data-theme') === 'light';
+    themeBtn.textContent = hell ? 'Dunkel' : 'Hell';
+    themeBtn.setAttribute('aria-pressed', String(hell));
+  }
+  themeBtn.addEventListener('click', function () {
+    var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    root.setAttribute('data-theme', next);
+    sSet(KEY_THEME, next);
+    syncTheme();
+  });
+  syncTheme();
+
+  /* ---------- Tastaturkürzel ---------- */
+  document.addEventListener('keydown', function (e) {
+    var tag = document.activeElement ? document.activeElement.tagName : '';
+    if (e.key === '/' && !/^(INPUT|SELECT|TEXTAREA)$/.test(tag)) {
+      e.preventDefault();
+      qInput.focus();
+    }
+  });
+
+  apply();
+})();
+</script>
+</body>
+</html>
