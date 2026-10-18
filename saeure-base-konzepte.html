@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Säure-Base-Konzepte – Arrhenius und Brønsted</title>
+<style>
+:root{
+  --bg:#f4f6f8; --card:#ffffff; --line:#d8dee5; --text:#1b2430; --muted:#5b6977;
+  --akzent:#0f6e6e; --akzent-hell:#e3f1f1; --warn:#9a5b00; --warn-hell:#fdf3e2;
+  --ok:#1d6b3a; --ok-hell:#e5f4ea; --falsch:#9b2226; --falsch-hell:#fbeaea;
+  --paar1:#0f6e6e; --paar2:#8a3fa0; --h:#f2c14e; --rot:#c0504d; --blau:#4472c4; --gruen:#4a8a4a; --grau:#6b7785;
+  --radius:12px; --schrift:"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--schrift);line-height:1.6;font-size:16px}
+header{background:linear-gradient(135deg,#0f6e6e,#124e66);color:#fff;padding:18px 20px 14px}
+header h1{margin:0 0 2px;font-size:1.45rem;letter-spacing:.2px}
+header p.unter{margin:0;opacity:.9;font-size:.92rem}
+.kopfzeile{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.kopfzeile input{padding:7px 10px;border:none;border-radius:8px;font-size:.92rem;font-family:inherit;min-width:140px}
+.niveauleiste{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.niveaubtn{border:2px solid rgba(255,255,255,.45);background:rgba(255,255,255,.1);color:#fff;
+  padding:8px 13px;border-radius:999px;cursor:pointer;font-size:.86rem;font-family:inherit;transition:.15s}
+.niveaubtn:hover{background:rgba(255,255,255,.22)}
+.niveaubtn.aktiv{background:#fff;color:#124e66;border-color:#fff;font-weight:600}
+nav.kapitel{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--line);
+  display:flex;gap:4px;overflow-x:auto;padding:7px 12px;scrollbar-width:thin}
+nav.kapitel a{white-space:nowrap;text-decoration:none;color:var(--muted);font-size:.83rem;
+  padding:6px 11px;border-radius:999px}
+nav.kapitel a:hover{background:var(--akzent-hell);color:var(--akzent)}
+main{max-width:1020px;margin:0 auto;padding:22px 16px 60px}
+section.kap{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px 22px;margin-bottom:22px;scroll-margin-top:60px}
+section.kap > h2{margin:0 0 4px;font-size:1.18rem;color:var(--akzent);display:flex;align-items:center;gap:9px}
+.kapnr{display:inline-flex;align-items:center;justify-content:center;width:27px;height:27px;border-radius:50%;
+  background:var(--akzent);color:#fff;font-size:.85rem;font-weight:700;flex:0 0 auto}
+.lernziel{font-size:.88rem;color:var(--muted);border-left:3px solid var(--akzent-hell);padding-left:10px;margin:8px 0 16px}
+h3{font-size:1.02rem;margin:20px 0 6px}
+p{margin:.55em 0}
+.box{border-radius:10px;padding:12px 15px;margin:14px 0;font-size:.95rem}
+.box.merk{background:var(--akzent-hell);border-left:4px solid var(--akzent)}
+.box.achtung{background:var(--warn-hell);border-left:4px solid var(--warn)}
+.box.vertief{background:#f0f0f7;border-left:4px solid var(--paar2)}
+.box.wort{background:#fffdf3;border:1px dashed #d8c89a}
+.box h4{margin:0 0 6px;font-size:.93rem;text-transform:uppercase;letter-spacing:.5px}
+.formel{font-family:"Cambria Math",Georgia,serif;font-size:1.06rem}
+.mitte{text-align:center}
+.glchg{text-align:center;font-family:"Cambria Math",Georgia,serif;font-size:1.22rem;margin:12px 0;line-height:2}
+.p1{color:var(--paar1);font-weight:600}
+.p2{color:var(--paar2);font-weight:600}
+.legende{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin-top:4px}
+.gl{border-bottom:1.5px dotted var(--akzent);cursor:help;color:var(--akzent)}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:.92rem}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:#eef2f5;font-weight:600}
+td.z{text-align:center}
+.animbox{border:1px solid var(--line);border-radius:10px;background:#fbfcfd;padding:10px 12px 14px;margin:14px 0}
+.svgbox svg{width:100%;height:auto;display:block}
+.steuer{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:6px}
+button{font-family:inherit;font-size:.88rem;padding:7px 13px;border-radius:8px;border:1px solid var(--akzent);
+  background:var(--akzent);color:#fff;cursor:pointer;transition:.15s}
+button:hover{filter:brightness(1.1)}
+button.sek{background:#fff;color:var(--akzent)}
+button.klein{padding:5px 10px;font-size:.8rem}
+input[type=range]{flex:1 1 160px;min-width:140px;accent-color:var(--akzent)}
+select,input[type=text]{font-family:inherit;font-size:.92rem;padding:6px 9px;border:1px solid var(--line);
+  border-radius:7px;background:#fff;color:var(--text)}
+input[type=text]{min-width:170px}
+.phase{font-size:.9rem;color:var(--muted);min-height:2.6em;margin-top:8px;padding:8px 11px;background:#fff;
+  border:1px solid var(--line);border-radius:8px}
+.wahlzeile{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.chip{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:999px;padding:6px 12px;
+  font-size:.85rem;cursor:pointer}
+.chip.aktiv{background:var(--akzent);color:#fff;border-color:var(--akzent)}
+.aufgabe{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:14px 0;background:#fff}
+.afb{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.6px;padding:2px 8px;border-radius:999px;
+  background:#eef2f5;color:var(--muted);margin-right:8px;vertical-align:2px}
+.afb.a1{background:#e5f4ea;color:var(--ok)}
+.afb.a2{background:#fdf3e2;color:var(--warn)}
+.afb.a3{background:#f0e9f7;color:var(--paar2)}
+.opt{display:block;margin:5px 0;padding:7px 10px;border:1px solid var(--line);border-radius:8px;cursor:pointer;font-size:.94rem}
+.opt:hover{background:#f6f9fa}
+.opt input{margin-right:8px}
+.opt.richtig{background:var(--ok-hell);border-color:var(--ok)}
+.opt.falschm{background:var(--falsch-hell);border-color:var(--falsch)}
+.rueck{margin-top:9px;font-size:.9rem;padding:9px 11px;border-radius:8px;display:none}
+.rueck.ok{background:var(--ok-hell);border-left:4px solid var(--ok);display:block}
+.rueck.nein{background:var(--falsch-hell);border-left:4px solid var(--falsch);display:block}
+.rueck.info{background:#eef2f5;border-left:4px solid var(--grau);display:block}
+textarea{width:100%;min-height:72px;font-family:inherit;font-size:.93rem;padding:8px 10px;
+  border:1px solid var(--line);border-radius:8px;resize:vertical}
+.luecke select{min-width:160px;margin:2px 0}
+.balken{height:14px;background:#eef2f5;border-radius:7px;overflow:hidden;margin:4px 0 10px}
+.balken > div{height:100%;background:var(--akzent)}
+.fortschritt{height:5px;background:rgba(255,255,255,.25);border-radius:3px;margin-top:12px;overflow:hidden}
+.fortschritt > div{height:100%;background:#fff;width:0;transition:width .3s}
+.popover{position:fixed;inset:auto 0 0 0;background:#fff;border-top:3px solid var(--akzent);
+  box-shadow:0 -4px 22px rgba(0,0,0,.18);padding:16px 18px;z-index:99;display:none;max-height:55vh;overflow:auto}
+.popover h4{margin:0 0 4px;color:var(--akzent)}
+.popover .schliessen{position:absolute;top:10px;right:14px;background:none;border:none;color:var(--muted);font-size:1.3rem;padding:0}
+.nurdruck{display:none}
+footer{max-width:1020px;margin:0 auto;padding:0 16px 50px;color:var(--muted);font-size:.84rem}
+@media (max-width:620px){
+  body{font-size:15px}
+  section.kap{padding:16px 14px}
+  .glchg{font-size:1.02rem}
+}
+@media print{
+  header{background:#124e66 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  nav.kapitel,.steuer,.niveauleiste,button,.popover{display:none !important}
+  section.kap{break-inside:avoid;border:1px solid #bbb;box-shadow:none}
+  .nurdruck{display:block}
+  body{background:#fff}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Von Arrhenius zu Brønsted – wie Protonen übertragen werden</h1>
+  <p class="unter">Digitales Arbeitsblatt mit Simulation · Chemie · Sekundarstufe I und II</p>
+  <div class="kopfzeile">
+    <input type="text" id="fName" placeholder="Name">
+    <input type="text" id="fKlasse" placeholder="Klasse / Kurs">
+    <input type="text" id="fDatum" placeholder="Datum">
+  </div>
+  <div class="niveauleiste" id="niveauleiste"></div>
+  <div class="fortschritt"><div id="fortschrittsbalken"></div></div>
+</header>
+
+<nav class="kapitel" id="kapitelnav"></nav>
+
+<main>
+
+<section class="kap" id="k-arrhenius">
+  <h2><span class="kapnr">1</span> Das Konzept von Arrhenius</h2>
+  <p class="lernziel">Lernziel: Sie können das Säure-Base-Konzept nach Arrhenius wiedergeben und an Beispielen anwenden.</p>
+  <div id="txt-arrhenius"></div>
+</section>
+
+<section class="kap" id="k-grenzen">
+  <h2><span class="kapnr">2</span> Wo das Konzept von Arrhenius endet</h2>
+  <p class="lernziel">Lernziel: Sie können begründen, warum ein erweitertes Konzept notwendig ist.</p>
+  <div id="txt-grenzen"></div>
+</section>
+
+<section class="kap" id="k-broensted">
+  <h2><span class="kapnr">3</span> Das Säure-Base-Konzept von Brønsted</h2>
+  <p class="lernziel">Lernziel: Sie können Säure und Base als Protonendonator und Protonenakzeptor definieren.</p>
+  <div id="txt-broensted"></div>
+</section>
+
+<section class="kap" id="k-sim">
+  <h2><span class="kapnr">4</span> Simulation: Übertragung eines Protons</h2>
+  <p class="lernziel">Lernziel: Sie können die Protonenübertragung zwischen zwei Teilchen beschreiben und die beteiligten Säure-Base-Paare benennen.</p>
+  <p>Wählen Sie eine Reaktion aus. Mit dem Schieberegler steuern Sie den Ablauf selbst; die Reaktionsgleichung darunter ist farbig nach korrespondierenden Paaren markiert.</p>
+  <div class="chips" id="simchips"></div>
+  <div id="simhost"></div>
+  <div class="rueck info" id="simnotiz" style="display:block"></div>
+  <div class="aufgabe">
+    <p><span class="afb a2">AFB II</span><strong>Beobachtungsauftrag.</strong> Bearbeiten Sie mindestens drei Reaktionen und notieren Sie, welches Teilchen jeweils das Proton abgibt und welches es aufnimmt.</p>
+    <textarea data-notiz="sim" placeholder="Reaktion 1: Protonendonator ... / Protonenakzeptor ..."></textarea>
+  </div>
+</section>
+
+<section class="kap" id="k-paare">
+  <h2><span class="kapnr">5</span> Korrespondierende Säure-Base-Paare</h2>
+  <p class="lernziel">Lernziel: Sie können zu einem Teilchen die korrespondierende Säure bzw. Base angeben.</p>
+  <div id="txt-paare"></div>
+</section>
+
+<section class="kap" id="k-mehrprotonig">
+  <h2><span class="kapnr">6</span> Mehrprotonige Säuren – Stufe für Stufe</h2>
+  <p class="lernziel">Lernziel: Sie können die Protolyse mehrprotoniger Säuren in Teilschritten und als Gesamtgleichung formulieren.</p>
+  <div id="txt-mehrprotonig"></div>
+  <div class="wahlzeile">
+    <label for="mpWahl"><strong>Säure:</strong></label>
+    <select id="mpWahl"></select>
+    <span id="mpStufen" class="chips" style="margin:0"></span>
+  </div>
+  <div id="mphost"></div>
+  <div id="mpinfo"></div>
+</section>
+
+<section class="kap" id="k-uebung">
+  <h2><span class="kapnr">7</span> Übungen</h2>
+  <p class="lernziel">Übungsteil ohne Bewertung: Fehler sind hier ausdrücklich erwünscht. Die Rückmeldung erscheint sofort.</p>
+  <div id="uebungen"></div>
+</section>
+
+<section class="kap" id="k-quiz">
+  <h2><span class="kapnr">8</span> Abschlussquiz</h2>
+  <p class="lernziel">Sechs Aufgaben der Anforderungsbereiche I bis III, passend zum gewählten Niveau.</p>
+  <div id="quiz"></div>
+  <div class="steuer" style="margin-top:16px">
+    <button id="btnAuswerten">Quiz auswerten</button>
+    <button class="sek" id="btnQuizReset">Antworten zurücksetzen</button>
+  </div>
+</section>
+
+<section class="kap" id="k-auswertung">
+  <h2><span class="kapnr">9</span> Auswertung</h2>
+  <div id="auswertung"><p class="lernziel">Die Auswertung erscheint, sobald Sie das Quiz auswerten lassen.</p></div>
+  <div class="steuer" style="margin-top:14px">
+    <button class="sek" onclick="window.print()">Arbeitsblatt drucken / als PDF sichern</button>
+    <button class="sek" id="btnLoesungen">Lösungen einblenden (Lehrkraft)</button>
+  </div>
+</section>
+
+<section class="kap" id="k-glossar">
+  <h2><span class="kapnr">G</span> Glossar – Wortliste</h2>
+  <p class="lernziel">Fachbegriffe mit Artikel, Pluralform und einer einfachen Umschreibung.</p>
+  <div id="glossartabelle"></div>
+</section>
+
+</main>
+
+<footer>
+  <p>Einzeldatei ohne Internetverbindung lauffähig. Eingaben werden – sofern der Browser es zulässt – lokal im Gerät gespeichert und verlassen dieses nicht.</p>
+</footer>
+
+<div class="popover" id="popover">
+  <button class="schliessen" onclick="document.getElementById('popover').style.display='none'">&times;</button>
+  <h4 id="popTitel"></h4>
+  <div id="popText"></div>
+</div>
+
+<script>
+/* ============================================================
+   1 · GRUNDZUSTAND
+   ============================================================ */
+const NIVEAUS = [
+  {id:'haupt', kurz:'Niveau I',   lang:'Hauptschule – grundlegend'},
+  {id:'real',  kurz:'Niveau II',  lang:'Realschule – mittleres Niveau'},
+  {id:'gym',   kurz:'Niveau III', lang:'Gymnasium – erweitertes Niveau'},
+  {id:'os',    kurz:'Sek II',     lang:'Oberstufe'}
+];
+const state = {niveau:'real', quiz:{}, uebung:{}, notiz:{}, kopf:{}, ausgewertet:false};
+
+function speichern(){
+  try{ localStorage.setItem('sb_konzepte', JSON.stringify(state)); }catch(e){}
+}
+function laden(){
+  try{
+    const r = localStorage.getItem('sb_konzepte');
+    if(r){ Object.assign(state, JSON.parse(r)); }
+  }catch(e){}
+}
+function istMin(stufe){ // true, wenn aktuelles Niveau mindestens 'stufe' ist
+  const ord = ['haupt','real','gym','os'];
+  return ord.indexOf(state.niveau) >= ord.indexOf(stufe);
+}
+
+/* ============================================================
+   2 · GLOSSAR (DaF/DaZ-Unterstützung)
+   ============================================================ */
+const GLOSSAR = {
+  'Proton':['das Proton, die Protonen','Ein positiv geladener Kernbaustein. Ein Wasserstoff-Ion H⁺ ist ein einzelnes Proton.'],
+  'Protonendonator':['der Donator, die Donatoren','Ein Teilchen, das ein Proton abgibt. „donare“ (lat.) = geben.'],
+  'Protonenakzeptor':['der Akzeptor, die Akzeptoren','Ein Teilchen, das ein Proton aufnimmt. „accipere“ (lat.) = annehmen.'],
+  'Protolyse':['die Protolyse, die Protolysen','Eine Reaktion, bei der ein Proton von einem Teilchen auf ein anderes übertragen wird.'],
+  'Dissoziation':['die Dissoziation, die Dissoziationen','Der Zerfall eines Stoffes in Ionen, zum Beispiel beim Lösen in Wasser.'],
+  'Oxonium-Ion':['das Oxonium-Ion, die Oxonium-Ionen','H₃O⁺ – entsteht, wenn ein Wassermolekül ein Proton aufnimmt. Auch: Hydronium-Ion.'],
+  'Hydroxid-Ion':['das Hydroxid-Ion, die Hydroxid-Ionen','OH⁻ – ein negativ geladenes Teilchen aus Sauerstoff und Wasserstoff.'],
+  'korrespondierend':['korrespondierend (Adjektiv)','„zusammengehörend“. Zwei Teilchen, die sich um genau ein Proton unterscheiden.'],
+  'Ampholyt':['der Ampholyt, die Ampholyte','Ein Teilchen, das je nach Reaktionspartner ein Proton abgeben oder aufnehmen kann.'],
+  'wässrige Lösung':['die Lösung, die Lösungen','Ein Stoff ist in Wasser gelöst.'],
+  'Gleichgewicht':['das Gleichgewicht, die Gleichgewichte','Hin- und Rückreaktion laufen gleich schnell ab; die Konzentrationen ändern sich nicht mehr.'],
+  'Neutralisation':['die Neutralisation, die Neutralisationen','Reaktion einer Säure mit einer Base; dabei entsteht Wasser.'],
+  'mehrprotonig':['mehrprotonig (Adjektiv)','Eine Säure, die mehr als ein Proton abgeben kann, z. B. H₂SO₄.'],
+  'Säurerest':['der Säurerest, die Säurereste','Der Teil der Säure, der nach der Protonenabgabe übrig bleibt, z. B. Cl⁻.'],
+  'freies Elektronenpaar':['das Elektronenpaar, die Elektronenpaare','Zwei Elektronen, die nicht an einer Bindung beteiligt sind. Sie binden das aufgenommene Proton.'],
+  'Autoprotolyse':['die Autoprotolyse','Protonenübertragung zwischen zwei gleichartigen Molekülen, z. B. zwischen zwei Wassermolekülen.'],
+  'Nivellierungseffekt':['der Nivellierungseffekt','In Wasser erscheinen alle sehr starken Säuren gleich stark, weil sie vollständig protolysiert vorliegen.']
+};
+function g(begriff, anzeige){
+  return '<span class="gl" data-g="'+begriff+'">'+(anzeige||begriff)+'</span>';
+}
+document.addEventListener('click', ev=>{
+  const el = ev.target.closest('.gl');
+  if(!el) return;
+  const e = GLOSSAR[el.dataset.g];
+  if(!e) return;
+  document.getElementById('popTitel').textContent = el.dataset.g;
+  document.getElementById('popText').innerHTML = '<p><em>'+e[0]+'</em></p><p>'+e[1]+'</p>';
+  document.getElementById('popover').style.display='block';
+});
+
+/* ============================================================
+   3 · INFOTEXTE, NACH NIVEAU DIFFERENZIERT
+   ============================================================ */
+const TEXTE = {};
+
+TEXTE.arrhenius = {
+haupt:`
+<p>Der Chemiker <strong>Svante Arrhenius</strong> erklärte im Jahr 1887 zum ersten Mal, was Säuren und Basen sind.</p>
+<p>Eine <strong>Säure</strong> zerfällt in Wasser. Dabei entstehen H⁺-Ionen (Wasserstoff-Ionen).</p>
+<p class="mitte formel">HCl &rarr; H⁺ + Cl⁻</p>
+<p>Eine <strong>Base</strong> zerfällt in Wasser. Dabei entstehen OH⁻-Ionen (${g('Hydroxid-Ion','Hydroxid-Ionen')}).</p>
+<p class="mitte formel">NaOH &rarr; Na⁺ + OH⁻</p>
+<p>Säure und Base reagieren miteinander zu Wasser. Diese Reaktion heißt ${g('Neutralisation')}.</p>
+<p class="mitte formel">H⁺ + OH⁻ &rarr; H₂O</p>
+<div class="box wort"><h4>Wortspeicher</h4>
+<p>die Säure – die Base – das Ion – das Wasserstoff-Ion (H⁺) – das Hydroxid-Ion (OH⁻) – abgeben – entstehen – zerfallen</p>
+<p><em>Satzbaustein:</em> „In Wasser entstehen aus HCl die Teilchen ____ und ____.“</p></div>`,
+real:`
+<p><strong>Svante Arrhenius</strong> formulierte 1887 die erste allgemeine Definition von Säuren und Basen. Grundlage ist die ${g('Dissoziation')} in ${g('wässrige Lösung','wässriger Lösung')}.</p>
+<div class="box merk"><h4>Definition nach Arrhenius</h4>
+<p><strong>Säure:</strong> ein Stoff, der in wässriger Lösung Wasserstoff-Ionen (H⁺) bildet.<br>
+<strong>Base:</strong> ein Stoff, der in wässriger Lösung ${g('Hydroxid-Ion','Hydroxid-Ionen')} (OH⁻) bildet.</p></div>
+<table><tr><th>Stoff</th><th>Dissoziation in Wasser</th><th>Einordnung</th></tr>
+<tr><td class="formel">HCl</td><td class="formel">HCl &rarr; H⁺ + Cl⁻</td><td>Säure</td></tr>
+<tr><td class="formel">H₂SO₄</td><td class="formel">H₂SO₄ &rarr; 2 H⁺ + SO₄²⁻</td><td>Säure (zweiprotonig)</td></tr>
+<tr><td class="formel">NaOH</td><td class="formel">NaOH &rarr; Na⁺ + OH⁻</td><td>Base</td></tr>
+<tr><td class="formel">KOH</td><td class="formel">KOH &rarr; K⁺ + OH⁻</td><td>Base</td></tr></table>
+<p>Bei der ${g('Neutralisation')} reagieren H⁺ und OH⁻ zu Wasser: <span class="formel">H⁺ + OH⁻ &rarr; H₂O</span>.</p>`,
+gym:`
+<p>Die Dissoziationstheorie von <strong>Svante Arrhenius</strong> (1887) verknüpft das Verhalten von Säuren und Basen mit der elektrolytischen ${g('Dissoziation')}: Gelöste Elektrolyte liegen in wässriger Lösung teilweise oder vollständig in Ionen vor, was sich in der elektrischen Leitfähigkeit der Lösung zeigt.</p>
+<div class="box merk"><h4>Definition nach Arrhenius</h4>
+<p><strong>Säure:</strong> Verbindung, die in wässriger Lösung unter Bildung von H⁺-Ionen dissoziiert.<br>
+<strong>Base:</strong> Verbindung, die in wässriger Lösung unter Bildung von OH⁻-Ionen dissoziiert.<br>
+<strong>Neutralisation:</strong> H⁺ + OH⁻ &rarr; H₂O; das Kation der Base und das Anion der Säure bleiben als Salz in Lösung.</p></div>
+<p>Der saure bzw. alkalische Charakter einer Lösung wird damit erstmals auf konkrete Teilchen zurückgeführt und nicht mehr nur über Sinneseindrücke oder Indikatorfarben beschrieben. Die Theorie erklärt außerdem, warum die Neutralisationsenthalpie starker Säuren mit starken Basen weitgehend unabhängig vom eingesetzten Stoffpaar ist: Es handelt sich stets um dieselbe Reaktion zwischen H⁺ und OH⁻.</p>`,
+os:`
+<p>Die Dissoziationstheorie von <strong>Arrhenius</strong> (1887) bildet den historischen Ausgangspunkt der modernen Säure-Base-Systematik. Sie definiert Säuren und Basen über die in wässriger Lösung gebildeten Ionen und verknüpft diese mit messbaren Größen, insbesondere der molaren Leitfähigkeit und dem Dissoziationsgrad α.</p>
+<div class="box merk"><h4>Definition nach Arrhenius</h4>
+<p><strong>Säure:</strong> dissoziiert in wässriger Lösung unter Bildung von H⁺.<br>
+<strong>Base:</strong> dissoziiert in wässriger Lösung unter Bildung von OH⁻.</p></div>
+<div class="box vertief"><h4>Vertiefung: Das „nackte“ Proton</h4>
+<p>Ein freies Proton besitzt einen Radius in der Größenordnung von 10⁻¹⁵ m und damit eine extrem hohe Ladungsdichte. In kondensierter Phase existiert es deshalb nicht isoliert, sondern stets gebunden an ein Lösungsmittelteilchen. In wässriger Lösung wird dies vereinfachend als H₃O⁺ formuliert; experimentell und quantenchemisch beschreibt man die Hydratstruktur über das Eigen-Ion H₉O₄⁺ und das Zundel-Ion H₅O₂⁺, zwischen denen ein schneller Wechsel stattfindet (Grotthuß-Mechanismus). Die Schreibweise „H⁺(aq)“ ist daher eine Abkürzung, keine Strukturaussage.</p></div>`
+};
+
+TEXTE.grenzen = {
+haupt:`
+<p>Das Konzept von Arrhenius funktioniert nicht immer. Es gibt drei Probleme:</p>
+<div class="box achtung"><h4>Probleme</h4>
+<p><strong>1.</strong> Ammoniak (NH₃) macht eine Lösung alkalisch. Aber NH₃ enthält gar kein OH.</p>
+<p><strong>2.</strong> Ein einzelnes H⁺-Ion gibt es in Wasser nicht. Es bindet sofort an ein Wassermolekül.</p>
+<p><strong>3.</strong> Die Reaktion funktioniert auch ohne Wasser. Gase aus HCl und NH₃ reagieren in der Luft zu weißem Rauch.</p></div>
+<p>Deshalb brauchen wir ein besseres Konzept.</p>`,
+real:`
+<div class="box achtung"><h4>Drei Grenzen des Arrhenius-Konzepts</h4>
+<p><strong>1 · Basen ohne Hydroxidgruppe.</strong> Ammoniak (NH₃) und Natriumcarbonat (Na₂CO₃) führen zu alkalischen Lösungen, enthalten aber selbst keine OH-Gruppe.</p>
+<p><strong>2 · Freie Protonen existieren nicht.</strong> In wässriger Lösung ist das Proton stets an ein Wassermolekül gebunden; es liegt als H₃O⁺ vor.</p>
+<p><strong>3 · Beschränkung auf Wasser.</strong> Chlorwasserstoff und Ammoniak reagieren auch in der Gasphase miteinander zu Ammoniumchlorid – ganz ohne Lösungsmittel.</p>
+<p class="mitte formel">HCl(g) + NH₃(g) &rarr; NH₄Cl(s)</p></div>`,
+gym:`
+<div class="box achtung"><h4>Grenzen des Arrhenius-Konzepts</h4>
+<p><strong>1 · Basen ohne OH-Gruppe.</strong> NH₃, Na₂CO₃ oder CH₃COONa erzeugen alkalische Lösungen, obwohl keine Hydroxidgruppe im Teilchen vorhanden ist. Das Konzept kann diese Beobachtung nicht erklären.</p>
+<p><strong>2 · Das Proton ist nicht isolierbar.</strong> Die Formulierung „HCl &rarr; H⁺ + Cl⁻“ unterschlägt das Lösungsmittel, das an der Reaktion beteiligt ist.</p>
+<p><strong>3 · Reaktionen außerhalb von Wasser.</strong> Säure-Base-Reaktionen in flüssigem Ammoniak, in Eisessig oder in der Gasphase bleiben unbeschrieben.</p>
+<p><strong>4 · Keine Abstufung.</strong> Das Konzept liefert kein Kriterium dafür, warum ein Stoff gegenüber einem Partner als Säure, gegenüber einem anderen aber als Base reagieren kann.</p></div>
+<p>Johannes Nicolaus <strong>Brønsted</strong> und, unabhängig von ihm, Thomas <strong>Lowry</strong> lösten diese Probleme 1923 durch einen Perspektivwechsel: Nicht der Zerfall eines einzelnen Stoffes steht im Mittelpunkt, sondern die <strong>Übertragung eines Protons zwischen zwei Reaktionspartnern</strong>.</p>`,
+os:`
+<div class="box achtung"><h4>Systematische Grenzen des Arrhenius-Konzepts</h4>
+<p><strong>1 · Stoffbezogen statt reaktionsbezogen.</strong> Säure und Base werden als Stoffeigenschaften definiert, nicht als Funktion in einer Reaktion. Amphotere Teilchen entziehen sich damit der Einordnung.</p>
+<p><strong>2 · Lösungsmittelgebunden.</strong> Die Definition ist an Wasser gekoppelt; Protolysen in Eisessig, flüssigem Ammoniak oder Dimethylsulfoxid sind nicht erfassbar, obwohl sie präparativ erhebliche Bedeutung haben.</p>
+<p><strong>3 · Modellinkonsistenz.</strong> Die postulierten freien H⁺-Ionen existieren in kondensierter Phase nicht.</p>
+<p><strong>4 · Keine Erklärung für Anionenbasen.</strong> Die alkalische Reaktion von CH₃COO⁻, CO₃²⁻ oder PO₄³⁻ bleibt unverstanden.</p></div>
+<p>Brønsted und Lowry formulierten 1923 unabhängig voneinander ein Konzept, das die Protonenübertragung selbst in den Mittelpunkt stellt. Es ist dem Arrhenius-Konzept nicht entgegengesetzt, sondern umfasst es als Sonderfall: Die Arrhenius-Säure ist eine Brønsted-Säure, deren Reaktionspartner das Lösungsmittel Wasser ist.</p>`
+};
+
+TEXTE.broensted = {
+haupt:`
+<div class="box merk"><h4>Definition nach Brønsted</h4>
+<p><strong>Säure</strong> = ein Teilchen, das ein ${g('Proton')} (H⁺) <strong>abgibt</strong>. Fachwort: ${g('Protonendonator')}.</p>
+<p><strong>Base</strong> = ein Teilchen, das ein Proton (H⁺) <strong>aufnimmt</strong>. Fachwort: ${g('Protonenakzeptor')}.</p></div>
+<p>Wichtig: Eine Säure kann ein Proton nur abgeben, wenn ein Partner da ist, der es aufnimmt. Es sind also immer <strong>zwei Teilchen</strong> beteiligt.</p>
+<p>Beispiel: Chlorwasserstoff und Wasser.</p>
+<p class="mitte formel">HCl + H₂O &rarr; Cl⁻ + H₃O⁺</p>
+<p>HCl gibt das Proton ab &rarr; HCl ist die Säure.<br>H₂O nimmt das Proton auf &rarr; H₂O ist die Base.</p>
+<p>Die Reaktion heißt ${g('Protolyse')}.</p>
+<div class="box wort"><h4>Wortspeicher</h4>
+<p>abgeben – aufnehmen – übertragen – der Donator – der Akzeptor – die Protolyse</p>
+<p><em>Satzbausteine:</em> „Das Teilchen ____ gibt ein Proton ab. Deshalb ist es die Säure.“ · „Das Teilchen ____ nimmt ein Proton auf. Deshalb ist es die Base.“</p></div>`,
+real:`
+<div class="box merk"><h4>Definition nach Brønsted (1923)</h4>
+<p><strong>Säure:</strong> Teilchen, das ein ${g('Proton')} abgibt &ndash; ${g('Protonendonator')}.<br>
+<strong>Base:</strong> Teilchen, das ein Proton aufnimmt &ndash; ${g('Protonenakzeptor')}.<br>
+<strong>${g('Protolyse')}:</strong> die Übertragung eines Protons von einer Säure auf eine Base.</p></div>
+<p>Säure und Base sind damit keine festen Stoffeigenschaften mehr, sondern <strong>Rollen in einer Reaktion</strong>. Eine Protonenabgabe ist nur möglich, wenn gleichzeitig ein Partner das Proton aufnimmt.</p>
+<p class="glchg"><span class="p1">HCl</span> + <span class="p2">H₂O</span> &rarr; <span class="p1">Cl⁻</span> + <span class="p2">H₃O⁺</span></p>
+<p class="legende"><span class="p1">■ Paar 1: HCl / Cl⁻</span><span class="p2">■ Paar 2: H₂O / H₃O⁺</span></p>
+<p>Das entstehende Teilchen H₃O⁺ heißt ${g('Oxonium-Ion')}. Es ist der eigentliche Träger der sauren Wirkung einer wässrigen Lösung.</p>`,
+gym:`
+<div class="box merk"><h4>Definition nach Brønsted und Lowry (1923)</h4>
+<p><strong>Säure:</strong> Teilchen, das ein ${g('Proton')} abgibt (${g('Protonendonator')}).<br>
+<strong>Base:</strong> Teilchen, das ein Proton aufnimmt (${g('Protonenakzeptor')}).<br>
+<strong>${g('Protolyse')}:</strong> Protonenübertragungsreaktion zwischen Säure und Base.</p></div>
+<p>Entscheidend ist der Perspektivwechsel vom Stoff zur Funktion: Ob ein Teilchen als Säure oder als Base reagiert, ergibt sich erst aus dem Reaktionspartner. Die Protonenabgabe ist an die gleichzeitige Protonenaufnahme gebunden; isolierte Protonenabgabe ist nicht möglich.</p>
+<p>Die Aufnahme des Protons erfolgt an einem ${g('freies Elektronenpaar','freien Elektronenpaar')} der Base. Dabei entsteht eine koordinative Bindung, die sich in nichts von einer gewöhnlichen Atombindung unterscheidet.</p>
+<p class="glchg"><span class="p1">HCl</span> + <span class="p2">H₂O</span> &rarr; <span class="p1">Cl⁻</span> + <span class="p2">H₃O⁺</span></p>
+<p class="legende"><span class="p1">■ Säure 1 / Base 1</span><span class="p2">■ Base 2 / Säure 2</span></p>
+<p>In jeder Protolyse treten zwei ${g('korrespondierend','korrespondierende')} Säure-Base-Paare auf. Der Doppelpfeil ⇌ zeigt an, dass sich bei schwachen Säuren ein ${g('Gleichgewicht')} einstellt; bei sehr starken Säuren wie HCl liegt das Gleichgewicht so weit rechts, dass vereinfachend ein einfacher Reaktionspfeil verwendet wird.</p>`,
+os:`
+<div class="box merk"><h4>Definition nach Brønsted und Lowry (1923)</h4>
+<p><strong>Säure:</strong> Protonendonator. <strong>Base:</strong> Protonenakzeptor. <strong>Protolyse:</strong> Protonenübertragung zwischen zwei korrespondierenden Säure-Base-Paaren.</p>
+<p class="formel mitte">HA + B ⇌ A⁻ + HB⁺</p></div>
+<p>Das Konzept ist funktional, nicht stoffbezogen: Die Zuordnung ergibt sich aus der konkreten Reaktion. Die Protonenaufnahme erfolgt formal am freien Elektronenpaar der Base unter Ausbildung einer koordinativen Bindung; das übertragene Teilchen ist das Proton, das bindende Elektronenpaar verbleibt beim Säurerest.</p>
+<div class="box vertief"><h4>Vertiefung: Lage des Gleichgewichts</h4>
+<p>Die Gleichgewichtslage einer Protolyse folgt aus der Differenz der pK<sub>S</sub>-Werte der beiden beteiligten Säuren. Das Gleichgewicht liegt auf der Seite der schwächeren Säure und der schwächeren Base, also auf der Seite der jeweils stabileren Teilchen. Für die Reaktion HA + B⁻ ⇌ A⁻ + HB gilt:</p>
+<p class="mitte formel">lg K = pK<sub>S</sub>(HB) − pK<sub>S</sub>(HA)</p>
+<p>Je stärker die eingesetzte Säure gegenüber der konjugierten Säure der Base ist, desto vollständiger verläuft die Übertragung.</p></div>
+<div class="box vertief"><h4>Vertiefung: Nivellierungs- und Differenzierungseffekt</h4>
+<p>In Wasser sind HCl, HBr, HI, HNO₃ und HClO₄ praktisch vollständig protolysiert; ihre Stärke erscheint einheitlich auf das Niveau des Oxonium-Ions nivelliert (${g('Nivellierungseffekt')}). Eine Differenzierung gelingt erst in einem schwächer basischen Lösungsmittel wie Eisessig, in dem Essigsäure selbst als Base fungiert.</p></div>`
+};
+
+TEXTE.paare = {
+haupt:`
+<p>Wenn eine Säure ihr Proton abgegeben hat, bleibt ein Teilchen übrig. Dieses Teilchen kann das Proton wieder aufnehmen. Es ist also eine Base.</p>
+<div class="box merk"><h4>Merke</h4>
+<p>Säure und zugehörige Base unterscheiden sich um <strong>genau ein Proton</strong>. Man nennt sie ein <strong>${g('korrespondierend','korrespondierendes')} Säure-Base-Paar</strong>.</p></div>
+<table><tr><th>Säure</th><th>minus 1 Proton</th><th>zugehörige Base</th></tr>
+<tr><td class="formel">HCl</td><td class="z">&rarr;</td><td class="formel">Cl⁻</td></tr>
+<tr><td class="formel">H₂O</td><td class="z">&rarr;</td><td class="formel">OH⁻</td></tr>
+<tr><td class="formel">NH₄⁺</td><td class="z">&rarr;</td><td class="formel">NH₃</td></tr></table>
+<p>Wasser ist etwas Besonderes: Es kann ein Proton abgeben <strong>und</strong> aufnehmen.</p>`,
+real:`
+<div class="box merk"><h4>Korrespondierendes Säure-Base-Paar</h4>
+<p>Zwei Teilchen, die sich um genau ein Proton unterscheiden, bilden ein korrespondierendes (konjugiertes) Säure-Base-Paar: <span class="formel">HA / A⁻</span>.</p>
+<p>In jeder Protolyse sind <strong>zwei</strong> solcher Paare beteiligt.</p></div>
+<table><tr><th>Säure</th><th>korrespondierende Base</th><th>Beispielreaktion</th></tr>
+<tr><td class="formel">HCl</td><td class="formel">Cl⁻</td><td class="formel">HCl + H₂O &rarr; Cl⁻ + H₃O⁺</td></tr>
+<tr><td class="formel">CH₃COOH</td><td class="formel">CH₃COO⁻</td><td class="formel">CH₃COOH + H₂O ⇌ CH₃COO⁻ + H₃O⁺</td></tr>
+<tr><td class="formel">H₃O⁺</td><td class="formel">H₂O</td><td class="formel">H₃O⁺ + OH⁻ &rarr; 2 H₂O</td></tr>
+<tr><td class="formel">NH₄⁺</td><td class="formel">NH₃</td><td class="formel">NH₄⁺ + H₂O ⇌ NH₃ + H₃O⁺</td></tr></table>
+<div class="box merk"><h4>${g('Ampholyt','Ampholyte')}</h4>
+<p>Wasser kann je nach Partner als Säure oder als Base reagieren:</p>
+<p class="mitte formel">HCl + H₂O &rarr; Cl⁻ + H₃O⁺ &nbsp;&nbsp;(Wasser als Base)<br>
+NH₃ + H₂O ⇌ NH₄⁺ + OH⁻ &nbsp;&nbsp;(Wasser als Säure)</p></div>`,
+gym:`
+<div class="box merk"><h4>Korrespondierende Säure-Base-Paare</h4>
+<p>HA / A⁻ bilden ein korrespondierendes Paar, wenn sie sich um genau ein Proton unterscheiden. Jede Protolyse umfasst zwei Paare; die Reaktionsgleichung lässt sich stets in der Form</p>
+<p class="mitte formel">Säure 1 + Base 2 ⇌ Base 1 + Säure 2</p>
+<p>schreiben, wobei Säure 1 / Base 1 und Säure 2 / Base 2 die Paare bilden.</p></div>
+<table><tr><th>Säure</th><th>korrespondierende Base</th><th>Besonderheit</th></tr>
+<tr><td class="formel">H₃O⁺</td><td class="formel">H₂O</td><td>stärkste in Wasser existenzfähige Säure</td></tr>
+<tr><td class="formel">H₂SO₄</td><td class="formel">HSO₄⁻</td><td>Base ist zugleich Säure &rarr; Ampholyt</td></tr>
+<tr><td class="formel">H₂CO₃</td><td class="formel">HCO₃⁻</td><td>Ampholyt</td></tr>
+<tr><td class="formel">H₂O</td><td class="formel">OH⁻</td><td>OH⁻ ist stärkste in Wasser existenzfähige Base</td></tr>
+<tr><td class="formel">NH₄⁺</td><td class="formel">NH₃</td><td>Kationensäure</td></tr></table>
+<div class="box merk"><h4>Ampholyte</h4>
+<p>Teilchen wie H₂O, HSO₄⁻, HCO₃⁻, H₂PO₄⁻ und HPO₄²⁻ können je nach Reaktionspartner als Säure oder als Base reagieren. Welche Rolle eintritt, entscheidet der pK<sub>S</sub>-Vergleich mit dem Partner.</p></div>
+<div class="box vertief"><h4>${g('Autoprotolyse')} des Wassers</h4>
+<p class="mitte formel">2 H₂O ⇌ H₃O⁺ + OH⁻</p>
+<p>Auch in reinem Wasser findet Protonenübertragung statt – allerdings in sehr geringem Ausmaß. Bei 25 °C beträgt c(H₃O⁺) = c(OH⁻) = 10⁻⁷ mol/L.</p></div>`,
+os:`
+<div class="box merk"><h4>Korrespondierende Paare und Gleichungsstruktur</h4>
+<p class="mitte formel">Säure 1 + Base 2 ⇌ Base 1 + Säure 2</p>
+<p>Die Zuordnung ist reaktionsabhängig. Die Stärke eines Paares wird über K<sub>S</sub> bzw. pK<sub>S</sub> quantifiziert; für ein korrespondierendes Paar gilt in wässriger Lösung bei 25 °C:</p>
+<p class="mitte formel">pK<sub>S</sub>(HA) + pK<sub>B</sub>(A⁻) = 14</p>
+<p>Je stärker die Säure, desto schwächer ihre korrespondierende Base.</p></div>
+<table><tr><th>Säure</th><th>pK<sub>S</sub> ≈</th><th>korresp. Base</th><th>Einordnung</th></tr>
+<tr><td class="formel">HClO₄</td><td class="z">−9</td><td class="formel">ClO₄⁻</td><td>sehr starke Säure, in Wasser nivelliert</td></tr>
+<tr><td class="formel">HCl</td><td class="z">−6</td><td class="formel">Cl⁻</td><td>in Wasser vollständig protolysiert</td></tr>
+<tr><td class="formel">H₃O⁺</td><td class="z">0</td><td class="formel">H₂O</td><td>Bezugspunkt in wässriger Lösung</td></tr>
+<tr><td class="formel">CH₃COOH</td><td class="z">4,75</td><td class="formel">CH₃COO⁻</td><td>schwache Säure</td></tr>
+<tr><td class="formel">NH₄⁺</td><td class="z">9,25</td><td class="formel">NH₃</td><td>Kationensäure</td></tr>
+<tr><td class="formel">H₂O</td><td class="z">14</td><td class="formel">OH⁻</td><td>Ampholyt</td></tr></table>
+<p style="font-size:.86rem;color:var(--muted)">pK<sub>S</sub>-Werte schwanken je nach Quelle und Temperatur geringfügig; die Angaben sind Richtwerte für 25 °C.</p>
+<div class="box vertief"><h4>Autoprotolyse und Ionenprodukt</h4>
+<p class="mitte formel">2 H₂O ⇌ H₃O⁺ + OH⁻ &nbsp;&nbsp;&nbsp; K<sub>W</sub> = c(H₃O⁺) · c(OH⁻) = 10⁻¹⁴ mol²·L⁻² (25 °C)</p>
+<p>Die Autoprotolyse ist ein Spezialfall der Protolyse, bei dem Donator und Akzeptor derselben Teilchensorte angehören. Sie begrenzt zugleich die in Wasser erreichbare Säure- und Basenstärke.</p></div>`
+};
+
+TEXTE.mehrprotonig = {
+haupt:`
+<p>Manche Säuren haben mehr als ein Proton. Sie geben die Protonen <strong>nacheinander</strong> ab – nicht alle auf einmal.</p>
+<p>Beispiel Schwefelsäure (H₂SO₄): Zuerst wird ein Proton abgegeben, danach das zweite.</p>`,
+real:`
+<p>${g('mehrprotonig','Mehrprotonige')} Säuren geben ihre Protonen <strong>stufenweise</strong> ab. Jede Stufe ist eine eigene Protolyse mit einem eigenen Reaktionspartner.</p>
+<p>Die Gesamtgleichung entsteht, indem man die Teilgleichungen addiert.</p>`,
+gym:`
+<p>Mehrprotonige Säuren protolysieren <strong>stufenweise</strong>. Jede Stufe besitzt einen eigenen K<sub>S</sub>-Wert, und die Stufen laufen in wässriger Lösung nebeneinander im Gleichgewicht ab.</p>
+<div class="box merk"><h4>Regel</h4>
+<p>Die Säurestärke nimmt von Stufe zu Stufe deutlich ab, typischerweise um vier bis fünf Zehnerpotenzen. Ursache ist die zunehmend negative Ladung des Säurerests: Die Abtrennung eines positiv geladenen Protons aus einem Anion erfordert eine höhere Energie als aus einem neutralen Molekül.</p></div>`,
+os:`
+<p>Mehrprotonige Säuren protolysieren stufenweise; jede Stufe besitzt eine eigene Säurekonstante. Die Stufen liegen in wässriger Lösung simultan im Gleichgewicht vor, ihre Anteile hängen vom pH-Wert ab (Hägg-Diagramm).</p>
+<div class="box vertief"><h4>Begründung der Abstufung</h4>
+<p>Mit jeder Deprotonierung steigt die negative Ladung des Säurerests. Die elektrostatische Anziehung zwischen Anion und Proton nimmt zu, zugleich sinkt die Stabilisierung des Produktanions relativ zum Edukt. Daraus resultiert eine Zunahme des pK<sub>S</sub>-Werts um typischerweise 4 bis 5 Einheiten pro Stufe.</p>
+<p>Eine vollständige Deprotonierung bis zur letzten Stufe ist in wässriger Lösung nur bei hinreichend hohem pH-Wert zu erreichen; bei pK<sub>S</sub>-Werten über 14 ist sie in Wasser nicht mehr vollständig realisierbar.</p></div>`
+};
+
+/* ============================================================
+   4 · ANIMATIONSMODUL
+   ============================================================ */
+const FARBEN = {rot:'var(--rot)', blau:'var(--blau)', gruen:'var(--gruen)', grau:'var(--grau)', lila:'var(--paar2)'};
+
+function kernBreite(label){
+  const l = label.replace(/[₀-₉²³⁺⁻]/g,'x').length;
+  return Math.max(58, l*15 + 24);
+}
+function winkelListe(n, von, bis){
+  if(n===0) return [];
+  if(n===1) return [(von+bis)/2];
+  const out=[]; const schritt=(bis-von)/(n-1);
+  for(let i=0;i<n;i++) out.push(von+i*schritt);
+  return out;
+}
+function molekuel(cx, cy, label, farbe, nH, seite, ladung, ladungAlpha){
+  const w = kernBreite(label), h = 56, r = Math.max(w,h)/2;
+  const winkel = seite==='links' ? winkelListe(nH,120,240) : winkelListe(nH,-62,62);
+  let s = '';
+  winkel.forEach(a=>{
+    const rad = a*Math.PI/180;
+    const bx = cx + Math.cos(rad)*(r+28), by = cy + Math.sin(rad)*(r+28);
+    s += '<line x1="'+cx+'" y1="'+cy+'" x2="'+bx.toFixed(1)+'" y2="'+by.toFixed(1)+'" stroke="#8795a3" stroke-width="3"/>';
+    s += '<circle cx="'+bx.toFixed(1)+'" cy="'+by.toFixed(1)+'" r="15" fill="#fdfdfd" stroke="#8795a3" stroke-width="2"/>';
+    s += '<text x="'+bx.toFixed(1)+'" y="'+(by+5).toFixed(1)+'" text-anchor="middle" font-size="14" fill="#333">H</text>';
+  });
+  s += '<rect x="'+(cx-w/2)+'" y="'+(cy-h/2)+'" width="'+w+'" height="'+h+'" rx="'+(h/2)+'" fill="'+farbe+'" opacity="0.92"/>';
+  s += '<text x="'+cx+'" y="'+(cy+7)+'" text-anchor="middle" font-size="20" font-weight="600" fill="#fff">'+label+'</text>';
+  if(ladung && ladungAlpha>0){
+    s += '<circle cx="'+(cx+w/2-2)+'" cy="'+(cy-h/2+2)+'" r="15" fill="#fff" stroke="#444" stroke-width="2" opacity="'+ladungAlpha.toFixed(2)+'"/>';
+    s += '<text x="'+(cx+w/2-2)+'" y="'+(cy-h/2+8)+'" text-anchor="middle" font-size="15" font-weight="700" fill="#222" opacity="'+ladungAlpha.toFixed(2)+'">'+ladung+'</text>';
+  }
+  return s;
+}
+
+/* Reaktionsdatensätze.
+   s = Säure (Protonendonator), b = Base (Protonenakzeptor)
+   kern  : Beschriftung des Rumpfteilchens
+   nH    : Anzahl der H-Atome, die am Rumpf verbleiben (ohne das übertragene Proton)
+   nHb   : Anzahl der H-Atome der Base vor der Aufnahme                                   */
+const REAKTIONEN = [
+ {id:'hcl_h2o', titel:'HCl + H₂O', ab:'haupt',
+  s:{kern:'Cl', farbe:FARBEN.gruen, nH:0, formel:'HCl', name:'Chlorwasserstoff', produkt:'Cl⁻', pname:'Chlorid-Ion', ladung:'−'},
+  b:{kern:'O', farbe:FARBEN.rot, nHb:2, formel:'H₂O', name:'Wasser', produkt:'H₃O⁺', pname:'Oxonium-Ion', ladung:'+'},
+  pfeil:'→',
+  notiz:'Chlorwasserstoff gibt ein Proton an Wasser ab. Paar 1: HCl / Cl⁻, Paar 2: H₂O / H₃O⁺. Die Protolyse verläuft praktisch vollständig, daher der einfache Reaktionspfeil.'},
+
+ {id:'essig_h2o', titel:'CH₃COOH + H₂O', ab:'haupt',
+  s:{kern:'CH₃COO', farbe:FARBEN.gruen, nH:0, formel:'CH₃COOH', name:'Essigsäure', produkt:'CH₃COO⁻', pname:'Acetat-Ion', ladung:'−'},
+  b:{kern:'O', farbe:FARBEN.rot, nHb:2, formel:'H₂O', name:'Wasser', produkt:'H₃O⁺', pname:'Oxonium-Ion', ladung:'+'},
+  pfeil:'⇌',
+  notiz:'Essigsäure ist eine schwache Säure: Nur ein kleiner Anteil der Moleküle überträgt ein Proton auf Wasser. Es stellt sich ein Gleichgewicht ein (Doppelpfeil).'},
+
+ {id:'h2o_nh3', titel:'H₂O + NH₃', ab:'haupt',
+  s:{kern:'O', farbe:FARBEN.rot, nH:1, formel:'H₂O', name:'Wasser (hier Säure)', produkt:'OH⁻', pname:'Hydroxid-Ion', ladung:'−'},
+  b:{kern:'N', farbe:FARBEN.blau, nHb:3, formel:'NH₃', name:'Ammoniak', produkt:'NH₄⁺', pname:'Ammonium-Ion', ladung:'+'},
+  pfeil:'⇌',
+  notiz:'Hier gibt das Wassermolekül ein Proton ab und reagiert damit als Säure. Ammoniak ist eine Base, obwohl es keine OH-Gruppe enthält – genau das kann das Arrhenius-Konzept nicht erklären.'},
+
+ {id:'hcl_nh3', titel:'HCl + NH₃ (ohne Wasser)', ab:'real',
+  s:{kern:'Cl', farbe:FARBEN.gruen, nH:0, formel:'HCl', name:'Chlorwasserstoff (gasförmig)', produkt:'Cl⁻', pname:'Chlorid-Ion', ladung:'−'},
+  b:{kern:'N', farbe:FARBEN.blau, nHb:3, formel:'NH₃', name:'Ammoniak (gasförmig)', produkt:'NH₄⁺', pname:'Ammonium-Ion', ladung:'+'},
+  pfeil:'→',
+  notiz:'Diese Protolyse benötigt kein Wasser. Beide Gase reagieren in der Luft zu festem Ammoniumchlorid (weißer Rauch). Das Brønsted-Konzept beschreibt auch solche Reaktionen.'},
+
+ {id:'h2so4_h2o', titel:'H₂SO₄ + H₂O', ab:'real',
+  s:{kern:'HSO₄', farbe:FARBEN.gruen, nH:0, formel:'H₂SO₄', name:'Schwefelsäure', produkt:'HSO₄⁻', pname:'Hydrogensulfat-Ion', ladung:'−'},
+  b:{kern:'O', farbe:FARBEN.rot, nHb:2, formel:'H₂O', name:'Wasser', produkt:'H₃O⁺', pname:'Oxonium-Ion', ladung:'+'},
+  pfeil:'→',
+  notiz:'Erste Protolysestufe der Schwefelsäure. Das entstehende Hydrogensulfat-Ion kann ein weiteres Proton abgeben – siehe Kapitel 6.'},
+
+ {id:'nh4_h2o', titel:'NH₄⁺ + H₂O', ab:'gym',
+  s:{kern:'N', farbe:FARBEN.blau, nH:3, formel:'NH₄⁺', name:'Ammonium-Ion', produkt:'NH₃', pname:'Ammoniak', ladung:''},
+  b:{kern:'O', farbe:FARBEN.rot, nHb:2, formel:'H₂O', name:'Wasser', produkt:'H₃O⁺', pname:'Oxonium-Ion', ladung:'+'},
+  pfeil:'⇌',
+  notiz:'Das Ammonium-Ion ist eine Kationensäure: Es gibt ein Proton ab und wird dabei elektrisch neutral. Deshalb reagieren Ammoniumsalzlösungen schwach sauer.'},
+
+ {id:'auto', titel:'2 H₂O (Autoprotolyse)', ab:'gym',
+  s:{kern:'O', farbe:FARBEN.rot, nH:1, formel:'H₂O', name:'Wasser (Säure)', produkt:'OH⁻', pname:'Hydroxid-Ion', ladung:'−'},
+  b:{kern:'O', farbe:FARBEN.rot, nHb:2, formel:'H₂O', name:'Wasser (Base)', produkt:'H₃O⁺', pname:'Oxonium-Ion', ladung:'+'},
+  pfeil:'⇌',
+  notiz:'Autoprotolyse: Donator und Akzeptor gehören derselben Teilchensorte an. Bei 25 °C beträgt c(H₃O⁺) = c(OH⁻) = 10⁻⁷ mol/L; das Gleichgewicht liegt weit links.'},
+
+ {id:'hcl_essig', titel:'HCl + CH₃COOH (in Eisessig)', ab:'os',
+  s:{kern:'Cl', farbe:FARBEN.gruen, nH:0, formel:'HCl', name:'Chlorwasserstoff', produkt:'Cl⁻', pname:'Chlorid-Ion', ladung:'−'},
+  b:{kern:'CH₃COOH', farbe:FARBEN.lila, nHb:0, formel:'CH₃COOH', name:'Essigsäure (hier Base)', produkt:'CH₃COOH₂⁺', pname:'protonierte Essigsäure', ladung:'+'},
+  pfeil:'⇌',
+  notiz:'Protonenübertragung auf eine andere Säure: In wasserfreier Essigsäure (Eisessig) fungiert das Essigsäuremolekül als Protonenakzeptor, weil kein stärker basischer Partner vorhanden ist. Das zeigt, dass die Rolle „Säure“ oder „Base“ ausschließlich aus dem Vergleich der Partner folgt. In diesem Medium lassen sich starke Säuren differenzieren, die in Wasser alle nivelliert erscheinen.'}
+];
+
+function animHTML(){
+  return '<div class="animbox">'+
+    '<div class="svgbox"></div>'+
+    '<div class="steuer">'+
+      '<button class="btnPlay">Ablauf abspielen</button>'+
+      '<input type="range" class="scrub" min="0" max="1000" value="0">'+
+      '<button class="sek klein btnReset">Zurücksetzen</button>'+
+    '</div>'+
+    '<div class="phase"></div>'+
+    '<div class="gleichung glchg"></div>'+
+    '<div class="legende"><span class="p1">■ korrespondierendes Paar 1</span><span class="p2">■ korrespondierendes Paar 2</span></div>'+
+  '</div>';
+}
+
+const AnimListe = [];
+function Animation(wrap){
+  let rk=null, t=0, raf=null, startZeit=0;
+  const svgbox = wrap.querySelector('.svgbox');
+  const scrub  = wrap.querySelector('.scrub');
+  const phase  = wrap.querySelector('.phase');
+  const gl     = wrap.querySelector('.gleichung');
+
+  const T_LOS = 0.18, T_AN = 0.72;
+
+  function bez(u,p0,p1,p2){
+    const v=1-u;
+    return {x: v*v*p0.x + 2*v*u*p1.x + u*u*p2.x, y: v*v*p0.y + 2*v*u*p1.y + u*u*p2.y};
+  }
+  function zeichne(){
+    if(!rk) return;
+    const W=640,H=300, cy=160, sx=150, bx=480;
+    const rS = Math.max(kernBreite(rk.s.kern),56)/2;
+    const rB = Math.max(kernBreite(rk.b.kern),56)/2;
+    const p0 = {x: sx + rS + 28, y: cy};
+    const p2 = {x: bx - rB - 28, y: cy};
+    const p1 = {x: (p0.x+p2.x)/2, y: cy - 78};
+    const u  = Math.max(0, Math.min(1, (t - T_LOS)/(T_AN - T_LOS)));
+    const pos = bez(u, p0, p1, p2);
+    const aS = t < T_LOS ? 1 : Math.max(0, 1 - (t - T_LOS)/0.07);
+    const aB = t > T_AN ? Math.min(1, (t - T_AN)/0.07) : 0;
+    const aLadung = t > 0.80 ? Math.min(1,(t-0.80)/0.12) : 0;
+    const zeigeEP = (state.niveau==='gym'||state.niveau==='os');
+
+    let s = '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" font-family="'+
+            'Segoe UI,Arial,sans-serif">';
+    s += '<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="none"/>';
+
+    // Rollenbeschriftung
+    const rolleS = t<0.5 ? 'Säure · Protonendonator' : 'korrespondierende Base';
+    const rolleB = t<0.5 ? 'Base · Protonenakzeptor' : 'korrespondierende Säure';
+    s += '<text x="'+sx+'" y="46" text-anchor="middle" font-size="13" fill="#5b6977">'+rolleS+'</text>';
+    s += '<text x="'+bx+'" y="46" text-anchor="middle" font-size="13" fill="#5b6977">'+rolleB+'</text>';
+
+    // Bindungslinien des übertragenen Protons
+    if(aS>0.01) s += '<line x1="'+sx+'" y1="'+cy+'" x2="'+p0.x+'" y2="'+cy+'" stroke="#8795a3" stroke-width="3" opacity="'+aS.toFixed(2)+'"/>';
+    if(aB>0.01) s += '<line x1="'+bx+'" y1="'+cy+'" x2="'+p2.x+'" y2="'+cy+'" stroke="#8795a3" stroke-width="3" opacity="'+aB.toFixed(2)+'"/>';
+
+    // freies Elektronenpaar der Base
+    if(zeigeEP && t < T_AN+0.05){
+      const epx = p2.x + 14, epy = cy;
+      const epA = Math.max(0, 1 - Math.max(0,(t-T_AN)/0.05));
+      s += '<circle cx="'+(epx-5)+'" cy="'+(epy-7)+'" r="3.4" fill="#2b6cb0" opacity="'+epA.toFixed(2)+'"/>';
+      s += '<circle cx="'+(epx-5)+'" cy="'+(epy+7)+'" r="3.4" fill="#2b6cb0" opacity="'+epA.toFixed(2)+'"/>';
+      if(t<T_LOS+0.1) s += '<text x="'+(epx+6)+'" y="'+(cy+42)+'" text-anchor="middle" font-size="11" fill="#2b6cb0">freies Elektronenpaar</text>';
+    }
+
+    // Moleküle
+    s += molekuel(sx, cy, rk.s.kern, rk.s.farbe, rk.s.nH, 'links',
+                  rk.s.ladung, aLadung);
+    s += molekuel(bx, cy, rk.b.kern, rk.b.farbe, rk.b.nHb, 'rechts',
+                  rk.b.ladung, aLadung);
+
+    // übertragenes Proton
+    const protLabel = (t>T_LOS && t<T_AN) ? 'H⁺' : 'H';
+    s += '<circle cx="'+pos.x.toFixed(1)+'" cy="'+pos.y.toFixed(1)+'" r="17" fill="var(--h)" stroke="#9a7a1f" stroke-width="2"/>';
+    s += '<text x="'+pos.x.toFixed(1)+'" y="'+(pos.y+5).toFixed(1)+'" text-anchor="middle" font-size="14" font-weight="700" fill="#4a3a06">'+protLabel+'</text>';
+    if(t>T_LOS && t<T_AN){
+      s += '<path d="M '+p0.x+' '+(cy-26)+' Q '+p1.x+' '+(p1.y-20)+' '+p2.x+' '+(cy-26)+
+           '" fill="none" stroke="#9a7a1f" stroke-width="1.6" stroke-dasharray="5 5" opacity="0.65"/>';
+      s += '<text x="'+p1.x+'" y="'+(p1.y-28)+'" text-anchor="middle" font-size="12" fill="#9a7a1f">Protonenübertragung</text>';
+    }
+
+    // Beschriftung unterhalb
+    const lblS = t<0.5 ? rk.s.formel : rk.s.produkt;
+    const lblB = t<0.5 ? rk.b.formel : rk.b.produkt;
+    const namS = t<0.5 ? rk.s.name   : rk.s.pname;
+    const namB = t<0.5 ? rk.b.name   : rk.b.pname;
+    s += '<text x="'+sx+'" y="252" text-anchor="middle" font-size="19" font-weight="600" fill="#1b2430">'+lblS+'</text>';
+    s += '<text x="'+sx+'" y="273" text-anchor="middle" font-size="12" fill="#5b6977">'+namS+'</text>';
+    s += '<text x="'+bx+'" y="252" text-anchor="middle" font-size="19" font-weight="600" fill="#1b2430">'+lblB+'</text>';
+    s += '<text x="'+bx+'" y="273" text-anchor="middle" font-size="12" fill="#5b6977">'+namB+'</text>';
+    s += '</svg>';
+    svgbox.innerHTML = s;
+
+    if(t < T_LOS){
+      phase.innerHTML = '<strong>Schritt 1 – Ausgangsstoffe.</strong> Links das Teilchen mit abgebbarem Proton, rechts das Teilchen mit freiem Elektronenpaar.';
+    } else if(t < T_AN){
+      phase.innerHTML = '<strong>Schritt 2 – Protonenübertragung.</strong> Die Bindung zum Proton wird gelöst; das bindende Elektronenpaar verbleibt beim Säurerest. Übertragen wird ausschließlich das Proton (H⁺).';
+    } else {
+      phase.innerHTML = '<strong>Schritt 3 – Produkte.</strong> Der Säurerest trägt nun eine zusätzliche negative, der Akzeptor eine zusätzliche positive Ladung. Beide Teilchen bilden mit ihren Ausgangsteilchen je ein korrespondierendes Säure-Base-Paar.';
+    }
+    gl.innerHTML = '<span class="p1">'+rk.s.formel+'</span> + <span class="p2">'+rk.b.formel+'</span> '+
+                   rk.pfeil+' <span class="p1">'+rk.s.produkt+'</span> + <span class="p2">'+rk.b.produkt+'</span>';
+  }
+  function setT(neu){ t = Math.max(0, Math.min(1, neu)); scrub.value = Math.round(t*1000); zeichne(); }
+  function play(){
+    if(raf) cancelAnimationFrame(raf);
+    if(t >= 0.999) t = 0;
+    const dauer = 3400, von = t, start = performance.now();
+    function frame(now){
+      const p = Math.min(1, (now-start)/(dauer*(1-von)));
+      setT(von + (1-von)*p);
+      if(p < 1) raf = requestAnimationFrame(frame); else raf = null;
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  wrap.querySelector('.btnPlay').addEventListener('click', play);
+  wrap.querySelector('.btnReset').addEventListener('click', ()=>{ if(raf) cancelAnimationFrame(raf); raf=null; setT(0); });
+  scrub.addEventListener('input', e=>{ if(raf){cancelAnimationFrame(raf); raf=null;} setT(e.target.value/1000); });
+
+  const api = {
+    setReaktion(r){ rk = r; setT(0); },
+    neuZeichnen(){ zeichne(); },
+    play
+  };
+  AnimListe.push(api);
+  return api;
+}
+
+/* ============================================================
+   5 · MEHRPROTONIGE SÄUREN
+   ============================================================ */
+const MEHRPROTONIG = {
+ h2so4:{
+  name:'Schwefelsäure H₂SO₄', ab:'haupt',
+  stufen:[
+   {rk:{s:{kern:'HSO₄',farbe:FARBEN.gruen,nH:0,formel:'H₂SO₄',name:'Schwefelsäure',produkt:'HSO₄⁻',pname:'Hydrogensulfat-Ion',ladung:'−'},
+        b:{kern:'O',farbe:FARBEN.rot,nHb:2,formel:'H₂O',name:'Wasser',produkt:'H₃O⁺',pname:'Oxonium-Ion',ladung:'+'},pfeil:'→'},
+    pks:'≈ −3', txt:'Erste Stufe: Das neutrale Molekül gibt ein Proton ab. Die Protolyse verläuft in verdünnter wässriger Lösung praktisch vollständig.'},
+   {rk:{s:{kern:'SO₄',farbe:FARBEN.gruen,nH:0,formel:'HSO₄⁻',name:'Hydrogensulfat-Ion',produkt:'SO₄²⁻',pname:'Sulfat-Ion',ladung:'2−'},
+        b:{kern:'O',farbe:FARBEN.rot,nHb:2,formel:'H₂O',name:'Wasser',produkt:'H₃O⁺',pname:'Oxonium-Ion',ladung:'+'},pfeil:'⇌'},
+    pks:'≈ 1,9', txt:'Zweite Stufe: Das Proton wird nun aus einem einfach negativ geladenen Ion abgetrennt. Das erfordert mehr Energie, die Stufe ist deutlich schwächer sauer.'}
+  ],
+  gesamt:'H₂SO₄ + 2 H₂O ⇌ SO₄²⁻ + 2 H₃O⁺'
+ },
+ h2co3:{
+  name:'Kohlensäure H₂CO₃', ab:'real',
+  stufen:[
+   {rk:{s:{kern:'HCO₃',farbe:FARBEN.gruen,nH:0,formel:'H₂CO₃',name:'Kohlensäure',produkt:'HCO₃⁻',pname:'Hydrogencarbonat-Ion',ladung:'−'},
+        b:{kern:'O',farbe:FARBEN.rot,nHb:2,formel:'H₂O',name:'Wasser',produkt:'H₃O⁺',pname:'Oxonium-Ion',ladung:'+'},pfeil:'⇌'},
+    pks:'≈ 6,35*', txt:'Erste Stufe. Das entstehende Hydrogencarbonat-Ion ist ein Ampholyt: Es kann ein weiteres Proton abgeben oder eines aufnehmen.'},
+   {rk:{s:{kern:'CO₃',farbe:FARBEN.gruen,nH:0,formel:'HCO₃⁻',name:'Hydrogencarbonat-Ion',produkt:'CO₃²⁻',pname:'Carbonat-Ion',ladung:'2−'},
+        b:{kern:'O',farbe:FARBEN.rot,nHb:2,formel:'H₂O',name:'Wasser',produkt:'H₃O⁺',pname:'Oxonium-Ion',ladung:'+'},pfeil:'⇌'},
+    pks:'≈ 10,33', txt:'Zweite Stufe: deutlich schwächer sauer. Deshalb reagieren Carbonatlösungen alkalisch – das Carbonat-Ion nimmt Protonen aus dem Wasser auf.'}
+  ],
+  gesamt:'H₂CO₃ + 2 H₂O ⇌ CO₃²⁻ + 2 H₃O⁺'
+ },
+ h3po4:{
+  name:'Phosphorsäure H₃PO₄', ab:'gym',
+  stufen:[
+   {rk:{s:{kern:'H₂PO₄',farbe:FARBEN.gruen,nH:0,formel:'H₃PO₄',name:'Phosphorsäure',produkt:'H₂PO₄⁻',pname:'Dihydrogenphosphat-Ion',ladung:'−'},
+        b:{kern:'O',farbe:FARBEN.rot,nHb:2,formel:'H₂O',name:'Wasser',produkt:'H₃O⁺',pname:'Oxonium-Ion',ladung:'+'},pfeil:'⇌'},
+    pks:'≈ 2,16', txt:'Erste Stufe aus dem neutralen Molekül – mit Abstand die stärkste der drei Stufen.'},
+   {rk:{s:{kern:'HPO₄',farbe:FARBEN.gruen,nH:0,formel:'H₂PO₄⁻',name:'Dihydrogenphosphat-Ion',produkt:'HPO₄²⁻',pname:'Hydrogenphosphat-Ion',ladung:'2−'},
+        b:{kern:'O',farbe:FARBEN.rot,nHb:2,formel:'H₂O',name:'Wasser',produkt:'H₃O⁺',pname:'Oxonium-Ion',ladung:'+'},pfeil:'⇌'},
+    pks:'≈ 7,21', txt:'Zweite Stufe. H₂PO₄⁻ und HPO₄²⁻ bilden zusammen das wichtigste Puffersystem im Zellinneren.'},
+   {rk:{s:{kern:'PO₄',farbe:FARBEN.gruen,nH:0,formel:'HPO₄²⁻',name:'Hydrogenphosphat-Ion',produkt:'PO₄³⁻',pname:'Phosphat-Ion',ladung:'3−'},
+        b:{kern:'O',farbe:FARBEN.rot,nHb:2,formel:'H₂O',name:'Wasser',produkt:'H₃O⁺',pname:'Oxonium-Ion',ladung:'+'},pfeil:'⇌'},
+    pks:'≈ 12,32', txt:'Dritte Stufe: Das Proton wird aus einem zweifach negativ geladenen Ion abgetrennt. In neutraler Lösung läuft diese Stufe nur in verschwindend geringem Ausmaß ab.'}
+  ],
+  gesamt:'H₃PO₄ + 3 H₂O ⇌ PO₄³⁻ + 3 H₃O⁺'
+ }
+};
+
+/* ============================================================
+   6 · ÜBUNGEN
+   ============================================================ */
+function norm(s){
+  const subs='₀₁₂₃₄₅₆₇₈₉';
+  const sup={'⁺':'+','⁻':'-','²':'2','³':'3','¹':'1','⁰':'0','⁴':'4'};
+  let x=(s||'').toString().trim();
+  x=x.replace(/[₀-₉]/g,c=>subs.indexOf(c));
+  x=x.replace(/[⁺⁻²³¹⁰⁴]/g,c=>sup[c]||c);
+  x=x.replace(/[–—−]/g,'-');
+  x=x.replace(/⇌|⇄|<=>|<->|<-->|→|->|-->|=>/g,'=');
+  x=x.replace(/\s+/g,'');
+  x=x.replace(/\*/g,'');
+  return x.toLowerCase();
+}
+function pruefeText(eingabe, loesungen){
+  const e = norm(eingabe);
+  return loesungen.some(l => norm(l)===e);
+}
+
+const UEBUNGEN = [
+ {id:'u1', ab:'haupt', afb:1, typ:'rollen',
+  frage:'Bestimmen Sie in jeder Gleichung den Protonendonator und den Protonenakzeptor.',
+  items:[
+    {gl:'HCl + H₂O → Cl⁻ + H₃O⁺', auswahl:['HCl','H₂O'], donator:'HCl', akzeptor:'H₂O'},
+    {gl:'NH₃ + H₂O ⇌ NH₄⁺ + OH⁻', auswahl:['NH₃','H₂O'], donator:'H₂O', akzeptor:'NH₃'},
+    {gl:'CH₃COOH + H₂O ⇌ CH₃COO⁻ + H₃O⁺', auswahl:['CH₃COOH','H₂O'], donator:'CH₃COOH', akzeptor:'H₂O'}
+  ]},
+
+ {id:'u2', ab:'haupt', afb:1, typ:'luecke',
+  frage:'Füllen Sie den Text aus. Die Wörter stehen in gemischter Reihenfolge zur Auswahl.',
+  woerter:['auf','Protonenakzeptor','Oxonium','Proton','korrespondierendes','Protonendonator'],
+  teile:['Nach Brønsted ist eine Säure ein ',' . Sie gibt ein ',' ab. Eine Base ist ein ',' . Sie nimmt ein Proton ',' . Bei der Reaktion von HCl mit Wasser entsteht das ','-Ion. Säure und zugehörige Base bilden ein ',' Säure-Base-Paar.'],
+  loesung:['Protonendonator','Proton','Protonenakzeptor','auf','Oxonium','korrespondierendes']},
+
+ {id:'u3', ab:'real', afb:2, typ:'eingabe',
+  frage:'Geben Sie das korrespondierende Teilchen an. Verwenden Sie Ladungszeichen (z. B. Cl- oder Cl⁻).',
+  items:[
+    {text:'korrespondierende Base von HNO₃', loes:['NO3-','NO3⁻']},
+    {text:'korrespondierende Säure von NH₃', loes:['NH4+','NH4⁺']},
+    {text:'korrespondierende Base von H₂O', loes:['OH-','OH⁻']},
+    {text:'korrespondierende Säure von H₂O', loes:['H3O+','H3O⁺']}
+  ]},
+
+ {id:'u4', ab:'real', afb:2, typ:'eingabe',
+  frage:'Formulieren Sie die beiden Protolysestufen der Kohlensäure sowie die Gesamtgleichung. Schreibweise z. B.: H2CO3 + H2O ⇌ HCO3- + H3O+',
+  items:[
+    {text:'1. Protolysestufe', loes:['H2CO3+H2O=HCO3-+H3O+','H2CO3+H2O=H3O++HCO3-']},
+    {text:'2. Protolysestufe', loes:['HCO3-+H2O=CO32-+H3O+','HCO3-+H2O=H3O++CO32-','HCO3-+H2O=CO3 2-+H3O+']},
+    {text:'Gesamtgleichung', loes:['H2CO3+2H2O=CO32-+2H3O+','H2CO3+2H2O=2H3O++CO32-']}
+  ]},
+
+ {id:'u5', ab:'gym', afb:2, typ:'eingabe',
+  frage:'Ampholyte: Formulieren Sie für das Hydrogencarbonat-Ion jeweils eine Gleichung.',
+  items:[
+    {text:'HCO₃⁻ reagiert mit Wasser als Säure', loes:['HCO3-+H2O=CO32-+H3O+','HCO3-+H2O=H3O++CO32-']},
+    {text:'HCO₃⁻ reagiert mit Wasser als Base', loes:['HCO3-+H2O=H2CO3+OH-','HCO3-+H2O=OH-+H2CO3']}
+  ]},
+
+ {id:'u6', ab:'os', afb:3, typ:'frei',
+  frage:'Begründen Sie mithilfe der pK<sub>S</sub>-Werte, warum eine Natriumhydrogensulfat-Lösung sauer, eine Natriumhydrogencarbonat-Lösung dagegen schwach alkalisch reagiert.',
+  muster:'Beide Anionen sind Ampholyte; entscheidend ist der Vergleich von pK<sub>S</sub> und pK<sub>B</sub> des jeweiligen Teilchens. Für HSO₄⁻ gilt pK<sub>S</sub> ≈ 1,9 und damit pK<sub>B</sub> ≈ 12,1: Die Protonenabgabe an Wasser überwiegt deutlich, die Lösung reagiert sauer. Für HCO₃⁻ gilt pK<sub>S</sub> ≈ 10,33, die korrespondierende Base-Funktion bezieht sich auf H₂CO₃ mit pK<sub>S</sub> ≈ 6,35, woraus pK<sub>B</sub>(HCO₃⁻) ≈ 7,65 folgt. Da pK<sub>B</sub> < pK<sub>S</sub> ist, überwiegt hier die Protonenaufnahme, und die Lösung reagiert schwach alkalisch.'}
+];
+
+/* ============================================================
+   7 · QUIZ (AFB I–III je Niveau)
+   ============================================================ */
+const QUIZ = {
+haupt:[
+ {afb:1,typ:'mc',frage:'Was gibt eine Säure nach Brønsted ab?',
+  opt:['ein Elektron','ein Proton (H⁺)','ein Hydroxid-Ion (OH⁻)','ein Neutron'],loes:1,
+  erkl:'Eine Säure ist ein Protonendonator: Sie gibt ein Proton (H⁺) ab.'},
+ {afb:1,typ:'mc',frage:'Was macht eine Base nach Brønsted?',
+  opt:['Sie nimmt ein Proton auf.','Sie gibt ein Proton ab.','Sie enthält immer eine OH-Gruppe.','Sie zerfällt in Wasser.'],loes:0,
+  erkl:'Eine Base ist ein Protonenakzeptor. Sie nimmt ein Proton auf – auch dann, wenn sie keine OH-Gruppe enthält, zum Beispiel NH₃.'},
+ {afb:2,typ:'eingabe',frage:'Vervollständigen Sie: HCl + H₂O → Cl⁻ + ______ (Teilchenformel eingeben)',
+  loes:['H3O+','H3O⁺'],erkl:'Es entsteht das Oxonium-Ion H₃O⁺. Das Wassermolekül hat das Proton aufgenommen.'},
+ {afb:2,typ:'mc',frage:'Welches Teilchen ist in der Reaktion NH₃ + H₂O ⇌ NH₄⁺ + OH⁻ die Säure?',
+  opt:['NH₃','H₂O','NH₄⁺','OH⁻'],loes:1,
+  erkl:'Falsch wäre NH₃: Ammoniak nimmt das Proton auf und ist damit die Base. Das Wassermolekül gibt ein Proton ab und wird zum OH⁻-Ion – es reagiert hier als Säure.'},
+ {afb:3,typ:'frei',frage:'Erklären Sie, warum Ammoniak (NH₃) nach Arrhenius keine Base ist, nach Brønsted aber schon.',
+  muster:'Nach Arrhenius ist eine Base ein Stoff, der in wässriger Lösung OH⁻-Ionen bildet. Ammoniak enthält keine OH-Gruppe und erfüllt diese Bedingung nicht. Nach Brønsted ist eine Base ein Protonenakzeptor: NH₃ nimmt von einem Wassermolekül ein Proton auf und bildet NH₄⁺; dabei entsteht OH⁻. Die alkalische Reaktion wird damit erklärt, ohne dass NH₃ selbst eine OH-Gruppe enthalten muss.'},
+ {afb:3,typ:'frei',frage:'Begründen Sie, warum bei einer Protolyse immer zwei Teilchen beteiligt sein müssen.',
+  muster:'Ein Proton kann nicht frei in Lösung vorliegen, weil seine Ladungsdichte sehr hoch ist. Eine Protonenabgabe ist deshalb nur möglich, wenn gleichzeitig ein Partner vorhanden ist, der das Proton an einem freien Elektronenpaar bindet. Säure und Base treten daher stets gemeinsam auf.'}
+],
+real:[
+ {afb:1,typ:'mc',frage:'Welche Zuordnung ist korrekt?',
+  opt:['Säure = Protonenakzeptor, Base = Protonendonator','Säure = Protonendonator, Base = Protonenakzeptor',
+       'Säure = Elektronenpaardonator, Base = Elektronenpaarakzeptor','Säure = Hydroxidbildner, Base = Protonenbildner'],loes:1,
+  erkl:'Nach Brønsted gibt die Säure ein Proton ab (Donator), die Base nimmt es auf (Akzeptor).'},
+ {afb:1,typ:'eingabe',frage:'Geben Sie die korrespondierende Base von HNO₃ an.',
+  loes:['NO3-','NO3⁻'],erkl:'Die korrespondierende Base entsteht durch Abgabe genau eines Protons: NO₃⁻.'},
+ {afb:2,typ:'eingabe',frage:'Formulieren Sie die Reaktionsgleichung für die Protolyse von Essigsäure in Wasser. (Schreibweise z. B. CH3COOH + H2O ⇌ ... )',
+  loes:['CH3COOH+H2O=CH3COO-+H3O+','CH3COOH+H2O=H3O++CH3COO-'],
+  erkl:'CH₃COOH + H₂O ⇌ CH₃COO⁻ + H₃O⁺. Da Essigsäure eine schwache Säure ist, stellt sich ein Gleichgewicht ein.'},
+ {afb:2,typ:'mc',frage:'Welche beiden Teilchen bilden ein korrespondierendes Säure-Base-Paar?',
+  opt:['H₂SO₄ und SO₄²⁻','H₂SO₄ und HSO₄⁻','HCl und H₃O⁺','NH₃ und OH⁻'],loes:1,
+  erkl:'Ein korrespondierendes Paar unterscheidet sich um genau ein Proton. H₂SO₄ und SO₄²⁻ unterscheiden sich um zwei Protonen und bilden daher kein Paar.'},
+ {afb:3,typ:'frei',frage:'Chlorwasserstoff-Gas und Ammoniak-Gas reagieren in der Luft zu einem weißen Feststoff. Erklären Sie diesen Vorgang mit dem Konzept von Brønsted und begründen Sie, warum das Arrhenius-Konzept hier nicht ausreicht.',
+  muster:'HCl gibt ein Proton an NH₃ ab: HCl + NH₃ → NH₄⁺ + Cl⁻; die Ionen bilden festes Ammoniumchlorid. HCl ist der Protonendonator, NH₃ der Protonenakzeptor. Das Arrhenius-Konzept ist nicht anwendbar, weil es wässrige Lösungen voraussetzt und Basen über die Bildung von OH⁻-Ionen definiert. Hier ist weder Wasser beteiligt, noch entstehen Hydroxid-Ionen.'},
+ {afb:3,typ:'frei',frage:'Beurteilen Sie die Aussage: „Wasser ist eine Base.“',
+  muster:'Die Aussage ist in dieser Allgemeinheit nicht haltbar. Nach Brønsted sind Säure und Base keine Stoffeigenschaften, sondern Rollen in einer konkreten Reaktion. Gegenüber HCl nimmt Wasser ein Proton auf und reagiert als Base; gegenüber NH₃ gibt es ein Proton ab und reagiert als Säure. Wasser ist daher ein Ampholyt. Zutreffend wäre: „Wasser kann je nach Reaktionspartner als Base oder als Säure reagieren.“'}
+],
+gym:[
+ {afb:1,typ:'mc',frage:'Welche Aussage beschreibt einen Ampholyten korrekt?',
+  opt:['Ein Teilchen, das zwei Protonen gleichzeitig abgibt.','Ein Teilchen, das je nach Partner ein Proton abgeben oder aufnehmen kann.',
+       'Ein Teilchen, das weder Protonen abgibt noch aufnimmt.','Ein Teilchen, das nur in nichtwässrigen Lösungen reagiert.'],loes:1,
+  erkl:'Ampholyte wie H₂O, HCO₃⁻ oder HSO₄⁻ können je nach Reaktionspartner als Säure oder als Base fungieren.'},
+ {afb:1,typ:'eingabe',frage:'Geben Sie die korrespondierende Säure von HPO₄²⁻ an.',
+  loes:['H2PO4-','H2PO4⁻'],erkl:'Die korrespondierende Säure entsteht durch Aufnahme eines Protons: H₂PO₄⁻.'},
+ {afb:2,typ:'eingabe',frage:'Formulieren Sie die zweite Protolysestufe der Schwefelsäure in Wasser.',
+  loes:['HSO4-+H2O=SO42-+H3O+','HSO4-+H2O=H3O++SO42-'],
+  erkl:'HSO₄⁻ + H₂O ⇌ SO₄²⁻ + H₃O⁺. Diese Stufe ist mit pK_S ≈ 1,9 deutlich schwächer sauer als die erste.'},
+ {afb:2,typ:'mcm',frage:'Welche der folgenden Teilchen können als Ampholyt reagieren? (Mehrfachauswahl)',
+  opt:['HSO₄⁻','Cl⁻','HCO₃⁻','NH₄⁺','H₂O'],loes:[0,2,4],
+  erkl:'HSO₄⁻, HCO₃⁻ und H₂O können Protonen sowohl abgeben als auch aufnehmen. Cl⁻ kann nur aufnehmen (sehr schwache Base), NH₄⁺ nur abgeben.'},
+ {afb:3,typ:'frei',frage:'Erklären Sie, warum die zweite Protolysestufe einer mehrprotonigen Säure stets schwächer sauer ist als die erste.',
+  muster:'Nach der ersten Protonenabgabe trägt der Säurerest eine negative Ladung. Die Abtrennung eines weiteren, positiv geladenen Protons aus einem Anion erfordert gegen die elektrostatische Anziehung eine deutlich höhere Energie als aus einem ungeladenen Molekül. Zugleich ist das zweifach negativ geladene Produktanion relativ zum Edukt weniger stabilisiert. Die Gleichgewichtslage verschiebt sich dadurch nach links, der pK_S-Wert steigt typischerweise um vier bis fünf Einheiten.'},
+ {afb:3,typ:'frei',frage:'Vergleichen Sie die Konzepte von Arrhenius und Brønsted hinsichtlich ihrer Reichweite und bewerten Sie, welches Konzept die Reaktion von Natriumcarbonat in Wasser besser erklärt.',
+  muster:'Das Arrhenius-Konzept definiert Säuren und Basen stoffbezogen über die Bildung von H⁺ bzw. OH⁻ in wässriger Lösung und ist damit auf Wasser beschränkt. Das Brønsted-Konzept definiert sie funktional über die Protonenübertragung und umfasst das Arrhenius-Konzept als Sonderfall. Die alkalische Reaktion einer Natriumcarbonat-Lösung lässt sich nach Arrhenius nicht erklären, da Na₂CO₃ keine OH-Gruppe enthält. Nach Brønsted nimmt das Carbonat-Ion ein Proton aus dem Wasser auf: CO₃²⁻ + H₂O ⇌ HCO₃⁻ + OH⁻. Die entstehenden Hydroxid-Ionen bedingen die alkalische Reaktion.'}
+],
+os:[
+ {afb:1,typ:'eingabe',frage:'Formulieren Sie die Gleichung der Autoprotolyse des Wassers.',
+  loes:['2H2O=H3O++OH-','2H2O=OH-+H3O+','H2O+H2O=H3O++OH-','H2O+H2O=OH-+H3O+'],
+  erkl:'2 H₂O ⇌ H₃O⁺ + OH⁻; K_W = 10⁻¹⁴ mol²·L⁻² bei 25 °C.'},
+ {afb:1,typ:'mc',frage:'Welche Aussage über pK<sub>S</sub>-Werte trifft zu?',
+  opt:['Ein kleiner pK_S-Wert kennzeichnet eine schwache Säure.','Ein kleiner pK_S-Wert kennzeichnet eine starke Säure.',
+       'Der pK_S-Wert ist unabhängig vom Lösungsmittel.','Für ein korrespondierendes Paar gilt pK_S + pK_B = 7.'],loes:1,
+  erkl:'Je kleiner der pK_S-Wert, desto stärker die Säure. Für ein korrespondierendes Paar gilt in wässriger Lösung bei 25 °C pK_S + pK_B = 14; die Werte sind zudem lösungsmittelabhängig.'},
+ {afb:2,typ:'eingabe',frage:'Formulieren Sie die Gesamtgleichung der vollständigen Protolyse von Phosphorsäure in Wasser.',
+  loes:['H3PO4+3H2O=PO43-+3H3O+','H3PO4+3H2O=3H3O++PO43-'],
+  erkl:'H₃PO₄ + 3 H₂O ⇌ PO₄³⁻ + 3 H₃O⁺. Die Gesamtgleichung ist die Summe der drei Teilgleichungen; in wässriger Lösung liegen die Stufen pH-abhängig nebeneinander vor.'},
+ {afb:2,typ:'mcm',frage:'In wasserfreier Essigsäure (Eisessig) wird Chlorwasserstoff gelöst. Welche Aussagen treffen zu? (Mehrfachauswahl)',
+  opt:['Das Essigsäuremolekül fungiert hier als Protonenakzeptor.',
+       'Es entsteht das Teilchen CH₃COOH₂⁺.',
+       'Essigsäure kann grundsätzlich nur als Säure reagieren.',
+       'In diesem Medium lassen sich starke Säuren differenzieren, die in Wasser nivelliert erscheinen.'],loes:[0,1,3],
+  erkl:'Die Rollenzuweisung folgt stets aus dem Vergleich der Partner: Gegenüber HCl ist Essigsäure der schwächere Protonendonator und übernimmt die Rolle des Akzeptors. Die Aussage, Essigsäure könne nur als Säure reagieren, ist falsch.'},
+ {afb:3,typ:'frei',frage:'Begründen Sie anhand der pK<sub>S</sub>-Werte, ob das Hydrogensulfat-Ion in wässriger Lösung überwiegend als Säure oder als Base reagiert.',
+  muster:'HSO₄⁻ ist ein Ampholyt. Als Säure gilt pK_S(HSO₄⁻) ≈ 1,9. Als Base bezieht es sich auf das korrespondierende Paar H₂SO₄/HSO₄⁻ mit pK_S(H₂SO₄) ≈ −3, woraus pK_B(HSO₄⁻) ≈ 17 folgt. Da pK_S ≪ pK_B ist, überwiegt die Protonenabgabe an Wasser deutlich; eine Natriumhydrogensulfat-Lösung reagiert sauer.'},
+ {afb:3,typ:'frei',frage:'Erläutern Sie den Nivellierungseffekt und beurteilen Sie, ob sich die Säurestärken von HCl und HClO₄ in wässriger Lösung unterscheiden lassen.',
+  muster:'In Wasser sind beide Säuren praktisch vollständig protolysiert; die stärkste in wässriger Lösung existenzfähige Säure ist das Oxonium-Ion. Die Säurestärke wird dadurch auf das Niveau von H₃O⁺ nivelliert, sodass sich HCl und HClO₄ in Wasser messtechnisch nicht unterscheiden lassen. Eine Differenzierung gelingt erst in einem schwächer basischen Lösungsmittel, beispielsweise in Eisessig: Dort ist die Protonenübertragung unvollständig, und die unterschiedlichen Gleichgewichtslagen machen die Abstufung der Säurestärken zugänglich.'}
+]
+};
+
+/* ============================================================
+   8 · RENDERING
+   ============================================================ */
+function el(id){ return document.getElementById(id); }
+
+function renderNiveauleiste(){
+  el('niveauleiste').innerHTML = NIVEAUS.map(n =>
+    '<button class="niveaubtn'+(n.id===state.niveau?' aktiv':'')+'" data-n="'+n.id+'">'+n.kurz+' · '+n.lang+'</button>'
+  ).join('');
+  el('niveauleiste').querySelectorAll('button').forEach(b=>{
+    b.addEventListener('click', ()=>{ state.niveau=b.dataset.n; speichern(); renderAlles(); window.scrollTo({top:0,behavior:'smooth'}); });
+  });
+}
+function renderNav(){
+  const kap=[['k-arrhenius','1 Arrhenius'],['k-grenzen','2 Grenzen'],['k-broensted','3 Brønsted'],
+             ['k-sim','4 Simulation'],['k-paare','5 Paare'],['k-mehrprotonig','6 Mehrprotonige Säuren'],
+             ['k-uebung','7 Übungen'],['k-quiz','8 Quiz'],['k-auswertung','9 Auswertung'],['k-glossar','Glossar']];
+  el('kapitelnav').innerHTML = kap.map(k=>'<a href="#'+k[0]+'">'+k[1]+'</a>').join('');
+}
+function renderTexte(){
+  ['arrhenius','grenzen','broensted','paare','mehrprotonig'].forEach(k=>{
+    el('txt-'+k).innerHTML = TEXTE[k][state.niveau];
+  });
+}
+
+/* --- Simulation --- */
+let simAnim=null, simAktiv=null;
+function renderSim(){
+  const liste = REAKTIONEN.filter(r=>istMin(r.ab) || r.ab==='haupt' ||
+                 (['haupt','real','gym','os'].indexOf(r.ab) <= ['haupt','real','gym','os'].indexOf(state.niveau)));
+  el('simchips').innerHTML = liste.map((r,i)=>'<button class="chip" data-r="'+r.id+'">'+r.titel+'</button>').join('');
+  el('simhost').innerHTML = animHTML();
+  simAnim = Animation(el('simhost').querySelector('.animbox'));
+  function waehle(id){
+    const r = REAKTIONEN.find(x=>x.id===id);
+    simAktiv = r;
+    simAnim.setReaktion(r);
+    el('simnotiz').innerHTML = '<strong>Hinweis:</strong> '+r.notiz;
+    el('simchips').querySelectorAll('.chip').forEach(c=>c.classList.toggle('aktiv', c.dataset.r===id));
+  }
+  el('simchips').querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>waehle(c.dataset.r)));
+  waehle(liste[0].id);
+}
+
+/* --- Mehrprotonige Säuren --- */
+let mpAnim=null, mpKey=null, mpStufe=0;
+function renderMP(){
+  const ord=['haupt','real','gym','os'];
+  const keys = Object.keys(MEHRPROTONIG).filter(k=>ord.indexOf(MEHRPROTONIG[k].ab) <= ord.indexOf(state.niveau));
+  if(keys.length===0) keys.push('h2so4');
+  el('mpWahl').innerHTML = keys.map(k=>'<option value="'+k+'">'+MEHRPROTONIG[k].name+'</option>').join('');
+  el('mphost').innerHTML = animHTML();
+  mpAnim = Animation(el('mphost').querySelector('.animbox'));
+  function zeigeStufen(){
+    const d = MEHRPROTONIG[mpKey];
+    let h = d.stufen.map((s,i)=>'<button class="chip" data-s="'+i+'">'+(i+1)+'. Stufe</button>').join('');
+    h += '<button class="chip" data-s="-1">Gesamtgleichung</button>';
+    el('mpStufen').innerHTML = h;
+    el('mpStufen').querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>setStufe(parseInt(c.dataset.s,10))));
+  }
+  function setStufe(i){
+    const d = MEHRPROTONIG[mpKey];
+    mpStufe = i;
+    el('mpStufen').querySelectorAll('.chip').forEach(c=>c.classList.toggle('aktiv', parseInt(c.dataset.s,10)===i));
+    if(i>=0){
+      el('mphost').style.display='';
+      mpAnim.setReaktion(d.stufen[i].rk);
+      let info = '<div class="rueck info" style="display:block"><strong>'+(i+1)+'. Protolysestufe.</strong> '+d.stufen[i].txt;
+      if(istMin('gym')) info += ' <br><strong>pK<sub>S</sub> '+d.stufen[i].pks+'</strong>';
+      info += '</div>';
+      if(mpKey==='h2co3' && i===0 && istMin('os')){
+        info += '<p style="font-size:.84rem;color:var(--muted)">* Der Wert 6,35 ist ein scheinbarer pK<sub>S</sub>: Er bezieht sich auf die Summe aus physikalisch gelöstem CO₂ und H₂CO₃. Für die freie Kohlensäure selbst liegt der Wert bei etwa 3,6.</p>';
+      }
+      el('mpinfo').innerHTML = info;
+    } else {
+      el('mphost').style.display='none';
+      let h = '<div class="box merk"><h4>Gesamtgleichung</h4><p class="mitte formel" style="font-size:1.15rem">'+d.gesamt+'</p>'+
+              '<p>Die Gesamtgleichung ist die Summe der Teilgleichungen. Sie beschreibt die vollständige Protonenabgabe, nicht den tatsächlichen Reaktionsweg: In wässriger Lösung laufen die Stufen nebeneinander ab, ihre Anteile hängen vom pH-Wert ab.</p></div>';
+      if(istMin('gym')){
+        h += '<table><tr><th>Stufe</th><th>Gleichung</th><th>pK<sub>S</sub></th></tr>'+
+             d.stufen.map((s,i)=>'<tr><td class="z">'+(i+1)+'</td><td class="formel">'+s.rk.s.formel+' + H₂O '+s.rk.pfeil+' '+
+               s.rk.s.produkt+' + H₃O⁺</td><td class="z">'+s.pks+'</td></tr>').join('')+'</table>';
+        h += '<p style="font-size:.84rem;color:var(--muted)">pK<sub>S</sub>-Werte sind Richtwerte für 25 °C und schwanken je nach Quelle geringfügig.</p>';
+      }
+      el('mpinfo').innerHTML = h;
+    }
+  }
+  el('mpWahl').onchange = e=>{ mpKey=e.target.value; zeigeStufen(); setStufe(0); };
+  mpKey = keys[0]; zeigeStufen(); setStufe(0);
+}
+
+/* --- Übungen --- */
+function renderUebungen(){
+  const ord=['haupt','real','gym','os'];
+  const liste = UEBUNGEN.filter(u=>ord.indexOf(u.ab) <= ord.indexOf(state.niveau));
+  let h='';
+  liste.forEach(u=>{
+    h += '<div class="aufgabe" data-u="'+u.id+'"><p><span class="afb a'+u.afb+'">AFB '+['','I','II','III'][u.afb]+'</span>'+u.frage+'</p>';
+    if(u.typ==='rollen'){
+      u.items.forEach((it,i)=>{
+        const opt = '<option value="">– wählen –</option>'+it.auswahl.map(a=>'<option>'+a+'</option>').join('');
+        h += '<p class="formel">'+it.gl+'</p><p style="margin-left:14px">Protonendonator (Säure): <select data-i="'+i+'" data-rolle="d">'+opt+'</select>'+
+             ' &nbsp; Protonenakzeptor (Base): <select data-i="'+i+'" data-rolle="a">'+opt+'</select></p>';
+      });
+    } else if(u.typ==='luecke'){
+      h += '<div class="box wort"><strong>Wortliste (gemischt):</strong> '+u.woerter.join(' · ')+'</div><p class="luecke">';
+      u.teile.forEach((teil,i)=>{
+        h += teil;
+        if(i < u.loesung.length){
+          h += '<select data-i="'+i+'"><option value="">– wählen –</option>'+u.woerter.map(w=>'<option>'+w+'</option>').join('')+'</select>';
+        }
+      });
+      h += '</p>';
+    } else if(u.typ==='eingabe'){
+      u.items.forEach((it,i)=>{
+        h += '<p style="margin-left:4px">'+it.text+': <input type="text" data-i="'+i+'" placeholder="Teilchenformel / Gleichung"></p>';
+      });
+    } else if(u.typ==='frei'){
+      h += '<textarea data-frei="1" placeholder="Ihre Begründung ..."></textarea>';
+    }
+    h += '<div class="steuer"><button class="klein btnPruef">'+(u.typ==='frei'?'Musterlösung anzeigen':'Prüfen')+'</button></div>';
+    h += '<div class="rueck"></div></div>';
+  });
+  el('uebungen').innerHTML = h;
+
+  el('uebungen').querySelectorAll('.aufgabe').forEach(box=>{
+    const u = UEBUNGEN.find(x=>x.id===box.dataset.u);
+    box.querySelector('.btnPruef').addEventListener('click',()=>{
+      const r = box.querySelector('.rueck');
+      if(u.typ==='frei'){
+        r.className='rueck info'; r.innerHTML='<strong>Musterlösung:</strong> '+u.muster;
+        return;
+      }
+      let richtig=0, gesamt=0, details=[];
+      if(u.typ==='rollen'){
+        u.items.forEach((it,i)=>{
+          const d = box.querySelector('select[data-i="'+i+'"][data-rolle="d"]').value;
+          const a = box.querySelector('select[data-i="'+i+'"][data-rolle="a"]').value;
+          gesamt+=2;
+          const okD = d===it.donator, okA = a===it.akzeptor;
+          if(okD) richtig++; if(okA) richtig++;
+          if(!okD||!okA) details.push('Zeile '+(i+1)+': falsch – Donator ist '+it.donator+', Akzeptor ist '+it.akzeptor+'.');
+        });
+      } else if(u.typ==='luecke'){
+        u.loesung.forEach((l,i)=>{
+          gesamt++;
+          const v = box.querySelector('select[data-i="'+i+'"]').value;
+          if(v===l) richtig++; else details.push('Lücke '+(i+1)+': falsch – richtig ist „'+l+'“.');
+        });
+      } else if(u.typ==='eingabe'){
+        u.items.forEach((it,i)=>{
+          gesamt++;
+          const v = box.querySelector('input[data-i="'+i+'"]').value;
+          if(pruefeText(v, it.loes)) richtig++;
+          else details.push('„'+it.text+'“: falsch – erwartet wird '+it.loes[0]+'.');
+        });
+      }
+      if(richtig===gesamt){
+        r.className='rueck ok'; r.innerHTML='<strong>Alles richtig.</strong> '+richtig+' von '+gesamt+' Teilaufgaben.';
+      } else {
+        r.className='rueck nein';
+        r.innerHTML='<strong>Noch nicht vollständig richtig:</strong> '+richtig+' von '+gesamt+' Teilaufgaben.<br>'+details.join('<br>');
+      }
+      state.uebung[u.id]=richtig+'/'+gesamt; speichern(); aktualisiereFortschritt();
+    });
+  });
+}
+
+/* --- Quiz --- */
+function renderQuiz(){
+  const q = QUIZ[state.niveau];
+  let h='';
+  q.forEach((f,i)=>{
+    h += '<div class="aufgabe" data-q="'+i+'"><p><span class="afb a'+f.afb+'">AFB '+['','I','II','III'][f.afb]+'</span><strong>Aufgabe '+(i+1)+'.</strong> '+f.frage+'</p>';
+    if(f.typ==='mc'){
+      f.opt.forEach((o,j)=> h += '<label class="opt" data-j="'+j+'"><input type="radio" name="q'+i+'" value="'+j+'">'+o+'</label>');
+    } else if(f.typ==='mcm'){
+      f.opt.forEach((o,j)=> h += '<label class="opt" data-j="'+j+'"><input type="checkbox" name="q'+i+'" value="'+j+'">'+o+'</label>');
+    } else if(f.typ==='eingabe'){
+      h += '<p><input type="text" data-eingabe="1" placeholder="Antwort eingeben"></p>';
+    } else if(f.typ==='frei'){
+      h += '<textarea data-frei="1" placeholder="Ihre Antwort ..."></textarea>'+
+           '<label class="opt" style="margin-top:6px"><input type="checkbox" data-selbst="1"> Selbsteinschätzung nach Vergleich mit der Musterlösung: im Wesentlichen richtig</label>';
+    }
+    h += '<div class="rueck"></div></div>';
+  });
+  el('quiz').innerHTML = h;
+  el('quiz').querySelectorAll('input').forEach(inp=>inp.addEventListener('change',()=>{ erfasseQuiz(); aktualisiereFortschritt(); }));
+  el('quiz').querySelectorAll('textarea').forEach(t=>t.addEventListener('input',()=>{ erfasseQuiz(); }));
+  // gespeicherte Antworten wiederherstellen
+  const sp = state.quiz[state.niveau];
+  if(sp){
+    q.forEach((f,i)=>{
+      const box = el('quiz').querySelector('[data-q="'+i+'"]');
+      const a = sp[i]; if(a===undefined || a===null) return;
+      if(f.typ==='mc'){ const r=box.querySelector('input[value="'+a+'"]'); if(r) r.checked=true; }
+      else if(f.typ==='mcm'){ (a||[]).forEach(j=>{ const c=box.querySelector('input[value="'+j+'"]'); if(c) c.checked=true; }); }
+      else if(f.typ==='eingabe'){ box.querySelector('input[data-eingabe]').value=a; }
+      else if(f.typ==='frei'){ box.querySelector('textarea').value=(a&&a.text)||''; const s=box.querySelector('[data-selbst]'); if(s) s.checked=!!(a&&a.selbst); }
+    });
+  }
+}
+function erfasseQuiz(){
+  const q = QUIZ[state.niveau], out=[];
+  q.forEach((f,i)=>{
+    const box = el('quiz').querySelector('[data-q="'+i+'"]');
+    if(f.typ==='mc'){ const r=box.querySelector('input:checked'); out[i]= r? parseInt(r.value,10): null; }
+    else if(f.typ==='mcm'){ out[i]=[...box.querySelectorAll('input:checked')].map(c=>parseInt(c.value,10)); }
+    else if(f.typ==='eingabe'){ out[i]=box.querySelector('input[data-eingabe]').value; }
+    else if(f.typ==='frei'){ out[i]={text:box.querySelector('textarea').value, selbst:box.querySelector('[data-selbst]').checked}; }
+  });
+  state.quiz[state.niveau]=out; speichern();
+}
+function werteQuizAus(){
+  erfasseQuiz();
+  const q = QUIZ[state.niveau], a = state.quiz[state.niveau]||[];
+  let punkte=0, max=0; const proAfb={1:[0,0],2:[0,0],3:[0,0]};
+  q.forEach((f,i)=>{
+    const box = el('quiz').querySelector('[data-q="'+i+'"]');
+    const r = box.querySelector('.rueck');
+    max++; proAfb[f.afb][1]++;
+    let ok=false, zusatz='';
+    if(f.typ==='mc'){
+      ok = (a[i]===f.loes);
+      box.querySelectorAll('.opt').forEach(o=>{
+        const j=parseInt(o.dataset.j,10);
+        o.classList.toggle('richtig', j===f.loes);
+        o.classList.toggle('falschm', j===a[i] && j!==f.loes);
+      });
+    } else if(f.typ==='mcm'){
+      const soll=[...f.loes].sort().join(','), ist=[...(a[i]||[])].sort().join(',');
+      ok = soll===ist;
+      box.querySelectorAll('.opt').forEach(o=>{
+        const j=parseInt(o.dataset.j,10);
+        o.classList.toggle('richtig', f.loes.indexOf(j)>-1);
+        o.classList.toggle('falschm', (a[i]||[]).indexOf(j)>-1 && f.loes.indexOf(j)===-1);
+      });
+    } else if(f.typ==='eingabe'){
+      ok = pruefeText(a[i], f.loes);
+      if(!ok) zusatz=' Erwartet: <span class="formel">'+f.loes[0]+'</span>.';
+    } else if(f.typ==='frei'){
+      ok = !!(a[i] && a[i].selbst);
+      zusatz = ' (Selbsteinschätzung)';
+    }
+    if(ok){ punkte++; proAfb[f.afb][0]++; }
+    r.className = 'rueck '+(ok?'ok':'nein');
+    r.innerHTML = (ok?'<strong>Richtig.</strong> ':'<strong>Falsch.</strong> ')+
+                  (f.typ==='frei'? '<strong>Musterlösung:</strong> '+f.muster : (f.erkl||'')+zusatz);
+  });
+  state.ausgewertet=true; speichern();
+  zeigeAuswertung(punkte,max,proAfb);
+  aktualisiereFortschritt();
+  if(el('k-auswertung').scrollIntoView) el('k-auswertung').scrollIntoView({behavior:'smooth'});
+}
+function zeigeAuswertung(punkte,max,proAfb){
+  const proz = Math.round(punkte/max*100);
+  const n = NIVEAUS.find(x=>x.id===state.niveau);
+  let rueck;
+  if(proz>=85) rueck='Die Protonenübertragung ist sicher verstanden. Wechseln Sie für eine weitere Herausforderung auf das nächsthöhere Niveau.';
+  else if(proz>=60) rueck='Die Grundlagen sitzen. Wiederholen Sie gezielt die Aufgaben, die als falsch markiert sind, und arbeiten Sie die zugehörigen Kapitel noch einmal durch.';
+  else rueck='Arbeiten Sie die Kapitel 3 bis 5 erneut durch und nutzen Sie die Simulation; anschließend lohnt sich ein zweiter Durchgang durch das Quiz.';
+  let h = '<p><strong>Ergebnis ('+n.lang+'):</strong> '+punkte+' von '+max+' Aufgaben ('+proz+' %)</p>';
+  h += '<div class="balken"><div style="width:'+proz+'%"></div></div>';
+  h += '<table><tr><th>Anforderungsbereich</th><th>gelöst</th><th>Schwerpunkt</th></tr>'+
+       '<tr><td>AFB I – Reproduktion</td><td class="z">'+proAfb[1][0]+' / '+proAfb[1][1]+'</td><td>Definitionen wiedergeben</td></tr>'+
+       '<tr><td>AFB II – Anwendung</td><td class="z">'+proAfb[2][0]+' / '+proAfb[2][1]+'</td><td>Gleichungen aufstellen, Rollen zuordnen</td></tr>'+
+       '<tr><td>AFB III – Transfer und Beurteilung</td><td class="z">'+proAfb[3][0]+' / '+proAfb[3][1]+'</td><td>begründen, vergleichen, bewerten</td></tr></table>';
+  h += '<div class="box merk"><h4>Rückmeldung</h4><p>'+rueck+'</p></div>';
+  h += '<p style="font-size:.84rem;color:var(--muted)">Freitextaufgaben werden über die Selbsteinschätzung gewertet und ersetzen keine Bewertung durch die Lehrkraft.</p>';
+  el('auswertung').innerHTML=h;
+}
+function renderGlossar(){
+  let h='<table><tr><th>Begriff</th><th>Artikel / Plural</th><th>Erklärung</th></tr>';
+  Object.keys(GLOSSAR).sort((a,b)=>a.localeCompare(b,'de')).forEach(k=>{
+    h+='<tr><td><strong>'+k+'</strong></td><td>'+GLOSSAR[k][0]+'</td><td>'+GLOSSAR[k][1]+'</td></tr>';
+  });
+  el('glossartabelle').innerHTML=h+'</table>';
+}
+function aktualisiereFortschritt(){
+  const q=QUIZ[state.niveau], a=state.quiz[state.niveau]||[];
+  let beantwortet=0;
+  q.forEach((f,i)=>{
+    const v=a[i];
+    if(f.typ==='mc' && v!==null && v!==undefined) beantwortet++;
+    else if(f.typ==='mcm' && v && v.length) beantwortet++;
+    else if(f.typ==='eingabe' && v && v.trim()) beantwortet++;
+    else if(f.typ==='frei' && v && v.text && v.text.trim()) beantwortet++;
+  });
+  const ue=Object.keys(state.uebung).length;
+  const p = Math.min(100, Math.round((beantwortet/q.length*70) + Math.min(30, ue*8)));
+  el('fortschrittsbalken').style.width = p+'%';
+}
+
+function renderAlles(){
+  AnimListe.length = 0;
+  renderNiveauleiste(); renderTexte(); renderSim(); renderMP();
+  renderUebungen(); renderQuiz(); renderGlossar();
+  if(state.ausgewertet) el('auswertung').innerHTML='<p class="lernziel">Niveau gewechselt – lassen Sie das Quiz erneut auswerten.</p>';
+  aktualisiereFortschritt();
+}
+
+/* --- Kopfzeile und Steuerung --- */
+['fName','fKlasse','fDatum'].forEach(id=>{
+  const inp=el(id);
+  inp.addEventListener('input',()=>{ state.kopf[id]=inp.value; speichern(); });
+});
+el('btnAuswerten').addEventListener('click', werteQuizAus);
+el('btnQuizReset').addEventListener('click', ()=>{
+  state.quiz[state.niveau]=[]; state.ausgewertet=false; speichern(); renderQuiz();
+  el('auswertung').innerHTML='<p class="lernziel">Die Auswertung erscheint, sobald Sie das Quiz auswerten lassen.</p>';
+  aktualisiereFortschritt();
+});
+el('btnLoesungen').addEventListener('click', ()=>{
+  const q=QUIZ[state.niveau];
+  q.forEach((f,i)=>{
+    const box=el('quiz').querySelector('[data-q="'+i+'"]');
+    const r=box.querySelector('.rueck');
+    r.className='rueck info';
+    if(f.typ==='mc') r.innerHTML='<strong>Lösung:</strong> '+f.opt[f.loes]+'. '+f.erkl;
+    else if(f.typ==='mcm') r.innerHTML='<strong>Lösung:</strong> '+f.loes.map(j=>f.opt[j]).join(' · ')+'. '+f.erkl;
+    else if(f.typ==='eingabe') r.innerHTML='<strong>Lösung:</strong> <span class="formel">'+f.loes[0]+'</span>. '+f.erkl;
+    else r.innerHTML='<strong>Musterlösung:</strong> '+f.muster;
+  });
+  el('uebungen').querySelectorAll('.aufgabe').forEach(box=>{
+    const u=UEBUNGEN.find(x=>x.id===box.dataset.u);
+    const r=box.querySelector('.rueck'); r.className='rueck info';
+    if(u.typ==='frei') r.innerHTML='<strong>Musterlösung:</strong> '+u.muster;
+    else if(u.typ==='luecke') r.innerHTML='<strong>Lösung:</strong> '+u.loesung.join(' – ');
+    else if(u.typ==='eingabe') r.innerHTML='<strong>Lösung:</strong> '+u.items.map(it=>it.text+': '+it.loes[0]).join(' · ');
+    else if(u.typ==='rollen') r.innerHTML='<strong>Lösung:</strong> '+u.items.map(it=>'Donator '+it.donator+' / Akzeptor '+it.akzeptor).join(' · ');
+  });
+});
+document.querySelectorAll('[data-notiz]').forEach(t=>{
+  t.addEventListener('input',()=>{ state.notiz[t.dataset.notiz]=t.value; speichern(); });
+});
+
+/* --- Start --- */
+laden();
+renderNav();
+renderAlles();
+['fName','fKlasse','fDatum'].forEach(id=>{ if(state.kopf[id]) el(id).value=state.kopf[id]; });
+document.querySelectorAll('[data-notiz]').forEach(t=>{ if(state.notiz[t.dataset.notiz]) t.value=state.notiz[t.dataset.notiz]; });
+window.addEventListener('resize', ()=>AnimListe.forEach(a=>a.neuZeichnen()));
+</script>
+</body>
+</html>
