@@ -1,0 +1,584 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zwei Wege zum Hydroxoaluminat – Energetik Klasse 11</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F6F8; --paper:#FFFFFF; --ink:#1B2A35; --muted:#5A6B78; --line:#C9D4DC; --soft:#E6ECF0;
+  --a:#2461A8; --b:#B3304A; --heat:#D98E04; --ok:#2E7D4F; --bad:#B3261E; --liquid:#CFE3F2; --glass:#9FB3C2;
+  --grid:#E3E9EE;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131B21; --paper:#1B252D; --ink:#E4ECF1; --muted:#9AAAB6; --line:#34434E; --soft:#243039;
+    --a:#6FA4E8; --b:#E4708A; --heat:#F0B63C; --ok:#6CC78F; --bad:#F08A80; --liquid:#28435A; --glass:#6E8595; --grid:#26323B;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131B21; --paper:#1B252D; --ink:#E4ECF1; --muted:#9AAAB6; --line:#34434E; --soft:#243039;
+  --a:#6FA4E8; --b:#E4708A; --heat:#F0B63C; --ok:#6CC78F; --bad:#F08A80; --liquid:#28435A; --glass:#6E8595; --grid:#26323B;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:17px;line-height:1.55;font-variant-numeric:tabular-nums}
+h1,h2,h3{font-family:"Source Serif 4",Georgia,"Times New Roman",serif;line-height:1.2;margin:0}
+h1{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:700}
+h2{font-size:1.45rem;font-weight:700;margin-bottom:.4rem}
+h3{font-size:1.1rem;font-weight:700;margin:1.1rem 0 .4rem}
+p{margin:.4rem 0 .8rem;max-width:72ch}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+header{padding:28px 0 0}
+.lead{color:var(--muted);max-width:68ch}
+.equation{font-family:"Source Serif 4",Georgia,serif;font-size:1.05rem;margin:.2rem 0}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);margin-top:18px}
+nav .wrap{display:flex;gap:4px;overflow-x:auto}
+nav button{font:inherit;font-size:.95rem;background:none;border:none;color:var(--muted);padding:12px 14px;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+nav button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--heat);font-weight:700}
+nav button:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--heat);outline-offset:2px}
+main{padding:24px 0 60px}
+[hidden]{display:none!important}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:18px}
+.grid2{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:18px}
+@media (max-width:820px){.grid2{grid-template-columns:1fr}}
+label{display:block;font-size:.9rem;color:var(--muted);margin:.6rem 0 .2rem}
+select,input[type=number]{font:inherit;width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink)}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+button.act{font:inherit;font-size:.95rem;padding:9px 14px;border-radius:6px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer}
+button.sec{font:inherit;font-size:.95rem;padding:9px 14px;border-radius:6px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}
+.info{font-size:.92rem;color:var(--muted)}
+.readout{display:flex;gap:18px;flex-wrap:wrap;margin:10px 0}
+.readout div{min-width:110px}
+.readout span{display:block;font-size:.8rem;color:var(--muted)}
+.readout strong{font-size:1.5rem;font-family:"Source Serif 4",Georgia,serif}
+.lab{display:grid;grid-template-columns:200px minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:560px){.lab{grid-template-columns:1fr}}
+canvas{width:100%;display:block}
+.scroll{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;font-size:.92rem}
+td,th{border:1px solid var(--line);padding:5px 8px;text-align:center;white-space:nowrap}
+th{background:var(--soft);font-weight:700;text-align:left}
+.steps{width:100%}
+.steps td{text-align:left;white-space:normal;vertical-align:top}
+.steps td:first-child{font-family:"Source Serif 4",Georgia,serif;width:58%}
+.steps td:last-child{color:var(--muted);font-size:.88rem;font-style:italic}
+.steps tr.res td:first-child{font-weight:700}
+.fb{padding:10px 12px;border-radius:6px;margin-top:10px;border-left:4px solid var(--line);background:var(--soft)}
+.fb.ok{border-left-color:var(--ok)}
+.fb.bad{border-left-color:var(--bad)}
+.fb b.ok{color:var(--ok)} .fb b.bad{color:var(--bad)}
+.inrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.9rem;margin:8px 0}
+.legend i{display:inline-block;width:18px;height:4px;vertical-align:middle;margin-right:6px}
+dl{margin:0}
+dt{font-weight:700;margin-top:.8rem}
+dd{margin:.1rem 0 0 0;max-width:72ch}
+.formula{font-family:"Source Serif 4",Georgia,serif;font-size:1.15rem;background:var(--soft);padding:8px 12px;border-radius:6px;display:inline-block;margin:.3rem 0}
+.hint{border-left:3px solid var(--heat);padding:4px 0 4px 12px;color:var(--muted);font-size:.93rem;margin:10px 0}
+svg text{fill:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,sans-serif}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Zwei Wege zum Hydroxoaluminat</h1>
+    <p class="lead">Begleitseite zu den Versuchen AB 1, V1–V3 und den Arbeitsblättern AB 2 und AB 3. Sie können hier den Versuch simulieren, Ihren Rechenweg überprüfen und das Enthalpiediagramm beider Wege erzeugen.</p>
+    <p class="equation">Al + 3 HCl + 4 NaOH → Na[Al(OH)<sub>4</sub>] + 3 NaCl + <sup>3</sup>/<sub>2</sub> H<sub>2</sub></p>
+  </div>
+  <nav aria-label="Bereiche">
+    <div class="wrap" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="sim">Kalorimeter-Simulation</button>
+      <button role="tab" aria-selected="false" data-tab="rech">Rechenweg prüfen</button>
+      <button role="tab" aria-selected="false" data-tab="dia">Enthalpiediagramm</button>
+      <button role="tab" aria-selected="false" data-tab="zust">Zustandsgröße</button>
+      <button role="tab" aria-selected="false" data-tab="begr">Begriffe und Formeln</button>
+    </div>
+  </nav>
+</header>
+
+<main class="wrap">
+
+<!-- ================= SIMULATION ================= -->
+<section id="sim" role="tabpanel">
+  <h2>Kalorimeter-Simulation</h2>
+  <p>Wählen Sie einen Versuch, starten Sie die Messung und geben Sie nach etwa zwei Minuten den zweiten Stoff zu. Die Temperatur wird automatisch protokolliert: vor der Zugabe alle 30 s, danach alle 15 s.</p>
+  <div class="grid2">
+    <div class="panel">
+      <label for="exp">Versuch</label>
+      <select id="exp">
+        <option value="ab1">AB 1: Salzsäure + Natronlauge</option>
+        <option value="v1">V1 (A1): Aluminium + Natronlauge</option>
+        <option value="v2">V2 (B1): Aluminium + Salzsäure</option>
+        <option value="v3">V3 (B2): Aluminiumchlorid + Natronlauge</option>
+      </select>
+      <label for="iso">Gefäß</label>
+      <select id="iso">
+        <option value="good">Styroporbecher mit Deckel</option>
+        <option value="mid">Styroporbecher ohne Deckel</option>
+        <option value="bad">Becherglas (nicht isoliert)</option>
+      </select>
+      <label for="speed">Zeitraffer</label>
+      <select id="speed">
+        <option value="1">1-fach (Echtzeit)</option>
+        <option value="5">5-fach</option>
+        <option value="20" selected>20-fach</option>
+      </select>
+      <div class="btns">
+        <button class="act" id="bStart">Messung starten</button>
+        <button class="act" id="bAdd" disabled>Zugabe</button>
+        <button class="sec" id="bReset">Zurücksetzen</button>
+      </div>
+      <p class="info" id="expInfo"></p>
+    </div>
+    <div class="panel">
+      <div class="lab">
+        <svg id="beaker" viewBox="0 0 200 260" role="img" aria-label="Kalorimeter mit Thermometer">
+          <rect x="146" y="18" width="16" height="170" rx="8" fill="none" stroke="var(--glass)" stroke-width="2"/>
+          <rect id="thermo" x="150" y="150" width="8" height="34" rx="4" fill="var(--heat)"/>
+          <circle cx="154" cy="196" r="12" fill="var(--heat)"/>
+          <path d="M28 70 L32 236 Q32 246 42 246 L118 246 Q128 246 128 236 L132 70" fill="none" stroke="var(--glass)" stroke-width="3"/>
+          <rect id="lid" x="22" y="60" width="116" height="9" rx="2" fill="var(--glass)" opacity=".7"/>
+          <path id="liq" d="M31 120 L33 236 Q33 244 42 244 L118 244 Q127 244 127 236 L129 120 Z" fill="var(--liquid)"/>
+          <rect id="haze" x="33" y="121" width="94" height="122" fill="#FFFFFF" opacity="0"/>
+          <g id="bubbles"></g>
+          <g id="solid"></g>
+        </svg>
+        <div>
+          <div class="readout">
+            <div><span>Zeit</span><strong id="rT">0 s</strong></div>
+            <div><span>Temperatur</span><strong id="rTemp">– °C</strong></div>
+            <div><span>Umsatz (Modell)</span><strong id="rX">0 %</strong></div>
+          </div>
+          <canvas id="plot" height="260" aria-label="Temperatur-Zeit-Diagramm"></canvas>
+        </div>
+      </div>
+      <h3>Messprotokoll</h3>
+      <div class="scroll"><table id="log"><tr><th>t in s</th></tr><tr><th>T in °C</th></tr></table></div>
+      <div class="readout" id="evalBox" hidden>
+        <div><span>T<sub>1</sub> (vor Zugabe)</span><strong id="eT1">–</strong></div>
+        <div><span>T<sub>2</sub> (Maximum)</span><strong id="eT2">–</strong></div>
+        <div><span>ΔT</span><strong id="eDT">–</strong></div>
+      </div>
+      <div class="btns"><button class="sec" id="bTransfer" disabled>Werte in „Rechenweg prüfen“ übernehmen</button></div>
+      <div class="hint">Vergleichen Sie die Gefäße: Bei schlechter Isolierung gibt die Lösung während der Messung mehr Wärme an die Umgebung ab. Achten Sie besonders auf V2, dort verläuft die Reaktion langsam.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= RECHENWEG ================= -->
+<section id="rech" role="tabpanel" hidden>
+  <h2>Rechenweg prüfen</h2>
+  <p>Geben Sie Ihre Messwerte ein. Die Seite zeigt den vollständigen Rechenweg Zeile für Zeile. Tragen Sie zuerst Ihr eigenes Ergebnis ein, wenn Sie sich selbst kontrollieren möchten.</p>
+  <div class="grid2">
+    <div class="panel">
+      <label for="rExp">Versuch</label>
+      <select id="rExp">
+        <option value="ab1">AB 1: Neutralisation</option>
+        <option value="v1">V1 (A1): Al + NaOH</option>
+        <option value="v2">V2 (B1): Al + HCl</option>
+        <option value="v3">V3 (B2): AlCl₃ + NaOH</option>
+      </select>
+      <div class="inrow">
+        <div><label for="iT1">T₁ in °C</label><input type="number" id="iT1" step="0.1" value="22.4"></div>
+        <div><label for="iT2">T₂ in °C</label><input type="number" id="iT2" step="0.1" value="28.7"></div>
+      </div>
+      <label for="iV">Gesamtvolumen der Lösung in mL</label>
+      <input type="number" id="iV" step="1" value="50">
+      <div id="nMass" hidden>
+        <label for="iM">Masse Aluminium in g</label>
+        <input type="number" id="iM" step="0.001" value="0.135">
+      </div>
+      <div id="nConc">
+        <div class="inrow">
+          <div><label for="iC" id="lC">c in mol/L</label><input type="number" id="iC" step="0.01" value="1"></div>
+          <div><label for="iVc" id="lVc">V in mL</label><input type="number" id="iVc" step="1" value="25"></div>
+        </div>
+      </div>
+      <label for="iOwn">Ihr Ergebnis Δ<sub>r</sub>H in kJ/mol (optional)</label>
+      <input type="number" id="iOwn" step="0.1" placeholder="z. B. -52.7">
+      <div class="btns">
+        <button class="act" id="bCheck">Ergebnis prüfen</button>
+        <button class="sec" id="bShow">Rechenweg anzeigen</button>
+      </div>
+    </div>
+    <div class="panel">
+      <div id="feedback"></div>
+      <div id="stepsBox"><p class="info">Der Rechenweg erscheint hier, sobald Sie „Rechenweg anzeigen“ wählen.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DIAGRAMM ================= -->
+<section id="dia" role="tabpanel" hidden>
+  <h2>Enthalpiediagramm beider Wege</h2>
+  <p>Tragen Sie die Mittelwerte Ihrer Klasse ein (in kJ/mol). Das Diagramm zeigt beide Reaktionswege mit Zwischenzuständen. Mit „Schrittweise aufbauen“ erscheinen die Teilschritte nacheinander.</p>
+  <div class="grid2">
+    <div class="panel">
+      <div class="inrow">
+        <div><label for="dA1">Δ<sub>r</sub>H(A1)</label><input type="number" id="dA1" step="0.1" value="-395.7"></div>
+        <div><label for="dA2">Δ<sub>r</sub>H(A2)</label><input type="number" id="dA2" step="0.1" value="-53.0"></div>
+        <div><label for="dB1">Δ<sub>r</sub>H(B1)</label><input type="number" id="dB1" step="0.1" value="-466.0"></div>
+        <div><label for="dB2">Δ<sub>r</sub>H(B2)</label><input type="number" id="dB2" step="0.1" value="-47.9"></div>
+      </div>
+      <label><input type="checkbox" id="dLit" checked> Literaturwert einblenden</label>
+      <div class="btns">
+        <button class="act" id="bDraw">Diagramm zeichnen</button>
+        <button class="sec" id="bStep">Schrittweise aufbauen</button>
+        <button class="sec" id="bLitVals">Literaturwerte einsetzen</button>
+      </div>
+      <div id="sums" class="fb"></div>
+    </div>
+    <div class="panel">
+      <div class="legend"><span><i style="background:var(--a)"></i>Weg A (direkt)</span><span><i style="background:var(--b)"></i>Weg B (über AlCl₃)</span><span><i style="background:var(--muted)"></i>Literaturwert</span></div>
+      <div class="scroll"><svg id="hdia" viewBox="0 0 640 460" style="min-width:520px;width:100%" role="img" aria-label="Enthalpiediagramm"></svg></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ZUSTANDSGRÖSSE ================= -->
+<section id="zust" role="tabpanel" hidden>
+  <h2>Warum ist die Enthalpie eine Zustandsgröße?</h2>
+  <p>Zwei Wanderwege führen vom selben Tal zum selben Gipfel. Der direkte Weg ist steil und kurz, der zweite führt über eine Hütte. Die zurückgelegte Strecke unterscheidet sich, der Höhenunterschied nicht. Übertragen auf die Chemie: Die Enthalpieänderung hängt nur von Ausgangs- und Endzustand ab.</p>
+  <div class="panel">
+    <div class="btns" style="margin-top:0">
+      <button class="act" id="bWalkA">Weg A gehen</button>
+      <button class="act" id="bWalkB" style="background:var(--b);border-color:var(--b)">Weg B gehen</button>
+    </div>
+    <div class="readout">
+      <div><span>Höhenunterschied (Zustandsgröße)</span><strong id="wH">0 m</strong></div>
+      <div><span>Zurückgelegte Strecke (wegabhängig)</span><strong id="wS">0 m</strong></div>
+    </div>
+    <div class="scroll"><svg id="mount" viewBox="0 0 640 320" style="min-width:480px;width:100%" role="img" aria-label="Zwei Wanderwege auf einen Berg">
+      <path d="M0 300 L150 250 L250 170 L330 60 L420 150 L520 220 L640 290 L640 320 L0 320 Z" fill="var(--soft)" stroke="var(--line)"/>
+      <path id="pathA" d="M70 290 L330 60" fill="none" stroke="var(--a)" stroke-width="3" stroke-dasharray="6 5"/>
+      <path id="pathB" d="M70 290 C200 300 330 280 470 190 C540 150 460 110 390 100 C360 95 340 80 330 60" fill="none" stroke="var(--b)" stroke-width="3" stroke-dasharray="6 5"/>
+      <rect x="462" y="176" width="22" height="16" fill="var(--b)" opacity=".7"/>
+      <text x="492" y="190" font-size="13">Hütte (Zwischenzustand)</text>
+      <circle cx="70" cy="290" r="6" fill="var(--ink)"/><text x="20" y="278" font-size="13">Tal: 800 m</text>
+      <circle cx="330" cy="60" r="6" fill="var(--ink)"/><text x="345" y="52" font-size="13">Gipfel: 2400 m</text>
+      <circle id="walker" cx="70" cy="290" r="8" fill="var(--heat)" stroke="var(--paper)" stroke-width="2"/>
+    </svg></div>
+    <p class="hint">Im Enthalpiediagramm entspricht die Höhe der Enthalpie H. Die Hütte entspricht einem Zwischenzustand (z. B. AlCl₃-Lösung auf Weg B). Die Wärme, die insgesamt abgegeben wird, entspricht dem Höhenunterschied und ist für beide Wege gleich.</p>
+  </div>
+</section>
+
+<!-- ================= BEGRIFFE ================= -->
+<section id="begr" role="tabpanel" hidden>
+  <h2>Begriffe und Formeln</h2>
+  <div class="grid2">
+    <div class="panel">
+      <h3 style="margin-top:0">Formeln</h3>
+      <div class="formula">Q = c · m · ΔT</div>
+      <p class="info">c = 4,18 J/(g·K); m in g (1 mL ≙ 1 g); ΔT = T₂ – T₁ in K</p>
+      <div class="formula">n = m / M</div>
+      <p class="info">für Feststoffe; M(Al) = 26,98 g/mol</p>
+      <div class="formula">n = c · V</div>
+      <p class="info">für Lösungen; V in Litern einsetzen</p>
+      <div class="formula">Δ<sub>r</sub>H = – Q / n</div>
+      <p class="info">n: Stoffmenge des Stoffes, der vollständig reagiert</p>
+      <h3>Satz von Hess</h3>
+      <p>Die Reaktionsenthalpie einer Gesamtreaktion ist unabhängig vom Reaktionsweg. Sie ist gleich der Summe der Reaktionsenthalpien der Teilschritte.</p>
+      <div class="formula">Δ<sub>r</sub>H(A1) + 3 · Δ<sub>r</sub>H(A2) = Δ<sub>r</sub>H(B1) + Δ<sub>r</sub>H(B2)</div>
+    </div>
+    <div class="panel">
+      <h3 style="margin-top:0">Wortspeicher</h3>
+      <dl>
+        <dt>die Wärme (Q)</dt><dd>übertragene Energie zwischen System und Umgebung; Einheit Joule (J)</dd>
+        <dt>das System / die Umgebung</dt><dd>System: die reagierenden Stoffe. Umgebung: alles andere, im Kalorimeter vor allem das Wasser.</dd>
+        <dt>exotherm / endotherm</dt><dd>exotherm: Wärme wird an die Umgebung abgegeben, Δ<sub>r</sub>H &lt; 0. Endotherm: Wärme wird aufgenommen, Δ<sub>r</sub>H &gt; 0.</dd>
+        <dt>die spezifische Wärmekapazität (c)</dt><dd>Wärme, die nötig ist, um 1 g eines Stoffes um 1 K zu erwärmen</dd>
+        <dt>die Stoffmenge (n)</dt><dd>Anzahl der Teilchen, angegeben in mol</dd>
+        <dt>die Reaktionsenthalpie (Δ<sub>r</sub>H)</dt><dd>bei konstantem Druck umgesetzte Wärme, bezogen auf den Formelumsatz der Reaktionsgleichung</dd>
+        <dt>der Überschuss</dt><dd>Ein Stoff liegt in größerer Menge vor, als für die Reaktion nötig ist.</dd>
+        <dt>die Zustandsgröße</dt><dd>Größe, deren Wert nur vom Zustand abhängt, nicht vom Weg dorthin (z. B. Enthalpie, Höhe)</dd>
+        <dt>amphoter</dt><dd>reagiert sowohl mit Säuren als auch mit Basen (z. B. Aluminiumhydroxid)</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+</main>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const fmt=(x,d=1)=>x.toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d});
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+/* ---------- Tabs ---------- */
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  document.querySelectorAll('main section').forEach(s=>s.hidden=s.id!==b.dataset.tab);
+  if(b.dataset.tab==='sim') drawPlot();
+  if(b.dataset.tab==='dia') drawDia(false);
+}));
+
+/* ---------- Versuchsdaten ---------- */
+const EXP={
+  ab1:{name:'Neutralisation',n:0.025,dH:-55.8,m:50,gas:false,prec:false,
+       X:t=>1-Math.exp(-t/4),
+       info:'25 mL Salzsäure (1 mol/L) im Becher, Zugabe: 25 mL Natronlauge (1 mol/L). Bezug: n(H₂O) = 0,025 mol.'},
+  v1:{name:'Aluminium + Natronlauge',n:0.0050,dH:-415,m:50,gas:true,prec:false,
+       X:t=>1-Math.exp(-Math.pow(t/45,1.4)),
+       info:'50 mL Natronlauge (1 mol/L) im Becher, Zugabe: 0,135 g Aluminium. Bezug: n(Al) = 0,0050 mol.'},
+  v2:{name:'Aluminium + Salzsäure',n:0.0050,dH:-531,m:50,gas:true,prec:false,
+       X:t=>1-Math.exp(-Math.pow(t/190,3)),
+       info:'50 mL Salzsäure (2 mol/L) im Becher, Zugabe: 0,135 g Aluminium. Die Oxidschicht verzögert den Reaktionsbeginn. Bezug: n(Al) = 0,0050 mol.'},
+  v3:{name:'Aluminiumchlorid + Natronlauge',n:0.020,dH:-51.5,m:50,gas:false,prec:true,
+       X:t=>1-Math.exp(-t/3),
+       info:'25 mL AlCl₃-Lösung (0,8 mol/L) im Becher, Zugabe: 25 mL Natronlauge (4 mol/L). Bezug: n(AlCl₃) = 0,020 mol.'}
+};
+const ISO={good:{k:0.0009,Cc:10},mid:{k:0.0025,Cc:10},bad:{k:0.006,Cc:90}};
+
+/* ---------- Simulation ---------- */
+let S=null, raf=null, lastReal=0;
+function newSim(){
+  const e=EXP[$('exp').value], iso=ISO[$('iso').value];
+  const Tenv=21.5+Math.random()*2;
+  S={e,iso,Tenv,T:Tenv,t:0,tAdd:null,run:false,trace:[],log:[],nextLog:0,X:0,Xprev:0,bubbles:[],done:false};
+  $('lid').style.display=$('iso').value==='good'?'':'none';
+  $('expInfo').textContent=e.info;
+  $('bAdd').disabled=true;$('bStart').disabled=false;$('bTransfer').disabled=true;
+  $('evalBox').hidden=true;
+  $('solid').innerHTML='';$('bubbles').innerHTML='';$('haze').setAttribute('opacity',0);
+  renderLog();updateReadout();drawPlot();drawThermo();
+}
+function measured(T){return Math.round((T+(Math.random()-.5)*0.08)*10)/10;}
+function step(dt){
+  const C=S.e.m*4.18+S.iso.Cc; // J/K
+  let P=0;
+  if(S.tAdd!==null){
+    const tr=S.t-S.tAdd; const X=S.e.X(Math.max(0,tr));
+    const dX=X-S.X; S.X=X;
+    P=dX*S.e.n*(-S.e.dH)*1000/dt; // W
+  }
+  S.T+= (P/C - S.iso.k*(S.T-S.Tenv))*dt;
+  S.t+=dt;
+}
+function loop(now){
+  if(!S.run){raf=null;return;}
+  const realDt=Math.min(0.1,(now-lastReal)/1000); lastReal=now;
+  const sp=+$('speed').value; let simDt=realDt*sp;
+  while(simDt>0){const h=Math.min(0.2,simDt);step(h);simDt-=h;
+    if(S.t>=S.nextLog){logPoint();}
+    if(S.trace.length===0||S.t-S.trace[S.trace.length-1][0]>=1) S.trace.push([S.t,S.T]);
+  }
+  if(S.tAdd!==null && S.t-S.tAdd>=(S.e===EXP.v2?540:300)){finish();}
+  updateReadout();animBeaker(realDt);drawThermo();drawPlot();
+  raf=requestAnimationFrame(loop);
+}
+function logPoint(){
+  const tl=Math.round(S.nextLog);
+  S.log.push([tl,measured(S.T)]);
+  S.nextLog += (S.tAdd===null)?30:15;
+  renderLog();
+}
+function renderLog(){
+  const tb=$('log'); const r1=['<th>t in s</th>'], r2=['<th>T in °C</th>'];
+  S&&S.log.forEach(([t,T])=>{const mark=S.tAdd!==null&&t>S.tAdd&&t-S.tAdd<=15?' style="background:var(--soft)"':'';r1.push(`<td${mark}>${t}</td>`);r2.push(`<td${mark}>${fmt(T)}</td>`);});
+  tb.innerHTML=`<tr>${r1.join('')}</tr><tr>${r2.join('')}</tr>`;
+  const sc=tb.parentElement; sc.scrollLeft=sc.scrollWidth;
+}
+function updateReadout(){
+  $('rT').textContent=Math.floor(S.t)+' s';
+  $('rTemp').textContent=fmt(measured(S.T))+' °C';
+  $('rX').textContent=Math.round(S.X*100)+' %';
+}
+function finish(){
+  S.run=false;S.done=true;$('bAdd').disabled=true;$('bStart').disabled=true;
+  const pre=S.log.filter(l=>l[0]<=S.tAdd); const post=S.log.filter(l=>l[0]>S.tAdd);
+  const T1=pre.length?pre[pre.length-1][1]:S.Tenv; const T2=Math.max(...post.map(l=>l[1]));
+  S.T1=T1;S.T2=T2;
+  $('eT1').textContent=fmt(T1)+' °C';$('eT2').textContent=fmt(T2)+' °C';$('eDT').textContent=fmt(T2-T1)+' K';
+  $('evalBox').hidden=false;$('bTransfer').disabled=false;
+}
+$('bStart').onclick=()=>{ if(S.done) newSim(); S.run=true; $('bStart').disabled=true; $('bAdd').disabled=false; lastReal=performance.now(); if(!raf) raf=requestAnimationFrame(loop); };
+$('bAdd').onclick=()=>{
+  S.tAdd=S.t; S.nextLog=S.t+15; $('bAdd').disabled=true;
+  S.log.push([Math.round(S.t),measured(S.T)]); renderLog();
+  // Volumenzunahme bei Lösungszugabe
+  if(S.e===EXP.ab1||S.e===EXP.v3){$('liq').setAttribute('d','M30 80 L33 236 Q33 244 42 244 L118 244 Q127 244 127 236 L130 80 Z');$('haze').setAttribute('y',81);$('haze').setAttribute('height',162);}
+  if(S.e.gas){ // Aluminiumstücke
+    let s='';for(let i=0;i<9;i++){s+=`<rect x="${42+Math.random()*76}" y="${234+Math.random()*6}" width="5" height="3" fill="var(--glass)"/>`;} $('solid').innerHTML=s;}
+};
+$('bReset').onclick=()=>{S.run=false;resetBeaker();newSim();};
+['exp','iso'].forEach(id=>$(id).addEventListener('change',()=>{S.run=false;resetBeaker();newSim();}));
+function resetBeaker(){ const half=($('exp').value==='ab1'||$('exp').value==='v3');
+  $('liq').setAttribute('d',half?'M31 160 L33 236 Q33 244 42 244 L118 244 Q127 244 127 236 L129 160 Z':'M30 80 L33 236 Q33 244 42 244 L118 244 Q127 244 127 236 L130 80 Z');
+  $('haze').setAttribute('y',half?161:81);$('haze').setAttribute('height',half?82:162);}
+$('bTransfer').onclick=()=>{
+  $('rExp').value=$('exp').value; presetRech();
+  $('iT1').value=S.T1.toFixed(1);$('iT2').value=S.T2.toFixed(1);
+  document.querySelector('nav button[data-tab="rech"]').click();
+};
+
+/* Becher-Animation */
+function animBeaker(dt){
+  const g=$('bubbles'); const top=+$('haze').getAttribute('y');
+  if(S.tAdd!==null&&S.e.gas){
+    const simDt=Math.max(dt*(+$('speed').value),1e-3);
+    const rate=Math.max(0,S.X-(S.Xprev||0))/simDt; S.Xprev=S.X; // Umsatz pro simulierter Sekunde
+    let pNew=Math.min(2,rate*150);
+    while(pNew>0){ if(Math.random()<Math.min(1,pNew)) S.bubbles.push({x:42+Math.random()*76,y:238,r:1.5+Math.random()*2.5}); pNew-=1; }
+  }
+  S.bubbles.forEach(b=>b.y-=dt*60*(1+b.r/3));
+  S.bubbles=S.bubbles.filter(b=>b.y>top);
+  g.innerHTML=S.bubbles.map(b=>`<circle cx="${b.x.toFixed(1)}" cy="${b.y.toFixed(1)}" r="${b.r.toFixed(1)}" fill="none" stroke="var(--glass)" stroke-width="1"/>`).join('');
+  if(S.tAdd!==null){
+    const X=S.X;
+    if(S.e.gas){ const rects=$('solid').children; for(let i=0;i<rects.length;i++) rects[i].setAttribute('opacity',Math.max(0,1-X*1.05)); }
+    if(S.e.prec){ const tr=S.t-S.tAdd; const h=tr<0?0:0.75*Math.exp(-tr/4)*(1-Math.exp(-tr/0.4)); $('haze').setAttribute('opacity',h.toFixed(2)); }
+  }
+}
+function drawThermo(){
+  const T=S?S.T:22; const frac=Math.min(1,Math.max(0,(T-15)/25));
+  const h=20+frac*140; $('thermo').setAttribute('y',188-h);$('thermo').setAttribute('height',h);
+}
+
+/* Plot */
+function drawPlot(){
+  const cv=$('plot'); if(!cv.offsetParent) return; const dpr=window.devicePixelRatio||1;
+  const W=cv.clientWidth,H=260; cv.width=W*dpr;cv.height=H*dpr; const c=cv.getContext('2d'); c.scale(dpr,dpr);
+  c.clearRect(0,0,W,H);
+  const L=46,R=10,T=10,B=34; const pw=W-L-R, ph=H-T-B;
+  const tMax=S&&S.tAdd!==null?(S.tAdd+(S.e===EXP.v2?540:300)):420;
+  const base=S?Math.floor(S.Tenv)-1:20; const top=base+16;
+  const X=t=>L+t/tMax*pw, Y=v=>T+(1-(v-base)/(top-base))*ph;
+  c.strokeStyle=css('--grid');c.lineWidth=1;c.fillStyle=css('--muted');c.font='12px "Atkinson Hyperlegible",sans-serif';
+  for(let v=base;v<=top;v+=2){c.beginPath();c.moveTo(L,Y(v));c.lineTo(W-R,Y(v));c.stroke();c.fillText(v,L-24,Y(v)+4);}
+  const stepT=tMax>500?60:30;
+  for(let t=0;t<=tMax;t+=stepT){c.beginPath();c.moveTo(X(t),T);c.lineTo(X(t),H-B);c.stroke();c.fillText(t,X(t)-8,H-B+15);}
+  c.fillText('t in s',W-R-40,H-4);c.save();c.translate(12,T+ph/2+20);c.rotate(-Math.PI/2);c.fillText('T in °C',0,0);c.restore();
+  if(!S) return;
+  if(S.tAdd!==null){c.strokeStyle=css('--heat');c.setLineDash([4,4]);c.beginPath();c.moveTo(X(S.tAdd),T);c.lineTo(X(S.tAdd),H-B);c.stroke();c.setLineDash([]);c.fillStyle=css('--heat');c.fillText('Zugabe',X(S.tAdd)+4,T+12);}
+  c.strokeStyle=css('--a');c.lineWidth=2;c.beginPath();
+  S.trace.forEach(([t,v],i)=>{if(t>tMax)return;i?c.lineTo(X(t),Y(v)):c.moveTo(X(t),Y(v));});c.stroke();
+  c.fillStyle=css('--ink');S.log.forEach(([t,v])=>{if(t<=tMax){c.beginPath();c.arc(X(t),Y(v),3,0,7);c.fill();}});
+}
+window.addEventListener('resize',()=>{drawPlot();});
+
+/* ---------- Rechenweg ---------- */
+function presetRech(){
+  const v=$('rExp').value;
+  const P={ab1:{V:50,mass:false,c:1,Vc:25,lc:'c(HCl) in mol/L',lv:'V(HCl) in mL'},
+           v1:{V:50,mass:true},v2:{V:50,mass:true},
+           v3:{V:50,mass:false,c:0.8,Vc:25,lc:'c(AlCl₃) in mol/L',lv:'V(AlCl₃) in mL'}}[v];
+  $('iV').value=P.V;$('nMass').hidden=!P.mass;$('nConc').hidden=P.mass;
+  if(!P.mass){$('iC').value=P.c;$('iVc').value=P.Vc;$('lC').textContent=P.lc;$('lVc').textContent=P.lv;}
+  $('feedback').innerHTML='';$('stepsBox').innerHTML='<p class="info">Der Rechenweg erscheint hier, sobald Sie „Rechenweg anzeigen“ wählen.</p>';
+}
+$('rExp').addEventListener('change',presetRech);
+function compute(){
+  const v=$('rExp').value, T1=+$('iT1').value, T2=+$('iT2').value, V=+$('iV').value;
+  const dT=T2-T1, m=V, Q=4.18*m*dT, QkJ=Q/1000;
+  const rows=[]; let n, nName;
+  rows.push([`ΔT = T₂ – T₁ = ${fmt(T2)} °C – ${fmt(T1)} °C = ${fmt(dT)} K`,'Temperaturdifferenz; °C-Differenz = K-Differenz']);
+  rows.push([`m(Lösung) ≈ ${fmt(m,0)} g`,'Näherung: 1 mL ≙ 1 g']);
+  rows.push(['Q = c · m · ΔT','Formel']);
+  rows.push([`Q = 4,18 J/(g·K) · ${fmt(m,0)} g · ${fmt(dT)} K`,'Werte einsetzen']);
+  rows.push([`Q = ${fmt(Q,0)} J ≈ ${fmt(QkJ,3)} kJ`,'Umrechnung: 1 kJ = 1000 J',true]);
+  if(v==='v1'||v==='v2'){
+    const mAl=+$('iM').value; n=mAl/26.98; nName='n(Al)';
+    rows.push(['n(Al) = m(Al) / M(Al)','Formel für Feststoffe']);
+    rows.push([`n(Al) = ${fmt(mAl,3)} g / 26,98 g/mol ≈ ${fmt(n,5)} mol`,'Aluminium reagiert vollständig (Säure bzw. Lauge im Überschuss)',true]);
+  } else {
+    const cc=+$('iC').value, Vc=+$('iVc').value; n=cc*Vc/1000;
+    nName=v==='ab1'?'n(H₂O)':'n(AlCl₃)';
+    const sub=v==='ab1'?'HCl':'AlCl₃';
+    rows.push([`n(${sub}) = c · V`,'Formel für Lösungen; V in Litern']);
+    rows.push([`n(${sub}) = ${fmt(cc,2)} mol/L · ${fmt(Vc/1000,3)} L = ${fmt(n,3)} mol`,`${fmt(Vc,0)} mL = ${fmt(Vc/1000,3)} L`,v!=='ab1']);
+    if(v==='ab1') rows.push([`n(H₂O) = n(HCl) = ${fmt(n,3)} mol`,'HCl : NaOH : H₂O = 1 : 1 : 1',true]);
+  }
+  const dH=-QkJ/n;
+  rows.push([`Δ<sub>r</sub>H = – Q / ${nName}`,'Minuszeichen: das System gibt Wärme ab']);
+  rows.push([`Δ<sub>r</sub>H = – ${fmt(QkJ,3)} kJ / ${fmt(n,5)} mol`,'Werte einsetzen']);
+  const lit=EXP[v].dH;
+  rows.push([`Δ<sub>r</sub>H ≈ ${fmt(dH,1)} kJ/mol`,`Literaturwert: ${fmt(lit,1)} kJ/mol`,true]);
+  rows.push([`Abweichung = |${fmt(Math.abs(lit),1)} – ${fmt(Math.abs(dH),1)}| / ${fmt(Math.abs(lit),1)} · 100 % ≈ ${fmt(Math.abs(Math.abs(lit)-Math.abs(dH))/Math.abs(lit)*100,1)} %`,'Vergleich mit dem Literaturwert']);
+  return {rows,dH,Q,n};
+}
+$('bShow').onclick=()=>{
+  const r=compute();
+  $('stepsBox').innerHTML='<h3 style="margin-top:0">Rechenweg</h3><div class="scroll"><table class="steps">'+r.rows.map(x=>`<tr class="${x[2]?'res':''}"><td>${x[0]}</td><td>${x[1]}</td></tr>`).join('')+'</table></div>';
+};
+$('bCheck').onclick=()=>{
+  const r=compute(); const own=parseFloat($('iOwn').value);
+  const fb=$('feedback');
+  if(isNaN(own)){fb.innerHTML='<div class="fb">Tragen Sie zuerst Ihr Ergebnis für Δ<sub>r</sub>H in kJ/mol ein.</div>';return;}
+  const tol=Math.max(0.02*Math.abs(r.dH),0.5);
+  let msg;
+  if(Math.abs(own-r.dH)<=tol) msg='<div class="fb ok"><b class="ok">Richtig.</b> Ihr Ergebnis stimmt mit Ihren Messwerten überein.</div>';
+  else if(Math.abs(own+r.dH)<=tol) msg='<div class="fb bad"><b class="bad">Falsch.</b> Der Betrag stimmt, aber das Vorzeichen nicht. Die Lösung hat sich erwärmt: Was bedeutet das für Δ<sub>r</sub>H?</div>';
+  else if(Math.abs(Math.abs(own)-Math.abs(r.dH*1000))<=tol*1000) msg='<div class="fb bad"><b class="bad">Falsch.</b> Ihr Wert ist etwa um den Faktor 1000 zu groß. Haben Sie Q von J in kJ umgerechnet?</div>';
+  else if(Math.abs(Math.abs(own)-Math.abs(r.dH/1000))<=Math.max(tol/1000,0.05)) msg='<div class="fb bad"><b class="bad">Falsch.</b> Ihr Wert ist etwa um den Faktor 1000 zu klein. Prüfen Sie die Umrechnung von mL in L und von J in kJ.</div>';
+  else msg='<div class="fb bad"><b class="bad">Falsch.</b> Prüfen Sie ΔT, die Masse der Lösung und die Stoffmenge. Mit „Rechenweg anzeigen“ können Sie jeden Schritt vergleichen.</div>';
+  fb.innerHTML=msg;
+};
+
+/* ---------- Enthalpiediagramm ---------- */
+let stepN=99, stepTimer=null;
+function drawDia(animate){
+  const A1=+$('dA1').value, A2=+$('dA2').value, B1=+$('dB1').value, B2=+$('dB2').value;
+  const endA=A1+3*A2, endB=B1+B2, lit=-582;
+  const vmin=Math.min(endA,endB,lit,B1,A1,-100)-70;
+  const svg=$('hdia'); const W=640,H=460,L=70,T=30,Bt=30; const ph=H-T-Bt;
+  const Y=v=>T+(0-v)/(0-vmin)*ph;
+  let s='';
+  for(let v=0;v>=vmin;v-=100){s+=`<line x1="${L}" y1="${Y(v)}" x2="${W-10}" y2="${Y(v)}" stroke="var(--grid)"/><text x="${L-8}" y="${Y(v)+4}" font-size="12" text-anchor="end">${v}</text>`;}
+  s+=`<line x1="${L}" y1="${T-10}" x2="${L}" y2="${H-Bt}" stroke="var(--ink)"/><text x="18" y="${T+ph/2}" font-size="13" transform="rotate(-90 18 ${T+ph/2})" text-anchor="middle">H in kJ (bezogen auf 1 mol Al)</text>`;
+  const lvl=(x1,x2,v,col,lab,below)=>`<line x1="${x1}" y1="${Y(v)}" x2="${x2}" y2="${Y(v)}" stroke="${col}" stroke-width="4"/><text x="${(x1+x2)/2}" y="${Y(v)+(below?18:-8)}" font-size="12" text-anchor="middle">${lab}</text>`;
+  const arr=(x,v1,v2,col,lab)=>`<line x1="${x}" y1="${Y(v1)}" x2="${x}" y2="${Y(v2)-8}" stroke="${col}" stroke-width="2.5"/><path d="M${x-6} ${Y(v2)-10} L${x} ${Y(v2)} L${x+6} ${Y(v2)-10} Z" fill="${col}"/><text x="${x+8}" y="${(Y(v1)+Y(v2))/2}" font-size="12" style="fill:${col}">${lab}</text>`;
+  const parts=[];
+  parts.push(lvl(90,230,0,'var(--ink)','Al + 3 HCl + 4 NaOH'));
+  parts.push(arr(250,0,A1,'var(--a)','A1: '+fmt(A1,1))+lvl(285,420,A1,'var(--a)','Na[Al(OH)₄] + 3 HCl + 3 NaOH',false));
+  parts.push(arr(430,A1,endA,'var(--a)','3·A2: '+fmt(3*A2,1))+lvl(450,620,endA,'var(--a)','Endzustand Weg A: '+fmt(endA,1),false));
+  parts.push(arr(110,0,B1,'var(--b)','B1: '+fmt(B1,1))+lvl(90,230,B1,'var(--b)','AlCl₃ + 4 NaOH',true));
+  parts.push(arr(236,B1,endB,'var(--b)','B2: '+fmt(B2,1))+lvl(450,620,endB,'var(--b)','Endzustand Weg B: '+fmt(endB,1),false)+`<line x1="236" y1="${Y(endB)}" x2="450" y2="${Y(endB)}" stroke="var(--b)" stroke-dasharray="3 4"/>`);
+  const k=animate?Math.min(stepN,parts.length):parts.length;
+  s+=parts.slice(0,k).join('');
+  if($('dLit').checked&&k===parts.length) s+=`<line x1="450" y1="${Y(lit)}" x2="620" y2="${Y(lit)}" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="6 4"/><text x="535" y="${Y(lit)+16}" font-size="12" text-anchor="middle" style="fill:var(--muted)">Literaturwert –582</text>`;
+  svg.innerHTML=s;
+  const diff=Math.abs(endA-endB), dev=diff/Math.abs(endA)*100;
+  $('sums').innerHTML=`Δ<sub>r</sub>H(Weg A) = ${fmt(A1,1)} + 3 · (${fmt(A2,1)}) = <b>${fmt(endA,1)} kJ/mol</b><br>Δ<sub>r</sub>H(Weg B) = ${fmt(B1,1)} + (${fmt(B2,1)}) = <b>${fmt(endB,1)} kJ/mol</b><br>Differenz: ${fmt(diff,1)} kJ/mol (${fmt(dev,1)} % bezogen auf Weg A)`;
+}
+$('bDraw').onclick=()=>{clearInterval(stepTimer);stepN=99;drawDia(false);};
+$('bStep').onclick=()=>{clearInterval(stepTimer);stepN=0;drawDia(true);stepTimer=setInterval(()=>{stepN++;drawDia(true);if(stepN>=5)clearInterval(stepTimer);},1100);};
+$('bLitVals').onclick=()=>{$('dA1').value=-415.1;$('dA2').value=-55.8;$('dB1').value=-531.0;$('dB2').value=-51.5;drawDia(false);};
+['dA1','dA2','dB1','dB2','dLit'].forEach(id=>$(id).addEventListener('change',()=>drawDia(false)));
+
+/* ---------- Wanderung ---------- */
+let walkRaf=null;
+function walk(pathId,col){
+  cancelAnimationFrame(walkRaf);
+  const p=$(pathId), len=p.getTotalLength(), w=$('walker'); w.setAttribute('fill',col);
+  const scale=pathId==='pathA'?1:1; const start=performance.now(), dur=3500;
+  const yTal=290,yGip=60; const mPerPx=(2400-800)/(yTal-yGip);
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const f=now=>{
+    const u=reduce?1:Math.min(1,(now-start)/dur); const pt=p.getPointAtLength(u*len);
+    w.setAttribute('cx',pt.x);w.setAttribute('cy',pt.y);
+    $('wH').textContent=Math.round((yTal-pt.y)*mPerPx)+' m';
+    $('wS').textContent=Math.round(u*len*mPerPx*scale*1.6)+' m';
+    if(u<1) walkRaf=requestAnimationFrame(f);
+  };
+  walkRaf=requestAnimationFrame(f);
+}
+$('bWalkA').onclick=()=>walk('pathA','var(--a)');
+$('bWalkB').onclick=()=>walk('pathB','var(--b)');
+
+/* Init */
+resetBeaker();newSim();presetRech();
+})();
+</script>
+</body>
+</html>
+
+</body></html>
