@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Doppelschicht und Galvanische Zelle</title>
+<style>
+:root{
+  --bg:#f4f6f9; --panel:#ffffff; --ink:#1c2330; --muted:#5a6475; --line:#d8dee7;
+  --acc:#2a62c9; --acc2:#e9f0fc; --ox:#c4473f; --red:#23855a; --e:#e8b400; --warn:#fff6dd; --warnline:#e6c35c;
+  --good:#e6f4ea; --goodline:#7cbf8e; --bad:#fdecea; --badline:#e3928a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+header{background:#18233a;color:#fff;padding:14px 16px 0}
+.hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+header h1{margin:0 0 4px;font-size:1.25rem;font-weight:650;letter-spacing:.2px}
+header p{margin:0 0 10px;color:#c5cfe2;font-size:.9rem}
+.hctl{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.seg{display:inline-flex;background:#2a3754;border-radius:9px;padding:3px}
+.seg button{background:transparent;color:#dfe6f3;border:0;padding:6px 12px;border-radius:7px;font:inherit;font-size:.88rem;cursor:pointer}
+.seg button.on{background:#fff;color:#18233a;font-weight:600}
+.hck{display:flex;gap:6px;align-items:center;font-size:.86rem;color:#dfe6f3;cursor:pointer}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{background:#2a3754;color:#dfe6f3;border:0;padding:9px 14px;border-radius:8px 8px 0 0;font:inherit;font-size:.92rem;cursor:pointer}
+nav button.active{background:var(--bg);color:var(--ink);font-weight:600}
+main{max-width:1320px;margin:0 auto;padding:14px 16px 40px}
+section.tab{display:none}
+section.tab.active{display:block}
+body.lvl-basis .erw-only{display:none!important}
+body:not(.lvl-basis) .basis-only{display:none!important}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;align-items:start}
+@media (max-width:980px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.card h2{font-size:1.05rem;margin:0 0 8px}
+.card h3{font-size:.95rem;margin:12px 0 6px}
+.mt{margin-top:12px}
+canvas{width:100%;height:auto;display:block;border-radius:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 11px;font:inherit;font-size:.88rem;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.chip .sw{width:12px;height:12px;border-radius:50%;border:1px solid rgba(0,0,0,.25)}
+.chip.sel{background:var(--acc);color:#fff;border-color:var(--acc)}
+.chips.compact .chip span.small{display:none}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0}
+label.ck{display:flex;gap:6px;align-items:center;font-size:.9rem;margin:3px 0;cursor:pointer}
+button.btn{background:var(--acc);color:#fff;border:0;border-radius:8px;padding:7px 12px;font:inherit;font-size:.9rem;cursor:pointer}
+button.btn.sec{background:#e8edf5;color:var(--ink)}
+button.btn.ox{background:var(--ox)}
+button.btn.red{background:var(--red)}
+button.btn:disabled{opacity:.45;cursor:not-allowed}
+select,input[type=text]{font:inherit;padding:5px 8px;border-radius:7px;border:1px solid var(--line);background:#fff}
+input[type=range]{width:140px}
+.muted{color:var(--muted);font-size:.86rem}
+.small{font-size:.82rem}
+.note{background:var(--warn);border:1px solid var(--warnline);border-radius:8px;padding:7px 10px;font-size:.86rem;margin-top:8px}
+.note:empty{display:none}
+.eq{font-size:1.15rem;text-align:center;margin:6px 0 4px;font-weight:600}
+.bars{display:grid;grid-template-columns:110px 1fr 54px;gap:6px;align-items:center;font-size:.86rem}
+.bar{height:12px;background:#eef1f5;border-radius:6px;overflow:hidden}
+.bar>i{display:block;height:100%;width:0;transition:width .25s}
+.status{margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--acc2);font-size:.9rem;min-height:2.5em}
+.status.good{background:var(--good);border:1px solid var(--goodline)}
+.status.bad{background:var(--bad);border:1px solid var(--badline)}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{border:1px solid var(--line);padding:4px 6px;text-align:center}
+th{background:#f0f3f8;font-weight:600}
+td.l,th.l{text-align:left}
+tr.hl td{background:#fff3c4;font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:10px 16px;font-size:.84rem;color:var(--muted);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:12px;height:12px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.25)}
+.lcd{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:2rem;background:#1e2a1e;color:#9ef59e;padding:6px 14px;border-radius:8px;text-align:right;letter-spacing:1px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:.9rem}
+.kv b{font-weight:600}
+.eqbox{font-family:"Cambria Math","Times New Roman",serif;font-size:1.02rem;line-height:1.7}
+.mat td{min-width:44px;font-variant-numeric:tabular-nums}
+.mat td.q{color:#9aa3b2;cursor:pointer}
+.mat td.q:hover{background:#eef3fd}
+.mat td.pos{color:#1d55b8;font-weight:600}
+.mat td.neg{color:#b5541b;font-weight:600}
+.mat td.cur{outline:2px solid var(--acc);outline-offset:-2px}
+.tasks h3{margin-top:18px;border-bottom:2px solid var(--line);padding-bottom:3px}
+.task{border-left:4px solid var(--acc);background:#fff;padding:8px 12px;margin:8px 0;border-radius:0 8px 8px 0}
+.task.erw-only{border-left-color:#7a3cc2}
+.task .afb{display:inline-block;font-size:.75rem;background:#e8edf5;border-radius:5px;padding:1px 6px;margin-left:6px;color:var(--muted)}
+.words{display:flex;flex-wrap:wrap;gap:6px}
+.words span{background:#eef2f8;border-radius:6px;padding:2px 8px;font-size:.88rem}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:820px){.split{grid-template-columns:1fr}}
+.gzwrap{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:10px}
+@media (max-width:820px){.gzwrap{grid-template-columns:1fr}}
+.steptxt{margin-top:8px;padding:8px 10px;border-radius:8px;background:#f3eefb;border:1px solid #cdb8ec;font-size:.92rem;min-height:2.4em}
+.steptxt:empty{display:none}
+.phases{display:flex;gap:4px;margin-top:6px}
+.phases span{flex:1;text-align:center;font-size:.76rem;padding:3px 2px;border-radius:6px;background:#eef1f5;color:var(--muted)}
+.phases span.on{background:#7a3cc2;color:#fff}
+.bal td:first-child{text-align:left}
+.bal td:last-child{font-variant-numeric:tabular-nums;font-weight:600;width:70px}
+.qcard{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0}
+.qcard.erw-only{border-left:4px solid #7a3cc2}
+.qopt{display:block;width:100%;text-align:left;margin:5px 0;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:#f8f9fb;font:inherit;font-size:.92rem;cursor:pointer}
+.qopt:hover{background:#eef3fd}
+.qopt.ok{background:var(--good);border-color:var(--goodline)}
+.qopt.bad{background:var(--bad);border-color:var(--badline)}
+.qfb{font-size:.9rem;margin-top:6px}
+.qfb:empty{display:none}
+.qfb.good{color:#1d6b3a}
+.qfb.badfb{color:#9b2c22}
+.gl{border-bottom:1px dotted #5a6475;cursor:help}
+.gl:focus{outline:2px solid var(--acc);outline-offset:1px}
+#tip{position:fixed;z-index:50;max-width:min(320px,86vw);background:#1c2330;color:#fff;padding:7px 10px;border-radius:8px;font-size:.84rem;line-height:1.4;display:none;box-shadow:0 4px 14px rgba(0,0,0,.25);pointer-events:none}
+#tip b{color:#ffd86b}
+.predict{display:none;margin-top:8px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#f8f9fb}
+.predict.show{display:block}
+.gloss dt{font-weight:600;margin-top:6px}
+.gloss dd{margin:0 0 4px 0;color:#333;font-size:.92rem}
+@media print{
+  header,nav,.noprint,#tip{display:none!important}
+  section.tab{display:none!important}
+  body[data-print="ds"] #tab-ds,body[data-print="cmp"] #tab-cmp,body[data-print="gz"] #tab-gz,body[data-print="lab"] #tab-lab,
+  body[data-print="diag"] #tab-diag,body[data-print="auf"] #tab-auf,body[data-print="info"] #tab-info{display:block!important}
+  body{background:#fff}
+  .card{border:0}
+  .gl{border-bottom:0}
+}
+</style>
+</head>
+<body data-print="ds">
+<header>
+  <div class="hdr">
+    <div>
+      <h1>Elektrochemische Doppelschicht und galvanische Zelle</h1>
+      <p>Interaktive Simulation für die Qualifikationsphase (Klasse 12) · Chemie</p>
+    </div>
+    <div class="hctl">
+      <div class="seg" id="lvlSeg" role="group" aria-label="Niveau">
+        <button data-l="basis">Basis</button>
+        <button data-l="erw" class="on">Erweitert</button>
+      </div>
+      <label class="hck"><input type="checkbox" id="cvdToggle"> Farben für Farbsehschwäche</label>
+    </div>
+  </div>
+  <nav id="nav">
+    <button data-tab="ds" class="active">1 · Doppelschicht</button>
+    <button data-tab="cmp">2 · Vergleich</button>
+    <button data-tab="gz">3 · Galvanische Zelle</button>
+    <button data-tab="lab">4 · Redox-Labor</button>
+    <button data-tab="diag">5 · Diagnose</button>
+    <button data-tab="auf">Arbeitsaufträge</button>
+    <button data-tab="info">Hinweise für Lehrkräfte</button>
+  </nav>
+</header>
+<div id="tip"></div>
+
+<main>
+<!-- ======================= 1 DOPPELSCHICHT ======================= -->
+<section class="tab active" id="tab-ds">
+  <div class="grid">
+    <div>
+      <div class="card">
+        <canvas id="dsCanvas"></canvas>
+        <div class="legend">
+          <span><i class="dot" id="lgAtom"></i>Metall-Atom im Gitter</span>
+          <span><i class="dot" id="lgIon"></i>hydratisiertes Metall-Kation</span>
+          <span class="erw-only"><i class="dot" id="lgAn"></i>Anion</span>
+          <span><i class="dot" data-pal="e"></i>Überschusselektron</span>
+          <span class="erw-only"><i class="dot" style="background:#7aa7ff;width:7px;height:7px"></i>Elektronengas (Valenzelektronen)</span>
+          <span class="erw-only"><i class="dot" style="background:#e45b5b;width:9px;height:9px"></i>Wassermolekül (O rot, H weiß)</span>
+        </div>
+        <p class="muted basis-only">Basis-Ansicht: Wassermoleküle, Anionen und Elektronengas sind ausgeblendet.</p>
+      </div>
+      <div class="card mt">
+        <h2>Zeitlicher Verlauf</h2>
+        <canvas id="dsChart"></canvas>
+        <p class="muted">Oben: Anzahl der Überschusselektronen im Metall. Unten: Oxidations- und Reduktionsereignisse pro Sekunde (gleitender Mittelwert über 4 s Simulationszeit).</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h2>Metall und Lösung</h2>
+        <div class="chips" id="dsChips"></div>
+        <div class="row" style="margin-top:8px">
+          <span class="small">c(Metall-Ionen):</span>
+          <select id="dsConc">
+            <option value="1">1 mol/L</option>
+            <option value="0.1">0,1 mol/L</option>
+            <option value="0.01">0,01 mol/L</option>
+            <option value="0.001">0,001 mol/L</option>
+          </select>
+        </div>
+        <div class="note" id="dsNote"></div>
+      </div>
+
+      <div class="card mt">
+        <h2>Steuerung</h2>
+        <div class="row">
+          <button class="btn" id="dsPlay">Pause</button>
+          <button class="btn sec" id="dsReset">Zurücksetzen</button>
+        </div>
+        <div class="row"><span class="small">Zeitraffer</span><input type="range" id="dsSpeed" min="0.25" max="4" step="0.25" value="1"><span id="dsSpeedV" class="small">1×</span></div>
+        <label class="ck"><input type="checkbox" id="dsManual"> Reaktionen nur manuell auslösen</label>
+        <div class="row">
+          <button class="btn ox" id="dsBtnOx">1 Oxidation</button>
+          <button class="btn red" id="dsBtnRed">1 Reduktion</button>
+        </div>
+        <div class="erw-only">
+          <h3>Darstellung</h3>
+          <label class="ck"><input type="checkbox" id="shEgas" checked> Elektronengas</label>
+          <label class="ck"><input type="checkbox" id="shWater" checked> Wassermoleküle</label>
+          <label class="ck"><input type="checkbox" id="shHyd" checked> Hydrathüllen andeuten</label>
+          <label class="ck"><input type="checkbox" id="shAn" checked> Anionen</label>
+          <label class="ck"><input type="checkbox" id="shPot"> Potenzialverlauf φ(x)</label>
+          <label class="ck"><input type="checkbox" id="shLab" checked> Beschriftungen</label>
+        </div>
+      </div>
+
+      <div class="card mt">
+        <h2>Gleichgewicht an der Phasengrenze</h2>
+        <div class="eq" id="dsEq"></div>
+        <div class="bars">
+          <span style="color:var(--ox)">Oxidation →</span><div class="bar"><i id="barOx" style="background:var(--ox)"></i></div><span id="valOx">0</span>
+          <span style="color:var(--red)">← Reduktion</span><div class="bar"><i id="barRed" style="background:var(--red)"></i></div><span id="valRed">0</span>
+        </div>
+        <div class="kv" style="margin-top:8px">
+          <span>Überschusselektronen:</span><b id="valQ">0</b>
+          <span>Simulationszeit:</span><b id="valT">0 s</b>
+        </div>
+        <div class="status" id="dsStatus"></div>
+        <div class="row" style="margin-top:8px">
+          <button class="btn sec" id="dsRecord">Gleichgewicht notieren</button>
+          <button class="btn sec" id="dsRecClear">Liste leeren</button>
+        </div>
+        <table id="dsRecTable" style="margin-top:6px">
+          <thead><tr><th class="l">Metall</th><th>c in mol/L</th><th>Überschuss-e⁻ (Mittel)</th><th>Zustand</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 2 VERGLEICH ======================= -->
+<section class="tab" id="tab-cmp">
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <h2 style="margin:0">Zwei Doppelschichten im Vergleich</h2>
+      <div class="row">
+        <button class="btn" id="cmpPlay">Pause</button>
+        <button class="btn sec" id="cmpReset">Zurücksetzen</button>
+        <button class="btn sec" id="cmpEq">Gleichgewicht sofort einstellen</button>
+        <span class="small">Zeitraffer</span><input type="range" id="cmpSpeed" min="0.5" max="4" step="0.5" value="1">
+      </div>
+    </div>
+    <p class="muted">Beide Halbzellen sind getrennt; es besteht keine leitende Verbindung. Verglichen wird, wie stark sich die Metalle im Gleichgewicht aufladen.</p>
+  </div>
+  <div class="split mt">
+    <div class="card">
+      <div class="chips compact" id="cmpChipsA"></div>
+      <div class="row"><span class="small">c:</span><select id="cmpCA"><option value="1">1 mol/L</option><option value="0.1">0,1 mol/L</option><option value="0.01">0,01 mol/L</option><option value="0.001">0,001 mol/L</option></select>
+        <span class="small" id="cmpInfoA"></span></div>
+      <canvas id="cmpCanvasA"></canvas>
+      <div class="status small" id="cmpStatA"></div>
+    </div>
+    <div class="card">
+      <div class="chips compact" id="cmpChipsB"></div>
+      <div class="row"><span class="small">c:</span><select id="cmpCB"><option value="1">1 mol/L</option><option value="0.1">0,1 mol/L</option><option value="0.01">0,01 mol/L</option><option value="0.001">0,001 mol/L</option></select>
+        <span class="small" id="cmpInfoB"></span></div>
+      <canvas id="cmpCanvasB"></canvas>
+      <div class="status small" id="cmpStatB"></div>
+    </div>
+  </div>
+  <div class="card mt">
+    <h2>Potenzialvergleich (Modell)</h2>
+    <canvas id="cmpPhi"></canvas>
+    <p class="muted">Die Höhe der Balken entspricht der mittleren Überschussladung der letzten 5 s. Die beiden Lösungen dienen als gemeinsamer Bezug, so als wären sie über einen Stromschlüssel verbunden.</p>
+  </div>
+</section>
+
+<!-- ======================= 3 GALVANISCHE ZELLE ======================= -->
+<section class="tab" id="tab-gz">
+  <div class="grid">
+    <div>
+      <div class="card">
+        <div class="gzwrap">
+          <canvas id="gzCanvas"></canvas>
+          <div><canvas id="pdCanvas"></canvas></div>
+        </div>
+        <div class="legend">
+          <span><i class="dot" data-pal="e"></i>Elektron (im Draht bzw. Überschuss an der Elektrode)</span>
+          <span><i class="dot" data-pal="K"></i>K⁺ (Stromschlüssel)</span>
+          <span><i class="dot" data-pal="N"></i>NO₃⁻ (Stromschlüssel)</span>
+          <span><i class="dot" id="lgGzIon"></i><i class="dot" id="lgGzIon2"></i>Metall-Kationen (links/rechts)</span>
+          <span id="lgGzAn"></span>
+          <span><i class="dot" style="background:#ddd;outline:1.5px solid #222"></i>umrandet: Ion während eines Übergangs</span>
+        </div>
+      </div>
+      <div class="card mt">
+        <div class="row" style="justify-content:space-between">
+          <h2 style="margin:0">Lupe: Phasengrenze an einer Elektrode</h2>
+          <select id="lupeSel"><option value="off">aus</option><option value="L">linke Elektrode</option><option value="R">rechte Elektrode</option></select>
+        </div>
+        <div id="lupeWrap" style="display:none">
+          <canvas id="lupeCanvas"></canvas>
+          <p class="muted" id="lupeInfo"></p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <h2>Halbzellen</h2>
+        <div class="small"><b>Linke Halbzelle</b></div>
+        <div class="chips" id="gzChipsL"></div>
+        <div class="row"><span class="small">c:</span>
+          <select id="gzCL"><option value="1">1 mol/L</option><option value="0.1">0,1 mol/L</option><option value="0.01">0,01 mol/L</option><option value="0.001">0,001 mol/L</option></select></div>
+        <div class="small" style="margin-top:8px"><b>Rechte Halbzelle</b></div>
+        <div class="chips" id="gzChipsR"></div>
+        <div class="row"><span class="small">c:</span>
+          <select id="gzCR"><option value="1">1 mol/L</option><option value="0.1">0,1 mol/L</option><option value="0.01">0,01 mol/L</option><option value="0.001">0,001 mol/L</option></select></div>
+        <div class="note" id="gzNote"></div>
+      </div>
+      <div class="card mt">
+        <h2>Messung und Stromkreis</h2>
+        <div class="lcd" id="gzLCD">0,00 V</div>
+        <div class="muted" id="gzLCDinfo" style="margin:4px 0 8px"></div>
+        <div class="row">
+          <button class="btn" id="gzSwitch">Verbraucher anschließen</button>
+          <button class="btn sec" id="gzReset">Zurücksetzen</button>
+        </div>
+        <div class="row"><span class="small">Zeitraffer</span><input type="range" id="gzSpeed" min="0.5" max="8" step="0.5" value="1"><span id="gzSpeedV" class="small">1×</span></div>
+        <div class="erw-only">
+          <div class="row"><span class="small" style="min-width:118px">Innenwiderstand R<sub>i</sub></span><input type="range" style="width:110px" id="gzRi" min="0" max="100" step="1" value="10"><span id="gzRiV" class="small">10 Ω</span></div>
+          <div class="row"><span class="small" style="min-width:118px">Verbraucher R<sub>a</sub></span><input type="range" style="width:110px" id="gzRa" min="1" max="200" step="1" value="20"><span id="gzRaV" class="small">20 Ω</span></div>
+          <label class="ck"><input type="checkbox" id="gzNernst"> Nernst-Rechnung anzeigen</label>
+        </div>
+        <div class="kv" style="margin-top:6px">
+          <span>Leerlaufspannung U₀:</span><b id="gzU0">–</b>
+          <span class="erw-only">Klemmspannung U<sub>K</sub>:</span><b class="erw-only" id="gzUK">–</b>
+          <span>Stromstärke I:</span><b id="gzI">–</b>
+        </div>
+      </div>
+      <div class="card mt">
+        <h2>Einzelschrittmodus</h2>
+        <label class="ck"><input type="checkbox" id="gzStepMode"> Einen Formelumsatz schrittweise ablaufen lassen</label>
+        <div class="row"><button class="btn" id="gzNext" disabled>Nächster Schritt</button></div>
+        <div class="phases"><span data-ph="1">Oxidation</span><span data-ph="2">Elektronen&shy;leitung</span><span data-ph="3">Reduktion</span><span data-ph="4">Ladungs&shy;ausgleich</span></div>
+        <div class="steptxt" id="gzStepTxt"></div>
+      </div>
+      <div class="card mt">
+        <h2>Bilanz</h2>
+        <table class="bal" id="gzBal"></table>
+        <p class="muted" style="margin:6px 0 0">Ein dargestelltes Teilchen steht für eine große Zahl realer Teilchen. Kleine Abweichungen entstehen, weil Teilchen schrittweise erscheinen.</p>
+      </div>
+      <div class="card mt">
+        <h2>Vorgänge</h2>
+        <div id="gzInfo" class="eqbox"></div>
+        <div id="gzNernstBox" class="small erw-only" style="display:none;margin-top:8px"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 4 REDOX-LABOR ======================= -->
+<section class="tab" id="tab-lab">
+  <div class="split">
+    <div>
+      <div class="card noprint">
+        <h2>Messaufbau (c = 1 mol/L, 25 °C)</h2>
+        <div class="small"><b>Halbzelle A</b> – angeschlossen an COM (schwarz)</div>
+        <div class="chips" id="labChipsA"></div>
+        <div class="small" style="margin-top:8px"><b>Halbzelle B</b> – angeschlossen an V (rot)</div>
+        <div class="chips" id="labChipsB"></div>
+        <label class="ck" style="margin-top:10px"><input type="checkbox" id="labPoe"> Vorhersage vor jeder Messung eintragen</label>
+        <label class="ck"><input type="checkbox" id="labReal"> Realexperiment (realistische Abweichungen)</label>
+        <div class="row" style="margin-top:6px">
+          <button class="btn" id="labMeasure">Messen</button>
+          <button class="btn sec" id="labSwap">Anschlüsse tauschen</button>
+        </div>
+        <div class="predict" id="labPredict">
+          <div class="small">Vorhersage: U = E(B) − E(A) in V (mit Vorzeichen, z. B. 1,10 oder −0,46)</div>
+          <div class="row"><input type="text" id="labPredIn" inputmode="decimal" style="width:120px"><button class="btn" id="labPredGo">Prüfen und messen</button></div>
+        </div>
+        <svg id="gauge" viewBox="0 0 300 175" style="width:100%;max-width:420px;display:block;margin:8px auto 0">
+          <path d="M30 150 A120 120 0 0 1 270 150" fill="none" stroke="#cfd6e0" stroke-width="14" stroke-linecap="round"/>
+          <g id="gTicks"></g>
+          <g id="needle"><line x1="150" y1="150" x2="150" y2="42" stroke="#c4473f" stroke-width="3.5" stroke-linecap="round"/></g>
+          <circle cx="150" cy="150" r="8" fill="#1c2330"/>
+          <text x="150" y="172" text-anchor="middle" font-size="12" fill="#5a6475">U in V</text>
+        </svg>
+        <div class="lcd" id="labLCD">—</div>
+        <div id="labResult" class="status"></div>
+        <div class="note" id="labNote"></div>
+      </div>
+      <div class="card mt">
+        <h2>Messprotokoll</h2>
+        <div class="row noprint"><span id="labCount" class="small"></span>
+          <button class="btn sec" id="labCSV">Als CSV exportieren</button>
+          <button class="btn sec" id="labPrint">Drucken</button>
+          <button class="btn sec" id="labClear">Protokoll leeren</button></div>
+        <div style="overflow-x:auto"><table id="labLog"></table></div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <h2>Messmatrix U = E(B) − E(A)</h2>
+        <p class="muted">Zeilen: Halbzelle A (COM), Spalten: Halbzelle B (V). Ein Klick auf „?“ wählt die Kombination aus. Mit * markierte Werte stammen aus dem Realexperiment.</p>
+        <div style="overflow-x:auto"><table class="mat" id="labMat"></table></div>
+      </div>
+      <div class="card mt">
+        <div class="row" style="justify-content:space-between"><h2 style="margin:0">Redoxreihe der Metalle</h2>
+          <label class="ck noprint"><input type="checkbox" id="labShowTab" checked> Tabelle anzeigen</label></div>
+        <div id="labTabWrap">
+          <p class="muted">Standardpotenziale E° bei 25 °C, Aktivität 1, gemessen gegen die Standard-Wasserstoffhalbzelle (diese wird in einer späteren Einheit behandelt).</p>
+          <table id="labTab"></table>
+        </div>
+        <div id="labTabHidden" class="muted" style="display:none">Die Tabelle ist ausgeblendet. Leite die Reihenfolge der Metalle aus deinen Messwerten ab.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 5 DIAGNOSE ======================= -->
+<section class="tab" id="tab-diag">
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <h2 style="margin:0">Diagnosefragen zu typischen Fehlvorstellungen</h2>
+      <div class="row noprint"><span id="quizScore" class="small"></span><button class="btn sec" id="quizReset">Zurücksetzen</button></div>
+    </div>
+    <p class="muted">Wähle jeweils eine Antwort. Die Rückmeldung erläutert, welche Vorstellung hinter den falschen Antworten steckt.</p>
+    <div id="quiz"></div>
+  </div>
+</section>
+
+<!-- ======================= ARBEITSAUFTRÄGE ======================= -->
+<section class="tab" id="tab-auf">
+  <div class="card tasks">
+    <div class="row noprint" style="justify-content:space-between"><h2 style="margin:0">Arbeitsaufträge <span class="small muted" id="aufLvl"></span></h2><button class="btn sec" id="aufPrint">Drucken</button></div>
+    <p>Bearbeite die Aufträge in der angegebenen Reihenfolge. Halte Beobachtungen, Skizzen und Erklärungen schriftlich fest. Unterstrichene Fachbegriffe zeigen beim Antippen eine Erklärung. <span class="erw-only">Violett markierte Aufträge gehören zum erweiterten Niveau.</span></p>
+
+    <h3>Teil A – Die elektrochemische Doppelschicht (Ansicht 1)</h3>
+    <div class="task"><b>A1</b><span class="afb">AFB I</span> Wähle Zink und c(Zn²⁺) = 1 mol/L. Aktiviere „Reaktionen nur manuell auslösen“ und löse nacheinander drei Oxidationen aus. <b>Beschreibe</b>, was mit einem Zink-Atom an der Metalloberfläche geschieht und welche Teilchen im Metall verbleiben.</div>
+    <div class="task"><b>A2</b><span class="afb">AFB I</span> <b>Formuliere</b> die Reaktionsgleichung für den Übergang zwischen Metall und Lösung mit Phasenangaben. <b>Kennzeichne</b> Hin- und Rückreaktion als Oxidation bzw. Reduktion.</div>
+    <div class="task"><b>A3</b><span class="afb">AFB II</span> Deaktiviere den manuellen Modus, setze die Simulation zurück und beobachte etwa 60 s. <b>Beschreibe</b> den Verlauf der Kurven im Diagramm. <b>Erkläre</b>, weshalb die Oxidationsrate abnimmt und die Reduktionsrate zunimmt. Berücksichtige die elektrostatische Anziehung zwischen der negativ geladenen Metalloberfläche und den Kationen.</div>
+    <div class="task"><b>A4</b><span class="afb">AFB II</span> <b>Erläutere</b>, weshalb der Endzustand als dynamisches Gleichgewicht bezeichnet wird. Gehe auf Hin- und Rückreaktion, deren Raten und die Überschussladung ein.</div>
+    <div class="task basis-only"><b>A5</b><span class="afb">AFB II</span> <b>Fertige</b> eine beschriftete Skizze der Phasengrenze im Gleichgewicht <b>an</b> (Metall mit Überschusselektronen an der Oberfläche, Schicht von Kationen in der Lösung). Benenne die Struktur.</div>
+    <div class="task erw-only"><b>A5</b><span class="afb">AFB II</span> Aktiviere „Potenzialverlauf φ(x)“. <b>Erläutere</b> den Aufbau der elektrochemischen Doppelschicht (Überschusselektronen an der Metalloberfläche, Schicht hydratisierter Kationen, Ausrichtung der Wassermoleküle, Verlauf des elektrischen Potenzials in starrer und diffuser Schicht). <b>Fertige</b> eine beschriftete Skizze an.</div>
+    <div class="task erw-only"><b>A6</b><span class="afb">AFB III</span> <b>Diskutiere</b>, weshalb sich die Galvani-Spannung einer einzelnen Halbzelle nicht direkt messen lässt. Hinweis: Überlege, wie ein Messgerät mit der Lösung leitend verbunden werden müsste.</div>
+
+    <h3>Teil B – Zwei Doppelschichten im Vergleich (Ansicht 2)</h3>
+    <div class="task"><b>B1</b><span class="afb">AFB I</span> Stelle links Zink und rechts Kupfer ein (jeweils 1 mol/L) und stelle das Gleichgewicht ein. <b>Beschreibe</b> die Unterschiede zwischen beiden Halbzellen (Zahl der in Lösung gegangenen Ionen, Überschussladung des Metalls).</div>
+    <div class="task"><b>B2</b><span class="afb">AFB II</span> Untersuche weitere Metalle (Magnesium, Eisen, Silber). <b>Ordne</b> die Metalle nach abnehmender Überschussladung. <b>Erläutere</b> den Zusammenhang mit den Begriffen „unedel“ und „edel“ sowie mit der Lage des Gleichgewichts Me ⇌ Me<sup>z+</sup> + z e⁻.</div>
+    <div class="task"><b>B3</b><span class="afb">AFB II</span> Stelle eine begründete Vermutung <b>auf</b>, welches der beiden Metalle Zink und Kupfer bei leitender Verbindung zum Minuspol wird und in welche Richtung sich die Elektronen im Draht bewegen.</div>
+    <div class="task erw-only"><b>B4</b><span class="afb">AFB II</span> Verringere in Ansicht 1 bei Zink die Konzentration schrittweise von 1 mol/L auf 0,001 mol/L. <b>Beschreibe</b> die Veränderung der Überschussladung im Gleichgewicht und <b>erkläre</b> sie mit dem Prinzip von Le Chatelier.</div>
+
+    <h3>Teil C – Die galvanische Zelle (Ansicht 3)</h3>
+    <div class="task"><b>C1</b><span class="afb">AFB I</span> Stelle das Daniell-Element ein (links Zink, rechts Kupfer, jeweils 1 mol/L), ohne den Verbraucher anzuschließen. <b>Notiere</b> die Spannung und <b>überprüfe</b> deine Vermutung aus B3.</div>
+    <div class="task"><b>C2</b><span class="afb">AFB II</span> Betrachte nacheinander beide Elektroden mit der Lupe. <b>Erkläre</b> das Zustandekommen der Spannung als Potenzialdifferenz zwischen den beiden Doppelschichten. Nutze das Potenzialdiagramm.</div>
+    <div class="task"><b>C3</b><span class="afb">AFB II</span> Schließe den Stromkreis, aktiviere den Einzelschrittmodus und lass einen Formelumsatz in vier Schritten ablaufen. <b>Beschreibe</b> jeden Schritt in Fachsprache. Achte dabei auf die Ladungssummen in der Bilanz.</div>
+    <div class="task"><b>C4</b><span class="afb">AFB I</span> <b>Formuliere</b> die Teilgleichungen und die Gesamtgleichung. <b>Ordne</b> die Begriffe Anode, Kathode, Minuspol und Pluspol den Elektroden zu und <b>notiere</b> das Zelldiagramm.</div>
+    <div class="task"><b>C5</b><span class="afb">AFB II</span> Stelle die Zelle Al | Al³⁺ ‖ Cu²⁺ | Cu ein und lass sie mit Verbraucher arbeiten. <b>Ermittle</b> aus der Bilanz das Verhältnis gebildeter Al³⁺-Ionen zu abgeschiedenen Cu²⁺-Ionen sowie die Zahl übertragener Elektronen. <b>Erkläre</b> das Verhältnis mit den Teilgleichungen und <b>erläutere</b>, wie die Elektroneutralität beider Lösungen gewahrt bleibt.</div>
+    <div class="task"><b>C6</b><span class="afb">AFB II</span> Lass das Daniell-Element mit hohem Zeitraffer längere Zeit arbeiten. <b>Beschreibe</b> die Veränderungen der Elektroden, der Ionenkonzentrationen und der Spannung und <b>erkläre</b> sie.</div>
+    <div class="task erw-only"><b>C7</b><span class="afb">AFB II</span> Variiere den Innenwiderstand R<sub>i</sub> und den Verbraucherwiderstand R<sub>a</sub>. <b>Beschreibe</b> den Zusammenhang zwischen Klemmspannung, Stromstärke und Widerständen und <b>erkläre</b> den Unterschied zwischen Leerlauf- und Klemmspannung (U<sub>K</sub> = U₀ − I · R<sub>i</sub>). <b>Begründe</b>, weshalb zur Bestimmung von Zellspannungen hochohmig gemessen wird.</div>
+    <div class="task erw-only"><b>C8</b><span class="afb">AFB II</span> Beobachte im erweiterten Niveau die beiden Enden des Stromschlüssels. <b>Beschreibe</b>, welche Ionen sich jeweils in welche Richtung bewegen, und <b>erläutere</b> den Begriff Überführungszahl am Beispiel von KNO₃.</div>
+    <div class="task erw-only"><b>C9</b><span class="afb">AFB III</span> Wähle für beide Halbzellen Kupfer, links c = 0,01 mol/L, rechts c = 1 mol/L. <b>Erkläre</b>, weshalb trotz gleicher Elektrodenmetalle eine Spannung auftritt, und <b>überprüfe</b> den Wert mit der Nernst-Gleichung.</div>
+
+    <h3>Teil D – Systematisches Arbeiten im Redox-Labor (Ansicht 4)</h3>
+    <div class="task"><b>D1</b><span class="afb">AFB II</span> Blende die Tabelle der Redoxpotenziale aus. Schließe Zink an die COM-Buchse an und miss alle Kombinationen mit den übrigen Metallen. <b>Leite</b> aus Betrag und Vorzeichen der Messwerte eine Reihenfolge der Metalle <b>ab</b>. Vergleiche anschließend mit der Tabelle.</div>
+    <div class="task"><b>D2</b><span class="afb">AFB II</span> Vertausche bei einigen Messungen die Anschlüsse und untersuche die Messmatrix. <b>Beschreibe</b> die Regelmäßigkeiten (Vorzeichen; U(Zn, Cu) + U(Cu, Ag) im Vergleich zu U(Zn, Ag)) und <b>erkläre</b> sie mit dem Modell der Potenzialdifferenz.</div>
+    <div class="task"><b>D3</b><span class="afb">AFB II</span> Aktiviere „Vorhersage vor jeder Messung eintragen“. <b>Berechne</b> für Fe/Ag, Ni/Cu und Zn/Pb die Spannung mit der Tabelle (U = E(Kathode) − E(Anode)) und <b>überprüfe</b> sie durch Messung. Werte die Rückmeldungen aus.</div>
+    <div class="task"><b>D4</b><span class="afb">AFB III</span> <b>Ermittle</b> die Kombination mit der größten Spannung. <b>Beurteile</b> ihre Eignung als praktische Spannungsquelle. Beachte die Hinweise zu den einzelnen Metallen.</div>
+    <div class="task erw-only"><b>D5</b><span class="afb">AFB III</span> Aktiviere „Realexperiment“ und miss Mg/Cu, Al/Cu, Zn/Cu und Cu/Au. <b>Vergleiche</b> mit den Tabellenwerten und <b>erkläre</b> die Abweichungen.</div>
+    <div class="task"><b>D6</b><span class="afb">AFB I</span> <b>Exportiere</b> oder drucke dein Messprotokoll und füge es deinen Unterlagen bei.</div>
+
+    <h3>Teil E – Diagnose (Ansicht 5)</h3>
+    <div class="task"><b>E1</b><span class="afb">AFB II</span> Bearbeite die Diagnosefragen. <b>Notiere</b> für jede falsch beantwortete Frage, welche Vorstellung deiner Antwort zugrunde lag, und <b>formuliere</b> eine fachlich korrekte Aussage.</div>
+
+    <h3 class="erw-only">Teil F – Modellkritik</h3>
+    <div class="task erw-only"><b>F1</b><span class="afb">AFB III</span> <b>Nenne</b> mindestens drei Vereinfachungen der Simulation gegenüber der Realität und <b>beurteile</b>, welche Aussagen trotz dieser Vereinfachungen zulässig sind.</div>
+
+    <h3>Sprachliche Hilfen</h3>
+    <p><b>Fachbegriffe</b></p>
+    <div class="words">
+      <span>Pluspol</span><span>hydratisiertes Ion</span><span>Reduktion</span><span class="erw-only">Galvani-Spannung</span><span>Halbzelle</span><span>Elektronenüberschuss</span><span>Kathode</span><span>Phasengrenze</span><span>Standardpotenzial</span><span>dynamisches Gleichgewicht</span><span>Minuspol</span><span>Stromschlüssel</span><span class="erw-only">Klemmspannung</span><span>Oxidation</span><span>Elektrolytlösung</span><span>Redoxpaar</span><span>Potenzialdifferenz</span><span class="erw-only">Überführungszahl</span><span>Anode</span><span>elektrochemische Doppelschicht</span><span>Hydrathülle</span><span>Zelldiagramm</span><span>Elektroneutralität</span>
+    </div>
+    <p style="margin-top:12px"><b>Satzbausteine</b></p>
+    <ul>
+      <li><i>Beschreiben:</i> An der Phasengrenze zwischen … und … gehen …-Atome als hydratisierte …-Ionen in Lösung. Die Valenzelektronen verbleiben dabei im …</li>
+      <li><i>Erklären:</i> Mit zunehmender negativer Ladung des Metalls werden die Kationen stärker … Dies hat zur Folge, dass …</li>
+      <li><i>Gleichgewicht:</i> Im Gleichgewichtszustand laufen Hin- und Rückreaktion mit gleicher Rate ab, sodass sich die Überschussladung nicht mehr …</li>
+      <li><i>Vergleichen:</i> Je unedler ein Metall ist, desto weiter liegt das Gleichgewicht auf der Seite der …, und desto größer ist …</li>
+      <li><i>Galvanische Zelle:</i> Zwischen den beiden Elektroden besteht eine Potenzialdifferenz, weil … Im äußeren Leiter erfolgt eine gerichtete Bewegung der Elektronen von der … zur …</li>
+      <li><i>Stromschlüssel:</i> Über den Stromschlüssel erfolgt ein Ladungsausgleich, indem sich Anionen in Richtung der … und Kationen in Richtung der … bewegen.</li>
+    </ul>
+    <h3>Glossar</h3>
+    <dl class="gloss" id="glossList"></dl>
+  </div>
+</section>
+
+<!-- ======================= HINWEISE ======================= -->
+<section class="tab" id="tab-info">
+  <div class="card">
+    <h2>Fachliche und didaktische Hinweise</h2>
+    <h3>Unsicherheiten und Grenzen der Angaben</h3>
+    <ul>
+      <li>Die Standardpotenziale sind auf zwei Nachkommastellen gerundet und entsprechen den in gängigen Tabellenwerken (z. B. CRC Handbook of Chemistry and Physics) üblichen Werten. Je nach Quelle sind Abweichungen von wenigen Hundertstel Volt üblich (besonders bei Ni²⁺/Ni: −0,23 V bis −0,26 V).</li>
+      <li>Au³⁺/Au (+1,50 V) ist ein idealisierter Wert. In realen Goldsalzlösungen liegen Chloridokomplexe vor ([AuCl₄]⁻/Au: etwa +1,0 V).</li>
+      <li>Mg und Al: Die Tabellenwerte sind thermodynamische Werte; Reaktion mit Wasser (Mg) bzw. Passivierung (Al) verhindern eine Reproduktion im Experiment.</li>
+      <li><b>Realexperiment-Modus:</b> Die dort verwendeten „effektiven“ Elektrodenpotenziale (Mg etwa −1,55 V, Al etwa −0,45 V, Au etwa +1,0 V) sind angenommene typische Größenordnungen und keine belegten Messwerte. Reale Messwerte hängen stark von Oberflächenzustand, Vorbehandlung, Konzentration und Messdauer ab. Für die übrigen Metalle wird nur eine kleine Streuung von etwa ±0,01 V addiert.</li>
+      <li>Die Nernst-Gleichung wird mit Konzentrationen statt Aktivitäten gerechnet (E = E° + (0,059 V / z) · lg(c / mol·L⁻¹), 25 °C). Bei 1 mol/L ist das eine deutliche Näherung.</li>
+      <li>Innenwiderstand und Verbraucherwiderstand sind frei wählbare Modellwerte, keine Messwerte einer realen Zelle.</li>
+    </ul>
+    <h3>Niveau-Schalter</h3>
+    <ul>
+      <li><b>Basis:</b> Nur Metall-Atome, hydratisierte Kationen und Überschusselektronen; vereinfachte Statusmeldungen; idealisierte Zelle ohne Innenwiderstand; Ladungsausgleich nur durch Ionen, die den Stromschlüssel verlassen; Aufträge ohne AFB III und ohne Vertiefungen.</li>
+      <li><b>Erweitert:</b> Wassermoleküle mit Dipolausrichtung, Anionen, Elektronengas, Potenzialverlauf φ(x), Nernst-Gleichung, Klemmspannung mit Innenwiderstand, beidseitige Überführung im Stromschlüssel, zusätzliche Aufträge und Diagnosefragen.</li>
+    </ul>
+    <h3>Modell der Doppelschicht-Simulation</h3>
+    <ul>
+      <li>Oxidations- und Reduktionsereignisse sind Zufallsereignisse. Die Raten hängen exponentiell von der Überschussladung q ab: r<sub>ox</sub> ∝ exp(−γ(q − q*)), r<sub>red</sub> ∝ exp(+γ(q − q*)). Eine Reduktion setzt zusätzlich ein Kation in Oberflächennähe voraus. Die Kationen erfahren eine zur Überschussladung proportionale, mit dem Abstand abklingende Anziehung (vereinfachte Abschirmung).</li>
+      <li>Die Gleichgewichtsladung q* wird monoton aus dem Elektrodenpotenzial abgebildet: je negativer das Potenzial, desto mehr Überschusselektronen. In Ansicht 1 und 2 ist der Konzentrationseinfluss gegenüber der Nernst-Gleichung etwa vierfach überzeichnet, damit er sichtbar wird. In der Lupe und an den Elektroden der Zelle wird q* direkt aus dem Nernst-Potenzial abgeleitet, sodass die Reihenfolge stets dem Potenzialdiagramm entspricht.</li>
+      <li>Die Darstellung ist ausdrücklich <b>nicht maßstäblich</b>; real geht nur ein verschwindend kleiner, analytisch nicht nachweisbarer Stoffmengenanteil in Lösung.</li>
+      <li>Relatives Modell: Alle Metalle laden sich negativ auf, unterschiedlich stark („Elektronendruck“). Manche Schulbücher stellen edle Metalle mit positiver Aufladung durch Kationenabscheidung dar. Beide sind Modelle, da absolute Galvani-Spannungen nicht messbar sind; bei Gold kann kurzzeitig auch eine positive Aufladung auftreten. Geeignet für die Modellkritik (A6, F1).</li>
+      <li>Die Vergleichsansicht setzt beide Lösungen als gemeinsamen Bezug; Diffusionspotenziale zwischen verschiedenen Elektrolytlösungen werden vernachlässigt.</li>
+      <li>Die Ionenfarben dienen der Unterscheidung. Real farbig sind nur Cu²⁺ (blau), Ni²⁺ (grün) und Fe²⁺ (blassgrün) in wässriger Lösung.</li>
+    </ul>
+    <h3>Modell der galvanischen Zelle</h3>
+    <ul>
+      <li>Je 100 mL Lösung. Die Stromstärke folgt I = U₀ / (R<sub>i</sub> + R<sub>a</sub>) und wird bei Verarmung an Kathoden-Kationen gedrosselt (vereinfachte Diffusionsbegrenzung). Das Voltmeter liegt parallel zum Verbraucher und zeigt bei geschlossenem Stromkreis die Klemmspannung U<sub>K</sub> = U₀ − I · R<sub>i</sub>. Im Basis-Niveau ist R<sub>i</sub> = 0 (idealisierte Zelle).</li>
+      <li>Teilchenbilanz: Die Zahl der dargestellten Metall-Kationen ist in beiden Halbzellen im gleichen Maßstab proportional zur durch die Elektrodenreaktionen veränderten Konzentration. Jede dabei entstehende Überschussladung einer Halbzelle wird durch Ionenübergänge am Stromschlüssel ausgeglichen; die Bilanz zeigt die Ladungssumme jeder Halbzelle.</li>
+      <li>Basis: Ausgleich ausschließlich durch NO₃⁻ (zur Anodenhalbzelle) und K⁺ (zur Kathodenhalbzelle), die den Stromschlüssel verlassen. Erweitert: etwa die Hälfte der Ladung wird zusätzlich durch Kationen der Anodenhalbzelle bzw. Anionen der Kathodenhalbzelle transportiert, die in den Stromschlüssel übertreten (Überführungszahlen von K⁺ und NO₃⁻ in KNO₃-Lösung jeweils etwa 0,5). Der Stromschlüssel ist endlich und kann im Modell verarmen.</li>
+      <li>Einzelschrittmodus: Ein Formelumsatz wird in vier didaktisch getrennte Schritte zerlegt. Real laufen Oxidation, Elektronenleitung, Reduktion und Ionenwanderung gleichzeitig ab; zwischen den Schritten auftretende Ladungssummen ungleich null existieren real nur in verschwindend kleinem Ausmaß.</li>
+      <li>Vorzeichenkonvention: Anode = Ort der Oxidation = Minuspol; Kathode = Ort der Reduktion = Pluspol; U = E(Kathode) − E(Anode).</li>
+      <li>Elektrolyse und die Standard-Wasserstoffhalbzelle sind bewusst nicht enthalten (Folgeeinheit). Die H₂-Zeile der Tabelle dient nur als Bezugspunkt.</li>
+    </ul>
+    <h3>Sicherheit (für Realexperimente)</h3>
+    <p class="muted">Für Realexperimente ist eine Gefährdungsbeurteilung erforderlich (u. a. Blei- und Nickelsalze, Silbernitrat, Kupfersulfat). Die Simulation ersetzt diese nicht.</p>
+  </div>
+</section>
+</main>
+
+<script>
+'use strict';
+/* ====================== DATEN ====================== */
+const METALS={
+ Mg:{name:'Magnesium',z:2,E:-2.37,salt:'MgSO₄',an:'SO4',col:'#c3c9d1',icol:'#b9a3e3',sol:null,
+   note:'Magnesium reagiert in wässriger Lösung zusätzlich mit Wasser unter Wasserstoffentwicklung. Der Tabellenwert lässt sich im Experiment nicht reproduzieren.'},
+ Al:{name:'Aluminium',z:3,E:-1.66,salt:'Al₂(SO₄)₃',an:'SO4',col:'#d6dadf',icol:'#a9c3ee',sol:null,
+   note:'Aluminium ist von einer dichten Oxidschicht überzogen (Passivierung). Gemessene Spannungen weichen deutlich vom Tabellenwert ab.'},
+ Zn:{name:'Zink',z:2,E:-0.76,salt:'ZnSO₄',an:'SO4',col:'#aab4be',icol:'#c7b2e8',sol:null,note:''},
+ Fe:{name:'Eisen',z:2,E:-0.44,salt:'FeSO₄',an:'SO4',col:'#868c94',icol:'#a8d8a0',sol:[168,214,160],
+   note:'Fe²⁺-Ionen werden durch Luftsauerstoff leicht zu Fe³⁺ oxidiert.'},
+ Ni:{name:'Nickel',z:2,E:-0.26,salt:'NiSO₄',an:'SO4',col:'#b9b49c',icol:'#62c77f',sol:[98,190,120],
+   note:'Für Ni²⁺/Ni finden sich in Tabellenwerken Werte zwischen −0,23 V und −0,26 V.'},
+ Sn:{name:'Zinn',z:2,E:-0.14,salt:'SnSO₄',an:'SO4',col:'#c9cdd2',icol:'#e3b7cf',sol:null,
+   note:'Sn²⁺-Lösungen hydrolysieren leicht und werden an Luft oxidiert.'},
+ Pb:{name:'Blei',z:2,E:-0.13,salt:'Pb(NO₃)₂',an:'NO3',col:'#7d8592',icol:'#d6c9a0',sol:null,
+   note:'Blei und Bleisalze sind giftig; für Realexperimente Gefährdungsbeurteilung beachten.'},
+ Cu:{name:'Kupfer',z:2,E:0.34,salt:'CuSO₄',an:'SO4',col:'#c77a3e',icol:'#3c8fdc',sol:[60,143,220],note:''},
+ Ag:{name:'Silber',z:1,E:0.80,salt:'AgNO₃',an:'NO3',col:'#dfe3e8',icol:'#e0a9a9',sol:null,note:''},
+ Au:{name:'Gold',z:3,E:1.50,salt:'AuCl₃ (idealisiert)',an:'Cl',col:'#e5b83d',icol:'#f0d27a',sol:null,
+   note:'Idealisierter Wert für Au³⁺/Au. In realen Goldsalzlösungen liegen Chloridokomplexe wie [AuCl₄]⁻ vor; deren Standardpotenzial ist deutlich niedriger (etwa +1,0 V).'},
+};
+const ORDER=['Mg','Al','Zn','Fe','Ni','Sn','Pb','Cu','Ag','Au'];
+const ANIONS={SO4:{label:'SO₄²⁻',z:2,col:'#c2553f'},NO3:{label:'NO₃⁻',z:1,col:'#e0954f'},Cl:{label:'Cl⁻',z:1,col:'#79c27a'}};
+/* Realexperiment: angenommene typische effektive Potenziale (Größenordnung, keine Messwerte) */
+const REAL={Mg:{E:-1.55,sd:0.08},Al:{E:-0.45,sd:0.12},Au:{E:1.00,sd:0.03}};
+
+const GLOSSARY={
+ 'elektrochemische Doppelschicht':'Ladungstrennung an der Phasengrenze Metall/Lösung: Überschussladung an der Metalloberfläche und eine Schicht entgegengesetzt geladener (hydratisierter) Ionen in der Lösung.',
+ 'dynamisches Gleichgewicht':'Zustand, in dem Hin- und Rückreaktion mit gleicher Rate ablaufen; makroskopisch ändert sich nichts mehr, auf Teilchenebene laufen die Reaktionen weiter.',
+ 'Galvani-Spannung':'Potenzialdifferenz zwischen dem Inneren des Metalls und dem Inneren der Lösung einer einzelnen Halbzelle; nicht direkt messbar.',
+ 'Standardpotenzial':'Elektrodenpotenzial eines Redoxpaares unter Standardbedingungen (25 °C, Aktivität 1), gemessen gegen die Standard-Wasserstoffhalbzelle.',
+ 'Elektrodenpotenzial':'Potenzial einer Halbzelle relativ zu einer Bezugselektrode; hängt vom Redoxpaar, der Konzentration und der Temperatur ab.',
+ 'Potenzialdifferenz':'Unterschied der elektrischen Potenziale zweier Punkte; zwischen den Elektroden einer galvanischen Zelle als Spannung messbar.',
+ 'Stromschlüssel':'Ionenleitende Verbindung zweier Halbzellen (z. B. mit KNO₃-Lösung gefüllt), die den Ladungsausgleich ermöglicht, ohne dass sich die Lösungen vermischen.',
+ 'Halbzelle':'Elektrode zusammen mit der Elektrolytlösung, die ein Redoxpaar enthält, z. B. Zinkstab in Zinksulfatlösung.',
+ 'Hydrathülle':'Wassermoleküle, die ein Ion umgeben und über Ion-Dipol-Wechselwirkungen gebunden sind.',
+ 'Phasengrenze':'Grenzfläche zwischen zwei Phasen, hier zwischen dem festen Metall und der Elektrolytlösung.',
+ 'Elektrolytlösung':'Lösung, die frei bewegliche Ionen enthält und daher den elektrischen Strom leitet.',
+ 'Zelldiagramm':'Kurzschreibweise einer galvanischen Zelle: Anode | Anodenelektrolyt ‖ Kathodenelektrolyt | Kathode.',
+ 'Leerlaufspannung':'Spannung einer Zelle ohne Stromfluss (Messung mit hochohmigem Voltmeter).',
+ 'Klemmspannung':'Spannung an den Polen einer Zelle bei Stromfluss; um I · R_i kleiner als die Leerlaufspannung.',
+ 'Innenwiderstand':'Elektrischer Widerstand innerhalb der Zelle (v. a. Elektrolytlösungen und Stromschlüssel).',
+ 'Überführungszahl':'Anteil einer Ionensorte am gesamten Ladungstransport in einer Elektrolytlösung.',
+ 'Nernst-Gleichung':'Beschreibt die Konzentrationsabhängigkeit des Elektrodenpotenzials: E = E° + (0,059 V / z) · lg(c) bei 25 °C.',
+ 'Elektronengas':'Modell für die frei beweglichen Valenzelektronen im Metallgitter.',
+ 'Elektroneutralität':'In jedem makroskopischen Volumen einer Lösung ist die Summe aller Ladungen null.',
+ 'Redoxpaar':'Reduzierte und oxidierte Form eines Teilchens, die durch Elektronenübergang ineinander überführt werden, z. B. Zn/Zn²⁺.',
+ 'Anode':'Elektrode, an der die Oxidation stattfindet; in der galvanischen Zelle der Minuspol.',
+ 'Kathode':'Elektrode, an der die Reduktion stattfindet; in der galvanischen Zelle der Pluspol.',
+ 'Minuspol':'Elektrode mit dem niedrigeren Elektrodenpotenzial; von hier bewegen sich die Elektronen durch den äußeren Leiter.',
+ 'Pluspol':'Elektrode mit dem höheren Elektrodenpotenzial; hier werden Elektronen aus dem äußeren Leiter aufgenommen.',
+ 'Oxidation':'Teilreaktion, bei der ein Teilchen Elektronen abgibt; die Oxidationszahl steigt.',
+ 'Reduktion':'Teilreaktion, bei der ein Teilchen Elektronen aufnimmt; die Oxidationszahl sinkt.',
+};
+
+const QUIZ=[
+ {q:'Wodurch wird ein Zinkstab in einer Zinksulfatlösung negativ geladen?',
+  a:['Sulfat-Ionen lagern sich an der Metalloberfläche an und übertragen ihre Ladung auf das Metall.','Zink-Atome gehen als Zn²⁺-Ionen in Lösung; die Valenzelektronen verbleiben im Metall.','Das Metall nimmt Elektronen aus der Lösung auf.'],ok:1,
+  ex:'Durch die Oxidation Zn → Zn²⁺ + 2 e⁻ verbleiben Elektronen im Metall. Anionen geben keine Elektronen an das Metall ab; die Lösung enthält keine freien Elektronen.'},
+ {q:'Was gilt im Gleichgewichtszustand der elektrochemischen Doppelschicht?',
+  a:['Es finden keine Reaktionen mehr statt.','Das Metall hat sich so weit gelöst, bis die Lösung gesättigt ist.','Oxidation und Reduktion laufen mit gleicher Rate ab; die Überschussladung bleibt konstant.'],ok:2,
+  ex:'Das Gleichgewicht ist dynamisch. Statisch erscheint nur die makroskopische Größe (Überschussladung); umgesetzt wird nur eine verschwindend kleine Stoffmenge.'},
+ {q:'Welches Metall weist im Modell im Gleichgewicht (c = 1 mol/L) den größten Elektronenüberschuss auf?',
+  a:['Kupfer','Silber','Magnesium','Zink'],ok:2,
+  ex:'Je unedler ein Metall (je negativer sein Standardpotenzial), desto weiter liegt das Gleichgewicht Me ⇌ Me^z+ + z e⁻ auf der rechten Seite.'},
+ {q:'Bewegen sich im Stromschlüssel Elektronen?',
+  a:['Ja, die Elektronen bewegen sich durch den Stromschlüssel zurück zur Anode und schließen so den Kreis.','Nein, im Stromschlüssel erfolgt der Ladungstransport ausschließlich durch Ionen.','Ja, aber nur, wenn ein Verbraucher angeschlossen ist.'],ok:1,
+  ex:'Elektronen bewegen sich nur in den metallischen Leitern (Elektroden, Draht). In Elektrolytlösungen und im Stromschlüssel wird Ladung durch Ionen transportiert.'},
+ {q:'Welche Aussage zum Pluspol einer galvanischen Zelle ist korrekt?',
+  a:['Am Pluspol findet die Oxidation statt.','Der Pluspol ist die Elektrode mit dem höheren Elektrodenpotenzial; dort findet die Reduktion statt.','Der Pluspol heißt so, weil sich dort Kationen anlagern und ihn positiv aufladen.'],ok:1,
+  ex:'Pluspol = Kathode = Ort der Reduktion. Die Bezeichnung bezieht sich auf das höhere Potenzial relativ zum Minuspol, nicht auf angelagerte Kationen.'},
+ {q:'Welche Spannung liefert die Zelle Zn | Zn²⁺ ‖ Ag⁺ | Ag unter Standardbedingungen? (E°(Zn²⁺/Zn) = −0,76 V; E°(Ag⁺/Ag) = +0,80 V)',
+  a:['0,04 V','1,56 V','2,36 V'],ok:1,
+  ex:'U = E(Kathode) − E(Anode) = 0,80 V − (−0,76 V) = 1,56 V. Elektrodenpotenziale sind intensive Größen und werden nicht mit stöchiometrischen Koeffizienten multipliziert (2,36 V entsteht durch Verdoppeln des Silberwertes; 0,04 V durch Addition statt Differenzbildung).'},
+ {q:'Lässt sich das Potenzial einer einzelnen Halbzelle direkt messen?',
+  a:['Ja, mit einem hochohmigen Voltmeter zwischen Metall und Lösung.','Ja, aber nur unter Standardbedingungen.','Nein; jede Messung erfordert eine zweite Elektrode in der Lösung, sodass stets eine Potenzialdifferenz zweier Halbzellen gemessen wird.'],ok:2,
+  ex:'Ein Messkontakt zur Lösung ist selbst eine Elektrode mit eigener Phasengrenze. Deshalb werden Potenziale stets relativ zu einer Bezugselektrode angegeben.'},
+ {q:'Warum sinkt die Spannung einer Daniell-Zelle während des Betriebs?',
+  a:['Weil c(Cu²⁺) abnimmt und c(Zn²⁺) zunimmt; dadurch verringert sich die Differenz der Elektrodenpotenziale.','Weil die Elektronen im Draht verbraucht werden.','Weil sich der Stromschlüssel mit Elektronen auflädt.'],ok:0,
+  ex:'Elektronen werden nicht verbraucht, sondern durch den Leiter transportiert. Nach Nernst sinkt E(Cu²⁺/Cu) mit abnehmender Konzentration, E(Zn²⁺/Zn) steigt mit zunehmender Konzentration.'},
+ {q:'Was geschieht, wenn man den Stromschlüssel entfernt?',
+  a:['Die Spannung steigt, weil keine Ladung mehr verloren geht.','Die Elektronen nehmen einen anderen Weg durch die Luft.','Der Stromfluss kommt praktisch sofort zum Erliegen, weil in den Halbzellen Ladungsüberschüsse entstehen, die nicht mehr ausgeglichen werden.'],ok:2,
+  ex:'Ohne Ionenleitung wäre die Anodenlösung positiv, die Kathodenlösung negativ geladen. Die entstehende Gegenspannung unterbindet jede weitere Reaktion.'},
+ {q:'Ein Voltmeter zeigt bei angeschlossenem Verbraucher 0,95 V, im Leerlauf 1,10 V. Woran liegt das?',erw:true,
+  a:['Das Voltmeter ist defekt.','Am Innenwiderstand der Zelle: U_K = U₀ − I · R_i.','Die Standardpotenziale haben sich durch den Stromfluss verändert.'],ok:1,
+  ex:'Bei Stromfluss fällt ein Teil der Spannung am Innenwiderstand (v. a. Elektrolytlösungen, Stromschlüssel) ab. Standardpotenziale sind Stoffkonstanten.'},
+ {q:'Welchen Anteil am Ladungstransport in einem KNO₃-Stromschlüssel tragen die Nitrat-Ionen ungefähr?',erw:true,
+  a:['0 %, weil nur Kationen wandern','etwa 50 %','100 %, weil nur Anionen zur Anode wandern'],ok:1,
+  ex:'K⁺ und NO₃⁻ besitzen ähnliche Ionenbeweglichkeiten; ihre Überführungszahlen liegen jeweils nahe 0,5. Deshalb wird KNO₃ für Stromschlüssel verwendet.'},
+ {q:'Ein Zinkstab taucht links in ZnSO₄-Lösung mit c = 0,01 mol/L, rechts in ZnSO₄-Lösung mit c = 1 mol/L. Welche Aussage trifft zu?',erw:true,
+  a:['Es entsteht keine Spannung, weil beide Elektroden aus Zink bestehen.','Die linke Elektrode ist der Minuspol, weil dort das Elektrodenpotenzial niedriger ist.','Die rechte Elektrode ist der Minuspol, weil dort mehr Zn²⁺-Ionen vorhanden sind.'],ok:1,
+  ex:'Nach Nernst ist E(links) = −0,76 V + 0,0295 V · lg 0,01 ≈ −0,82 V. Bei geringerer Konzentration liegt das Gleichgewicht weiter auf der Ionenseite; das Metall trägt mehr Überschusselektronen. U ≈ 0,059 V.'},
+];
+
+/* ====================== HILFSFUNKTIONEN ====================== */
+const $=s=>document.querySelector(s);
+const SUP={'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻','+':'⁺'};
+const supStr=s=>String(s).split('').map(ch=>SUP[ch]||ch).join('');
+const ionLabel=sym=>{const z=METALS[sym].z;return sym+(z===1?'⁺':supStr(z)+'⁺');};
+const dec=(v,d)=>v.toFixed(d).replace('.',',');
+function sgn(v,d=2){if(Math.abs(v)<0.5*Math.pow(10,-d))return dec(0,d);return (v<0?'−':'+')+dec(Math.abs(v),d);}
+function fmtC(c){
+  if(c>=0.995)return dec(c,2);
+  if(c>=0.0095)return c.toPrecision(2).replace('.',',');
+  const e=Math.floor(Math.log10(c));const m=c/Math.pow(10,e);return dec(m,1)+'·10'+supStr(e);
+}
+const randn=()=>{let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function shade(hex,f){const n=parseInt(hex.slice(1),16);let r=n>>16,g=(n>>8)&255,b=n&255;
+  r=clamp(Math.round(r*f),0,255);g=clamp(Math.round(g*f),0,255);b=clamp(Math.round(b*f),0,255);return `rgb(${r},${g},${b})`;}
+function setupCanvas(cv,W,H){const dpr=Math.min(2,window.devicePixelRatio||1);cv.width=W*dpr;cv.height=H*dpr;const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);return c;}
+const gcd=(a,b)=>b?gcd(b,a%b):a;const lcm=(a,b)=>a*b/gcd(a,b);
+const coef=n=>n===1?'':n+' ';
+function Ehalf(sym,c){const m=METALS[sym];return m.E+0.0592/m.z*Math.log10(Math.max(c,1e-12));}
+/* Abbildung Elektrodenpotenzial -> Überschusselektronen (monoton: je negativer E, desto mehr Überschusselektronen) */
+function qFromE(E){return Math.max(1,1+(1.50-E)/3.87*22);}
+/* Ansichten 1 und 2: Konzentrationseinfluss qualitativ, gegenüber Nernst etwa vierfach überzeichnet */
+function qEq(sym,c){const m=METALS[sym];return Math.max(1,qFromE(m.E)-1.5*Math.log10(c)/m.z);}
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,v);}catch(e){}}};
+
+function buildChips(el,get,set){
+  el.innerHTML='';
+  ORDER.forEach(sym=>{const b=document.createElement('button');b.className='chip'+(get()===sym?' sel':'');
+    b.innerHTML=`<i class="sw" style="background:${METALS[sym].col}"></i>${sym} <span class="small" style="opacity:.75">${METALS[sym].name}</span>`;
+    b.onclick=()=>{set(sym);[...el.children].forEach(x=>x.classList.remove('sel'));b.classList.add('sel');};
+    el.appendChild(b);});
+}
+
+/* ====================== NIVEAU UND FARBEN ====================== */
+let LEVEL=store.get('rx_level','erw');
+let CVD=store.get('rx_cvd','0')==='1';
+const PAL={};
+function applyPalette(){
+  Object.assign(PAL,CVD?
+    {ox:'#D55E00',red:'#0072B2',minus:'#0072B2',plus:'#D55E00',K:'#CC79A7',N:'#E69F00',e:'#F0E442',eStroke:'#6b6200',q:'#8a6d00'}:
+    {ox:'#c4473f',red:'#23855a',minus:'#2a62c9',plus:'#c4473f',K:'#9b7fd6',N:'#e0954f',e:'#f2c200',eStroke:'#8a6d00',q:'#a07800'});
+  document.documentElement.style.setProperty('--ox',PAL.ox);document.documentElement.style.setProperty('--red',PAL.red);
+  document.querySelectorAll('[data-pal]').forEach(el=>el.style.background=PAL[el.dataset.pal]);
+  $('#needle line').setAttribute('stroke',PAL.ox);
+}
+function applyLevel(){
+  document.body.classList.toggle('lvl-basis',LEVEL==='basis');
+  document.querySelectorAll('#lvlSeg button').forEach(b=>b.classList.toggle('on',b.dataset.l===LEVEL));
+  $('#aufLvl').textContent=LEVEL==='basis'?'(Niveau: Basis)':'(Niveau: Erweitert)';
+  if(typeof updateScore==='function')updateScore();
+}
+document.querySelectorAll('#lvlSeg button').forEach(b=>b.onclick=()=>{LEVEL=b.dataset.l;store.set('rx_level',LEVEL);applyLevel();});
+$('#cvdToggle').checked=CVD;
+$('#cvdToggle').onchange=e=>{CVD=e.target.checked;store.set('rx_cvd',CVD?'1':'0');applyPalette();};
+
+/* ====================== TABS ====================== */
+let activeTab='ds';
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+  document.querySelectorAll('section.tab').forEach(s=>s.classList.remove('active'));
+  activeTab=b.dataset.tab;$('#tab-'+activeTab).classList.add('active');document.body.dataset.print=activeTab;
+});
+function printTab(t){document.body.dataset.print=t;window.print();}
+
+/* =====================================================================
+   SIMULATION DER DOPPELSCHICHT (wiederverwendbar)
+   ===================================================================== */
+class DLSim{
+  constructor(cv,o){
+    Object.assign(this,{W:900,H:500,surf:300,rows:9,top:36,sp:49,cols:7,colSp:46,R:17,near:70,
+      metal:'Zn',c:1,mode:'ds',manual:false,density:1,compact:false},o||{});
+    this.ctx=setupCanvas(cv,this.W,this.H);this.init();
+  }
+  get yLim(){return this.H-46;}
+  qe(){return this.mode==='nernst'?qFromE(Ehalf(this.metal,this.c)):qEq(this.metal,this.c);}
+  slotX(c){return this.surf-22-(5-c)*this.colSp;}
+  slotY(r){return this.top+r*this.sp;}
+  init(){
+    const m=METALS[this.metal],A=ANIONS[m.an];
+    this.grid=[];for(let c=0;c<this.cols;c++){this.grid[c]=[];for(let r=0;r<this.rows;r++)this.grid[c][r]={occ:c<6,res:false};}
+    this.ions=[];this.fx=[];this.q=0;this.t=0;this.events=[];this.hist=[];this.nextHist=0;
+    const base=clamp(8+2*Math.log10(Math.max(this.c,1e-3)),2,10);
+    const n0=Math.max(2,Math.round(base*this.density));
+    const rx=()=>this.surf+60+Math.random()*(this.W-this.surf-80), ry=()=>20+Math.random()*(this.yLim-20);
+    for(let i=0;i<n0;i++)this.ions.push({type:'cat',x:rx(),y:ry(),state:'free'});
+    const nA=Math.round(n0*m.z/A.z);for(let i=0;i<nA;i++)this.ions.push({type:'an',x:rx(),y:ry(),state:'free'});
+    const area=((this.W-this.surf)/600)*(this.rows/9);
+    this.waters=[];for(let i=0;i<Math.round(48*area);i++)this.waters.push({x:this.surf+15+Math.random()*(this.W-this.surf-25),y:12+Math.random()*(this.yLim-10),a:Math.random()*6.28});
+    this.egas=[];for(let i=0;i<Math.round(70*(this.surf/300)*(this.rows/9));i++)this.egas.push({x:8+Math.random()*(this.surf-16),y:10+Math.random()*(this.yLim-8)});
+  }
+  ionXmin(y){const r=Math.round((y-this.top)/this.sp);
+    if(r>=0&&r<this.rows&&this.grid[6][r].occ)return this.slotX(6)+this.R+17;return this.surf+19;}
+  exposed(){const L=[];for(let c=0;c<this.cols;c++)for(let r=0;r<this.rows;r++){const s=this.grid[c][r];
+    if(s.occ&&(c===6||!this.grid[c+1][r].occ&&!this.grid[c+1][r].res))L.push([c,r]);}return L;}
+  depSlots(){const L=[];for(let c=0;c<this.cols;c++)for(let r=0;r<this.rows;r++){const s=this.grid[c][r];
+    if(!s.occ&&!s.res&&(c===0||this.grid[c-1][r].occ))L.push([c,r]);}return L;}
+  ox(){
+    const m=METALS[this.metal];const L=this.exposed().filter(([c])=>this.slotX(c)>-10);if(!L.length)return false;
+    const [c,r]=pick(L);this.grid[c][r].occ=false;const x=this.slotX(c),y=this.slotY(r);
+    this.ions.push({type:'cat',x,y,state:'leave',t:0,x0:x,y0:y,x1:Math.max(x+55,this.surf+34),y1:clamp(y+(Math.random()-.5)*24,20,this.yLim)});
+    this.q+=m.z;this.events.push({t:this.t,k:'ox'});
+    this.fx.push({x,y:y-4,t:0,txt:'Oxidation',k:'ox'});
+    for(let i=0;i<m.z;i++)this.fx.push({x:x-14,y:y+6+i*9,t:0,txt:'e⁻',k:'e',small:true});
+    return true;
+  }
+  nearestCat(){let best=null,bd=1e9;for(const i of this.ions){if(i.type!=='cat'||i.state!=='free')continue;
+    const d=i.x-this.ionXmin(i.y);if(d<this.near&&d<bd){bd=d;best=i;}}return best;}
+  red(ion){
+    const m=METALS[this.metal];ion=ion||this.nearestCat();if(!ion)return false;
+    const L=this.depSlots();if(!L.length)return false;
+    let best=null,bd=1e9;for(const [c,r] of L){const d=Math.abs(this.slotY(r)-ion.y)+0.3*Math.abs(this.slotX(c)-ion.x);if(d<bd){bd=d;best=[c,r];}}
+    const [c,r]=best;this.grid[c][r].res=true;
+    Object.assign(ion,{state:'dep',t:0,x0:ion.x,y0:ion.y,x1:this.slotX(c),y1:this.slotY(r),tc:c,tr:r});
+    this.q-=m.z;this.events.push({t:this.t,k:'red'});
+    this.fx.push({x:this.slotX(c),y:this.slotY(r)-4,t:0,txt:'Reduktion',k:'red'});
+    return true;
+  }
+  rate(k){const w=Math.min(4,Math.max(this.t,0.5));let n=0;for(const e of this.events)if(e.k===k&&e.t>this.t-w)n++;return n/w;}
+  meanQ(sec=5){const hs=this.hist.filter(h=>h.t>this.t-sec);return hs.length?hs.reduce((a,h)=>a+h.q,0)/hs.length:this.q;}
+  step(dt){
+    const m=METALS[this.metal],A=ANIONS[m.an];this.t+=dt;
+    if(!this.manual){
+      const qe=this.qe(),g=0.18;
+      const rox=Math.min(6,Math.exp(-g*(this.q-qe))),rred=Math.min(6,Math.exp(g*(this.q-qe)));
+      if(Math.random()<rox*dt)this.ox();
+      if(Math.random()<rred*dt)this.red();
+    }
+    const D=38*Math.sqrt(dt),yl=this.yLim;
+    for(const ion of this.ions){
+      if(ion.state==='leave'||ion.state==='dep'){
+        ion.t+=dt/0.55;const s=Math.min(1,ion.t),e=s*s*(3-2*s);
+        ion.x=ion.x0+(ion.x1-ion.x0)*e;ion.y=ion.y0+(ion.y1-ion.y0)*e;
+        if(ion.t>=1){if(ion.state==='leave')ion.state='free';else{this.grid[ion.tc][ion.tr].occ=true;this.grid[ion.tc][ion.tr].res=false;ion.dead=true;}}
+        continue;
+      }
+      const zc=ion.type==='cat'?m.z:-A.z;const d=Math.max(0,ion.x-this.surf);
+      const drift=-zc*this.q*3.2*Math.exp(-d/170);
+      ion.x+=drift*dt+randn()*D;ion.y+=randn()*D;
+      ion.x=clamp(ion.x,this.ionXmin(ion.y),this.W-14);ion.y=clamp(ion.y,14,yl);
+    }
+    this.ions=this.ions.filter(i=>!i.dead);
+    const F=this.ions.filter(i=>i.state==='free');
+    for(let i=0;i<F.length;i++)for(let j=i+1;j<F.length;j++){const a=F[i],b=F[j];const dx=b.x-a.x,dy=b.y-a.y;const d2=dx*dx+dy*dy;
+      if(d2<900&&d2>0.01){const d=Math.sqrt(d2),p=(30-d)/2;const ux=dx/d,uy=dy/d;a.x-=ux*p;a.y-=uy*p;b.x+=ux*p;b.y+=uy*p;
+        a.x=Math.max(a.x,this.ionXmin(a.y));b.x=Math.max(b.x,this.ionXmin(b.y));}}
+    const Dw=45*Math.sqrt(dt);
+    for(const w of this.waters){w.x+=randn()*Dw;w.y+=randn()*Dw;w.x=clamp(w.x,this.ionXmin(w.y)-10,this.W-8);w.y=clamp(w.y,8,yl+5);
+      const d=w.x-this.surf;
+      if(d<85&&Math.abs(this.q)>0.5){const target=this.q>0?Math.PI:0;const df=((target-w.a+Math.PI*3)%(2*Math.PI))-Math.PI;w.a+=df*Math.min(1,dt*3);}
+      else w.a+=randn()*dt*3;}
+    const De=90*Math.sqrt(dt);for(const e of this.egas){e.x=clamp(e.x+randn()*De,6,this.surf-8);e.y=clamp(e.y+randn()*De,8,yl+2);}
+    for(const f of this.fx)f.t+=dt;this.fx=this.fx.filter(f=>f.t<1.3);
+    this.events=this.events.filter(e=>e.t>this.t-6);
+    if(this.t>=this.nextHist){this.hist.push({t:this.t,q:this.q,ox:this.rate('ox'),red:this.rate('red')});this.nextHist=this.t+0.25;
+      if(this.hist.length>480)this.hist.shift();}
+  }
+  warmup(sec){const mm=this.manual;this.manual=false;for(let t=0;t<sec;t+=0.05)this.step(0.05);this.manual=mm;this.fx=[];}
+  phase(){
+    const ox=this.rate('ox'),red=this.rate('red');const m=METALS[this.metal];
+    const old=this.hist.find(h=>h.t>=this.t-6);const dq=old?Math.abs(this.q-old.q):99;
+    if(this.manual)return 'manual';
+    if(this.t<2)return 'start';
+    if(this.t>8&&dq<=Math.max(2,m.z*1.5)&&Math.abs(ox-red)<=0.35*Math.max(ox,red,0.6)+0.15)return 'eq';
+    return ox>red?'ox':'red';
+  }
+  statusText(){
+    const m=METALS[this.metal],ion=ionLabel(this.metal),p=this.phase();
+    if(LEVEL==='basis')return {
+      manual:'Du löst die Reaktionen selbst aus. Beobachte jedes Teilchen genau.',
+      start:`Start: Das ${m.name}-Stück ist elektrisch neutral.`,
+      ox:`${m.name}-Atome gehen als ${ion}-Ionen in Lösung. Die Elektronen bleiben im Metall. Das Metall wird immer stärker negativ geladen.`,
+      red:`${ion}-Ionen werden an der Oberfläche wieder zu ${m.name}-Atomen. Die negative Ladung des Metalls nimmt ab.`,
+      eq:`Gleichgewicht: In gleicher Zeit gehen gleich viele Ionen in Lösung, wie sich wieder abscheiden. Die Ladung des Metalls bleibt gleich.`}[p];
+    return {
+      manual:'Manueller Modus: Oxidation und Reduktion erfolgen nur über die Schaltflächen. Beobachte die Teilchen einzeln.',
+      start:'Start: Das Metall ist elektrisch neutral; die Lösung enthält nur die Ionen des gelösten Salzes.',
+      ox:'Oxidation überwiegt: Metall-Ionen gehen in Lösung, die Elektronen verbleiben im Metall. Das Metall lädt sich zunehmend negativ auf.',
+      red:'Reduktion überwiegt: Kationen aus der Lösung werden an der Oberfläche reduziert; die negative Überschussladung des Metalls nimmt ab.',
+      eq:'Dynamisches Gleichgewicht: Oxidation und Reduktion laufen im Mittel mit gleicher Rate ab; die Überschussladung bleibt (bis auf Schwankungen) konstant.'}[p];
+  }
+  draw(show,labelText){
+    const c=this.ctx,m=METALS[this.metal],A=ANIONS[m.an],W=this.W,H=this.H,S=this.surf;
+    c.clearRect(0,0,W,H);
+    let g=c.createLinearGradient(S,0,W,0);g.addColorStop(0,'#d6e7f7');g.addColorStop(1,'#eef5fc');
+    c.fillStyle=g;c.fillRect(S,0,W-S,H);
+    c.fillStyle=shade(m.col,1.12);c.globalAlpha=.45;c.fillRect(0,0,S,H);c.globalAlpha=1;
+    c.strokeStyle='rgba(40,50,70,.35)';c.setLineDash([5,5]);c.beginPath();c.moveTo(S,0);c.lineTo(S,H-38);c.stroke();c.setLineDash([]);
+    for(let cc=0;cc<this.cols;cc++)for(let r=0;r<this.rows;r++){const s=this.grid[cc][r],x=this.slotX(cc),y=this.slotY(r);
+      if(x<-this.R)continue;
+      if(s.occ){c.beginPath();c.arc(x,y,this.R,0,6.283);c.fillStyle=m.col;c.fill();c.strokeStyle=shade(m.col,.65);c.lineWidth=1.3;c.stroke();
+        c.fillStyle='rgba(20,25,35,.75)';c.font='600 11px system-ui';c.textAlign='center';c.textBaseline='middle';c.fillText(this.metal,x,y);}
+      else if(cc<6){c.beginPath();c.arc(x,y,this.R,0,6.283);c.setLineDash([3,3]);c.strokeStyle='rgba(60,70,90,.35)';c.lineWidth=1;c.stroke();c.setLineDash([]);}}
+    if(show.egas){c.fillStyle='rgba(90,140,255,.55)';for(const e of this.egas){c.beginPath();c.arc(e.x,e.y,2.3,0,6.283);c.fill();}}
+    const n=Math.min(42,Math.round(Math.abs(this.q)));
+    for(let i=0;i<n;i++){const y=22+(i+0.5)*(H-80)/n;const x=S-7-((i%2)?8:0);
+      c.beginPath();c.arc(x,y,5.2,0,6.283);c.fillStyle=this.q>0?PAL.e:'#e86b6b';c.fill();c.strokeStyle='rgba(0,0,0,.35)';c.lineWidth=.8;c.stroke();
+      c.fillStyle='#222';c.font='bold 9px system-ui';c.textAlign='center';c.textBaseline='middle';c.fillText(this.q>0?'−':'+',x,y+.5);}
+    if(show.water){for(const w of this.waters){const ox=w.x,oy=w.y;
+      for(const s of [-0.91,0.91]){const hx=ox+Math.cos(w.a+s)*7,hy=oy+Math.sin(w.a+s)*7;c.beginPath();c.arc(hx,hy,2.7,0,6.283);c.fillStyle='#fff';c.fill();c.strokeStyle='#9aa';c.lineWidth=.7;c.stroke();}
+      c.beginPath();c.arc(ox,oy,4.4,0,6.283);c.fillStyle='#e45b5b';c.fill();}}
+    for(const ion of this.ions){
+      if(ion.type==='an'){if(!show.an)continue;
+        if(show.hyd){c.beginPath();c.arc(ion.x,ion.y,14,0,6.283);c.setLineDash([2,3]);c.strokeStyle='rgba(200,110,60,.45)';c.lineWidth=1;c.stroke();c.setLineDash([]);}
+        c.beginPath();c.arc(ion.x,ion.y,9,0,6.283);c.fillStyle=A.col;c.fill();c.strokeStyle=shade(A.col,.6);c.stroke();
+        c.fillStyle='#222';c.font='bold 9px system-ui';c.textAlign='center';c.textBaseline='middle';c.fillText(A.z===1?'−':A.z+'−',ion.x,ion.y);continue;}
+      const fresh=ion.state!=='free';
+      if(show.hyd&&ion.state==='free'){c.beginPath();c.arc(ion.x,ion.y,17,0,6.283);c.setLineDash([2,3]);c.strokeStyle='rgba(50,110,200,.5)';c.lineWidth=1;c.stroke();c.setLineDash([]);}
+      c.beginPath();c.arc(ion.x,ion.y,12,0,6.283);c.fillStyle=m.icol;c.fill();c.strokeStyle=fresh?'#222':shade(m.icol,.6);c.lineWidth=fresh?1.8:1.2;c.stroke();
+      c.fillStyle='#111';c.font='bold 9px system-ui';c.textAlign='center';c.textBaseline='middle';c.fillText(ionLabel(this.metal),ion.x,ion.y);
+    }
+    for(const f of this.fx){c.globalAlpha=Math.max(0,1-f.t/1.3);c.fillStyle=f.k==='ox'?PAL.ox:f.k==='red'?PAL.red:PAL.q;
+      c.font=(f.small?'bold 11px':'600 12px')+' system-ui';c.textAlign='center';c.fillText(f.txt,f.x+(f.small?0:40),f.y-f.t*22);}c.globalAlpha=1;
+    if(show.pot){
+      const yL=100,dphi=clamp(this.q*4.5,-140,140),yM=yL+dphi,xH=S+22,yH=yM+(yL-yM)*0.75;
+      c.fillStyle='rgba(255,255,255,.6)';c.fillRect(0,Math.min(yL,yM)-34,W,Math.abs(dphi)+58);
+      c.beginPath();c.moveTo(0,yM);c.lineTo(S,yM);c.lineTo(xH,yH);
+      for(let x=xH;x<=xH+160;x+=4)c.lineTo(x,yL+(yH-yL)*Math.exp(-(x-xH)/35));c.lineTo(W,yL);
+      c.strokeStyle='#7a3cc2';c.lineWidth=3;c.stroke();
+      c.fillStyle='#5b2a96';c.font='600 12px system-ui';c.textAlign='left';c.textBaseline='alphabetic';
+      c.fillText('φ(Metall)',12,yM-8);c.fillText('φ(Lösung)',W-90,yL-8);
+      c.font='11px system-ui';c.fillText('starre Schicht',S+4,Math.min(yL,yM)-20);c.fillText('diffuse Schicht',S+70,Math.min(yL,yM)-8);
+      if(Math.abs(dphi)>12){const ax=S+210;c.strokeStyle='#5b2a96';c.lineWidth=1.5;c.beginPath();c.moveTo(ax,yM);c.lineTo(ax,yL);c.stroke();
+        c.setLineDash([3,3]);c.beginPath();c.moveTo(S,yM);c.lineTo(ax+4,yM);c.stroke();c.setLineDash([]);
+        c.font='600 12px system-ui';c.fillText('Δφ = Galvani-Spannung',ax+8,(yM+yL)/2-2);c.font='11px system-ui';c.fillText('(nicht direkt messbar)',ax+8,(yM+yL)/2+12);}
+    }
+    if(show.lab){
+      c.fillStyle='rgba(255,255,255,.88)';c.fillRect(0,H-38,W,38);
+      c.fillStyle='#1c2330';c.font=(this.compact?'600 12px':'600 13px')+' system-ui';c.textAlign='center';c.textBaseline='alphabetic';
+      c.fillText(this.compact?m.name:`Metall: ${m.name}`,S/2,H-14);
+      const sol=labelText||(this.compact?`${ionLabel(this.metal)}(aq), c = ${fmtC(this.c)} mol/L`:`Elektrolytlösung: ${m.salt}(aq), c(${ionLabel(this.metal)}) = ${fmtC(this.c)} mol/L`);
+      c.fillText(sol,(S+W)/2+(this.compact?0:60),H-14);
+      c.strokeStyle='#7a3cc2';c.lineWidth=2;c.beginPath();c.moveTo(S-16,H-32);c.lineTo(S-16,H-26);c.lineTo(S+70,H-26);c.lineTo(S+70,H-32);c.stroke();
+      c.fillStyle='#5b2a96';c.font='600 11px system-ui';c.fillText('Doppelschicht',S+27,H-5);
+    }
+  }
+}
+function showOpts(base){return LEVEL==='basis'?{egas:false,water:false,hyd:true,an:false,pot:false,lab:true}:base;}
+
+/* =====================================================================
+   1  DOPPELSCHICHT
+   ===================================================================== */
+const ds={running:true,speed:1,show:{egas:true,water:true,hyd:true,an:true,pot:false,lab:true},records:[]};
+const dsSim=new DLSim($('#dsCanvas'),{});
+const chCtx=setupCanvas($('#dsChart'),900,210);
+function dsInit(){
+  dsSim.init();const m=METALS[dsSim.metal];
+  $('#dsNote').textContent=m.note;
+  $('#dsEq').innerHTML=`${dsSim.metal}(s) ⇌ ${ionLabel(dsSim.metal)}(aq) + ${m.z} e⁻`;
+  $('#lgAtom').style.background=m.col;$('#lgIon').style.background=m.icol;$('#lgAn').style.background=ANIONS[m.an].col;
+}
+function dsChart(){
+  const c=chCtx,W=900,H=210,S=dsSim;c.clearRect(0,0,W,H);c.fillStyle='#fff';c.fillRect(0,0,W,H);
+  const t1=Math.max(60,S.t),t0=t1-60,X=t=>60+(t-t0)/60*(W-80);
+  const hs=S.hist.filter(h=>h.t>=t0);
+  let qmax=5;for(const h of hs)qmax=Math.max(qmax,Math.abs(h.q));qmax*=1.15;
+  let rmax=2;for(const h of hs)rmax=Math.max(rmax,h.ox,h.red);rmax*=1.15;
+  const p1=[12,92],p2=[118,196];
+  c.strokeStyle='#d8dee7';c.lineWidth=1;c.strokeRect(60,p1[0],W-80,p1[1]-p1[0]);c.strokeRect(60,p2[0],W-80,p2[1]-p2[0]);
+  c.fillStyle='#5a6475';c.font='11px system-ui';c.textAlign='right';c.textBaseline='alphabetic';
+  c.fillText(Math.round(qmax),56,p1[0]+9);c.fillText('0',56,p1[1]);c.fillText(dec(rmax,1),56,p2[0]+9);c.fillText('0',56,p2[1]);
+  c.textAlign='left';c.fillText('Überschusselektronen',66,p1[0]+12);c.fillText('Ereignisse pro s',66,p2[0]+12);
+  c.textAlign='center';for(let k=0;k<=6;k++){const t=t0+k*10;c.fillText(Math.round(t)+' s',X(t),H-2);}
+  const line=(key,col,p,max)=>{c.beginPath();let first=true;for(const h of hs){const y=p[1]-(h[key]/max)*(p[1]-p[0]);
+      if(first){c.moveTo(X(h.t),y);first=false;}else c.lineTo(X(h.t),y);}c.strokeStyle=col;c.lineWidth=2;c.stroke();};
+  line('q',PAL.q,p1,qmax);line('ox',PAL.ox,p2,rmax);line('red',PAL.red,p2,rmax);
+  c.textAlign='left';c.font='600 11px system-ui';c.fillStyle=PAL.ox;c.fillText('Oxidation',W-160,p2[0]+12);c.fillStyle=PAL.red;c.fillText('Reduktion',W-90,p2[0]+12);
+}
+function dsUI(){
+  const ox=dsSim.rate('ox'),red=dsSim.rate('red');
+  $('#valOx').textContent=dec(ox,2);$('#valRed').textContent=dec(red,2);
+  $('#barOx').style.width=Math.min(100,ox/4*100)+'%';$('#barRed').style.width=Math.min(100,red/4*100)+'%';
+  $('#valQ').textContent=dsSim.q;$('#valT').textContent=dec(dsSim.t,1)+' s';
+  $('#dsStatus').textContent=dsSim.statusText();
+}
+function renderRecords(){$('#dsRecTable tbody').innerHTML=ds.records.map(r=>`<tr><td class="l">${METALS[r.m].name}</td><td>${String(r.c).replace('.',',')}</td><td>${dec(r.q,1)}</td><td>${r.st}</td></tr>`).join('');}
+buildChips($('#dsChips'),()=>dsSim.metal,s=>{dsSim.metal=s;dsInit();});
+$('#dsConc').onchange=e=>{dsSim.c=parseFloat(e.target.value);dsInit();};
+$('#dsPlay').onclick=()=>{ds.running=!ds.running;$('#dsPlay').textContent=ds.running?'Pause':'Weiter';};
+$('#dsReset').onclick=()=>dsInit();
+$('#dsSpeed').oninput=e=>{ds.speed=parseFloat(e.target.value);$('#dsSpeedV').textContent=String(ds.speed).replace('.',',')+'×';};
+$('#dsManual').onchange=e=>{dsSim.manual=e.target.checked;};
+$('#dsBtnOx').onclick=()=>dsSim.ox();
+$('#dsBtnRed').onclick=()=>{if(!dsSim.red())dsSim.fx.push({x:dsSim.surf+60,y:60,t:0,txt:'kein Kation in Oberflächennähe',k:'e'});};
+[['shEgas','egas'],['shWater','water'],['shHyd','hyd'],['shAn','an'],['shPot','pot'],['shLab','lab']].forEach(([id,k])=>$('#'+id).onchange=e=>ds.show[k]=e.target.checked);
+$('#dsRecord').onclick=()=>{ds.records.push({m:dsSim.metal,c:dsSim.c,q:dsSim.meanQ(6),st:dsSim.phase()==='eq'?'Gleichgewicht':'noch kein Gleichgewicht'});renderRecords();};
+$('#dsRecClear').onclick=()=>{ds.records=[];renderRecords();};
+
+/* =====================================================================
+   2  VERGLEICH
+   ===================================================================== */
+const cmpOpts={W:460,H:420,surf:170,rows:7,top:34,sp:48,density:0.6,compact:true};
+const cmp={running:true,speed:1,A:new DLSim($('#cmpCanvasA'),Object.assign({metal:'Zn'},cmpOpts)),B:new DLSim($('#cmpCanvasB'),Object.assign({metal:'Cu'},cmpOpts))};
+const phiCtx=setupCanvas($('#cmpPhi'),900,240);
+function cmpInfo(k){const s=cmp[k];$('#cmpInfo'+k).textContent=`E°(${ionLabel(s.metal)}/${s.metal}) = ${sgn(METALS[s.metal].E)} V`;}
+buildChips($('#cmpChipsA'),()=>cmp.A.metal,s=>{cmp.A.metal=s;cmp.A.init();cmpInfo('A');});
+buildChips($('#cmpChipsB'),()=>cmp.B.metal,s=>{cmp.B.metal=s;cmp.B.init();cmpInfo('B');});
+$('#cmpCA').onchange=e=>{cmp.A.c=parseFloat(e.target.value);cmp.A.init();};
+$('#cmpCB').onchange=e=>{cmp.B.c=parseFloat(e.target.value);cmp.B.init();};
+$('#cmpPlay').onclick=()=>{cmp.running=!cmp.running;$('#cmpPlay').textContent=cmp.running?'Pause':'Weiter';};
+$('#cmpReset').onclick=()=>{cmp.A.init();cmp.B.init();};
+$('#cmpEq').onclick=()=>{cmp.A.warmup(40);cmp.B.warmup(40);};
+$('#cmpSpeed').oninput=e=>{cmp.speed=parseFloat(e.target.value);};
+cmpInfo('A');cmpInfo('B');
+function cmpDraw(){
+  const c=phiCtx,W=900,H=240;c.clearRect(0,0,W,H);c.fillStyle='#fff';c.fillRect(0,0,W,H);
+  const sims=[cmp.A,cmp.B],qs=sims.map(s=>s.meanQ(5));
+  const qmax=Math.max(8,...qs.map(Math.abs))*1.1,y0=46,sc=(H-90)/qmax,xs=[170,400];
+  c.strokeStyle='#5a6475';c.setLineDash([6,4]);c.lineWidth=1.5;c.beginPath();c.moveTo(60,y0);c.lineTo(520,y0);c.stroke();c.setLineDash([]);
+  c.fillStyle='#5a6475';c.font='12px system-ui';c.textAlign='left';c.textBaseline='alphabetic';c.fillText('φ(Lösung) – gemeinsamer Bezug',62,y0-8);
+  c.save();c.translate(30,y0+70);c.rotate(-Math.PI/2);c.textAlign='center';c.fillText('φ(Metall) ↓ negativer',0,0);c.restore();
+  sims.forEach((s,i)=>{const m=METALS[s.metal],x=xs[i],h=qs[i]*sc;
+    c.fillStyle=shade(m.col,1.0);c.fillRect(x-40,y0,80,h);c.strokeStyle=shade(m.col,.6);c.strokeRect(x-40,y0,80,h);
+    c.fillStyle='#1c2330';c.font='600 13px system-ui';c.textAlign='center';c.fillText(m.name,x,y0+Math.max(h,0)+18);
+    c.font='12px system-ui';c.fillStyle='#5a6475';c.fillText(`≈ ${dec(qs[i],1)} Überschuss-e⁻`,x,y0+Math.max(h,0)+33);});
+  const y1=y0+qs[0]*sc,y2=y0+qs[1]*sc;
+  if(Math.abs(y1-y2)>6){const ax=285;c.strokeStyle='#7a3cc2';c.lineWidth=1.5;
+    c.setLineDash([3,3]);c.beginPath();c.moveTo(xs[0]+40,y1);c.lineTo(ax,y1);c.moveTo(xs[1]-40,y2);c.lineTo(ax,y2);c.stroke();c.setLineDash([]);
+    c.beginPath();c.moveTo(ax,y1);c.lineTo(ax,y2);c.stroke();c.fillStyle='#5b2a96';c.font='600 12px system-ui';c.textAlign='center';c.fillText('Δφ',ax+14,(y1+y2)/2+4);}
+  const mA=METALS[cmp.A.metal],mB=METALS[cmp.B.metal];
+  const EA=Ehalf(cmp.A.metal,cmp.A.c),EB=Ehalf(cmp.B.metal,cmp.B.c);const U=Math.abs(EA-EB);
+  c.textAlign='left';c.fillStyle='#1c2330';c.font='600 13px system-ui';c.fillText('Folgerung für eine galvanische Zelle',560,40);
+  c.font='12.5px system-ui';const lines=[];
+  if(U<0.005){lines.push('Gleiche Elektrodenpotenziale:','keine Potenzialdifferenz, keine Spannung.');}
+  else{const minus=EA<EB?mA:mB,plus=EA<EB?mB:mA;
+    lines.push(`Größerer Elektronenüberschuss: ${minus.name}`,`→ wäre in einer Zelle der Minuspol (Anode).`,`${plus.name} wäre der Pluspol (Kathode).`,'',
+      `Elektrodenpotenziale (Tabelle${LEVEL==='erw'?', Nernst':''}):`,`E(${mA.name}) = ${sgn(EA)} V; E(${mB.name}) = ${sgn(EB)} V`,`zu erwartende Spannung U = ${dec(U,2)} V`);}
+  lines.forEach((t,i)=>c.fillText(t,560,64+i*19));
+}
+function cmpUI(){for(const k of ['A','B']){const s=cmp[k];$('#cmpStat'+k).textContent=s.statusText();}}
+
+/* =====================================================================
+   3  GALVANISCHE ZELLE
+   ===================================================================== */
+const G={W:900,H:560,bL:[70,390],bR:[510,830],bTop:200,sTop:238,bBot:482,xe:{L:230,R:670},eTop:118,eBot:440,wireY:58,br:{L:330,R:570},brTop:166,brBot:330};
+const gzCtx=setupCanvas($('#gzCanvas'),G.W,G.H);
+const pdCtx=setupCanvas($('#pdCanvas'),230,560);
+const gz={L:'Zn',R:'Cu',cL0:1,cR0:1,c:{L:1,R:1},closed:false,speed:1,w:{L:36,R:36},dep:{L:0,R:0},p:{L:[],R:[]},bridge:[],el:[],k:10,
+  I:0,Irel:0,UK:0,showN:false,bridgeEmpty:false,Ri:10,Ra:20,stepMode:false,phase:0,hiE:[],Q:{L:0,R:0},moved:{L:0,R:0},bal:null,lupe:'off'};
+const NB=36;
+const symOf=s=>s==='L'?gz.L:gz.R;
+function gzRegion(side){const b=side==='L'?G.bL:G.bR;return {x0:b[0]+12,x1:b[1]-12,y0:G.sTop+10,y1:G.bBot-10};}
+function inBlocked(side,x,y){const xe=G.xe[side];if(Math.abs(x-xe)<gz.w[side]/2+gz.dep[side]+11&&y<G.eBot+8)return true;
+  const xb=G.br[side];if(Math.abs(x-xb)<20&&y<G.brBot+12)return true;return false;}
+function randDot(side,type){const R=gzRegion(side);for(let k=0;k<80;k++){const x=R.x0+Math.random()*(R.x1-R.x0),y=R.y0+Math.random()*(R.y1-R.y0);if(!inBlocked(side,x,y))return {t:type,x,y,state:'free'};}return {t:type,x:R.x1-5,y:R.y1-5,state:'free'};}
+function balReset(){gz.bal={ox:0,red:0,eOut:0,eIn:0,N:0,K:0,Mbr:0,Abr:0};}
+function gzInit(){
+  gz.c.L=gz.cL0;gz.c.R=gz.cR0;gz.w={L:36,R:36};gz.dep={L:0,R:0};gz.I=0;gz.Irel=0;gz.bridgeEmpty=false;
+  gz.Q={L:0,R:0};gz.moved={L:0,R:0};gz.phase=0;gz.hiE=[];balReset();$('#gzStepTxt').textContent='';
+  gz.k=10/Math.max(gz.cL0,gz.cR0);
+  gz.p={L:[],R:[]};
+  for(const s of ['L','R']){const m=METALS[symOf(s)],A=ANIONS[m.an];const nM=Math.round(gz.k*gz.c[s]);
+    for(let i=0;i<nM;i++)gz.p[s].push(randDot(s,'M'));
+    const nA=Math.round(nM*m.z/A.z);for(let i=0;i<nA;i++)gz.p[s].push(randDot(s,'A'));}
+  gz.bridge=[];for(const k of ['K','N'])for(let i=0;i<NB;i++)gz.bridge.push({k,sg:k==='K'?1:-1,s:clamp((i+0.5)/NB+(Math.random()-.5)*0.02,0.015,0.985),j:(Math.random()-.5)*12,state:'in'});
+  gz.el=[];for(let i=0;i<14;i++)gz.el.push({s:i/14});
+  $('#gzNote').innerHTML=[gz.L,gz.R].filter((v,i,a)=>a.indexOf(v)===i).map(s=>METALS[s].note?`<b>${METALS[s].name}:</b> ${METALS[s].note}`:'').filter(Boolean).join('<br>');
+  $('#lgGzIon').style.background=METALS[gz.L].icol;$('#lgGzIon2').style.background=METALS[gz.R].icol;
+  const anions=[...new Set([METALS[gz.L].an,METALS[gz.R].an])];
+  $('#lgGzAn').innerHTML=anions.map(a=>`<i class="dot" style="background:${ANIONS[a].col}"></i>${ANIONS[a].label}`).join(' ')+' (Anionen der Salzlösungen)';
+  lupeSync(true);
+}
+function gzState(){const EL=Ehalf(gz.L,gz.c.L),ER=Ehalf(gz.R,gz.c.R);const U=Math.abs(EL-ER);
+  let an=null;if(U>1e-4)an=EL<ER?'L':'R';return {EL,ER,U,an,ka:an?(an==='L'?'R':'L'):null};}
+function polyLen(P){let L=0;for(let i=1;i<P.length;i++)L+=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);return L;}
+function polyAt(P,s){let L=polyLen(P)*s;for(let i=1;i<P.length;i++){const l=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);if(L<=l){const f=l?L/l:0;return [P[i-1][0]+(P[i][0]-P[i-1][0])*f,P[i-1][1]+(P[i][1]-P[i-1][1])*f];}L-=l;}return P[P.length-1];}
+const WIRE=()=>[[G.xe.L,G.eTop],[G.xe.L,G.wireY],[G.xe.R,G.wireY],[G.xe.R,G.eTop]];
+const BRIDGE=[[G.br.L,G.brBot],[G.br.L,G.brTop],[G.br.R,G.brTop],[G.br.R,G.brBot]];
+const countM=s=>gz.p[s].filter(d=>d.t==='M'&&d.state!=='dep').length+gz.moved[s];
+const effRi=()=>LEVEL==='erw'?gz.Ri:0, effRa=()=>LEVEL==='erw'?gz.Ra:20;
+
+function spawnAnodeIon(A){const sd=Math.random()<.5?-1:1;const y=G.sTop+18+Math.random()*(G.eBot-G.sTop-30);
+  gz.p[A].push({t:'M',x:G.xe[A]+sd*(gz.w[A]/2+gz.dep[A]+8),y,state:'out',tt:0,vx:sd*45,vy:0});}
+function depositOne(K){const L=gz.p[K].filter(d=>d.t==='M'&&d.state==='free');if(!L.length)return false;
+  let best=L[0],bd=1e9;for(const d of L){const dd=Math.abs(d.x-G.xe[K])+0.2*Math.abs(d.y-(G.sTop+G.eBot)/2);if(dd<bd){bd=dd;best=d;}}
+  const sd=best.x<G.xe[K]?-1:1;
+  Object.assign(best,{state:'dep',tt:0,x0:best.x,y0:best.y,x1:G.xe[K]+sd*(gz.w[K]/2+gz.dep[K]+2),y1:clamp(best.y,G.sTop+12,G.eBot-6)});return true;}
+function bridgeExit(type,side){const end=side==='L'?0:1;let best=null,bd=9;
+  for(const b of gz.bridge){if(b.k!==type||b.state!=='in')continue;const d=Math.abs(b.s-end);if(d<bd){bd=d;best=b;}}
+  if(!best){gz.bridgeEmpty=true;return;}best.state='exit';best.side=side;}
+function moveIntoBridge(side,type){const L=gz.p[side].filter(d=>d.t===type&&d.state==='free');if(!L.length)return false;
+  let best=L[0],bd=1e9;for(const d of L){const dd=Math.hypot(d.x-G.br[side],d.y-G.brBot);if(dd<bd){bd=dd;best=d;}}
+  Object.assign(best,{state:'tobr',tt:0,x0:best.x,y0:best.y,x1:G.br[side],y1:G.brBot-2,side});
+  if(type==='M')gz.moved[side]++;return true;}
+/* Ladungsausgleich: jede Überschussladung einer Halbzelle wird über den Stromschlüssel ausgeglichen */
+function balance(A,K){
+  const mA=METALS[symOf(A)],anK=ANIONS[METALS[symOf(K)].an];let g=0;
+  while(gz.Q[A]>=1&&g++<40){
+    if(LEVEL==='erw'&&gz.bal.N>gz.bal.Mbr&&gz.Q[A]>=mA.z&&moveIntoBridge(A,'M')){gz.Q[A]-=mA.z;gz.bal.Mbr+=mA.z;}
+    else{bridgeExit('N',A);gz.Q[A]-=1;gz.bal.N++;}}
+  g=0;
+  while(gz.Q[K]<=-1&&g++<40){
+    if(LEVEL==='erw'&&gz.bal.K>gz.bal.Abr&&-gz.Q[K]>=anK.z&&moveIntoBridge(K,'A')){gz.Q[K]+=anK.z;gz.bal.Abr+=anK.z;}
+    else{bridgeExit('K',K);gz.Q[K]+=1;gz.bal.K++;}}
+}
+
+function gzStep(dt){
+  const st=gzState();const sdt=dt*gz.speed;
+  gz.I=0;gz.Irel=0;gz.UK=st.U;
+  if(gz.closed&&st.an&&!gz.stepMode){
+    const A=st.an,K=st.ka,mA=METALS[symOf(A)],mK=METALS[symOf(K)];
+    const cK=gz.c[K],cfac=cK/(cK+0.02);
+    gz.I=cfac*st.U/(effRi()+effRa());gz.UK=st.U-gz.I*effRi();gz.Irel=gz.I*20;
+    const dxi=0.0028*gz.Irel*sdt; // Stoffmenge Elektronen in mol (Zeitraffer, V = 0,1 L je Halbzelle)
+    gz.c[A]+=dxi/(mA.z*0.1);gz.c[K]=Math.max(1e-9,gz.c[K]-dxi/(mK.z*0.1));
+    gz.w[A]=Math.max(10,gz.w[A]-dxi/mA.z*130);gz.dep[K]=Math.min(14,gz.dep[K]+dxi/mK.z*130);
+    let g=0;
+    while(countM(A)<Math.round(gz.k*gz.c[A])&&g++<6){spawnAnodeIon(A);gz.Q[A]+=mA.z;gz.bal.ox++;gz.bal.eOut+=mA.z;}
+    g=0;
+    while(countM(K)>Math.round(gz.k*gz.c[K])&&g++<6){if(!depositOne(K))break;gz.Q[K]-=mK.z;gz.bal.red++;gz.bal.eIn+=mK.z;}
+    balance(A,K);
+  }
+  for(const s of ['L','R']){const R=gzRegion(s);
+    for(const d of gz.p[s]){
+      if(d.state==='dep'||d.state==='tobr'){d.tt+=dt/0.7;const f=Math.min(1,d.tt);d.x=d.x0+(d.x1-d.x0)*f;d.y=d.y0+(d.y1-d.y0)*f;
+        if(d.tt>=1){d.dead=true;
+          if(d.state==='tobr'){const m=METALS[symOf(s)];const col=d.t==='M'?m.icol:ANIONS[m.an].col;
+            gz.bridge.push({k:'X',sg:d.t==='M'?1:-1,col,lab:d.t==='M'?m.z+'+':ANIONS[m.an].z+'−',s:s==='L'?0.02:0.98,j:(Math.random()-.5)*12,state:'in'});}}
+        continue;}
+      if(d.state==='out'){d.tt+=dt;d.x=clamp(d.x+d.vx*dt,R.x0,R.x1);d.y=clamp(d.y+d.vy*dt,R.y0,R.y1);if(d.tt>0.9)d.state='free';continue;}
+      const D=(d.t==='M'?20:24)*Math.sqrt(dt);
+      const nx=clamp(d.x+randn()*D,R.x0,R.x1),ny=clamp(d.y+randn()*D,R.y0,R.y1);
+      if(!inBlocked(s,nx,ny)){d.x=nx;d.y=ny;}}
+    gz.p[s]=gz.p[s].filter(d=>!d.dead);}
+  const v=gz.Irel>0.0005?(0.05+0.35*Math.min(1,gz.Irel)):0;
+  const dirE=st.an==='L'?1:-1;
+  for(const e of gz.el){e.s=(e.s+dirE*v*dt+1)%1;}
+  for(const e of gz.hiE){if(e.delay>0){e.delay-=dt;continue;}e.s=clamp(e.s+e.dir*0.45*dt,0,1);if((e.dir>0&&e.s>=1)||(e.dir<0&&e.s<=0))e.done=true;}
+  gz.hiE=gz.hiE.filter(e=>!e.done);
+  // Stromschlüssel: gerichtete Bewegung (Kationen zur Kathodenseite, Anionen zur Anodenseite), kein Kreislauf
+  const drift=(gz.stepMode&&gz.phase===4)?0.02:0.004*Math.min(1,gz.Irel)*gz.speed;
+  for(const b of gz.bridge){
+    if(b.state==='exit'){const end=b.side==='L'?0:1;b.s+=(end>b.s?1:-1)*0.5*dt;
+      if((end===0&&b.s<=0)||(end===1&&b.s>=1)){b.state='gone';
+        gz.p[b.side].push({t:b.k,x:G.br[b.side]+b.j*.6,y:G.brBot+4,state:'out',tt:0,vx:(Math.random()-.5)*30,vy:40});}
+      continue;}
+    if(b.state!=='in')continue;
+    let dir=0;if(st.ka&&drift>0){dir=((b.sg>0)===(st.ka==='R'))?1:-1;}
+    b.s=clamp(b.s+dir*drift*dt+randn()*0.004*Math.sqrt(dt),0.015,0.985);}
+  gz.bridge=gz.bridge.filter(b=>b.state!=='gone');
+  if(gz.lupe!=='off'){lupeSync(false);lupe.step(dt);}
+}
+
+/* Einzelschrittmodus: ein Formelumsatz in vier Schritten */
+function gzNextStep(){
+  const st=gzState();
+  if(!gz.closed||!st.an){$('#gzStepTxt').textContent=!st.an?'Ohne Potenzialdifferenz findet kein Formelumsatz statt.':'Schließe zuerst den Stromkreis (Verbraucher anschließen).';return;}
+  const A=st.an,K=st.ka,sA=symOf(A),sK=symOf(K),mA=METALS[sA],mK=METALS[sK];const l=lcm(mA.z,mK.z),a=l/mA.z,k=l/mK.z;
+  gz.phase=gz.phase%4+1;let t='';
+  if(gz.phase===1){
+    for(let i=0;i<a;i++)spawnAnodeIon(A);gz.c[A]+=a/gz.k;gz.Q[A]+=l;gz.bal.ox+=a;gz.bal.eOut+=l;gz.w[A]=Math.max(10,gz.w[A]-a*0.1/gz.k*130);
+    t=`<b>Schritt 1 – Oxidation an der Anode (${mA.name}):</b> ${coef(a)}${sA}(s) → ${coef(a)}${ionLabel(sA)}(aq) + ${l} e⁻. Es bilden sich ${a} hydratisierte${a>1?'':'s'} ${ionLabel(sA)}-Ion${a>1?'en':''}; ${l} Elektronen verbleiben zunächst in der Elektrode. Die Anodenlösung trägt jetzt ${l} positive Überschussladung${l>1?'en':''}.`;
+  }else if(gz.phase===2){
+    const dir=A==='L'?1:-1;for(let i=0;i<l;i++)gz.hiE.push({s:A==='L'?0:1,dir,delay:i*0.35});
+    t=`<b>Schritt 2 – Elektronenleitung:</b> ${l} Elektronen bewegen sich gerichtet durch den äußeren Leiter (Draht und Verbraucher) von der Anode (${mA.name}) zur Kathode (${mK.name}).`;
+  }else if(gz.phase===3){
+    let n=0;for(let i=0;i<k;i++)if(depositOne(K))n++;
+    gz.c[K]=Math.max(1e-9,gz.c[K]-n/gz.k);gz.Q[K]-=n*mK.z;gz.bal.red+=n;gz.bal.eIn+=n*mK.z;gz.dep[K]=Math.min(14,gz.dep[K]+n*0.1/gz.k*130);
+    t=n<k?`<b>Schritt 3:</b> In der Kathodenlösung sind nicht mehr genügend ${ionLabel(sK)}-Ionen vorhanden.`:
+      `<b>Schritt 3 – Reduktion an der Kathode (${mK.name}):</b> ${coef(k)}${ionLabel(sK)}(aq) + ${l} e⁻ → ${coef(k)}${sK}(s). ${k} ${ionLabel(sK)}-Ion${k>1?'en':''} werden an der Elektrodenoberfläche reduziert. Der Kathodenlösung fehlen jetzt ${l} positive Ladung${l>1?'en':''}.`;
+  }else{
+    balance(A,K);
+    t=`<b>Schritt 4 – Ladungsausgleich:</b> Über den Stromschlüssel treten Ionen über (siehe Bilanz)${LEVEL==='erw'?'; dabei tragen Anionen und Kationen gemeinsam zum Ladungstransport bei':': NO₃⁻-Ionen in die Anodenhalbzelle, K⁺-Ionen in die Kathodenhalbzelle'}. Beide Lösungen sind wieder elektroneutral.`;
+  }
+  $('#gzStepTxt').innerHTML=t;
+  document.querySelectorAll('.phases span').forEach(s=>s.classList.toggle('on',+s.dataset.ph===gz.phase));
+}
+
+function excessN(side){return clamp(Math.round(qFromE(Ehalf(symOf(side),gz.c[side]))*0.7),1,16);}
+function drawElectrode(c,side){
+  const sym=symOf(side),m=METALS[sym],xe=G.xe[side],w=gz.w[side],dp=gz.dep[side];
+  if(dp>0){c.fillStyle=shade(m.col,.85);c.fillRect(xe-w/2-dp,G.sTop-6,w+2*dp,G.eBot-G.sTop+6);}
+  const g=c.createLinearGradient(xe-w/2,0,xe+w/2,0);g.addColorStop(0,shade(m.col,.8));g.addColorStop(.5,shade(m.col,1.1));g.addColorStop(1,shade(m.col,.75));
+  c.fillStyle=g;c.fillRect(xe-w/2,G.eTop,w,G.eBot-G.eTop);c.strokeStyle=shade(m.col,.5);c.lineWidth=1;c.strokeRect(xe-w/2,G.eTop,w,G.eBot-G.eTop);
+  c.fillStyle='#1c2330';c.font='bold 14px system-ui';c.textAlign='center';c.textBaseline='alphabetic';c.fillText(sym,xe,G.eTop+60);
+  const n=excessN(side);
+  for(const sd of [-1,1]){for(let i=0;i<n;i++){const y=G.sTop+12+(i+.5)*(G.eBot-G.sTop-20)/n;const x=xe+sd*(w/2+dp-5);
+      c.beginPath();c.arc(x,y,4.2,0,6.283);c.fillStyle=PAL.e;c.fill();c.strokeStyle='rgba(0,0,0,.35)';c.lineWidth=.7;c.stroke();
+      c.fillStyle='#222';c.font='bold 8px system-ui';c.fillText('−',x,y+3);
+      const xi=xe+sd*(w/2+dp+10);c.beginPath();c.arc(xi,y,4.6,0,6.283);c.fillStyle=m.icol;c.globalAlpha=.9;c.fill();c.globalAlpha=1;
+      c.strokeStyle=shade(m.icol,.6);c.lineWidth=.6;c.stroke();}}
+  if(gz.lupe===side){c.strokeStyle='#7a3cc2';c.lineWidth=2;c.setLineDash([5,4]);c.strokeRect(xe-w/2-dp-20,G.sTop+60,w+2*dp+40,80);c.setLineDash([]);
+    c.fillStyle='#5b2a96';c.font='600 11px system-ui';c.fillText('Lupe',xe,G.sTop+154);}
+}
+function gzDraw(){
+  const c=gzCtx,st=gzState();c.clearRect(0,0,G.W,G.H);c.fillStyle='#fbfcfe';c.fillRect(0,0,G.W,G.H);c.textBaseline='alphabetic';
+  for(const s of ['L','R']){const b=s==='L'?G.bL:G.bR,m=METALS[symOf(s)];
+    let col='rgba(170,205,240,.35)';if(m.sol){const a=clamp(0.1+0.32*Math.min(1,gz.c[s]),0.06,0.45);col=`rgba(${m.sol[0]},${m.sol[1]},${m.sol[2]},${a})`;}
+    c.fillStyle=col;c.fillRect(b[0],G.sTop,b[1]-b[0],G.bBot-G.sTop);
+    c.strokeStyle='#8995a8';c.lineWidth=2.5;c.beginPath();c.moveTo(b[0],G.bTop);c.lineTo(b[0],G.bBot);c.lineTo(b[1],G.bBot);c.lineTo(b[1],G.bTop);c.stroke();}
+  c.lineJoin='round';c.lineCap='butt';c.strokeStyle='#b9c3d1';c.lineWidth=28;c.beginPath();BRIDGE.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.stroke();
+  c.strokeStyle='#eef2f7';c.lineWidth=22;c.stroke();
+  for(const s of ['L','R']){c.fillStyle='#e4dccb';c.fillRect(G.br[s]-11,G.brBot-8,22,10);}
+  c.fillStyle='#5a6475';c.font='12px system-ui';c.textAlign='center';c.fillText('Stromschlüssel',450,G.brTop+32);c.fillText('(KNO₃-Lösung)',450,G.brTop+47);
+  for(const b of gz.bridge){const [x,y]=polyAt(BRIDGE,clamp(b.s,0,1));const horiz=Math.abs(y-G.brTop)<2;const ox=horiz?0:b.j*.6,oy=horiz?b.j*.6:0;
+    c.beginPath();c.arc(x+ox,y+oy,b.k==='X'?5:3.8,0,6.283);c.fillStyle=b.k==='K'?PAL.K:b.k==='N'?PAL.N:b.col;c.fill();
+    if(b.k==='X'||b.state==='exit'){c.strokeStyle='#222';c.lineWidth=1.2;c.stroke();}}
+  for(const s of ['L','R'])drawElectrode(c,s);
+  for(const s of ['L','R']){const m=METALS[symOf(s)],A=ANIONS[m.an];for(const d of gz.p[s]){
+    let r,col,lab;
+    if(d.t==='M'){r=7;col=m.icol;lab=m.z===1?'+':m.z+'+';}
+    else if(d.t==='A'){r=5.2;col=A.col;lab=A.z===1?'−':A.z+'−';}
+    else if(d.t==='K'){r=4.6;col=PAL.K;lab='+';}
+    else{r=4.6;col=PAL.N;lab='−';}
+    const tr=d.state==='dep'||d.state==='tobr'||d.state==='out';
+    c.beginPath();c.arc(d.x,d.y,r,0,6.283);c.fillStyle=col;c.fill();c.strokeStyle=tr?'#222':shade(col.startsWith('#')?col:'#888888',.6);c.lineWidth=tr?1.5:.9;c.stroke();
+    c.fillStyle='#111';c.font='bold 7px system-ui';c.textAlign='center';c.fillText(lab,d.x,d.y+2.5);}}
+  // Draht, Schalter, Verbraucher
+  c.strokeStyle='#2b2f36';c.lineWidth=3;c.lineCap='round';
+  c.beginPath();c.moveTo(G.xe.L,G.eTop);c.lineTo(G.xe.L,G.wireY);c.lineTo(410,G.wireY);c.stroke();
+  c.beginPath();c.moveTo(500,G.wireY);c.lineTo(G.xe.R,G.wireY);c.lineTo(G.xe.R,G.eTop);c.stroke();
+  c.beginPath();c.moveTo(410,G.wireY);if(gz.closed)c.lineTo(440,G.wireY);else c.lineTo(436,G.wireY-16);c.stroke();
+  c.beginPath();c.arc(410,G.wireY,3,0,6.283);c.arc(440,G.wireY,3,0,6.283);c.fillStyle='#2b2f36';c.fill();
+  c.beginPath();c.moveTo(440,G.wireY);c.lineTo(456,G.wireY);c.moveTo(484,G.wireY);c.lineTo(500,G.wireY);c.stroke();
+  const glow=Math.min(1,gz.Irel/1.1);
+  if(glow>0.01){const rg=c.createRadialGradient(470,G.wireY,2,470,G.wireY,40);rg.addColorStop(0,`rgba(255,220,80,${.75*glow})`);rg.addColorStop(1,'rgba(255,220,80,0)');c.fillStyle=rg;c.beginPath();c.arc(470,G.wireY,40,0,6.283);c.fill();}
+  c.beginPath();c.arc(470,G.wireY,14,0,6.283);c.fillStyle=glow>0.01?`rgb(255,${230-60*glow|0},120)`:'#fff';c.fill();c.lineWidth=2;c.strokeStyle='#2b2f36';c.stroke();
+  c.beginPath();c.moveTo(460,G.wireY-10);c.lineTo(480,G.wireY+10);c.moveTo(480,G.wireY-10);c.lineTo(460,G.wireY+10);c.lineWidth=1.5;c.stroke();
+  c.fillStyle='#5a6475';c.font='11px system-ui';c.textAlign='center';c.fillText('Schalter',425,G.wireY-24);c.fillText('Verbraucher',470,G.wireY+30);
+  c.strokeStyle='#2b2f36';c.lineWidth=2;c.beginPath();c.moveTo(300,G.wireY);c.lineTo(300,118);c.lineTo(395,118);c.moveTo(505,118);c.lineTo(600,118);c.lineTo(600,G.wireY);c.stroke();
+  for(const x of [300,600]){c.beginPath();c.arc(x,G.wireY,3.5,0,6.283);c.fillStyle='#2b2f36';c.fill();}
+  c.fillStyle='#1e2a1e';c.fillRect(395,98,110,40);c.fillStyle='#9ef59e';c.font='bold 18px ui-monospace,Menlo,monospace';c.textAlign='center';
+  c.fillText(dec(gz.UK,2)+' V',450,125);c.fillStyle='#5a6475';c.font='11px system-ui';c.fillText('V',450,152);
+  const P=WIRE();
+  if(gz.Irel>0.0005){for(const e of gz.el){const [x,y]=polyAt(P,e.s);c.beginPath();c.arc(x,y,4.5,0,6.283);c.fillStyle=PAL.e;c.fill();c.strokeStyle=PAL.eStroke;c.lineWidth=.8;c.stroke();}}
+  for(const e of gz.hiE){const [x,y]=polyAt(P,e.s);c.beginPath();c.arc(x,y,6,0,6.283);c.fillStyle=PAL.e;c.fill();c.strokeStyle='#222';c.lineWidth=1.6;c.stroke();
+    c.fillStyle='#222';c.font='bold 9px system-ui';c.fillText('−',x,y+3);}
+  for(const s of ['L','R']){const xe=G.xe[s];let pol='',role='';
+    if(st.an===s){pol='−';role='Minuspol · Anode (Oxidation)';}else if(st.ka===s){pol='+';role='Pluspol · Kathode (Reduktion)';}
+    if(pol){c.beginPath();c.arc(xe-34,G.eTop+12,11,0,6.283);c.fillStyle=pol==='−'?PAL.minus:PAL.plus;c.fill();c.fillStyle='#fff';c.font='bold 16px system-ui';c.textAlign='center';c.fillText(pol,xe-34,G.eTop+18);
+      c.fillStyle=pol==='−'?PAL.minus:PAL.plus;c.font='600 14px system-ui';c.fillText(role,(s==='L'?(G.bL[0]+G.bL[1]):(G.bR[0]+G.bR[1]))/2,G.bBot+62);}
+    const m=METALS[symOf(s)],b=s==='L'?G.bL:G.bR;
+    c.fillStyle='#1c2330';c.font='13px system-ui';c.textAlign='center';
+    c.fillText(`${m.salt}(aq), c(${ionLabel(symOf(s))}) = ${fmtC(gz.c[s])} mol/L`,(b[0]+b[1])/2,G.bBot+20);
+    const n=excessN(s);c.fillStyle='#5a6475';c.font='12px system-ui';
+    c.fillText(`E = ${sgn(s==='L'?st.EL:st.ER)} V · Elektronenüberschuss (Modell): ${n>=11?'groß':n>=6?'mittel':'gering'}`,(b[0]+b[1])/2,G.bBot+38);}
+  if(!st.an){c.fillStyle='#5a6475';c.font='600 13px system-ui';c.textAlign='center';c.fillText('Keine Potenzialdifferenz – kein gerichteter Elektronenfluss',450,G.bBot+62);}
+}
+function pdDraw(){
+  const c=pdCtx,W=230,H=560,st=gzState();c.clearRect(0,0,W,H);c.fillStyle='#fbfcfe';c.fillRect(0,0,W,H);c.textBaseline='alphabetic';
+  const Y=E=>36+(1.7-E)/4.3*480;const ax=46;
+  c.strokeStyle='#8995a8';c.lineWidth=1.5;c.beginPath();c.moveTo(ax,Y(1.7));c.lineTo(ax,Y(-2.6));c.stroke();
+  c.beginPath();c.moveTo(ax-5,Y(1.7)+8);c.lineTo(ax,Y(1.7));c.lineTo(ax+5,Y(1.7)+8);c.stroke();
+  c.fillStyle='#5a6475';c.font='11px system-ui';c.textAlign='right';
+  for(let E=-2.5;E<=1.51;E+=0.5){c.fillText(dec(E,1).replace('-','−'),ax-6,Y(E)+4);c.beginPath();c.moveTo(ax-3,Y(E));c.lineTo(ax+3,Y(E));c.stroke();}
+  c.textAlign='left';c.font='600 12px system-ui';c.fillStyle='#1c2330';c.fillText('E in V',ax+6,18);
+  c.font='10.5px system-ui';c.fillStyle='#5a6475';c.save();c.translate(14,Y(-0.4));c.rotate(-Math.PI/2);c.textAlign='center';c.fillText('zunehmend edel →',0,0);c.restore();
+  const L=ORDER.map(s=>({s,y:Y(METALS[s].E)})).sort((a,b)=>b.y-a.y);
+  let last=1e9;for(const o of L){o.ly=Math.min(o.y,last-12);last=o.ly;}
+  for(const o of L){c.strokeStyle='#cfd6e0';c.lineWidth=1;c.beginPath();c.moveTo(ax,o.y);c.lineTo(ax+18,o.y);c.lineTo(ax+24,o.ly);c.stroke();
+    c.fillStyle='#8995a8';c.font='10px system-ui';c.textAlign='left';c.fillText(o.s,ax+26,o.ly+3.5);}
+  for(const [s,E] of [['L',st.EL],['R',st.ER]]){const y=Y(E);const col=st.an===s?PAL.minus:(st.ka===s?PAL.plus:'#555');
+    c.strokeStyle=col;c.lineWidth=2.5;c.beginPath();c.moveTo(ax,y);c.lineTo(ax+150,y);c.stroke();
+    c.fillStyle=col;c.font='600 11px system-ui';c.textAlign='right';
+    c.fillText(`${symOf(s)} (${s==='L'?'links':'rechts'}): ${sgn(E)} V`,W-4,y+(E===Math.min(st.EL,st.ER)?14:-5));}
+  if(st.U>0.005){const x=ax+120,y1=Y(st.EL),y2=Y(st.ER);c.strokeStyle='#1c2330';c.lineWidth=1.5;c.beginPath();c.moveTo(x,y1);c.lineTo(x,y2);c.stroke();
+    for(const [yy,dir] of [[y1,Math.sign(y2-y1)],[y2,Math.sign(y1-y2)]]){c.beginPath();c.moveTo(x-4,yy+dir*7);c.lineTo(x,yy);c.lineTo(x+4,yy+dir*7);c.stroke();}
+    const ym=(y1+y2)/2;c.fillStyle='rgba(251,252,254,.92)';c.fillRect(x-84,ym-10,80,16);c.fillStyle='#1c2330';c.font='bold 12px system-ui';c.textAlign='right';c.fillText(`U₀ = ${dec(st.U,2)} V`,x-6,ym+2);}
+}
+function chargeSum(s){const m=METALS[symOf(s)],A=ANIONS[m.an];let q=0;
+  for(const d of gz.p[s])q+=d.t==='M'?m.z:d.t==='A'?-A.z:d.t==='K'?1:-1;return q;}
+function gzUI(){
+  const st=gzState();
+  $('#gzLCD').textContent=dec(gz.UK,2)+' V';
+  $('#gzLCDinfo').textContent=gz.closed&&!gz.stepMode&&st.an?(LEVEL==='erw'?'Anzeige: Klemmspannung (Voltmeter parallel zum Verbraucher)':'Anzeige: Spannung der idealisierten Zelle (Innenwiderstand vernachlässigt)'):'Anzeige: Leerlaufspannung (hochohmige Messung, I ≈ 0)';
+  $('#gzU0').textContent=dec(st.U,3).replace(/0$/,'')+' V';$('#gzUK').textContent=dec(gz.UK,3).replace(/0$/,'')+' V';
+  $('#gzI').textContent=dec(gz.I*1000,1)+' mA';
+  const b=gz.bal,A=st.an,K=st.ka;
+  const nA=A?ionLabel(symOf(A)):'Kationen',nK=K?ionLabel(symOf(K)):'Kationen';
+  const qs=s=>{const q=chargeSum(s);return q===0?'0 (neutral)':(q>0?'+':'−')+Math.abs(q)+' (Ausgleich steht aus)';};
+  let h=`<tr><th class="l">Vorgang</th><th>Anzahl</th></tr>
+   <tr><td>Oxidation an der Anode: gebildete ${nA}-Ionen</td><td>${b.ox}</td></tr>
+   <tr><td>dabei freigesetzte Elektronen</td><td>${b.eOut}</td></tr>
+   <tr><td>Reduktion an der Kathode: abgeschiedene ${nK}-Ionen</td><td>${b.red}</td></tr>
+   <tr><td>dabei aufgenommene Elektronen</td><td>${b.eIn}</td></tr>
+   <tr><td>NO₃⁻ aus dem Stromschlüssel → Anodenhalbzelle</td><td>${b.N}</td></tr>
+   <tr><td>K⁺ aus dem Stromschlüssel → Kathodenhalbzelle</td><td>${b.K}</td></tr>`;
+  if(LEVEL==='erw')h+=`<tr><td>Kationen der Anodenhalbzelle → Stromschlüssel (Ladung)</td><td>${b.Mbr}</td></tr>
+   <tr><td>Anionen der Kathodenhalbzelle → Stromschlüssel (Ladung)</td><td>${b.Abr}</td></tr>`;
+  h+=`<tr><td>Ladungssumme linke Halbzelle</td><td style="width:auto">${qs('L')}</td></tr><tr><td>Ladungssumme rechte Halbzelle</td><td style="width:auto">${qs('R')}</td></tr>`;
+  $('#gzBal').innerHTML=h;
+  let t='';
+  if(!st.an){t=`<p>Beide Halbzellen besitzen dasselbe Elektrodenpotenzial. Es besteht keine Potenzialdifferenz; auch nach Anschließen eines Verbrauchers erfolgt keine gerichtete Elektronenbewegung.</p>`;}
+  else{
+    const sA=symOf(A),sK=symOf(K),mA=METALS[sA],mK=METALS[sK];const l=lcm(mA.z,mK.z),a=l/mA.z,k=l/mK.z;const same=sA===sK;
+    t+=`<div><b>Minuspol / Anode</b> (${A==='L'?'links':'rechts'}), Oxidation:<br>${coef(a)}${sA}(s) → ${coef(a)}${ionLabel(sA)}(aq) + ${l} e⁻</div>`;
+    t+=`<div style="margin-top:6px"><b>Pluspol / Kathode</b> (${K==='L'?'links':'rechts'}), Reduktion:<br>${coef(k)}${ionLabel(sK)}(aq) + ${l} e⁻ → ${coef(k)}${sK}(s)</div>`;
+    t+=`<div style="margin-top:6px"><b>Gesamtreaktion:</b><br>`+(same?`${ionLabel(sK)}(aq, Kathodenseite) → ${ionLabel(sA)}(aq, Anodenseite)`:
+      `${coef(a)}${sA}(s) + ${coef(k)}${ionLabel(sK)}(aq) → ${coef(a)}${ionLabel(sA)}(aq) + ${coef(k)}${sK}(s)`)+`</div>`;
+    t+=`<div style="margin-top:6px"><b>Zelldiagramm:</b><br>${sA} | ${ionLabel(sA)} (${fmtC(gz.c[A])} mol/L) ‖ ${ionLabel(sK)} (${fmtC(gz.c[K])} mol/L) | ${sK}</div>`;
+    t+=`<div style="margin-top:6px"><b>Spannung:</b> U₀ = E(Kathode) − E(Anode) = ${sgn(K==='L'?st.EL:st.ER)} V − (${sgn(A==='L'?st.EL:st.ER)} V) = ${dec(st.U,2)} V</div>`;
+    if(gz.closed&&!gz.stepMode)t+=`<div class="muted" style="margin-top:6px">Elektronen bewegen sich im Draht von der Anode (${sA}) zur Kathode (${sK}). ${LEVEL==='erw'?'Im Stromschlüssel bewegen sich Kationen in Richtung Kathodenhalbzelle und Anionen in Richtung Anodenhalbzelle; an beiden Enden treten Ionen beider Ladungsvorzeichen über.':`Für jedes gebildete ${ionLabel(sA)}-Ion treten ${mA.z} NO₃⁻-Ion(en) in die Anodenhalbzelle über, für jedes abgeschiedene ${ionLabel(sK)}-Ion ${mK.z} K⁺-Ion(en) in die Kathodenhalbzelle.`}</div>`;
+    if(gz.bridgeEmpty)t+=`<div class="note">Der Stromschlüssel ist an K⁺- bzw. NO₃⁻-Ionen verarmt; ein weiterer Ladungsausgleich ist im Modell nur noch eingeschränkt möglich.</div>`;
+    if(gz.closed&&gz.c[K]<0.002)t+=`<div class="note">Die Kathodenhalbzelle ist an ${ionLabel(sK)}-Ionen nahezu verarmt; die Stromstärke geht gegen null.</div>`;
+  }
+  $('#gzInfo').innerHTML=t;
+  if(gz.showN&&LEVEL==='erw'){const f=s=>{const m=METALS[symOf(s)];return `E(${ionLabel(symOf(s))}/${symOf(s)}) = ${sgn(m.E)} V + (0,059 V / ${m.z}) · lg(${fmtC(gz.c[s])}) = ${sgn(Ehalf(symOf(s),gz.c[s]),3)} V`;};
+    $('#gzNernstBox').innerHTML=`<b>Nernst-Gleichung (25 °C, Näherung c statt Aktivität):</b><br>${f('L')}<br>${f('R')}`;$('#gzNernstBox').style.display='block';}
+  else $('#gzNernstBox').style.display='none';
+  if(gz.lupe!=='off'){const s=gz.lupe,m=METALS[symOf(s)];
+    $('#lupeInfo').textContent=`Ausschnitt der Phasengrenze an der ${s==='L'?'linken':'rechten'} Elektrode (${m.name}, c = ${fmtC(gz.c[s])} mol/L, E = ${sgn(Ehalf(symOf(s),gz.c[s]))} V). Überschusselektronen im Mittel: ${dec(lupe.meanQ(5),1)}. Zum Vergleich die Lupe auf die andere Elektrode richten.`;}
+}
+/* Lupe */
+const lupe=new DLSim($('#lupeCanvas'),{W:900,H:300,rows:5,top:34,sp:49,mode:'nernst',density:0.7});
+function lupeSync(force){
+  if(gz.lupe==='off')return;const s=gz.lupe,sym=symOf(s);
+  if(force||lupe.metal!==sym){lupe.metal=sym;lupe.c=gz.c[s];lupe.init();lupe.warmup(30);}
+  lupe.c=gz.c[s];
+}
+$('#lupeSel').onchange=e=>{gz.lupe=e.target.value;$('#lupeWrap').style.display=gz.lupe==='off'?'none':'block';lupeSync(true);};
+buildChips($('#gzChipsL'),()=>gz.L,s=>{gz.L=s;gzInit();});
+buildChips($('#gzChipsR'),()=>gz.R,s=>{gz.R=s;gzInit();});
+$('#gzCL').onchange=e=>{gz.cL0=parseFloat(e.target.value);gzInit();};
+$('#gzCR').onchange=e=>{gz.cR0=parseFloat(e.target.value);gzInit();};
+$('#gzSwitch').onclick=()=>{gz.closed=!gz.closed;$('#gzSwitch').textContent=gz.closed?'Verbraucher trennen':'Verbraucher anschließen';$('#gzNext').disabled=!(gz.stepMode&&gz.closed);};
+$('#gzReset').onclick=()=>{gzInit();document.querySelectorAll('.phases span').forEach(s=>s.classList.remove('on'));};
+$('#gzSpeed').oninput=e=>{gz.speed=parseFloat(e.target.value);$('#gzSpeedV').textContent=String(gz.speed).replace('.',',')+'×';};
+$('#gzNernst').onchange=e=>{gz.showN=e.target.checked;};
+$('#gzRi').oninput=e=>{gz.Ri=+e.target.value;$('#gzRiV').textContent=gz.Ri+' Ω';};
+$('#gzRa').oninput=e=>{gz.Ra=+e.target.value;$('#gzRaV').textContent=gz.Ra+' Ω';};
+$('#gzStepMode').onchange=e=>{gz.stepMode=e.target.checked;gz.phase=0;$('#gzNext').disabled=!(gz.stepMode&&gz.closed);
+  $('#gzStepTxt').textContent=gz.stepMode?(gz.closed?'Bereit. „Nächster Schritt“ startet den ersten Teilschritt.':'Schließe den Stromkreis, um zu beginnen.'):'';
+  document.querySelectorAll('.phases span').forEach(s=>s.classList.remove('on'));};
+$('#gzNext').onclick=gzNextStep;
+
+/* =====================================================================
+   4  REDOX-LABOR
+   ===================================================================== */
+const lab={A:'Zn',B:'Cu',log:[],mat:{},needle:0,target:0,vel:0,poe:false,real:false};
+(function ticks(){let s='';for(let v=-4;v<=4;v++){const a=(v/4)*90*Math.PI/180;const x1=150+Math.sin(a)*108,y1=150-Math.cos(a)*108,x2=150+Math.sin(a)*96,y2=150-Math.cos(a)*96;
+  const tx=150+Math.sin(a)*82,ty=150-Math.cos(a)*82+4;s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#5a6475" stroke-width="2"/><text x="${tx}" y="${ty}" text-anchor="middle" font-size="11" fill="#5a6475">${v<0?'−'+(-v):v}</text>`;}
+  $('#gTicks').innerHTML=s;})();
+const Eeff=sym=>lab.real&&REAL[sym]?REAL[sym].E:METALS[sym].E;
+const sdOf=sym=>lab.real?(REAL[sym]?REAL[sym].sd:0.01):0;
+function labChips(){buildChips($('#labChipsA'),()=>lab.A,s=>{lab.A=s;labPreview();});buildChips($('#labChipsB'),()=>lab.B,s=>{lab.B=s;labPreview();});}
+function labStart(){
+  if(lab.poe){$('#labPredict').classList.add('show');$('#labPredIn').value='';$('#labPredIn').focus();
+    $('#labResult').className='status';$('#labResult').textContent=`Trage zuerst deine Vorhersage für A = ${lab.A}, B = ${lab.B} ein.`;return;}
+  doMeasure(null);
+}
+function parseNum(s){s=String(s).trim().replace('−','-').replace(',','.').replace(/\s*V$/i,'');if(s==='')return NaN;return Number(s);}
+function doMeasure(pred){
+  $('#labPredict').classList.remove('show');
+  const mA=METALS[lab.A],mB=METALS[lab.B];
+  const Uid=mB.E-mA.E;
+  let U=lab.A===lab.B?0:(Eeff(lab.B)-Eeff(lab.A));
+  if(lab.real)U+=randn()*Math.hypot(sdOf(lab.A),sdOf(lab.B))+(lab.A===lab.B?randn()*0.003:0);
+  lab.target=U;$('#labLCD').textContent=sgn(U)+' V';
+  let ev='',cls='status';
+  if(pred!==null){
+    if(Math.abs(Uid)>0.02&&Math.sign(pred)!==Math.sign(Uid)){ev='falsch';cls='status bad';}
+    else if(Math.abs(pred-Uid)<=0.02){ev='richtig';cls='status good';}
+    else{ev='falsch';cls='status bad';}
+  }
+  let h='';
+  if(pred!==null){h+=`<b>Vorhersage ${sgn(pred)} V: ${ev}.</b> `;
+    if(ev==='falsch')h+=(Math.abs(Uid)>0.02&&Math.sign(pred)!==Math.sign(Uid))?'Das Vorzeichen stimmt nicht: Prüfe, welche Halbzelle an der V-Buchse angeschlossen ist. ':`Abweichung vom Tabellenwert: ${dec(Math.abs(pred-Uid),2)} V. `;
+    h+='<br>';}
+  if(lab.A===lab.B)h+='Gleiche Halbzellen unter gleichen Bedingungen: keine Potenzialdifferenz.';
+  else{const plus=U>0?lab.B:lab.A,minus=U>0?lab.A:lab.B;
+    h+=`Erwartung (Tabelle): U = E(${lab.B}) − E(${lab.A}) = ${sgn(mB.E)} V − (${sgn(mA.E)} V) = <b>${sgn(Uid)} V</b><br>`;
+    h+=`Messwert: <b>${sgn(U)} V</b>${lab.real?` (Realexperiment, Abweichung ${sgn(U-Uid)} V)`:''}<br>Pluspol (Kathode): <b>${METALS[plus].name}</b> · Minuspol (Anode): <b>${METALS[minus].name}</b>`;
+    lab.mat[lab.A+'|'+lab.B]={U,real:lab.real};}
+  $('#labResult').className=cls;$('#labResult').innerHTML=h;
+  lab.log.push({A:lab.A,B:lab.B,U,plus:lab.A===lab.B?'—':(U>0?lab.B:lab.A),pred,ev,real:lab.real});labRender();
+}
+function labPreview(){$('#labLCD').textContent='—';$('#labResult').className='status';$('#labResult').textContent='Halbzellen gewählt. Starte die Messung.';$('#labPredict').classList.remove('show');
+  const n=[lab.A,lab.B].filter((v,i,a)=>a.indexOf(v)===i).map(s=>METALS[s].note?`<b>${METALS[s].name}:</b> ${METALS[s].note}`:'').filter(Boolean).join('<br>');$('#labNote').innerHTML=n;labRender();}
+function labRender(){
+  const pairs=new Set(Object.keys(lab.mat).map(k=>k.split('|').sort().join('|')));
+  $('#labCount').textContent=`${pairs.size} von 45 Kombinationen gemessen`;
+  $('#labLog').innerHTML='<tr><th>Nr.</th><th>A (COM)</th><th>B (V)</th><th>U in V</th><th>Pluspol</th><th>Vorhersage</th><th>Modus</th></tr>'+
+    lab.log.map((r,i)=>`<tr><td>${i+1}</td><td>${r.A}</td><td>${r.B}</td><td>${sgn(r.U)}</td><td>${r.plus}</td><td>${r.pred===null?'–':sgn(r.pred)+' ('+r.ev+')'}</td><td>${r.real?'real':'ideal'}</td></tr>`).join('');
+  let h='<tr><th>A \\ B</th>'+ORDER.map(s=>`<th>${s}</th>`).join('')+'</tr>';
+  for(const a of ORDER){h+=`<tr><th>${a}</th>`;for(const b of ORDER){
+    if(a===b){h+='<td>—</td>';continue;}const k=a+'|'+b;const cur=(a===lab.A&&b===lab.B)?' cur':'';
+    if(k in lab.mat){const u=lab.mat[k];h+=`<td class="${u.U>0?'pos':'neg'}${cur}">${sgn(u.U)}${u.real?'*':''}</td>`;}
+    else h+=`<td class="q${cur}" data-a="${a}" data-b="${b}">?</td>`;}h+='</tr>';}
+  $('#labMat').innerHTML=h;
+  $('#labMat').querySelectorAll('td.q').forEach(td=>td.onclick=()=>{lab.A=td.dataset.a;lab.B=td.dataset.b;labChips();labPreview();labStart();});
+  const rows=ORDER.map(s=>({s,E:METALS[s].E})).concat([{s:'H',E:0}]).sort((x,y)=>x.E-y.E);
+  let t='<tr><th class="l">Reduzierte Form</th><th>⇌</th><th class="l">Oxidierte Form + z e⁻</th><th>E° in V</th></tr>';
+  for(const r of rows){if(r.s==='H'){t+=`<tr style="color:#5a6475"><td class="l">H₂(g)</td><td>⇌</td><td class="l">2 H⁺(aq) + 2 e⁻</td><td>0,00 <span class="small">(Bezug)</span></td></tr>`;continue;}
+    const m=METALS[r.s];const hl=(r.s===lab.A||r.s===lab.B)?' class="hl"':'';
+    t+=`<tr${hl}><td class="l">${r.s}(s)</td><td>⇌</td><td class="l">${ionLabel(r.s)}(aq) + ${m.z===1?'':m.z+' '}e⁻</td><td>${sgn(m.E)}</td></tr>`;}
+  t+='<tr><td colspan="4" class="muted">oben: unedel (stark reduzierend) · unten: edel</td></tr>';
+  $('#labTab').innerHTML=t;
+}
+function labCSV(){
+  const rows=[['Nr.','Halbzelle A (COM)','Halbzelle B (V)','U in V','Pluspol','Vorhersage in V','Bewertung','Modus']];
+  lab.log.forEach((r,i)=>rows.push([i+1,r.A,r.B,dec(r.U,2),r.plus,r.pred===null?'':dec(r.pred,2),r.ev||'',r.real?'Realexperiment':'ideal']));
+  const csv='﻿'+rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(';')).join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='messprotokoll_redoxlabor.csv';document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},800);
+}
+function needleLoop(dt){const k=40,dmp=7;const acc=k*(lab.target-lab.needle)-dmp*lab.vel;lab.vel+=acc*dt;lab.needle+=lab.vel*dt;
+  const a=clamp(lab.needle,-4.3,4.3)/4*90;$('#needle').setAttribute('transform',`rotate(${a} 150 150)`);}
+labChips();
+$('#labMeasure').onclick=labStart;
+$('#labSwap').onclick=()=>{[lab.A,lab.B]=[lab.B,lab.A];labChips();labPreview();labStart();};
+$('#labPredGo').onclick=()=>{const v=parseNum($('#labPredIn').value);if(isNaN(v)){$('#labResult').className='status bad';$('#labResult').textContent='Bitte eine Zahl eingeben, z. B. 1,10 oder −0,46.';return;}doMeasure(v);};
+$('#labPredIn').onkeydown=e=>{if(e.key==='Enter')$('#labPredGo').click();};
+$('#labPoe').onchange=e=>{lab.poe=e.target.checked;$('#labPredict').classList.remove('show');};
+$('#labReal').onchange=e=>{lab.real=e.target.checked;};
+$('#labClear').onclick=()=>{lab.log=[];lab.mat={};lab.target=0;$('#labLCD').textContent='—';$('#labResult').className='status';$('#labResult').textContent='';labRender();};
+$('#labCSV').onclick=labCSV;$('#labPrint').onclick=()=>printTab('lab');
+$('#labShowTab').onchange=e=>{$('#labTabWrap').style.display=e.target.checked?'block':'none';$('#labTabHidden').style.display=e.target.checked?'none':'block';};
+labPreview();
+
+/* =====================================================================
+   5  DIAGNOSE
+   ===================================================================== */
+const quizAns={};
+function renderQuiz(){
+  const box=$('#quiz');box.innerHTML='';
+  QUIZ.forEach((it,i)=>{const d=document.createElement('div');d.className='qcard'+(it.erw?' erw-only':'');
+    d.innerHTML=`<p style="margin:0 0 6px"><b>${i+1}.</b> ${it.q}</p>`+it.a.map((t,j)=>`<button class="qopt" data-i="${i}" data-j="${j}">${t}</button>`).join('')+'<div class="qfb"></div>';
+    box.appendChild(d);});
+  box.querySelectorAll('.qopt').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i,j=+b.dataset.j,it=QUIZ[i],card=b.closest('.qcard');
+    card.querySelectorAll('.qopt').forEach(x=>x.classList.remove('ok','bad'));
+    b.classList.add(j===it.ok?'ok':'bad');quizAns[i]=j;
+    const fb=card.querySelector('.qfb');fb.className='qfb '+(j===it.ok?'good':'badfb');
+    fb.innerHTML=(j===it.ok?'<b>richtig.</b> ':'<b>falsch.</b> ')+it.ex;glossify(fb);updateScore();});
+  QUIZ.forEach((it,i)=>glossify(box.children[i].querySelector('p')));
+  updateScore();
+}
+function updateScore(){const vis=QUIZ.map((it,i)=>i).filter(i=>LEVEL==='erw'||!QUIZ[i].erw);
+  const done=vis.filter(i=>i in quizAns),ok=done.filter(i=>quizAns[i]===QUIZ[i].ok);
+  $('#quizScore').textContent=`${ok.length} von ${vis.length} richtig (${done.length} beantwortet)`;}
+$('#quizReset').onclick=()=>{for(const k in quizAns)delete quizAns[k];renderQuiz();};
+
+/* =====================================================================
+   GLOSSAR-TOOLTIPS
+   ===================================================================== */
+const GL_TERMS=Object.keys(GLOSSARY).sort((a,b)=>b.length-a.length);
+const escRe=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+const GL_RE={};GL_TERMS.forEach(t=>GL_RE[t]=new RegExp('(^|[^A-Za-zÄÖÜäöüß])('+escRe(t)+'(?:en|n|s|e)?)(?![A-Za-zÄÖÜäöüß])','i'));
+function glossNode(node,used){
+  const txt=node.nodeValue;let best=null;
+  for(const t of GL_TERMS){if(used.has(t))continue;const m=GL_RE[t].exec(txt);if(m){const idx=m.index+m[1].length;if(!best||idx<best.idx)best={t,idx,len:m[2].length};}}
+  if(!best)return;used.add(best.t);
+  const mid=node.splitText(best.idx);const rest=mid.splitText(best.len);
+  const span=document.createElement('span');span.className='gl';span.tabIndex=0;span.dataset.term=best.t;span.textContent=mid.nodeValue;mid.replaceWith(span);
+  glossNode(rest,used);
+}
+function glossify(root){if(!root)return;const used=new Set();
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement.closest('.gl,button,b,script,style,sub,sup')?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});
+  const nodes=[];while(w.nextNode())nodes.push(w.currentNode);nodes.forEach(n=>glossNode(n,used));}
+const tip=$('#tip');let tipEl=null;
+function showTip(el){const t=el.dataset.term;tip.innerHTML=`<b>${t}</b><br>${GLOSSARY[t]}`;tip.style.display='block';tipEl=el;
+  const r=el.getBoundingClientRect(),tw=tip.offsetWidth,th=tip.offsetHeight;
+  let x=clamp(r.left,8,window.innerWidth-tw-8),y=r.bottom+6;if(y+th>window.innerHeight-8)y=r.top-th-6;tip.style.left=x+'px';tip.style.top=y+'px';}
+function hideTip(){tip.style.display='none';tipEl=null;}
+document.addEventListener('mouseover',e=>{const g=e.target.closest&&e.target.closest('.gl');if(g)showTip(g);});
+document.addEventListener('mouseout',e=>{const g=e.target.closest&&e.target.closest('.gl');if(g)hideTip();});
+document.addEventListener('focusin',e=>{if(e.target.classList&&e.target.classList.contains('gl'))showTip(e.target);});
+document.addEventListener('focusout',e=>{if(e.target.classList&&e.target.classList.contains('gl'))hideTip();});
+document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest('.gl');if(g){if(tipEl===g)hideTip();else showTip(g);}else hideTip();});
+window.addEventListener('scroll',hideTip,{passive:true});
+document.querySelectorAll('.task, #tab-info li, #tab-ds .muted').forEach(glossify);
+$('#glossList').innerHTML=Object.keys(GLOSSARY).sort((a,b)=>a.localeCompare(b,'de')).map(t=>`<dt>${t}</dt><dd>${GLOSSARY[t]}</dd>`).join('');
+$('#aufPrint').onclick=()=>printTab('auf');
+
+/* ====================== START ====================== */
+applyPalette();applyLevel();dsInit();gzInit();renderQuiz();
+
+let lastT=performance.now(),lastUI=0;
+function loop(now){
+  const dt=Math.min(0.05,(now-lastT)/1000);lastT=now;const ui=now-lastUI>200;if(ui)lastUI=now;
+  if(activeTab==='ds'){
+    if(ds.running){const sdt=dt*ds.speed;const n=Math.ceil(sdt/0.02);for(let i=0;i<n;i++)dsSim.step(sdt/n);}
+    dsSim.draw(showOpts(ds.show));dsChart();if(ui)dsUI();
+  }else if(activeTab==='cmp'){
+    if(cmp.running){const sdt=dt*cmp.speed;const n=Math.ceil(sdt/0.02);for(let i=0;i<n;i++){cmp.A.step(sdt/n);cmp.B.step(sdt/n);}}
+    const so=showOpts({egas:true,water:true,hyd:true,an:true,pot:false,lab:true});cmp.A.draw(so);cmp.B.draw(so);cmpDraw();if(ui)cmpUI();
+  }else if(activeTab==='gz'){
+    gzStep(dt);gzDraw();pdDraw();
+    if(gz.lupe!=='off'){const s=gz.lupe,m=METALS[symOf(s)];lupe.draw(showOpts({egas:true,water:true,hyd:true,an:true,pot:false,lab:true}),`Elektrode ${s==='L'?'links':'rechts'}: ${m.name} in ${m.salt}(aq), c = ${fmtC(gz.c[s])} mol/L`);}
+    if(ui)gzUI();
+  }else if(activeTab==='lab'){needleLoop(dt);}
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
