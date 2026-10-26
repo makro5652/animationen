@@ -166,9 +166,9 @@ tr.hl td{background:#fff3c4;font-weight:600}
           <span class="erw-only"><i class="dot" id="lgAn"></i>Anion</span>
           <span><i class="dot" data-pal="e"></i>Überschusselektron</span>
           <span class="erw-only"><i class="dot" style="background:#7aa7ff;width:7px;height:7px"></i>Elektronengas (Valenzelektronen)</span>
-          <span class="erw-only"><i class="dot" style="background:#e45b5b;width:9px;height:9px"></i>Wassermolekül (O rot, H weiß)</span>
+          <span><i class="dot" style="background:#e45b5b;width:9px;height:9px"></i>Wassermolekül (O rot, H weiß); um die Ionen als Hydrathülle orientiert</span>
         </div>
-        <p class="muted basis-only">Basis-Ansicht: Wassermoleküle, Anionen und Elektronengas sind ausgeblendet.</p>
+        <p class="muted basis-only">Basis-Ansicht: Hydrathüllen der Kationen sind dargestellt; freie Wassermoleküle, Anionen und Elektronengas sind ausgeblendet.</p>
       </div>
       <div class="card mt">
         <h2>Zeitlicher Verlauf</h2>
@@ -209,7 +209,7 @@ tr.hl td{background:#fff3c4;font-weight:600}
           <h3>Darstellung</h3>
           <label class="ck"><input type="checkbox" id="shEgas" checked> Elektronengas</label>
           <label class="ck"><input type="checkbox" id="shWater" checked> Wassermoleküle</label>
-          <label class="ck"><input type="checkbox" id="shHyd" checked> Hydrathüllen andeuten</label>
+          <label class="ck"><input type="checkbox" id="shHyd" checked> Hydrathüllen</label>
           <label class="ck"><input type="checkbox" id="shAn" checked> Anionen</label>
           <label class="ck"><input type="checkbox" id="shPot"> Potenzialverlauf φ(x)</label>
           <label class="ck"><input type="checkbox" id="shLab" checked> Beschriftungen</label>
@@ -439,13 +439,14 @@ tr.hl td{background:#fff3c4;font-weight:600}
     <p>Bearbeite die Aufträge in der angegebenen Reihenfolge. Halte Beobachtungen, Skizzen und Erklärungen schriftlich fest. Unterstrichene Fachbegriffe zeigen beim Antippen eine Erklärung. <span class="erw-only">Violett markierte Aufträge gehören zum erweiterten Niveau.</span></p>
 
     <h3>Teil A – Die elektrochemische Doppelschicht (Ansicht 1)</h3>
-    <div class="task"><b>A1</b><span class="afb">AFB I</span> Wähle Zink und c(Zn²⁺) = 1 mol/L. Aktiviere „Reaktionen nur manuell auslösen“ und löse nacheinander drei Oxidationen aus. <b>Beschreibe</b>, was mit einem Zink-Atom an der Metalloberfläche geschieht und welche Teilchen im Metall verbleiben.</div>
-    <div class="task"><b>A2</b><span class="afb">AFB I</span> <b>Formuliere</b> die Reaktionsgleichung für den Übergang zwischen Metall und Lösung mit Phasenangaben. <b>Kennzeichne</b> Hin- und Rückreaktion als Oxidation bzw. Reduktion.</div>
-    <div class="task"><b>A3</b><span class="afb">AFB II</span> Deaktiviere den manuellen Modus, setze die Simulation zurück und beobachte etwa 60 s. <b>Beschreibe</b> den Verlauf der Kurven im Diagramm. <b>Erkläre</b>, weshalb die Oxidationsrate abnimmt und die Reduktionsrate zunimmt. Berücksichtige die elektrostatische Anziehung zwischen der negativ geladenen Metalloberfläche und den Kationen.</div>
-    <div class="task"><b>A4</b><span class="afb">AFB II</span> <b>Erläutere</b>, weshalb der Endzustand als dynamisches Gleichgewicht bezeichnet wird. Gehe auf Hin- und Rückreaktion, deren Raten und die Überschussladung ein.</div>
-    <div class="task basis-only"><b>A5</b><span class="afb">AFB II</span> <b>Fertige</b> eine beschriftete Skizze der Phasengrenze im Gleichgewicht <b>an</b> (Metall mit Überschusselektronen an der Oberfläche, Schicht von Kationen in der Lösung). Benenne die Struktur.</div>
-    <div class="task erw-only"><b>A5</b><span class="afb">AFB II</span> Aktiviere „Potenzialverlauf φ(x)“. <b>Erläutere</b> den Aufbau der elektrochemischen Doppelschicht (Überschusselektronen an der Metalloberfläche, Schicht hydratisierter Kationen, Ausrichtung der Wassermoleküle, Verlauf des elektrischen Potenzials in starrer und diffuser Schicht). <b>Fertige</b> eine beschriftete Skizze an.</div>
-    <div class="task erw-only"><b>A6</b><span class="afb">AFB III</span> <b>Diskutiere</b>, weshalb sich die Galvani-Spannung einer einzelnen Halbzelle nicht direkt messen lässt. Hinweis: Überlege, wie ein Messgerät mit der Lösung leitend verbunden werden müsste.</div>
+    <div class="task"><b>A1</b><span class="afb">AFB I</span> Wähle Zink und c(Zn²⁺) = 1 mol/L. Aktiviere „Reaktionen nur manuell auslösen“ und löse nacheinander drei Oxidationen aus. <b>Beschreibe</b>, was mit einem Zink-Atom an der Metalloberfläche geschieht, welche Teilchen im Metall verbleiben und wie sich die Umgebung des entstehenden Ions in der Lösung verändert.</div>
+    <div class="task"><b>A2</b><span class="afb">AFB II</span> <b>Erkläre</b> die Ausrichtung der Wassermoleküle in der Hydrathülle eines Kations und eines Anions mithilfe des Dipolcharakters des Wassermoleküls. <b>Beschreibe</b>, was mit der Hydrathülle bei der Abscheidung eines Kations an der Metalloberfläche geschieht.</div>
+    <div class="task"><b>A3</b><span class="afb">AFB I</span> <b>Formuliere</b> die Reaktionsgleichung für den Übergang zwischen Metall und Lösung mit Phasenangaben. <b>Kennzeichne</b> Hin- und Rückreaktion als Oxidation bzw. Reduktion.</div>
+    <div class="task"><b>A4</b><span class="afb">AFB II</span> Deaktiviere den manuellen Modus, setze die Simulation zurück und beobachte etwa 60 s. <b>Beschreibe</b> den Verlauf der Kurven im Diagramm. <b>Erkläre</b>, weshalb die Oxidationsrate abnimmt und die Reduktionsrate zunimmt. Berücksichtige die elektrostatische Anziehung zwischen der negativ geladenen Metalloberfläche und den Kationen.</div>
+    <div class="task"><b>A5</b><span class="afb">AFB II</span> <b>Erläutere</b>, weshalb der Endzustand als dynamisches Gleichgewicht bezeichnet wird. Gehe auf Hin- und Rückreaktion, deren Raten und die Überschussladung ein.</div>
+    <div class="task basis-only"><b>A6</b><span class="afb">AFB II</span> <b>Fertige</b> eine beschriftete Skizze der Phasengrenze im Gleichgewicht <b>an</b> (Metall mit Überschusselektronen an der Oberfläche, Schicht von Kationen in der Lösung). Benenne die Struktur.</div>
+    <div class="task erw-only"><b>A6</b><span class="afb">AFB II</span> Aktiviere „Potenzialverlauf φ(x)“. <b>Erläutere</b> den Aufbau der elektrochemischen Doppelschicht (Überschusselektronen an der Metalloberfläche, Schicht hydratisierter Kationen, Ausrichtung der Wassermoleküle, Verlauf des elektrischen Potenzials in starrer und diffuser Schicht). <b>Fertige</b> eine beschriftete Skizze an.</div>
+    <div class="task erw-only"><b>A7</b><span class="afb">AFB III</span> <b>Diskutiere</b>, weshalb sich die Galvani-Spannung einer einzelnen Halbzelle nicht direkt messen lässt. Hinweis: Überlege, wie ein Messgerät mit der Lösung leitend verbunden werden müsste.</div>
 
     <h3>Teil B – Zwei Doppelschichten im Vergleich (Ansicht 2)</h3>
     <div class="task"><b>B1</b><span class="afb">AFB I</span> Stelle links Zink und rechts Kupfer ein (jeweils 1 mol/L) und stelle das Gleichgewicht ein. <b>Beschreibe</b> die Unterschiede zwischen beiden Halbzellen (Zahl der in Lösung gegangenen Ionen, Überschussladung des Metalls).</div>
@@ -519,8 +520,9 @@ tr.hl td{background:#fff3c4;font-weight:600}
     <ul>
       <li>Oxidations- und Reduktionsereignisse sind Zufallsereignisse. Die Raten hängen exponentiell von der Überschussladung q ab: r<sub>ox</sub> ∝ exp(−γ(q − q*)), r<sub>red</sub> ∝ exp(+γ(q − q*)). Eine Reduktion setzt zusätzlich ein Kation in Oberflächennähe voraus. Die Kationen erfahren eine zur Überschussladung proportionale, mit dem Abstand abklingende Anziehung (vereinfachte Abschirmung).</li>
       <li>Die Gleichgewichtsladung q* wird monoton aus dem Elektrodenpotenzial abgebildet: je negativer das Potenzial, desto mehr Überschusselektronen. In Ansicht 1 und 2 ist der Konzentrationseinfluss gegenüber der Nernst-Gleichung etwa vierfach überzeichnet, damit er sichtbar wird. In der Lupe und an den Elektroden der Zelle wird q* direkt aus dem Nernst-Potenzial abgeleitet, sodass die Reihenfolge stets dem Potenzialdiagramm entspricht.</li>
+      <li>Hydratation: Kationen und Anionen sind von orientierten Wassermolekülen umgeben (Kation: O-Atome zum Ion, Anion: H-Atome zum Ion). Die Hülle ist vereinfacht mit sechs Wassermolekülen dargestellt, ohne zweite Hydratsphäre; die tatsächliche Koordinationszahl hängt vom Ion ab (für Zn²⁺ und Cu²⁺ wird in der Regel sechs angegeben, Cu²⁺ mit Jahn-Teller-Verzerrung). Hydratisierte Kationen nähern sich der Oberfläche bis zur äußeren Helmholtz-Ebene; die Hülle bildet sich beim Übertritt in die Lösung aus und wird bei der Abscheidung abgestreift. Spezifische Adsorption von Anionen (innere Helmholtz-Ebene) ist nicht modelliert.</li>
       <li>Die Darstellung ist ausdrücklich <b>nicht maßstäblich</b>; real geht nur ein verschwindend kleiner, analytisch nicht nachweisbarer Stoffmengenanteil in Lösung.</li>
-      <li>Relatives Modell: Alle Metalle laden sich negativ auf, unterschiedlich stark („Elektronendruck“). Manche Schulbücher stellen edle Metalle mit positiver Aufladung durch Kationenabscheidung dar. Beide sind Modelle, da absolute Galvani-Spannungen nicht messbar sind; bei Gold kann kurzzeitig auch eine positive Aufladung auftreten. Geeignet für die Modellkritik (A6, F1).</li>
+      <li>Relatives Modell: Alle Metalle laden sich negativ auf, unterschiedlich stark („Elektronendruck“). Manche Schulbücher stellen edle Metalle mit positiver Aufladung durch Kationenabscheidung dar. Beide sind Modelle, da absolute Galvani-Spannungen nicht messbar sind; bei Gold kann kurzzeitig auch eine positive Aufladung auftreten. Geeignet für die Modellkritik (A7, F1).</li>
       <li>Die Vergleichsansicht setzt beide Lösungen als gemeinsamen Bezug; Diffusionspotenziale zwischen verschiedenen Elektrolytlösungen werden vernachlässigt.</li>
       <li>Die Ionenfarben dienen der Unterscheidung. Real farbig sind nur Cu²⁺ (blau), Ni²⁺ (grün) und Fe²⁺ (blassgrün) in wässriger Lösung.</li>
     </ul>
@@ -727,7 +729,7 @@ class DLSim{
     this.egas=[];for(let i=0;i<Math.round(70*(this.surf/300)*(this.rows/9));i++)this.egas.push({x:8+Math.random()*(this.surf-16),y:10+Math.random()*(this.yLim-8)});
   }
   ionXmin(y){const r=Math.round((y-this.top)/this.sp);
-    if(r>=0&&r<this.rows&&this.grid[6][r].occ)return this.slotX(6)+this.R+17;return this.surf+19;}
+    if(r>=0&&r<this.rows&&this.grid[6][r].occ)return this.slotX(6)+this.R+24;return this.surf+25;}
   exposed(){const L=[];for(let c=0;c<this.cols;c++)for(let r=0;r<this.rows;r++){const s=this.grid[c][r];
     if(s.occ&&(c===6||!this.grid[c+1][r].occ&&!this.grid[c+1][r].res))L.push([c,r]);}return L;}
   depSlots(){const L=[];for(let c=0;c<this.cols;c++)for(let r=0;r<this.rows;r++){const s=this.grid[c][r];
@@ -765,6 +767,7 @@ class DLSim{
     }
     const D=38*Math.sqrt(dt),yl=this.yLim;
     for(const ion of this.ions){
+      ion.rot=(ion.rot===undefined?Math.random()*6.28:ion.rot)+dt*0.35;
       if(ion.state==='leave'||ion.state==='dep'){
         ion.t+=dt/0.55;const s=Math.min(1,ion.t),e=s*s*(3-2*s);
         ion.x=ion.x0+(ion.x1-ion.x0)*e;ion.y=ion.y0+(ion.y1-ion.y0)*e;
@@ -779,7 +782,7 @@ class DLSim{
     this.ions=this.ions.filter(i=>!i.dead);
     const F=this.ions.filter(i=>i.state==='free');
     for(let i=0;i<F.length;i++)for(let j=i+1;j<F.length;j++){const a=F[i],b=F[j];const dx=b.x-a.x,dy=b.y-a.y;const d2=dx*dx+dy*dy;
-      if(d2<900&&d2>0.01){const d=Math.sqrt(d2),p=(30-d)/2;const ux=dx/d,uy=dy/d;a.x-=ux*p;a.y-=uy*p;b.x+=ux*p;b.y+=uy*p;
+      if(d2<1764&&d2>0.01){const d=Math.sqrt(d2),p=(42-d)/2;const ux=dx/d,uy=dy/d;a.x-=ux*p;a.y-=uy*p;b.x+=ux*p;b.y+=uy*p;
         a.x=Math.max(a.x,this.ionXmin(a.y));b.x=Math.max(b.x,this.ionXmin(b.y));}}
     const Dw=45*Math.sqrt(dt);
     for(const w of this.waters){w.x+=randn()*Dw;w.y+=randn()*Dw;w.x=clamp(w.x,this.ionXmin(w.y)-10,this.W-8);w.y=clamp(w.y,8,yl+5);
@@ -806,16 +809,26 @@ class DLSim{
     if(LEVEL==='basis')return {
       manual:'Du löst die Reaktionen selbst aus. Beobachte jedes Teilchen genau.',
       start:`Start: Das ${m.name}-Stück ist elektrisch neutral.`,
-      ox:`${m.name}-Atome gehen als ${ion}-Ionen in Lösung. Die Elektronen bleiben im Metall. Das Metall wird immer stärker negativ geladen.`,
-      red:`${ion}-Ionen werden an der Oberfläche wieder zu ${m.name}-Atomen. Die negative Ladung des Metalls nimmt ab.`,
+      ox:`${m.name}-Atome gehen als ${ion}-Ionen in Lösung. Dort werden sie von Wassermolekülen umgeben (Hydrathülle). Die Elektronen bleiben im Metall. Das Metall wird immer stärker negativ geladen.`,
+      red:`${ion}-Ionen verlieren an der Oberfläche ihre Hydrathülle und werden wieder zu ${m.name}-Atomen. Die negative Ladung des Metalls nimmt ab.`,
       eq:`Gleichgewicht: In gleicher Zeit gehen gleich viele Ionen in Lösung, wie sich wieder abscheiden. Die Ladung des Metalls bleibt gleich.`}[p];
     return {
       manual:'Manueller Modus: Oxidation und Reduktion erfolgen nur über die Schaltflächen. Beobachte die Teilchen einzeln.',
       start:'Start: Das Metall ist elektrisch neutral; die Lösung enthält nur die Ionen des gelösten Salzes.',
-      ox:'Oxidation überwiegt: Metall-Ionen gehen in Lösung, die Elektronen verbleiben im Metall. Das Metall lädt sich zunehmend negativ auf.',
-      red:'Reduktion überwiegt: Kationen aus der Lösung werden an der Oberfläche reduziert; die negative Überschussladung des Metalls nimmt ab.',
+      ox:'Oxidation überwiegt: Metall-Ionen gehen in Lösung und werden hydratisiert (Ion-Dipol-Wechselwirkung, O-Atome der Wassermoleküle zum Kation gerichtet); die Elektronen verbleiben im Metall. Das Metall lädt sich zunehmend negativ auf.',
+      red:'Reduktion überwiegt: Kationen werden an der Oberfläche dehydratisiert und reduziert; die negative Überschussladung des Metalls nimmt ab.',
       eq:'Dynamisches Gleichgewicht: Oxidation und Reduktion laufen im Mittel mit gleicher Rate ab; die Überschussladung bleibt (bis auf Schwankungen) konstant.'}[p];
   }
+  /* Hydrathülle: orientierte Wassermoleküle. Kation: O-Atom (negative Partialladung) zum Ion; Anion: H-Atome zum Ion */
+  drawShell(c,ion,n,dist,alpha,isCat){
+    if(alpha<=0.02)return;c.globalAlpha=alpha;const base=ion.rot||0;
+    for(let i=0;i<n;i++){const th=base+i*2*Math.PI/n;const ox=ion.x+Math.cos(th)*dist,oy=ion.y+Math.sin(th)*dist;
+      const a=isCat?th:th+Math.PI;
+      for(const s of [-0.91,0.91]){const hx=ox+Math.cos(a+s)*5.6,hy=oy+Math.sin(a+s)*5.6;c.beginPath();c.arc(hx,hy,2.3,0,6.283);c.fillStyle='#fff';c.fill();c.strokeStyle='#8a9aa6';c.lineWidth=.7;c.stroke();}
+      c.beginPath();c.arc(ox,oy,3.7,0,6.283);c.fillStyle='#e45b5b';c.fill();c.strokeStyle='#b23c3c';c.lineWidth=.6;c.stroke();}
+    c.globalAlpha=1;
+  }
+  shellAlpha(ion){if(ion.state==='leave')return Math.min(1,ion.t*1.2);if(ion.state==='dep')return Math.max(0,1-ion.t*1.6);return 1;}
   draw(show,labelText){
     const c=this.ctx,m=METALS[this.metal],A=ANIONS[m.an],W=this.W,H=this.H,S=this.surf;
     c.clearRect(0,0,W,H);
@@ -838,11 +851,11 @@ class DLSim{
       c.beginPath();c.arc(ox,oy,4.4,0,6.283);c.fillStyle='#e45b5b';c.fill();}}
     for(const ion of this.ions){
       if(ion.type==='an'){if(!show.an)continue;
-        if(show.hyd){c.beginPath();c.arc(ion.x,ion.y,14,0,6.283);c.setLineDash([2,3]);c.strokeStyle='rgba(200,110,60,.45)';c.lineWidth=1;c.stroke();c.setLineDash([]);}
+        if(show.hyd)this.drawShell(c,ion,6,15.5,1,false);
         c.beginPath();c.arc(ion.x,ion.y,9,0,6.283);c.fillStyle=A.col;c.fill();c.strokeStyle=shade(A.col,.6);c.stroke();
         c.fillStyle='#222';c.font='bold 9px system-ui';c.textAlign='center';c.textBaseline='middle';c.fillText(A.z===1?'−':A.z+'−',ion.x,ion.y);continue;}
       const fresh=ion.state!=='free';
-      if(show.hyd&&ion.state==='free'){c.beginPath();c.arc(ion.x,ion.y,17,0,6.283);c.setLineDash([2,3]);c.strokeStyle='rgba(50,110,200,.5)';c.lineWidth=1;c.stroke();c.setLineDash([]);}
+      if(show.hyd)this.drawShell(c,ion,6,18.5,this.shellAlpha(ion),true);
       c.beginPath();c.arc(ion.x,ion.y,12,0,6.283);c.fillStyle=m.icol;c.fill();c.strokeStyle=fresh?'#222':shade(m.icol,.6);c.lineWidth=fresh?1.8:1.2;c.stroke();
       c.fillStyle='#111';c.font='bold 9px system-ui';c.textAlign='center';c.textBaseline='middle';c.fillText(ionLabel(this.metal),ion.x,ion.y);
     }
