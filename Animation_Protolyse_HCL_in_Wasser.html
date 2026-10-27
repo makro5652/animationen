@@ -1,464 +1,1080 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Säure-Base Reaktion (Teilchenmodell)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { margin: 0; overflow: hidden; background-color: #ffffff; touch-action: none; }
-        canvas { display: block; width: 100vw; height: 100vh; }
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        /* Custom Slider Styling */
-        input[type=range] {
-            -webkit-appearance: none;
-            width: 100%;
-            background: transparent;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 16px;
-            width: 16px;
-            border-radius: 50%;
-            background: #475569;
-            margin-top: -6px;
-            cursor: pointer;
-        }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 4px;
-            cursor: pointer;
-            background: #cbd5e1;
-            border-radius: 2px;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protolyse – Digitales Arbeitsblatt (Sek I)</title>
+<meta name="description" content="Digitales Arbeitsblatt für die Sekundarstufe I: Protolyse von HCl, H₂SO₄ und H₃PO₄ in Wasser – Schritt-für-Schritt-Animation, Teilchensimulation, Reaktionsgleichungen und Aufgaben mit Selbstkontrolle.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%238839EF'/%3E%3Ccircle cx='11' cy='17' r='6' fill='%23fff'/%3E%3Ccircle cx='23' cy='15' r='4' fill='%2360A5FA'/%3E%3Ccircle cx='18' cy='9' r='2.2' fill='%23FACC15'/%3E%3C/svg%3E">
+<style>
+  /* Farbschema: Catppuccin Latte (hell) / Frappé (dunkel) – passend zur Sammlungsseite */
+  :root {
+    --ink: #EFF1F5; --panel: #E6E9EF; --panel2: #DCE0E8; --line: #CCD0DA; --line2: #ACB0BE;
+    --txt: #4C4F69; --dim: #6C6F85; --accent: #8839EF; --chem: #179299;
+    --ok: #40A02B; --bad: #D20F39; --warn: #DF8E1D; --blue: #1E66F5; --glow: #E5E6F8;
+    --white: #fff;
+    --sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #303446; --panel: #414559; --panel2: #51576D; --line: #51576D; --line2: #626880;
+      --txt: #C6D0F5; --dim: #A5ADCE; --accent: #CA9EE6; --chem: #81C8BE;
+      --ok: #A6D189; --bad: #E78284; --warn: #E5C890; --blue: #8CAAEE; --glow: #3A3D57;
+      --white: #232634;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: radial-gradient(1200px 700px at 20% -10%, var(--glow) 0%, transparent 60%), var(--ink);
+    color: var(--txt); font: 16px/1.55 var(--sans); -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 28px 16px 70px; }
+  [hidden] { display: none !important; }
+
+  /* Fortschritt (oben fixiert) */
+  .fortschritt {
+    position: sticky; top: 0; z-index: 20; padding: 8px 16px;
+    background: color-mix(in srgb, var(--ink) 92%, transparent);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .fortschritt .in { max-width: 980px; margin: 0 auto; display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--dim); }
+  .fortschritt .bar { flex: 1; height: 8px; background: var(--panel2); border-radius: 99px; overflow: hidden; }
+  .fortschritt .bar > i { display: block; height: 100%; width: 0; background: var(--ok); transition: width .3s ease; }
+
+  .eyebrow { font: 11px var(--mono); letter-spacing: .18em; text-transform: uppercase; color: var(--dim); margin: 0 0 6px; }
+  h1 { font-size: clamp(26px, 4.5vw, 38px); line-height: 1.15; margin: 0 0 10px; letter-spacing: -.02em; }
+  h1 span { color: var(--accent); }
+  h2 { font-size: 21px; margin: 0; letter-spacing: -.01em; }
+  h3 { font-size: 16px; margin: 0 0 6px; }
+  .sub { color: var(--dim); max-width: 70ch; margin: 0 0 16px; }
+
+  .kopf { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+  .kopf label { flex: 1 1 180px; font-size: 12px; color: var(--dim); display: flex; flex-direction: column; gap: 3px; }
+  .kopf input { font: 15px var(--sans); padding: 9px 11px; border: 1px solid var(--line2); border-radius: 8px; background: var(--panel); color: var(--txt); }
+
+  .box { border: 1px solid var(--line); background: var(--panel); border-radius: 12px; padding: 12px 16px; margin: 12px 0; }
+  .box.merke { border-left: 5px solid var(--accent); }
+  .box.hinweis { border-left: 5px solid var(--warn); font-size: 14px; }
+  .box ul { margin: 6px 0 0; padding-left: 22px; }
+  details.box > summary { cursor: pointer; font-weight: 600; }
+  .wortspeicher dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 10px 0 2px; font-size: 14px; }
+  .wortspeicher dt { font-weight: 700; color: var(--accent); }
+  .wortspeicher dd { margin: 0; }
+
+  /* Stationen */
+  .station { margin-top: 34px; }
+  .station > header { display: flex; align-items: center; gap: 12px; padding-bottom: 10px; border-bottom: 2px solid var(--line); margin-bottom: 14px; }
+  .nr { flex: none; width: 38px; height: 38px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 800; }
+  .station > header p { margin: 0; color: var(--dim); font-size: 14px; }
+
+  .aufgabe { border: 1px solid var(--line); border-left: 5px solid var(--chem); background: color-mix(in srgb, var(--panel) 55%, transparent); border-radius: 12px; padding: 14px 16px; margin: 16px 0; }
+  .aufgabe.stern { border-left-color: var(--warn); }
+  .aufgabe h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .afb { font: 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; padding: 2px 7px; border-radius: 6px; border: 1px solid var(--line2); color: var(--dim); }
+  .aufgabe p { margin: 6px 0; }
+  .erledigt { display: none; color: var(--ok); font-weight: 800; }
+  .aufgabe.fertig .erledigt { display: inline; }
+  .aufgabe.fertig { border-left-color: var(--ok); }
+
+  /* Eingaben */
+  .slot, .num, textarea {
+    font: 600 16px var(--sans); color: var(--txt);
+    background: var(--panel); border: 2px solid var(--line2); border-radius: 8px; padding: 5px 8px;
+  }
+  .slot { min-height: 38px; max-width: 100%; cursor: pointer; }
+  .num { width: 4.2em; text-align: center; min-height: 38px; }
+  textarea { width: 100%; min-height: 92px; font-weight: 400; resize: vertical; margin-top: 4px; }
+  .ok { border-color: var(--ok) !important; background: color-mix(in srgb, var(--ok) 14%, var(--panel)) !important; }
+  .bad { border-color: var(--bad) !important; background: color-mix(in srgb, var(--bad) 12%, var(--panel)) !important; }
+  .gleichung, .cloze { font-size: 18px; line-height: 2.5; }
+  .gleichung { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 6px 0; }
+  .gleichung .pf { font-size: 22px; color: var(--accent); font-weight: 700; }
+  .mc { display: grid; gap: 6px; margin: 8px 0; }
+  .mc label { display: flex; align-items: flex-start; gap: 10px; padding: 8px 12px; border: 2px solid var(--line); border-radius: 10px; cursor: pointer; background: var(--panel); }
+  .mc label:hover { border-color: var(--line2); }
+  .mc input { margin-top: 5px; accent-color: var(--accent); width: 18px; height: 18px; }
+  .erk { display: none; font-size: 14px; color: var(--dim); }
+  .mc label.zeige .erk { display: block; }
+  table.tab { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 15px; }
+  table.tab th, table.tab td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: middle; }
+  table.tab th { background: var(--panel2); font-size: 13px; }
+  .tabwrap { overflow-x: auto; }
+
+  .btn {
+    font: 600 14px var(--sans); color: var(--txt); background: var(--panel); border: 1px solid var(--line2);
+    border-radius: 9px; padding: 9px 14px; min-height: 40px; cursor: pointer; transition: background-color .15s ease, transform .1s ease;
+  }
+  .btn:hover { background: var(--panel2); }
+  .btn:active { transform: scale(.97); }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.08); }
+  .aktionen { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+  .feedback { font-weight: 600; min-height: 1.4em; }
+  .feedback.gut { color: var(--ok); }
+  .feedback.mist { color: var(--bad); }
+  details.tipp, details.loesung { margin-top: 8px; font-size: 14px; }
+  details.tipp > summary, details.loesung > summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+  details.loesung[data-gesperrt] > summary { color: var(--dim); }
+  details.loesung > div, details.tipp > div { padding: 8px 12px; margin-top: 6px; border-radius: 8px; background: var(--panel); border: 1px dashed var(--line2); }
+
+  /* Animationen */
+  .szene-ui, .sim-ui { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); padding: 12px; margin: 12px 0; }
+  .canvas-wrap { border-radius: 10px; overflow: hidden; border: 1px solid var(--line2); background: #eaf3fc; line-height: 0; }
+  canvas { width: 100%; height: auto; display: block; }
+  .stufen { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .stufen button { font: 600 14px var(--sans); padding: 8px 14px; min-height: 40px; border-radius: 999px; border: 2px solid var(--line2); background: var(--panel); color: var(--txt); cursor: pointer; }
+  .stufen button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .steuerung { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
+  .steuerung input[type=range] { flex: 1 1 160px; min-width: 120px; accent-color: var(--accent); height: 28px; }
+  .caption { margin: 10px 0 2px; font-size: 15px; min-height: 3.2em; }
+  .szene-eq { font-size: 20px; margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+  .szene-eq .pf { color: var(--accent); font-weight: 700; }
+  .szene-eq .prod { transition: opacity .2s; }
+  .stufenhinweis { font-size: 14px; color: var(--dim); margin: 6px 0 0; }
+  .legende { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--dim); margin: 10px 0 0; }
+  .legende span { display: inline-flex; align-items: center; gap: 6px; }
+  .legende i { width: 14px; height: 14px; border-radius: 50%; display: inline-block; border: 1px solid rgba(0,0,0,.25); }
+  .stats { font-size: 14px; margin: 10px 0 0; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+  .stats b { font-family: var(--mono); }
+  .bilanz { font-size: 14px; color: var(--dim); margin-top: 4px; }
+  .sim-ui .steuerung label { font-size: 13px; color: var(--dim); display: flex; align-items: center; gap: 6px; }
+
+  footer.fuss { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; color: var(--dim); font-size: 13px; }
+  footer.fuss .grow { flex: 1; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  #fehler { background: #fee; color: #900; padding: 8px 12px; font: 12px var(--mono); white-space: pre-wrap; }
+
+  @media (max-width: 640px) {
+    .gleichung, .cloze { font-size: 16px; }
+    .wortspeicher dl { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  @media print {
+    :root { --ink: #fff; --panel: #fff; --panel2: #f2f2f2; --line: #bbb; --line2: #888; --txt: #000; --dim: #333; --glow: #fff; }
+    body { background: #fff; font-size: 12px; }
+    .noprint, .steuerung, .stufen, .aktionen, .fortschritt, details.tipp, .sim-ui .steuerung { display: none !important; }
+    .aufgabe, .station > header { break-inside: avoid; }
+    .station { break-before: page; }
+    .station:first-of-type { break-before: auto; }
+    textarea { min-height: 80px; border: 1px solid #888; }
+    details.loesung { display: none; }
+    .szene-ui, .sim-ui { padding: 6px; }
+  }
+</style>
 </head>
-<body class="font-sans text-gray-800">
+<body>
+<noscript><p style="padding:16px">Dieses Arbeitsblatt benötigt JavaScript.</p></noscript>
 
-    <!-- UI Overlay -->
-    <div class="absolute top-4 left-4 glass-panel p-4 rounded-xl z-10 max-w-sm">
-        <h1 class="text-xl font-bold mb-2 text-slate-800">HCl in Wasser (Protolyse)</h1>
-        <div class="space-y-2 text-sm">
-            <div class="flex items-center gap-2">
-                <div class="w-4 h-4 rounded-full bg-blue-400 border border-slate-300"></div>
-                <span>Wasser (H₂O) - Lösungsmittel</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <div class="w-4 h-4 rounded-full bg-yellow-400 border border-slate-300"></div>
-                <span>Chlorwasserstoff (HCl)</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <div class="w-4 h-4 rounded-full bg-red-500 border border-slate-300 shadow-[0_0_5px_rgba(239,68,68,0.6)]"></div>
-                <span>Oxoniumion (H₃O⁺)</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <div class="w-4 h-4 rounded-full bg-green-600 border border-slate-300"></div>
-                <span>Chloridion (Cl⁻)</span>
-            </div>
-        </div>
-        
-        <div class="mt-4 border-t pt-3 border-gray-200">
-            <p class="text-xs text-gray-500 mb-2 font-mono">HCl + H₂O ⇌ H₃O⁺ + Cl⁻</p>
-            
-            <!-- Buttons -->
-            <div class="flex gap-2 mb-3">
-                <button id="addHCl" class="flex-1 bg-slate-800 text-white px-2 py-2 rounded hover:bg-slate-700 transition active:scale-95 text-xs font-bold">
-                    + HCl
-                </button>
-                <button id="pauseSim" class="flex-1 bg-amber-100 text-amber-700 px-2 py-2 rounded hover:bg-amber-200 transition active:scale-95 text-xs font-bold">
-                    Pause
-                </button>
-                <button id="resetSim" class="bg-red-100 text-red-600 px-2 py-2 rounded hover:bg-red-200 transition active:scale-95 text-xs font-bold">
-                    Reset
-                </button>
-            </div>
+<div class="fortschritt noprint" role="status" aria-live="polite">
+  <div class="in">
+    <span id="fortschritt-text">0 von 14 Aufgaben bearbeitet</span>
+    <div class="bar" aria-hidden="true"><i id="fortschritt-bar"></i></div>
+  </div>
+</div>
 
-            <!-- Speed Slider -->
-            <div class="flex flex-col gap-1 mb-2">
-                <div class="flex justify-between text-xs text-gray-500 font-bold">
-                    <span>Geschwindigkeit</span>
-                    <span id="speedValue">1.0x</span>
-                </div>
-                <input type="range" id="speedSlider" min="0.1" max="3.0" step="0.1" value="1.0" class="w-full">
-            </div>
+<div class="wrap" id="blatt">
 
-            <div class="mt-2 text-xs text-gray-500 border-t border-gray-100 pt-2">
-                Statistik: <span id="stats">Wird geladen...</span>
-            </div>
-        </div>
+<header>
+  <p class="eyebrow">Digitales Arbeitsblatt · Chemie · Sek I (Jgst. 9–10)</p>
+  <h1>Protolyse: <span>Wie Säuren Protonen abgeben</span></h1>
+  <p class="sub">
+    Was passiert eigentlich mit Chlorwasserstoff (HCl), Schwefelsäure (H₂SO₄) oder Phosphorsäure (H₃PO₄), wenn sie in Wasser gelöst werden?
+    Du schaust dir die Teilchen im Modell an, stellst Reaktionsgleichungen auf und vergleichst Säuren, die ein, zwei oder drei Protonen abgeben können.
+  </p>
+
+  <div class="kopf">
+    <label>Name<input type="text" id="k-name" autocomplete="name"></label>
+    <label>Klasse / Kurs<input type="text" id="k-klasse"></label>
+    <label>Datum<input type="text" id="k-datum"></label>
+  </div>
+
+  <div class="box merke">
+    <strong>Das kannst du nach diesem Arbeitsblatt:</strong>
+    <ul>
+      <li>den Protonenübergang bei der Reaktion von HCl mit Wasser beschreiben (Protolyse),</li>
+      <li>Säuren als Protonen-Donatoren und Basen als Protonen-Akzeptoren erklären,</li>
+      <li>Reaktionsgleichungen für ein-, zwei- und dreiprotonige Säuren aufstellen,</li>
+      <li>erklären, warum mehrprotonige Säuren ihre Protonen <em>stufenweise</em> abgeben.</li>
+    </ul>
+  </div>
+
+  <details class="box wortspeicher">
+    <summary>Wortspeicher – wichtige Begriffe</summary>
+    <dl>
+      <dt>Proton (H⁺)</dt><dd>Wasserstoff-Ion: ein H-Atom ohne sein Elektron.</dd>
+      <dt>Protolyse</dt><dd>Reaktion, bei der ein Proton von einem Teilchen auf ein anderes übergeht.</dd>
+      <dt>Säure</dt><dd>Teilchen, das Protonen abgibt (Protonen-Donator).</dd>
+      <dt>Base</dt><dd>Teilchen, das Protonen aufnimmt (Protonen-Akzeptor).</dd>
+      <dt>Oxonium-Ion</dt><dd>H₃O⁺ – entsteht, wenn ein Wassermolekül ein Proton aufnimmt.</dd>
+      <dt>Säurerest-Ion</dt><dd>Teilchen, das übrig bleibt, wenn eine Säure Protonen abgegeben hat (z. B. Cl⁻, SO₄²⁻).</dd>
+      <dt>ein-, zwei-, dreiprotonig</dt><dd>Anzahl der Protonen, die ein Säure-Teilchen abgeben kann.</dd>
+      <dt>Ampholyt</dt><dd>Teilchen, das sowohl Protonen abgeben als auch aufnehmen kann.</dd>
+      <dt>⇌</dt><dd>Doppelpfeil: Die Reaktion läuft in beide Richtungen, nur ein Teil der Teilchen reagiert.</dd>
+    </dl>
+  </details>
+
+  <div class="box hinweis">
+    <strong>Hinweis zum Modell:</strong> Die Teilchen sind stark vereinfacht dargestellt. Größen, Abstände und Geschwindigkeiten sind nicht maßstabsgetreu.
+    Deine Eingaben bleiben auf diesem Gerät gespeichert. Mit „Antworten kopieren“ am Ende kannst du sie weitergeben.
+  </div>
+</header>
+
+<!-- ============================ STATION 1 ============================ -->
+<section class="station" id="s1">
+  <header>
+    <div class="nr">1</div>
+    <div><h2>Salzsäure: eine einprotonige Säure</h2><p>HCl gibt ein Proton an Wasser ab.</p></div>
+  </header>
+
+  <p>Beobachte zuerst <strong>ein einzelnes</strong> HCl-Molekül, das auf ein Wassermolekül trifft. Mit „Schritt ▶“ gehst du die Animation in drei Schritten durch.</p>
+
+  <div class="szene" data-acid="hcl"></div>
+
+  <div class="aufgabe" data-auto id="a1" data-frei>
+    <h3>Aufgabe 1 <span class="afb">AFB I · Beschreiben</span> <span class="erledigt">✓</span></h3>
+    <p>Beschreibe in ein bis zwei Sätzen, was mit dem Wasserstoff-Teilchen (H⁺) geschieht, das im Schritt ② gelb markiert ist.</p>
+    <textarea aria-label="Antwort zu Aufgabe 1" placeholder="Ich beobachte, dass …"></textarea>
+    <details class="loesung" data-gesperrt><summary>Lösungsvorschlag (erst nach deiner Antwort)</summary>
+      <div>Ein H⁺-Teilchen (Proton) wird vom HCl-Molekül auf das Wassermolekül übertragen. Dabei entstehen ein H₃O⁺-Ion und ein Cl⁻-Ion.</div>
+    </details>
+  </div>
+
+  <div class="aufgabe" data-auto id="a2">
+    <h3>Aufgabe 2 <span class="afb">AFB I · Wiedergeben</span> <span class="erledigt">✓</span></h3>
+    <p>Ergänze den Text mit den Auswahllisten.</p>
+    <div class="cloze">
+      Bei der Protolyse gibt HCl ein
+      <select class="slot" data-opts="Proton|Neutron|Elektron" data-ans="Proton"></select> ab.
+      HCl ist deshalb ein Protonen-<select class="slot" data-opts="Donator|Akzeptor" data-ans="Donator"></select>
+      und damit eine <select class="slot" data-opts="Säure|Base" data-ans="Säure"></select>.
+      Das Wassermolekül nimmt das Proton auf. Es ist ein Protonen-<select class="slot" data-opts="Akzeptor|Donator" data-ans="Akzeptor"></select>
+      und wirkt als <select class="slot" data-opts="Base|Säure" data-ans="Base"></select>.
+      Aus dem Wassermolekül entsteht ein <select class="slot" data-opts="Hydroxid-Ion (OH⁻)|Oxonium-Ion (H₃O⁺)|Chlorid-Ion (Cl⁻)" data-ans="Oxonium-Ion (H₃O⁺)"></select>.
     </div>
+    <div class="aktionen"><button class="btn primary pruefen" type="button">Prüfen</button><span class="feedback" aria-live="polite"></span></div>
+    <details class="tipp"><summary>Tipp</summary><div>Donator = gibt ab, Akzeptor = nimmt auf. Wer ein Proton abgibt, ist die Säure.</div></details>
+  </div>
 
-    <canvas id="simCanvas"></canvas>
+  <div class="aufgabe" data-auto id="a3">
+    <h3>Aufgabe 3 <span class="afb">AFB II · Anwenden</span> <span class="erledigt">✓</span></h3>
+    <p>Stelle die Reaktionsgleichung für die Protolyse von Chlorwasserstoff in Wasser auf.</p>
+    <div class="gleichung">
+      <span>HCl +</span>
+      <select class="slot" data-opts="H₂O|OH⁻|H₂|HCl" data-ans="H₂O"></select>
+      <span class="pf">→</span>
+      <select class="slot" data-opts="H₃O⁺|OH⁻|Cl₂|H₂O" data-ans="H₃O⁺"></select>
+      <span>+</span>
+      <select class="slot" data-opts="Cl⁻|Cl|H⁺|HCl" data-ans="Cl⁻"></select>
+    </div>
+    <p>Prüfe die Ladungen: Links ist die Gesamtladung 0. Rechts gilt (+1) + (−1) = <input class="num" type="number" inputmode="numeric" data-ans="0" aria-label="Gesamtladung rechts"></p>
+    <div class="aktionen"><button class="btn primary pruefen" type="button">Prüfen</button><span class="feedback" aria-live="polite"></span></div>
+    <details class="tipp"><summary>Tipp</summary><div>HCl gibt ein H⁺ ab. Das Wassermolekül nimmt es auf: H₂O + H⁺ → H₃O⁺. Was bleibt vom HCl übrig?</div></details>
+  </div>
+
+  <h3 style="margin-top:22px">Jetzt viele Teilchen: Was passiert in einer Lösung?</h3>
+  <p>In einem Tropfen Salzsäure sind unvorstellbar viele Teilchen. Hier siehst du einen winzigen Ausschnitt. Mit „+ 5 HCl“ gibst du HCl-Moleküle in das Wasser.</p>
+
+  <div class="sim" data-acid="hcl"></div>
+
+  <div class="aufgabe" data-auto id="a4">
+    <h3>Aufgabe 4 <span class="afb">AFB II · Auswerten</span> <span class="erledigt">✓</span></h3>
+    <p>Drücke „Neustart“ und danach genau einmal „+ 5 HCl“. Warte einige Sekunden und lies die Zähler ab.</p>
+    <p>Wie viele H₃O⁺-Ionen zählst du? <input class="num" type="number" inputmode="numeric" data-ans="5" aria-label="Anzahl H₃O⁺"></p>
+    <p>Was passiert mit den HCl-Molekülen?</p>
+    <div class="mc" data-name="a4">
+      <label><input type="radio" name="a4" value="a" data-richtig><span>Fast alle reagieren vollständig mit Wasser zu H₃O⁺ und Cl⁻.<span class="erk">Richtig: Bei HCl läuft die Protolyse praktisch vollständig ab (→).</span></span></label>
+      <label><input type="radio" name="a4" value="b"><span>Nur wenige reagieren, die meisten bleiben HCl.<span class="erk">Nicht ganz: Schau auf den Zähler „HCl“ – er sinkt schnell auf 0.</span></span></label>
+      <label><input type="radio" name="a4" value="c"><span>Sie bleiben unverändert.<span class="erk">Nein, die Zahl der H₃O⁺-Ionen steigt.</span></span></label>
+    </div>
+    <div class="aktionen"><button class="btn primary pruefen" type="button">Prüfen</button><span class="feedback" aria-live="polite"></span></div>
+  </div>
+
+  <div class="box merke">
+    <strong>Merke:</strong> HCl + H₂O → H₃O⁺ + Cl⁻ &nbsp;·&nbsp; Das HCl-Molekül gibt ein Proton ab (<em>Donator</em>), das Wassermolekül nimmt es auf (<em>Akzeptor</em>).
+    Weil nur ein Proton abgegeben werden kann, nennt man HCl eine <strong>einprotonige</strong> Säure.
+  </div>
+</section>
+
+<!-- ============================ STATION 2 ============================ -->
+<section class="station" id="s2">
+  <header>
+    <div class="nr">2</div>
+    <div><h2>Schwefelsäure: eine zweiprotonige Säure</h2><p>H₂SO₄ kann zwei Protonen abgeben – nacheinander.</p></div>
+  </header>
+
+  <p>Das Schwefelsäure-Molekül hat zwei H-Atome, die als Protonen abgegeben werden können. Das passiert in <strong>zwei Stufen</strong>. Wechsle zwischen den Stufen und sieh dir beide an.</p>
+
+  <div class="szene" data-acid="h2so4"></div>
+
+  <div class="aufgabe" data-auto id="a5">
+    <h3>Aufgabe 5 <span class="afb">AFB II · Anwenden</span> <span class="erledigt">✓</span></h3>
+    <p>Ergänze die Reaktionsgleichungen für beide Stufen.</p>
+    <p><strong>Stufe 1:</strong></p>
+    <div class="gleichung">
+      <span>H₂SO₄ + H₂O</span><span class="pf">→</span>
+      <select class="slot" data-opts="HSO₄⁻|SO₄²⁻|H₂SO₃|OH⁻" data-ans="HSO₄⁻"></select>
+      <span>+</span>
+      <select class="slot" data-opts="H₃O⁺|OH⁻|H₂O|H⁺" data-ans="H₃O⁺"></select>
+    </div>
+    <p><strong>Stufe 2:</strong></p>
+    <div class="gleichung">
+      <span>HSO₄⁻ + H₂O</span><span class="pf">⇌</span>
+      <select class="slot" data-opts="SO₄²⁻|SO₄⁻|H₂SO₄|HSO₄²⁻" data-ans="SO₄²⁻"></select>
+      <span>+</span>
+      <select class="slot" data-opts="H₃O⁺|OH⁻|H₂O|H⁺" data-ans="H₃O⁺"></select>
+    </div>
+    <div class="aktionen"><button class="btn primary pruefen" type="button">Prüfen</button><span class="feedback" aria-live="polite"></span></div>
+    <details class="tipp"><summary>Tipp</summary><div>Das Säure-Teilchen verliert pro Stufe ein H⁺ und wird dadurch um eine negative Ladung reicher: H₂SO₄ → HSO₄⁻ → SO₄²⁻.</div></details>
+  </div>
+
+  <div class="aufgabe stern" data-auto id="a6">
+    <h3>Aufgabe 6 <span class="afb">AFB III · Erweiterung ★</span> <span class="erledigt">✓</span></h3>
+    <p>Das Hydrogensulfat-Ion HSO₄⁻ kommt in beiden Gleichungen vor.</p>
+    <div class="cloze">
+      In Stufe 1 entsteht HSO₄⁻ aus der Säure H₂SO₄. Es ist die <em>korrespondierende</em> <select class="slot" data-opts="Base|Säure" data-ans="Base"></select> zu H₂SO₄.
+      In Stufe 2 gibt HSO₄⁻ selbst ein Proton ab und wirkt als <select class="slot" data-opts="Säure|Base" data-ans="Säure"></select>.
+      Teilchen, die Protonen aufnehmen <em>und</em> abgeben können, heißen
+      <select class="slot" data-opts="Ampholyte|Katalysatoren|Indikatoren" data-ans="Ampholyte"></select>.
+    </div>
+    <div class="aktionen"><button class="btn primary pruefen" type="button">Prüfen</button><span class="feedback" aria-live="polite"></span></div>
+  </div>
+
+  <div class="aufgabe" data-auto id="a7">
+    <h3>Aufgabe 7 <span class="afb">AFB II · Anwenden</span> <span class="erledigt">✓</span></h3>
+    <p>Gibt ein H₂SO₄-Molekül <em>beide</em> Protonen ab, kannst du die beiden Stufen zu einer Gesamtgleichung zusammenfassen. Trage die fehlenden Zahlen ein.</p>
+    <div class="gleichung">
+      <span>H₂SO₄ +</span><input class="num" type="number" inputmode="numeric" data-ans="2" aria-label="Koeffizient vor H₂O"><span>H₂O</span>
+      <span class="pf">→</span>
+      <span>SO₄²⁻ +</span><input class="num" type="number" inputmode="numeric" data-ans="2" aria-label="Koeffizient vor H₃O⁺"><span>H₃O⁺</span>
+    </div>
+    <p>Ladungsbilanz rechts: 2 · (+1) + (−2) = <input class="num" type="number" inputmode="numeric" data-ans="0" aria-label="Gesamtladung rechts"></p>
+    <div class="aktionen"><button class="btn primary pruefen" type="button">Prüfen</button><span class="feedback" aria-live="polite"></span></div>
+    <details class="tipp"><summary>Tipp</summary><div>Pro abgegebenem Proton wird ein Wassermolekül zum H₃O⁺. Zähle auch die Atome: Links 2 + 2·2 = 6 H-Atome. Rechts muss es genauso viele geben.</div></details>
+  </div>
+
+  <div class="box merke">
+    <strong>Merke:</strong> Schwefelsäure ist <strong>zweiprotonig</strong>. Die Protonen werden <em>nacheinander</em> abgegeben: H₂SO₄ → HSO₄⁻ → SO₄²⁻.
+    Das zweite Proton wird schwerer abgegeben als das erste – deshalb läuft Stufe 2 nur teilweise ab (⇌).
+  </div>
+</section>
+
+<!-- ============================ STATION 3 ============================ -->
+<section class="station" id="s3">
+  <header>
+    <div class="nr">3</div>
+    <div><h2>Phosphorsäure: eine dreiprotonige Säure</h2><p>H₃PO₄ kann bis zu drei Protonen abgeben.</p></div>
+  </header>
+
+  <p>Phosphorsäure steckt z. B. in Cola. Sie hat drei abspaltbare H-Atome und damit <strong>drei Stufen</strong>. Sieh dir alle drei an.</p>
+
+  <div class="szene" data-acid="h3po4"></div>
+
+  <div class="aufgabe" data-auto id="a8">
+    <h3>Aufgabe 8 <span class="afb">AFB II · Anwenden</span> <span class="erledigt">✓</span></h3>
+    <p>Welches Teilchen entsteht in jeder Stufe, wenn das Säure-Teilchen ein Proton abgibt?</p>
+    <div class="tabwrap"><table class="tab">
+      <thead><tr><th>Stufe</th><th>Säure-Teilchen</th><th></th><th>entstehende Base</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>H₃PO₄</td><td>→</td><td><select class="slot" data-opts="H₂PO₄⁻|HPO₄²⁻|PO₄³⁻|H₂PO₄²⁻" data-ans="H₂PO₄⁻"></select></td></tr>
+        <tr><td>2</td><td>H₂PO₄⁻</td><td>→</td><td><select class="slot" data-opts="H₂PO₄⁻|HPO₄²⁻|PO₄³⁻|H₂PO₄²⁻" data-ans="HPO₄²⁻"></select></td></tr>
+        <tr><td>3</td><td>HPO₄²⁻</td><td>→</td><td><select class="slot" data-opts="H₂PO₄⁻|HPO₄²⁻|PO₄³⁻|H₂PO₄²⁻" data-ans="PO₄³⁻"></select></td></tr>
+      </tbody>
+    </table></div>
+    <div class="aktionen"><button class="btn primary pruefen" type="button">Prüfen</button><span class="feedback" aria-live="polite"></span></div>
+  </div>
+
+  <div class="aufgabe" data-auto id="a9">
+    <h3>Aufgabe 9 <span class="afb">AFB II · Anwenden</span> <span class="erledigt">✓</span></h3>
+    <p>Wenn alle drei Protonen abgegeben werden, lautet die Gesamtgleichung:</p>
+    <div class="gleichung">
+      <span>H₃PO₄ +</span><input class="num" type="number" inputmode="numeric" data-ans="3" aria-label="Koeffizient vor H₂O"><span>H₂O</span>
+      <span class="pf">⇌</span>
+      <span>PO₄³⁻ +</span><input class="num" type="number" inputmode="numeric" data-ans="3" aria-label="Koeffizient vor H₃O⁺"><span>H₃O⁺</span>
+    </div>
+    <p>Ladungsbilanz rechts: 3 · (+1) + (−3) = <input class="num" type="number" inputmode="numeric" data-ans="0" aria-label="Gesamtladung rechts"></p>
+    <div class="aktionen"><button class="btn primary pruefen" type="button">Prüfen</button><span class="feedback" aria-live="polite"></span></div>
+  </div>
+
+  <p>Jetzt zum Ausprobieren: In der Simulation kannst du Phosphorsäure-Moleküle in Wasser geben. Beobachte die Zähler für H₃PO₄, H₂PO₄⁻, HPO₄²⁻ und PO₄³⁻.</p>
+  <div class="sim" data-acid="h3po4"></div>
+
+  <div class="aufgabe" data-auto id="a10">
+    <h3>Aufgabe 10 <span class="afb">AFB III · Beurteilen</span> <span class="erledigt">✓</span></h3>
+    <p>Gib mit „+ 5“ und „+ 1“ mehrere H₃PO₄-Teilchen ins Wasser und lass die Simulation einige Zeit laufen. Welche Aussage passt zu deiner Beobachtung?</p>
+    <div class="mc" data-name="a10">
+      <label><input type="radio" name="a10" value="a"><span>Alle drei Protonen werden gleich leicht abgegeben.<span class="erk">Nein: Dann würde am Ende fast nur PO₄³⁻ vorkommen.</span></span></label>
+      <label><input type="radio" name="a10" value="b" data-richtig><span>Das erste Proton wird am leichtesten abgegeben, das dritte kaum.<span class="erk">Richtig: Von Stufe zu Stufe wird es schwerer, weil das Teilchen schon negativ geladen ist und das positive H⁺ festhält.</span></span></label>
+      <label><input type="radio" name="a10" value="c"><span>Das dritte Proton wird am leichtesten abgegeben.<span class="erk">Nein, es ist genau umgekehrt.</span></span></label>
+    </div>
+    <div class="aktionen"><button class="btn primary pruefen" type="button">Prüfen</button><span class="feedback" aria-live="polite"></span></div>
+  </div>
+
+  <div class="box merke">
+    <strong>Merke:</strong> Phosphorsäure ist <strong>dreiprotonig</strong>: H₃PO₄ → H₂PO₄⁻ → HPO₄²⁻ → PO₄³⁻.
+    Mit jeder Stufe wird die Abgabe schwieriger. Die dritte Stufe findet in Wasser kaum statt.
+  </div>
+</section>
+
+<!-- ============================ STATION 4 ============================ -->
+<section class="station" id="s4">
+  <header>
+    <div class="nr">4</div>
+    <div><h2>Vergleichen und übertragen</h2><p>Ein-, zwei-, dreiprotonig – was ist der Unterschied?</p></div>
+  </header>
+
+  <div class="aufgabe" data-auto id="a11">
+    <h3>Aufgabe 11 <span class="afb">AFB II · Vergleichen</span> <span class="erledigt">✓</span></h3>
+    <p>Vervollständige die Tabelle.</p>
+    <div class="tabwrap"><table class="tab">
+      <thead><tr><th>Säure</th><th>Formel</th><th>Anzahl abgebbarer Protonen</th><th>Bezeichnung</th></tr></thead>
+      <tbody>
+        <tr><td>Salzsäure (Chlorwasserstoff)</td><td>HCl</td>
+          <td><input class="num" type="number" inputmode="numeric" data-ans="1" aria-label="Protonen HCl"></td>
+          <td><select class="slot" data-opts="einprotonig|zweiprotonig|dreiprotonig" data-ans="einprotonig"></select></td></tr>
+        <tr><td>Schwefelsäure</td><td>H₂SO₄</td>
+          <td><input class="num" type="number" inputmode="numeric" data-ans="2" aria-label="Protonen H₂SO₄"></td>
+          <td><select class="slot" data-opts="einprotonig|zweiprotonig|dreiprotonig" data-ans="zweiprotonig"></select></td></tr>
+        <tr><td>Phosphorsäure</td><td>H₃PO₄</td>
+          <td><input class="num" type="number" inputmode="numeric" data-ans="3" aria-label="Protonen H₃PO₄"></td>
+          <td><select class="slot" data-opts="einprotonig|zweiprotonig|dreiprotonig" data-ans="dreiprotonig"></select></td></tr>
+      </tbody>
+    </table></div>
+    <div class="aktionen"><button class="btn primary pruefen" type="button">Prüfen</button><span class="feedback" aria-live="polite"></span></div>
+  </div>
+
+  <div class="aufgabe" data-auto id="a12">
+    <h3>Aufgabe 12 <span class="afb">AFB II · Anwenden</span> <span class="erledigt">✓</span></h3>
+    <p>Wie viele H₃O⁺-Ionen können <strong>höchstens</strong> entstehen, wenn jeweils 10 Säure-Teilchen ihre Protonen vollständig abgeben?</p>
+    <p>10 HCl: <input class="num" type="number" inputmode="numeric" data-ans="10" aria-label="H₃O⁺ aus HCl">
+       &nbsp; 10 H₂SO₄: <input class="num" type="number" inputmode="numeric" data-ans="20" aria-label="H₃O⁺ aus H₂SO₄">
+       &nbsp; 10 H₃PO₄: <input class="num" type="number" inputmode="numeric" data-ans="30" aria-label="H₃O⁺ aus H₃PO₄"></p>
+    <div class="aktionen"><button class="btn primary pruefen" type="button">Prüfen</button><span class="feedback" aria-live="polite"></span></div>
+    <details class="tipp"><summary>Tipp</summary><div>Jedes abgegebene Proton macht aus einem Wassermolekül ein H₃O⁺-Ion.</div></details>
+  </div>
+
+  <div class="aufgabe" data-auto id="a13">
+    <h3>Aufgabe 13 <span class="afb">AFB III · Beurteilen</span> <span class="erledigt">✓</span></h3>
+    <p>Welche Aussage ist richtig?</p>
+    <div class="mc" data-name="a13">
+      <label><input type="radio" name="a13" value="a"><span>Eine Säure mit vielen H-Atomen im Molekül ist immer mehrprotonig.<span class="erk">Nein. Entscheidend ist, wie viele H-Atome als Protonen <em>abgegeben</em> werden können (siehe Profi-Aufgabe).</span></span></label>
+      <label><input type="radio" name="a13" value="b" data-richtig><span>Die Zahl der abgebbaren Protonen bestimmt, ob eine Säure ein-, zwei- oder dreiprotonig ist.<span class="erk">Richtig.</span></span></label>
+      <label><input type="radio" name="a13" value="c"><span>Mehrprotonige Säuren geben alle Protonen gleichzeitig ab.<span class="erk">Nein, die Protonen werden Stufe für Stufe abgegeben.</span></span></label>
+      <label><input type="radio" name="a13" value="d"><span>Das Sulfat-Ion SO₄²⁻ kann noch ein weiteres Proton abgeben.<span class="erk">Nein, SO₄²⁻ hat kein H-Atom mehr, das es abgeben könnte. Es kann aber Protonen aufnehmen.</span></span></label>
+    </div>
+    <div class="aktionen"><button class="btn primary pruefen" type="button">Prüfen</button><span class="feedback" aria-live="polite"></span></div>
+  </div>
+
+  <div class="aufgabe stern" data-auto id="a14" data-frei>
+    <h3>Aufgabe 14 – Profi-Aufgabe ★ <span class="afb">AFB III · Transfer</span> <span class="erledigt">✓</span></h3>
+    <p>Essigsäure (CH₃COOH) hat vier H-Atome, ist aber nur <strong>einprotonig</strong>. Schreibe die Protolysegleichung mit Wasser auf und vermute, welches H-Atom abgegeben wird.</p>
+    <textarea aria-label="Antwort zu Aufgabe 14" placeholder="CH₃COOH + H₂O … "></textarea>
+    <details class="loesung" data-gesperrt><summary>Lösungsvorschlag (erst nach deiner Antwort)</summary>
+      <div>CH₃COOH + H₂O ⇌ CH₃COO⁻ + H₃O⁺. Nur das H-Atom der Carboxy-Gruppe (–COOH) wird als Proton abgegeben. Die drei H-Atome der Methyl-Gruppe (CH₃) sind fest an das Kohlenstoff-Atom gebunden.</div>
+    </details>
+  </div>
+
+  <div class="box">
+    <strong>Das habe ich verstanden:</strong>
+    <div class="mc" style="margin-top:6px">
+      <label><input type="checkbox"><span>Ich kann den Protonenübergang bei HCl + H₂O beschreiben.</span></label>
+      <label><input type="checkbox"><span>Ich kann Säure und Base mit „Donator“ und „Akzeptor“ erklären.</span></label>
+      <label><input type="checkbox"><span>Ich kann Gleichungen für zwei- und dreiprotonige Säuren aufstellen.</span></label>
+      <label><input type="checkbox"><span>Ich kann erklären, warum die Protonen stufenweise abgegeben werden.</span></label>
+    </div>
+  </div>
+</section>
+
+<details class="box noprint" style="margin-top:34px">
+  <summary>Hinweise für Lehrkräfte</summary>
+  <ul>
+    <li><strong>Zeitbedarf:</strong> ca. 45–60 Minuten (Station 1 und 2 als Doppelstunde, Station 3 und 4 als Vertiefung oder Hausaufgabe).</li>
+    <li><strong>Differenzierung:</strong> Aufgaben mit ★ sind Erweiterungen. Tipps und Lösungsvorschläge sind eingebaut; Freitexte lassen sich erst nach eigener Antwort vergleichen.</li>
+    <li><strong>Modellgrenzen ansprechen:</strong> Die Wahrscheinlichkeiten in der Simulation sind für die Anschauung gewählt, keine Messwerte. H⁺ liegt in Wasser nicht frei vor (→ H₃O⁺). Stufe 2 der Schwefelsäure und alle Stufen der Phosphorsäure sind Gleichgewichte (⇌).</li>
+    <li><strong>Gesamtgleichungen</strong> (Aufgaben 7 und 9) beschreiben den Fall, dass <em>alle</em> Protonen abgegeben werden. Bei H₃PO₄ geschieht das in Wasser nur zu einem kleinen Teil.</li>
+    <li><strong>Lösungsansicht:</strong> unten im Fuß „Lösungen einblenden“ (oder Adresse mit <code>?loesung</code> öffnen).</li>
+    <li><strong>Abgabe:</strong> „Drucken / PDF“ oder „Antworten kopieren“ (z. B. in Teams/Moodle einfügen).</li>
+  </ul>
+</details>
+
+<footer class="fuss">
+  <span class="grow noprint">Digitales Arbeitsblatt · Protolyse · Chemie Sek I</span>
+  <button class="btn noprint" type="button" id="b-kopieren">Antworten kopieren</button>
+  <button class="btn noprint" type="button" id="b-drucken">Drucken / PDF</button>
+  <button class="btn noprint" type="button" id="b-reset">Alles zurücksetzen</button>
+  <label class="noprint"><input type="checkbox" id="b-loesung" data-nosave> Lösungen einblenden (Lehrkraft)</label>
+</footer>
+<div id="fehler" hidden></div>
+<span class="sr" id="kopier-status" role="status" aria-live="polite"></span>
+
+</div><!-- /wrap -->
 
 <script>
-/**
- * KONFIGURATION & KONSTANTEN
- */
-const TYPES = {
-    H2O: 0,
-    HCL: 1,
-    H3O: 2,
-    CL: 3
-};
+(function () {
+  'use strict';
 
-// Farben und Radien für die Visualisierung
-const PARTICLE_CONFIG = {
-    [TYPES.H2O]: { color: '#60A5FA', radius: 12, mass: 18, label: 'H2O' }, // Blau
-    [TYPES.HCL]: { color: '#FACC15', radius: 13, mass: 36, label: 'HCl' }, // Gelb
-    [TYPES.H3O]: { color: '#EF4444', radius: 14, mass: 19, label: 'H3O+' }, // Rot (Sauer)
-    [TYPES.CL]:  { color: '#16A34A', radius: 14, mass: 35, label: 'Cl-' }   // Grün
-};
+  /* Fehlermeldungen sichtbar machen (hilft bei der Fehlersuche) */
+  window.addEventListener('error', function (e) {
+    var f = document.getElementById('fehler');
+    if (location.search.indexOf('debug') >= 0) { f.hidden = false; f.textContent += e.message + ' @' + e.lineno + '\n'; }
+  });
 
-// Wahrscheinlichkeiten
-const REACTION_PROB_FORWARD = 1.0; // HCl + H2O -> H3O+ + Cl- (Sehr wahrscheinlich)
-const REACTION_PROB_REVERSE = 0.2; // H3O+ + Cl- -> HCl + H2O (Häufiger: 20%)
+  function $(s, c) { return (c || document).querySelector(s); }
+  function $$(s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); }
+  function clamp(x, a, b) { return Math.max(a === undefined ? 0 : a, Math.min(b === undefined ? 1 : b, x)); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function ease(x) { return x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2; }
+  function sget(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function sset(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-class Simulation {
-    constructor() {
-        this.canvas = document.getElementById('simCanvas');
-        this.ctx = this.canvas.getContext('2d');
-        this.particles = [];
-        this.width = window.innerWidth;
-        this.height = window.innerHeight;
-        this.paused = false;
-        this.speedFactor = 1.0; // Standardgeschwindigkeit
-        
-        // Grid für Performance-Optimierung (Spatial Hashing)
-        this.gridSize = 40;
-        this.grid = {};
+  /* ================================================================
+     DATEN: Säuren
+     ================================================================ */
+  var SUB = ['₀', '₁', '₂', '₃', '₄'];
+  function chargeStr(z) {
+    if (z === 0) return '';
+    var n = Math.abs(z);
+    return (n === 1 ? '' : n === 2 ? '²' : '³') + (z > 0 ? '⁺' : '⁻');
+  }
+  var ACIDS = {
+    hcl: {
+      n: 1, core: 'Cl', color: '#16A34A', r: 30, pr: 15,
+      names: ['Chlorwasserstoff-Molekül', 'Chlorid-Ion'],
+      steps: [{ arrow: '→', pf: 1, pr: 0 }],
+      hinweise: ['Diese Reaktion läuft praktisch vollständig ab (→).']
+    },
+    h2so4: {
+      n: 2, core: 'SO₄', color: '#F59E0B', r: 36, pr: 16,
+      names: ['Schwefelsäure-Molekül', 'Hydrogensulfat-Ion', 'Sulfat-Ion'],
+      steps: [{ arrow: '→', pf: 1, pr: 0 }, { arrow: '⇌', pf: 0.5, pr: 0.3 }],
+      hinweise: [
+        'Stufe 1 läuft praktisch vollständig ab (→).',
+        'Stufe 2 läuft nur teilweise ab (⇌): Das zweite Proton wird schwerer abgegeben, weil das Ion schon negativ geladen ist.'
+      ]
+    },
+    h3po4: {
+      n: 3, core: 'PO₄', color: '#A855F7', r: 36, pr: 16,
+      names: ['Phosphorsäure-Molekül', 'Dihydrogenphosphat-Ion', 'Hydrogenphosphat-Ion', 'Phosphat-Ion'],
+      steps: [{ arrow: '⇌', pf: 0.6, pr: 0.3 }, { arrow: '⇌', pf: 0.15, pr: 0.5 }, { arrow: '⇌', pf: 0.03, pr: 0.8 }],
+      hinweise: [
+        'Stufe 1 läuft zu einem großen Teil ab (⇌).',
+        'Stufe 2 läuft nur noch zu einem kleinen Teil ab (⇌).',
+        'Stufe 3 findet in Wasser kaum statt (⇌).'
+      ]
+    }
+  };
+  /* Formel nach s abgegebenen Protonen, z. B. formel(h2so4,1) = HSO₄⁻ */
+  function formel(a, s) {
+    var k = a.n - s;
+    return (k === 0 ? '' : k === 1 ? 'H' : 'H' + SUB[k]) + a.core + chargeStr(-s);
+  }
 
-        this.resize();
-        window.addEventListener('resize', () => this.resize());
+  /* ================================================================
+     ZEICHENHILFEN
+     ================================================================ */
+  var INK = '#1e293b', DIM = '#64748b';
+  function disc(ctx, x, y, r, fill, stroke) {
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = fill; ctx.fill();
+    ctx.lineWidth = 1.2; ctx.strokeStyle = stroke || 'rgba(0,0,0,.28)'; ctx.stroke();
+  }
+  function atomH(ctx, x, y, r, label, glow) {
+    if (glow) {
+      ctx.beginPath(); ctx.arc(x, y, r + 7, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(250,204,21,.45)'; ctx.fill();
+    }
+    disc(ctx, x, y, r, glow ? '#FACC15' : '#ffffff', glow ? '#b45309' : 'rgba(0,0,0,.35)');
+    if (label) {
+      ctx.fillStyle = INK; ctx.font = '700 ' + Math.round(r * 1.05) + 'px system-ui, sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(label, x, y + 0.5);
+    }
+  }
+  function badge(ctx, x, y, text, alpha, color) {
+    if (alpha <= 0 || !text) return;
+    ctx.save(); ctx.globalAlpha = alpha;
+    ctx.font = '700 14px system-ui, sans-serif';
+    var w = Math.max(22, ctx.measureText(text).width + 12);
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(x - w / 2, y - 11, w, 22, 11); else ctx.rect(x - w / 2, y - 11, w, 22);
+    ctx.fillStyle = '#fff'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = color; ctx.stroke();
+    ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(text, x, y + 0.5);
+    ctx.restore();
+  }
+  function badgeText(z) { if (z === 0) return ''; if (z === 1) return '+'; if (z === -1) return '−'; return Math.abs(z) + (z > 0 ? '+' : '−'); }
+  function label(ctx, text, x, y, size, color, weight) {
+    ctx.fillStyle = color || INK; ctx.font = (weight || 700) + ' ' + size + 'px system-ui, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText(text, x, y);
+  }
+  function setupCanvas(cv, w, h) {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = w * dpr; cv.height = h * dpr;
+    var ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return ctx;
+  }
 
-        this.initParticles();
-        this.loop();
-        
-        // Event Listeners
-        document.getElementById('addHCl').addEventListener('click', () => this.injectHCl(5));
-        document.getElementById('resetSim').addEventListener('click', () => this.initParticles());
-        
-        // Pause Button Listener
-        const pauseBtn = document.getElementById('pauseSim');
-        pauseBtn.addEventListener('click', () => {
-            this.paused = !this.paused;
-            pauseBtn.textContent = this.paused ? "Weiter" : "Pause";
-            if (this.paused) {
-                pauseBtn.classList.remove('bg-amber-100', 'text-amber-700');
-                pauseBtn.classList.add('bg-green-100', 'text-green-700');
-            } else {
-                pauseBtn.classList.add('bg-amber-100', 'text-amber-700');
-                pauseBtn.classList.remove('bg-green-100', 'text-green-700');
-            }
-        });
+  /* ================================================================
+     SCHRITT-FÜR-SCHRITT-ANIMATION (deterministisch in t = 0 … 1)
+     ================================================================ */
+  var CW = 760, CH = 268, GRENZEN = [0, 0.3, 0.7, 1];
 
-        // Speed Slider Listener
-        const speedSlider = document.getElementById('speedSlider');
-        const speedValue = document.getElementById('speedValue');
-        speedSlider.addEventListener('input', (e) => {
-            this.speedFactor = parseFloat(e.target.value);
-            speedValue.textContent = this.speedFactor.toFixed(1) + 'x';
-        });
+  function Szene(root, key) {
+    this.root = root; this.a = ACIDS[key]; this.s = 0; this.t = 0; this.mode = null; this.target = 0; this.raf = 0; this.last = 0;
+    var a = this.a, self = this;
+    var tabs = '';
+    if (a.n > 1) {
+      tabs = '<div class="stufen" role="tablist" aria-label="Protolyse-Stufe">';
+      for (var i = 0; i < a.n; i++) tabs += '<button type="button" role="tab" data-stufe="' + i + '" aria-selected="' + (i === 0) + '">Stufe ' + (i + 1) + ': ' + formel(a, i) + ' → ' + formel(a, i + 1) + '</button>';
+      tabs += '</div>';
+    }
+    root.innerHTML =
+      '<div class="szene-ui">' + tabs +
+      '<div class="canvas-wrap"><canvas role="img" aria-label="Animation der Protolyse"></canvas></div>' +
+      '<div class="steuerung">' +
+      '<button type="button" class="btn" data-act="start" title="Zum Anfang" aria-label="Zum Anfang">⏮</button>' +
+      '<button type="button" class="btn" data-act="back">◀ Schritt</button>' +
+      '<button type="button" class="btn primary" data-act="play">▶ Abspielen</button>' +
+      '<button type="button" class="btn" data-act="next">Schritt ▶</button>' +
+      '<input type="range" min="0" max="1000" value="0" step="1" aria-label="Zeitleiste der Animation" data-nosave>' +
+      '</div>' +
+      '<p class="caption" aria-live="polite"></p>' +
+      '<p class="szene-eq" aria-label="Reaktionsgleichung"></p>' +
+      '<p class="stufenhinweis"></p>' +
+      '<div class="legende"><span><i style="background:#60A5FA"></i>Wasser (O-Atom)</span><span><i style="background:' + a.color + '"></i>Säure(rest)-Teilchen</span><span><i style="background:#EF4444"></i>Oxonium-Ion H₃O⁺</span><span><i style="background:#fff"></i>H-Atom</span><span><i style="background:#FACC15"></i>wanderndes Proton H⁺</span></div>' +
+      '</div>';
+    this.cv = $('canvas', root); this.ctx = setupCanvas(this.cv, CW, CH);
+    this.cap = $('.caption', root); this.eq = $('.szene-eq', root); this.hint = $('.stufenhinweis', root);
+    this.slider = $('input[type=range]', root); this.playBtn = $('[data-act=play]', root);
+
+    root.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.stufe !== undefined) { self.setStufe(+b.dataset.stufe); return; }
+      var act = b.dataset.act;
+      if (act === 'start') { self.mode = null; self.t = 0; self.draw(); self.ui(); }
+      else if (act === 'play') self.play();
+      else if (act === 'next') self.step(1);
+      else if (act === 'back') self.step(-1);
+    });
+    this.slider.addEventListener('input', function () { self.mode = null; self.t = this.value / 1000; self.draw(); self.ui(); });
+    this.draw(); this.ui();
+  }
+  Szene.prototype.setStufe = function (i) {
+    this.s = i; this.t = 0; this.mode = null;
+    $$('[data-stufe]', this.root).forEach(function (b) { b.setAttribute('aria-selected', String(+b.dataset.stufe === i)); });
+    this.draw(); this.ui();
+  };
+  Szene.prototype.play = function () {
+    if (this.mode === 'play') { this.mode = null; this.ui(); return; }
+    if (this.t >= 0.999) this.t = 0;
+    this.mode = 'play'; this.kick(); this.ui();
+  };
+  Szene.prototype.step = function (dir) {
+    var t = this.t, tg = null, i;
+    if (dir > 0) { for (i = 0; i < GRENZEN.length; i++) if (GRENZEN[i] > t + 0.002) { tg = GRENZEN[i]; break; } }
+    else { for (i = GRENZEN.length - 1; i >= 0; i--) if (GRENZEN[i] < t - 0.002) { tg = GRENZEN[i]; break; } }
+    if (tg === null) return;
+    this.target = tg; this.mode = 'goto'; this.kick();
+  };
+  Szene.prototype.kick = function () {
+    var self = this;
+    if (this.raf) return;
+    this.last = performance.now();
+    var loop = function (ts) {
+      var dt = Math.min(0.05, (ts - self.last) / 1000); self.last = ts;
+      if (self.mode === 'play') {
+        self.t = Math.min(1, self.t + dt * 0.11);
+        if (self.t >= 1) self.mode = null;
+      } else if (self.mode === 'goto') {
+        var d = self.target - self.t, st = dt * 0.32;
+        if (Math.abs(d) <= st) { self.t = self.target; self.mode = null; } else self.t += Math.sign(d) * st;
+      }
+      self.draw(); self.ui();
+      if (self.mode) self.raf = requestAnimationFrame(loop); else self.raf = 0;
+    };
+    this.raf = requestAnimationFrame(loop);
+  };
+  Szene.prototype.phase = function () { return this.t < 0.3 ? 0 : this.t < 0.7 ? 1 : 2; };
+  Szene.prototype.ui = function () {
+    var a = this.a, s = this.s, ph = this.phase();
+    this.slider.value = Math.round(this.t * 1000);
+    this.playBtn.textContent = this.mode === 'play' ? '⏸ Pause' : (this.t >= 0.999 ? '↺ Nochmal' : '▶ Abspielen');
+    var von = formel(a, s), nach = formel(a, s + 1), nm = a.names[s];
+    var txt = [
+      '① Annäherung: Ein ' + nm + ' (' + von + ') und ein Wassermolekül (H₂O) stoßen zusammen.',
+      '② Protonenübergang: Ein H⁺-Teilchen (Proton) wechselt von ' + von + ' zum Wassermolekül. Das Wasser bindet es mit einem freien Elektronenpaar am Sauerstoff-Atom.',
+      '③ Ergebnis: ' + von + ' hat ein Proton abgegeben und ist dadurch um eine negative Ladung reicher: ' + nach + ' (' + a.names[s + 1] + '). Das Wassermolekül hat es aufgenommen und ist jetzt positiv geladen: H₃O⁺ (Oxonium-Ion).'
+    ][ph];
+    if (this.cap.textContent !== txt) { this.cap.textContent = txt; this.cv.setAttribute('aria-label', txt); }
+    var p = clamp((this.t - 0.6) / 0.3);
+    this.eq.innerHTML = '<span>' + von + ' + H₂O</span><span class="pf">' + a.steps[s].arrow + '</span>' +
+      '<span class="prod" style="opacity:' + (0.15 + 0.85 * p).toFixed(2) + '">' + nach + ' + H₃O⁺</span>';
+    this.hint.textContent = a.hinweise[s];
+  };
+  Szene.prototype.draw = function () {
+    var ctx = this.ctx, a = this.a, s = this.s, t = this.t;
+    var R = a.r, Wr = 27, ay = 150;
+    var p1 = ease(clamp(t / 0.3)), p2 = clamp((t - 0.3) / 0.4), p3 = ease(clamp((t - 0.7) / 0.3));
+    var ax = lerp(150, 285, p1); ax = lerp(ax, 170, p3);
+    var wx = lerp(615, 415, p1); wx = lerp(wx, 605, p3);
+    var done = p2 >= 0.999;
+
+    ctx.clearRect(0, 0, CW, CH);
+    var g = ctx.createLinearGradient(0, 0, 0, CH); g.addColorStop(0, '#f1f8ff'); g.addColorStop(1, '#dcebfa');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, CW, CH);
+    ctx.fillStyle = DIM; ctx.font = '600 12px system-ui, sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText('Stufe ' + (s + 1) + ' von ' + a.n + '  ·  Modellausschnitt der wässrigen Lösung', 14, 22);
+
+    /* Säureteilchen: Kern */
+    disc(ctx, ax, ay, R, a.color);
+    label(ctx, a.core, ax, ay + 6, a.core.length > 2 ? 17 : 20, '#fff', 800);
+    /* verbleibende Protonen (links) */
+    var rest = a.n - s - 1, angs = rest === 1 ? [Math.PI] : rest === 2 ? [Math.PI * 0.72, Math.PI * 1.28] : [];
+    for (var i = 0; i < angs.length; i++) atomH(ctx, ax + Math.cos(angs[i]) * (R + 4), ay + Math.sin(angs[i]) * (R + 4), 11, 'H');
+    /* Ladung Säureteilchen */
+    badge(ctx, ax + R * 0.8, ay - R * 0.95, badgeText(done ? -(s + 1) : -s), done ? clamp(0.3 + p3 * 2) : 1, '#b91c1c');
+
+    /* Wasser / Oxonium */
+    disc(ctx, wx, ay, Wr, done ? '#EF4444' : '#60A5FA');
+    var wa = [0.75, -0.75];
+    for (i = 0; i < wa.length; i++) atomH(ctx, wx + Math.cos(wa[i]) * (Wr + 3), ay + Math.sin(wa[i]) * (Wr + 3), 11, 'H');
+    badge(ctx, wx - 8, ay - Wr - 14, '+', clamp((t - 0.68) / 0.12), '#b91c1c');
+
+    /* freies Elektronenpaar (Hinweis) */
+    var lp = clamp((t - 0.1) / 0.2) * (1 - clamp((p2 - 0.35) / 0.3));
+    if (lp > 0.01) {
+      ctx.save(); ctx.globalAlpha = lp;
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath(); ctx.arc(wx - Wr + 8, ay - 5, 3.2, 0, 7); ctx.arc(wx - Wr + 8, ay + 5, 3.2, 0, 7); ctx.fill();
+      ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 1.2; ctx.setLineDash([3, 3]);
+      ctx.beginPath(); ctx.moveTo(wx - Wr + 6, ay - 8); ctx.lineTo(wx - 14, ay - 70); ctx.stroke(); ctx.setLineDash([]);
+      label(ctx, 'freies Elektronenpaar', wx - 10, ay - 76, 13, '#0f172a', 600);
+      ctx.restore();
     }
 
-    resize() {
-        this.width = window.innerWidth;
-        this.height = window.innerHeight;
-        this.canvas.width = this.width;
-        this.canvas.height = this.height;
+    /* wanderndes Proton */
+    var S = { x: ax + R + 4, y: ay }, E = { x: wx - Wr - 3, y: ay }, pos;
+    if (p2 <= 0) pos = S; else if (p2 >= 1) pos = E;
+    else {
+      var u = ease(p2), c = { x: (S.x + E.x) / 2, y: ay - 72 };
+      pos = { x: (1 - u) * (1 - u) * S.x + 2 * (1 - u) * u * c.x + u * u * E.x, y: (1 - u) * (1 - u) * S.y + 2 * (1 - u) * u * c.y + u * u * E.y };
     }
+    var moving = p2 > 0 && p2 < 1;
+    atomH(ctx, pos.x, pos.y, 11, moving ? 'H⁺' : 'H', moving);
 
-    initParticles() {
-        this.particles = [];
-        // Sehr viele Wasserteilchen erzeugen
-        const area = this.width * this.height;
-        const particleCount = Math.min(Math.floor(area / 1800), 400); 
+    /* Beschriftungen */
+    var sw = p2 >= 0.5, off = 34 * (1 - p3), lxA = ax - off, lxW = wx + off;
+    label(ctx, formel(a, sw ? s + 1 : s), lxA, ay + R + 28, 20);
+    label(ctx, sw ? 'H₃O⁺' : 'H₂O', lxW, ay + Wr + 28, 20);
+    label(ctx, sw ? 'korrespondierende Base' : 'Säure (Protonen-Donator)', lxA, ay + R + 48, 13, DIM, 600);
+    label(ctx, sw ? 'korrespondierende Säure' : 'Base (Protonen-Akzeptor)', lxW, ay + Wr + 48, 13, DIM, 600);
+  };
 
-        for (let i = 0; i < particleCount; i++) {
-            this.spawnParticle(TYPES.H2O);
+  /* ================================================================
+     TEILCHENSIMULATION
+     ================================================================ */
+  var SW = 760, SH = 340, NWATER = 120;
+
+  function Sim(root, key) {
+    this.root = root; this.key = key; this.a = ACIDS[key]; this.speed = 1; this.paused = reduced;
+    var a = this.a, self = this;
+    root.innerHTML =
+      '<div class="sim-ui">' +
+      '<div class="canvas-wrap"><canvas role="img" aria-label="Teilchensimulation: ' + formel(a, 0) + ' in Wasser"></canvas></div>' +
+      '<div class="steuerung">' +
+      '<button type="button" class="btn primary" data-n="1">+ 1 ' + formel(a, 0) + '</button>' +
+      '<button type="button" class="btn primary" data-n="5">+ 5 ' + formel(a, 0) + '</button>' +
+      '<button type="button" class="btn" data-act="pause">' + (this.paused ? '▶ Start' : '⏸ Pause') + '</button>' +
+      '<button type="button" class="btn" data-act="reset">↺ Neustart</button>' +
+      '<label>Tempo <input type="range" min="0.2" max="3" step="0.1" value="1" aria-label="Geschwindigkeit" data-nosave></label>' +
+      '</div>' +
+      '<div class="stats" aria-live="off"></div>' +
+      '<div class="bilanz"></div>' +
+      '<div class="legende"><span><i style="background:#60A5FA"></i>H₂O</span><span><i style="background:#EF4444"></i>H₃O⁺</span>' +
+      '<span><i style="background:' + a.color + '"></i>' + formel(a, 0) + ' bzw. Säurerest-Ion (weiße Punkte = noch abgebbare H)</span></div>' +
+      '</div>';
+    this.cv = $('canvas', root); this.ctx = setupCanvas(this.cv, SW, SH);
+    this.stats = $('.stats', root); this.bilanz = $('.bilanz', root); this.pauseBtn = $('[data-act=pause]', root);
+    root.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.n) self.add(+b.dataset.n);
+      else if (b.dataset.act === 'reset') self.init();
+      else if (b.dataset.act === 'pause') { self.paused = !self.paused; b.textContent = self.paused ? '▶ Weiter' : '⏸ Pause'; if (!self.paused) self.run(); }
+    });
+    $('input[type=range]', root).addEventListener('input', function () { self.speed = +this.value; });
+    this.visible = true;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (en) { self.visible = en[0].isIntersecting; if (self.visible) self.run(); }).observe(root);
+    }
+    this.init(); this.run();
+  }
+  Sim.prototype.radius = function (type) { return type === 'a' ? this.a.pr : type === 'h3o' ? 12 : 11; };
+  Sim.prototype.spawn = function (type) {
+    var r = this.radius(type), x, y, ok, tries = 0;
+    do {
+      x = r + 12 + Math.random() * (SW - 2 * r - 24); y = r + 16 + Math.random() * (SH - 2 * r - 32); ok = true;
+      for (var i = 0; i < this.p.length; i++) {
+        var q = this.p[i], dx = q.x - x, dy = q.y - y;
+        if (dx * dx + dy * dy < (q.r + r + 2) * (q.r + r + 2)) { ok = false; break; }
+      }
+      tries++;
+    } while (!ok && tries < 80);
+    if (!ok) return false;
+    var ang = Math.random() * 6.283, v = 1.1 + Math.random() * 1.1;
+    this.p.push({ x: x, y: y, vx: Math.cos(ang) * v, vy: Math.sin(ang) * v, type: type, s: 0, r: r, m: type === 'a' ? 3 : 1 });
+    return true;
+  };
+  Sim.prototype.init = function () {
+    this.p = []; this.added = 0;
+    for (var i = 0; i < NWATER; i++) this.spawn('w');
+    this.count(); this.draw();
+  };
+  Sim.prototype.add = function (n) {
+    for (var i = 0; i < n; i++) if (this.spawn('a')) this.added++;
+    if (this.paused) { this.paused = false; this.pauseBtn.textContent = '⏸ Pause'; }
+    this.run();
+  };
+  Sim.prototype.react = function (p, q) {
+    var a = this.a;
+    if (p.type !== 'a') { var tmp = p; p = q; q = tmp; }
+    if (p.type !== 'a') return;
+    if (q.type === 'w' && p.s < a.n) {
+      if (Math.random() < a.steps[p.s].pf) { p.s++; q.type = 'h3o'; q.r = 12; }
+    } else if (q.type === 'h3o' && p.s > 0) {
+      if (Math.random() < a.steps[p.s - 1].pr) { p.s--; q.type = 'w'; q.r = 11; }
+    }
+  };
+  Sim.prototype.step = function () {
+    var P = this.p, n = P.length, f = this.speed, i, j, p, q;
+    for (i = 0; i < n; i++) {
+      p = P[i]; p.x += p.vx * f; p.y += p.vy * f;
+      var rgt = p.r + (p.type === 'a' ? 10 : 0), top = p.r + (p.type === 'a' ? 14 : 0);
+      if (p.x < p.r) { p.x = p.r; p.vx = Math.abs(p.vx); } else if (p.x > SW - rgt) { p.x = SW - rgt; p.vx = -Math.abs(p.vx); }
+      if (p.y < top) { p.y = top; p.vy = Math.abs(p.vy); } else if (p.y > SH - p.r) { p.y = SH - p.r; p.vy = -Math.abs(p.vy); }
+    }
+    for (i = 0; i < n; i++) {
+      p = P[i];
+      for (j = i + 1; j < n; j++) {
+        q = P[j];
+        var dx = q.x - p.x, dy = q.y - p.y, md = p.r + q.r, d2 = dx * dx + dy * dy;
+        if (d2 >= md * md || d2 === 0) continue;
+        var d = Math.sqrt(d2), nx = dx / d, ny = dy / d, ov = (md - d) / 2;
+        p.x -= nx * ov; p.y -= ny * ov; q.x += nx * ov; q.y += ny * ov;
+        var rel = (p.vx - q.vx) * nx + (p.vy - q.vy) * ny;
+        if (rel > 0) {
+          var imp = (2 * rel) / (1 / p.m + 1 / q.m);
+          p.vx -= imp / p.m * nx; p.vy -= imp / p.m * ny; q.vx += imp / q.m * nx; q.vy += imp / q.m * ny;
         }
+        this.react(p, q);
+      }
     }
-
-    injectHCl(count) {
-        for(let i=0; i<count; i++) {
-            this.spawnParticle(TYPES.HCL);
-        }
+  };
+  Sim.prototype.count = function () {
+    var a = this.a, c = { w: 0, h3o: 0, st: [] }, i, p;
+    for (i = 0; i <= a.n; i++) c.st.push(0);
+    for (i = 0; i < this.p.length; i++) { p = this.p[i]; if (p.type === 'a') c.st[p.s]++; else c[p.type]++; }
+    var html = '<span>H₂O: <b>' + c.w + '</b></span><span>H₃O⁺: <b>' + c.h3o + '</b></span>', neg = 0;
+    for (i = 0; i <= a.n; i++) { html += '<span>' + formel(a, i) + ': <b>' + c.st[i] + '</b></span>'; neg += i * c.st[i]; }
+    this.stats.innerHTML = html;
+    this.bilanz.textContent = 'Ladungsbilanz: ' + c.h3o + ' positive Ladungen (H₃O⁺) und ' + neg + ' negative Ladungen (Säurerest-Ionen)' + (c.h3o === neg ? ' → die Lösung ist insgesamt elektrisch neutral ✓' : '');
+  };
+  Sim.prototype.draw = function () {
+    var ctx = this.ctx, a = this.a, i, k, p;
+    ctx.clearRect(0, 0, SW, SH);
+    var g = ctx.createLinearGradient(0, 0, 0, SH); g.addColorStop(0, '#f1f8ff'); g.addColorStop(1, '#dcebfa');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, SW, SH);
+    var angs = [[-0.78], [-0.78, 2.36], [-0.78, 1.3, 3.5]];
+    for (i = 0; i < this.p.length; i++) {
+      p = this.p[i];
+      if (p.type === 'w') {
+        disc(ctx, p.x, p.y, 11, '#60A5FA');
+        atomH(ctx, p.x + 8, p.y - 7, 4.2); atomH(ctx, p.x + 8, p.y + 7, 4.2);
+      } else if (p.type === 'h3o') {
+        disc(ctx, p.x, p.y, 12, '#EF4444');
+        atomH(ctx, p.x + 9, p.y - 7, 4.2); atomH(ctx, p.x + 9, p.y + 7, 4.2); atomH(ctx, p.x - 11, p.y, 4.2);
+        label(ctx, '+', p.x - 1, p.y + 4, 12, '#fff', 800);
+      } else {
+        disc(ctx, p.x, p.y, p.r, a.color);
+        label(ctx, a.core, p.x, p.y + 3.5, a.core.length > 2 ? 9 : 10, '#fff', 800);
+        var kH = a.n - p.s;
+        for (k = 0; k < kH; k++) atomH(ctx, p.x + Math.cos(angs[kH - 1][k]) * (p.r + 2), p.y + Math.sin(angs[kH - 1][k]) * (p.r + 2), 4.6);
+        if (p.s > 0) badge(ctx, p.x + p.r * 0.7, p.y - p.r * 1.05, badgeText(-p.s), 1, '#b91c1c');
+      }
     }
+  };
+  Sim.prototype.run = function () {
+    if (this.raf || this.paused || !this.visible) return;
+    var self = this, tick = 0;
+    var loop = function () {
+      if (self.paused || !self.visible) { self.raf = 0; return; }
+      self.step(); self.draw();
+      if ((tick++ % 12) === 0) self.count();
+      self.raf = requestAnimationFrame(loop);
+    };
+    this.raf = requestAnimationFrame(loop);
+  };
 
-    spawnParticle(type) {
-        const radius = PARTICLE_CONFIG[type].radius;
-        let x, y, safe;
-        let attempts = 0;
-        
-        do {
-            x = Math.random() * (this.width - 2 * radius) + radius;
-            y = Math.random() * (this.height - 2 * radius) + radius;
-            safe = true;
-            
-            for (let p of this.particles) {
-                const dx = p.x - x;
-                const dy = p.y - y;
-                const dist = Math.sqrt(dx*dx + dy*dy);
-                if (dist < p.radius + radius) {
-                    safe = false;
-                    break;
-                }
-            }
-            attempts++;
-        } while (!safe && attempts < 50);
+  $$('.szene').forEach(function (el) { new Szene(el, el.dataset.acid); });
+  $$('.sim').forEach(function (el) { new Sim(el, el.dataset.acid); });
 
-        if (safe) {
-            this.particles.push({
-                x: x,
-                y: y,
-                vx: (Math.random() - 0.5) * 4,
-                vy: (Math.random() - 0.5) * 4,
-                type: type,
-                radius: radius,
-                mass: PARTICLE_CONFIG[type].mass
-            });
-        }
+  /* ================================================================
+     AUFGABEN: Auswahllisten, Prüfen, Speichern
+     ================================================================ */
+  $$('select.slot').forEach(function (sel) {
+    var o = (sel.dataset.opts || '').split('|');
+    sel.innerHTML = '<option value="">▾ wählen</option>' + o.map(function (t) { return '<option>' + t + '</option>'; }).join('');
+    sel.setAttribute('aria-label', 'Antwort auswählen');
+  });
+
+  var STATE_KEY = 'protolyse-arbeitsblatt-v1';
+  var state = { v: {}, done: {} };
+  try { state = JSON.parse(sget(STATE_KEY) || 'null') || state; } catch (e) {}
+  function save() { sset(STATE_KEY, JSON.stringify(state)); }
+
+  var controls = $$('#blatt select, #blatt input:not([data-nosave]), #blatt textarea');
+  controls = controls.filter(function (c) { return c.type !== 'range'; });
+  controls.forEach(function (c, i) {
+    var key = 'c' + i;
+    if (key in state.v) { if (c.type === 'checkbox' || c.type === 'radio') c.checked = !!state.v[key]; else c.value = state.v[key]; }
+    var h = function () {
+      state.v[key] = (c.type === 'checkbox' || c.type === 'radio') ? c.checked : c.value;
+      if (c.type === 'radio') controls.forEach(function (o, j) { if (o.type === 'radio' && o.name === c.name) state.v['c' + j] = o.checked; });
+      var ak = c.closest('.aufgabe'); if (ak) clearMarks(ak);
+      if (c.tagName === 'TEXTAREA') gate(ak);
+      save();
+    };
+    c.addEventListener('input', h); c.addEventListener('change', h);
+  });
+  if (!$('#k-datum').value) { var d = new Date(); $('#k-datum').value = d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear(); }
+
+  function clearMarks(ak) {
+    $$('.ok,.bad', ak).forEach(function (e) { e.classList.remove('ok', 'bad'); });
+    $$('.mc label.zeige', ak).forEach(function (e) { e.classList.remove('zeige'); });
+    var f = $('.feedback', ak); if (f) { f.textContent = ''; f.className = 'feedback'; }
+  }
+
+  function pruefe(ak) {
+    var items = 0, ok = 0;
+    $$('[data-ans]', ak).forEach(function (c) {
+      items++;
+      var good = c.tagName === 'SELECT' ? c.value === c.dataset.ans : (c.value !== '' && Number(c.value) === Number(c.dataset.ans));
+      c.classList.remove('ok', 'bad'); c.classList.add(good ? 'ok' : 'bad');
+      if (good) ok++;
+    });
+    $$('.mc[data-name]', ak).forEach(function (mc) {
+      items++;
+      var sel = $('input:checked', mc);
+      $$('label', mc).forEach(function (l) { l.classList.remove('ok', 'bad', 'zeige'); });
+      if (sel) {
+        var l = sel.closest('label'), good = sel.hasAttribute('data-richtig');
+        l.classList.add(good ? 'ok' : 'bad', 'zeige'); if (good) ok++;
+      }
+    });
+    var fb = $('.feedback', ak);
+    var alles = ok === items && items > 0;
+    fb.className = 'feedback ' + (alles ? 'gut' : 'mist');
+    fb.textContent = alles ? '✓ Richtig!' : ok + ' von ' + items + ' richtig. Schau noch einmal genau hin' + ($('details.tipp', ak) ? ' – der Tipp hilft.' : '.');
+    if (alles) markFertig(ak, true);
+  }
+  function markFertig(ak, on) {
+    ak.classList.toggle('fertig', on);
+    if (on) state.done[ak.id] = true; else delete state.done[ak.id];
+    save(); fortschritt();
+  }
+  $$('.pruefen').forEach(function (b) { b.addEventListener('click', function () { pruefe(b.closest('.aufgabe')); }); });
+
+  /* Freitext: Lösungsvorschlag erst nach eigener Antwort */
+  function gate(ak) {
+    if (!ak) return;
+    var ta = $('textarea', ak), dt = $('details.loesung', ak);
+    if (!ta || !dt) return;
+    var frei = ta.value.trim().length >= 8 || document.body.classList.contains('lehrer');
+    if (frei) { dt.removeAttribute('data-gesperrt'); $('summary', dt).textContent = 'Lösungsvorschlag anzeigen und vergleichen'; }
+    else { dt.setAttribute('data-gesperrt', ''); dt.open = false; $('summary', dt).textContent = 'Lösungsvorschlag (erst nach deiner Antwort)'; }
+  }
+  $$('details.loesung').forEach(function (dt) {
+    $('summary', dt).addEventListener('click', function (e) { if (dt.hasAttribute('data-gesperrt')) e.preventDefault(); });
+    dt.addEventListener('toggle', function () { if (dt.open) markFertig(dt.closest('.aufgabe'), true); });
+    gate(dt.closest('.aufgabe'));
+  });
+
+  /* Fortschritt */
+  var AUFGABEN = $$('.aufgabe[data-auto]');
+  function fortschritt() {
+    var n = AUFGABEN.filter(function (a) { return a.classList.contains('fertig'); }).length;
+    $('#fortschritt-text').textContent = n + ' von ' + AUFGABEN.length + ' Aufgaben bearbeitet';
+    $('#fortschritt-bar').style.width = (100 * n / AUFGABEN.length) + '%';
+  }
+  AUFGABEN.forEach(function (a) { if (state.done[a.id]) a.classList.add('fertig'); });
+  fortschritt();
+
+  /* Lösungen einblenden (Lehrkraft) */
+  var cbL = $('#b-loesung');
+  function loesungen(on) {
+    document.body.classList.toggle('lehrer', on);
+    if (on) {
+      $$('[data-ans]').forEach(function (c) { c.value = c.dataset.ans; });
+      $$('.mc [data-richtig]').forEach(function (r) { r.checked = true; });
+      $$('details.loesung').forEach(function (d) { d.removeAttribute('data-gesperrt'); d.open = true; });
+      $$('.aufgabe[data-auto]').forEach(function (a) { if (a.hasAttribute('data-frei')) markFertig(a, true); else pruefe(a); });
+    } else {
+      location.reload();
     }
+  }
+  cbL.addEventListener('change', function () { if (cbL.checked) { loesungen(true); } else { loesungen(false); } });
+  if (/[?&]loesung/.test(location.search)) { cbL.checked = true; loesungen(true); }
 
-    update() {
-        // Grid leeren
-        this.grid = {};
-
-        // 1. Bewegung (unter Berücksichtigung des SpeedFactors)
-        this.particles.forEach((p, index) => {
-            p.x += p.vx * this.speedFactor;
-            p.y += p.vy * this.speedFactor;
-
-            // Ins Grid einsortieren
-            const gridKey = `${Math.floor(p.x / this.gridSize)},${Math.floor(p.y / this.gridSize)}`;
-            if (!this.grid[gridKey]) this.grid[gridKey] = [];
-            this.grid[gridKey].push(index);
-        });
-
-        // 2. Teilchenkollisionen und Reaktionen
-        const checkedPairs = new Set();
-
-        this.particles.forEach((p1, i) => {
-            const gx = Math.floor(p1.x / this.gridSize);
-            const gy = Math.floor(p1.y / this.gridSize);
-
-            // Nachbarzellen prüfen
-            for (let x = -1; x <= 1; x++) {
-                for (let y = -1; y <= 1; y++) {
-                    const key = `${gx + x},${gy + y}`;
-                    const cellParticles = this.grid[key];
-                    
-                    if (cellParticles) {
-                        cellParticles.forEach(j => {
-                            if (i === j) return; 
-                            
-                            const pairId = i < j ? `${i},${j}` : `${j},${i}`;
-                            if (checkedPairs.has(pairId)) return;
-                            checkedPairs.add(pairId);
-
-                            const p2 = this.particles[j];
-                            this.resolveCollision(p1, p2);
-                        });
-                    }
-                }
-            }
-        });
-
-        // 3. Wandkollisionen
-        this.particles.forEach(p => {
-            if (p.x - p.radius < 0) { 
-                p.x = p.radius + 1; 
-                p.vx = Math.abs(p.vx); 
-            }
-            if (p.x + p.radius > this.width) { 
-                p.x = this.width - p.radius - 1; 
-                p.vx = -Math.abs(p.vx); 
-            }
-            if (p.y - p.radius < 0) { 
-                p.y = p.radius + 1; 
-                p.vy = Math.abs(p.vy); 
-            }
-            if (p.y + p.radius > this.height) { 
-                p.y = this.height - p.radius - 1; 
-                p.vy = -Math.abs(p.vy); 
-            }
-        });
-        
-        this.updateStats();
+  /* Zurücksetzen / Drucken / Kopieren */
+  $('#b-reset').addEventListener('click', function () {
+    if (!confirm('Alle Eingaben auf diesem Gerät löschen?')) return;
+    try { localStorage.removeItem(STATE_KEY); } catch (e) {}
+    location.href = location.pathname;
+  });
+  $('#b-drucken').addEventListener('click', function () { window.print(); });
+  function baueText() {
+    var out = ['Arbeitsblatt Protolyse', 'Name: ' + $('#k-name').value, 'Klasse: ' + $('#k-klasse').value, 'Datum: ' + $('#k-datum').value, ''];
+    $$('.aufgabe').forEach(function (ak) {
+      var cl = ak.cloneNode(true);
+      $$('details, .aktionen, .afb, .erledigt, .erk', cl).forEach(function (n) { n.remove(); });
+      var live = $$('select, input, textarea', ak);
+      /* Quelltext-Umbrüche entfernen, danach Absätze/Zeilen gezielt umbrechen */
+      var tw = document.createTreeWalker(cl, NodeFilter.SHOW_TEXT), tn;
+      while ((tn = tw.nextNode())) tn.nodeValue = tn.nodeValue.replace(/\s+/g, ' ');
+      $$('p, div, tr, label, li', cl).forEach(function (n) { n.appendChild(document.createTextNode('\n')); });
+      $$('select, input, textarea', cl).forEach(function (c, i) {
+        var o = live[i], txt;
+        if (o.type === 'radio') { c.replaceWith(document.createTextNode(o.checked ? '(●) ' : '( ) ')); return; }
+        if (o.tagName === 'SELECT') txt = '[' + (o.value || '___') + ']';
+        else if (o.tagName === 'TEXTAREA') txt = '\n' + (o.value || '(keine Antwort)') + '\n';
+        else txt = '[' + (o.value || '___') + ']';
+        c.replaceWith(document.createTextNode(txt));
+      });
+      var h = $('h3', cl); var title = h ? h.textContent.replace(/\s+/g, ' ').trim() : 'Aufgabe';
+      if (h) h.remove();
+      out.push(title); out.push(cl.textContent.replace(/[ \t]+/g, ' ').replace(/ ?\n ?/g, '\n').replace(/\n{2,}/g, '\n').trim()); out.push('');
+    });
+    return out.join('\n');
+  }
+  $('#b-kopieren').addEventListener('click', function () {
+    var text = baueText(), st = $('#kopier-status');
+    function fallback() {
+      var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); st.textContent = 'Antworten kopiert.'; alert('Antworten kopiert.'); } catch (e) { alert('Kopieren nicht möglich.'); }
+      ta.remove();
     }
-
-    resolveCollision(p1, p2) {
-        const dx = p2.x - p1.x;
-        const dy = p2.y - p1.y;
-        const distSq = dx*dx + dy*dy;
-        const minDist = p1.radius + p2.radius;
-
-        if (distSq < minDist * minDist) {
-            const dist = Math.sqrt(distSq);
-
-            // --- 1. Physikalischer Stoß ---
-            const nx = dx / dist;
-            const ny = dy / dist;
-
-            const dvx = p1.vx - p2.vx;
-            const dvy = p1.vy - p2.vy;
-            
-            const velAlongNormal = dvx * nx + dvy * ny;
-
-            // Überlappung korrigieren
-            const overlap = (minDist - dist + 0.5) / 2;
-            
-            p1.x -= nx * overlap;
-            p1.y -= ny * overlap;
-            p2.x += nx * overlap;
-            p2.y += ny * overlap;
-
-            // Wenn sie sich voneinander wegbewegen, abbrechen
-            if (velAlongNormal < 0) return;
-
-            // Impulserhaltung
-            const restitution = 1.0; 
-            const j = -(1 + restitution) * velAlongNormal;
-            
-            const invMass1 = 1 / p1.mass; 
-            const invMass2 = 1 / p2.mass;
-            const impulseScalar = j / (invMass1 + invMass2);
-
-            const impulseX = impulseScalar * nx;
-            const impulseY = impulseScalar * ny;
-
-            p1.vx += impulseX * invMass1;
-            p1.vy += impulseY * invMass1;
-            p2.vx -= impulseX * invMass2;
-            p2.vy -= impulseY * invMass2;
-
-            // --- 2. Chemische Reaktion ---
-            this.handleChemistry(p1, p2);
-        }
-    }
-
-    handleChemistry(p1, p2) {
-        // Fall 1: HCl + H2O -> H3O+ + Cl- (Hinreaktion)
-        let hcl = null;
-        let h2o = null;
-
-        if (p1.type === TYPES.HCL && p2.type === TYPES.H2O) { hcl = p1; h2o = p2; }
-        else if (p1.type === TYPES.H2O && p2.type === TYPES.HCL) { hcl = p2; h2o = p1; }
-
-        if (hcl && h2o) {
-            if (Math.random() < REACTION_PROB_FORWARD) {
-                hcl.type = TYPES.CL;
-                hcl.radius = PARTICLE_CONFIG[TYPES.CL].radius;
-                
-                h2o.type = TYPES.H3O;
-                h2o.radius = PARTICLE_CONFIG[TYPES.H3O].radius;
-            }
-            return;
-        }
-
-        // Fall 2: H3O+ + Cl- -> HCl + H2O (Rückreaktion)
-        let h3o = null;
-        let cl = null;
-
-        if (p1.type === TYPES.H3O && p2.type === TYPES.CL) { h3o = p1; cl = p2; }
-        else if (p1.type === TYPES.CL && p2.type === TYPES.H3O) { h3o = p2; cl = p1; }
-
-        if (h3o && cl) {
-            if (Math.random() < REACTION_PROB_REVERSE) {
-                cl.type = TYPES.HCL;
-                cl.radius = PARTICLE_CONFIG[TYPES.HCL].radius;
-
-                h3o.type = TYPES.H2O;
-                h3o.radius = PARTICLE_CONFIG[TYPES.H2O].radius;
-            }
-        }
-    }
-
-    draw() {
-        this.ctx.clearRect(0, 0, this.width, this.height);
-
-        this.particles.forEach(p => {
-            this.ctx.save();
-            this.ctx.translate(p.x, p.y);
-            
-            // Hauptatom
-            this.ctx.beginPath();
-            this.ctx.arc(0, 0, p.radius, 0, Math.PI * 2);
-            this.ctx.fillStyle = PARTICLE_CONFIG[p.type].color;
-            this.ctx.fill();
-            this.ctx.strokeStyle = "rgba(0,0,0,0.1)";
-            this.ctx.lineWidth = 1;
-            this.ctx.stroke();
-
-            // Atome (Wasserstoff)
-            this.ctx.fillStyle = "white";
-            const hRadius = p.radius * 0.4; 
-
-            if (p.type === TYPES.H2O) {
-                this.drawAtom(hRadius, -p.radius*0.6, -p.radius*0.6);
-                this.drawAtom(hRadius, p.radius*0.6, -p.radius*0.6);
-            } else if (p.type === TYPES.HCL) {
-                this.drawAtom(hRadius, p.radius*0.7, -p.radius*0.7);
-            } else if (p.type === TYPES.H3O) {
-                this.drawAtom(hRadius, 0, -p.radius*0.7);
-                this.drawAtom(hRadius, -p.radius*0.7, p.radius*0.5);
-                this.drawAtom(hRadius, p.radius*0.7, p.radius*0.5);
-                
-                this.ctx.fillStyle = "rgba(255,255,255,0.7)";
-                this.ctx.font = "10px Arial";
-                this.ctx.textAlign = "center";
-                this.ctx.textBaseline = "middle";
-                this.ctx.fillText("+", 0, 0);
-            } else if (p.type === TYPES.CL) {
-                this.ctx.fillStyle = "rgba(255,255,255,0.7)";
-                this.ctx.font = "12px Arial";
-                this.ctx.textAlign = "center";
-                this.ctx.textBaseline = "middle";
-                this.ctx.fillText("-", 0, 0);
-            }
-
-            this.ctx.restore();
-        });
-    }
-
-    drawAtom(r, x, y) {
-        this.ctx.beginPath();
-        this.ctx.arc(x, y, r, 0, Math.PI * 2);
-        this.ctx.fill();
-        this.ctx.stroke();
-    }
-
-    updateStats() {
-        if (Math.random() > 0.1) return;
-
-        let counts = { [TYPES.H2O]: 0, [TYPES.HCL]: 0, [TYPES.H3O]: 0, [TYPES.CL]: 0 };
-        this.particles.forEach(p => counts[p.type]++);
-
-        const statsEl = document.getElementById('stats');
-        statsEl.innerHTML = `
-            <span class="text-blue-600 font-bold">${counts[TYPES.H2O]}</span> H₂O | 
-            <span class="text-yellow-600 font-bold">${counts[TYPES.HCL]}</span> HCl | 
-            <span class="text-red-600 font-bold">${counts[TYPES.H3O]}</span> H₃O⁺
-        `;
-    }
-
-    loop() {
-        if (!this.paused) {
-            this.update();
-        }
-        this.draw();
-        requestAnimationFrame(() => this.loop());
-    }
-}
-
-window.onload = () => {
-    const sim = new Simulation();
-};
-
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { st.textContent = 'Antworten kopiert.'; alert('Antworten in die Zwischenablage kopiert.'); }, fallback);
+    else fallback();
+  });
+})();
 </script>
 </body>
 </html>
