@@ -1,0 +1,1117 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stoffmenge und molare Masse – Klasse 8</title>
+<style>
+:root{
+  --bg:#f6f7fb; --card:#ffffff; --ink:#1d2433; --muted:#5b6475; --line:#d9deea;
+  --accent:#1f6feb; --accent-soft:#e7f0ff; --ok:#1a7f37; --ok-soft:#e6f6ea;
+  --bad:#c62828; --bad-soft:#fdecec; --warn:#9a6700; --warn-soft:#fff6db;
+  --rs:#0f766e; --gy:#6d28d9; --gold:#b7791f; --gold-soft:#fdf3e1;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+header.top{position:sticky;top:0;z-index:20;background:var(--card);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px}
+header.top h1{font-size:1.05rem;margin:0;line-height:1.3}
+header.top h1 small{display:block;color:var(--muted);font-weight:400;font-size:.85rem}
+.switch{display:flex;border:2px solid var(--line);border-radius:999px;overflow:hidden;flex-shrink:0}
+.switch button{border:0;background:transparent;padding:8px 14px;font:inherit;font-size:.9rem;cursor:pointer;color:var(--muted)}
+body.rs .switch button[data-level=rs]{background:var(--rs);color:#fff}
+body.gy .switch button[data-level=gy]{background:var(--gy);color:#fff}
+nav.toc{max-width:980px;margin:16px auto 0;padding:0 16px;display:flex;flex-wrap:wrap;gap:8px}
+nav.toc a{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 12px;text-decoration:none;color:var(--ink);font-size:.9rem}
+nav.toc a:hover{border-color:var(--accent)}
+main{max-width:980px;margin:0 auto;padding:16px}
+section.chapter{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:18px 0}
+section.leitfrage{border:2px solid var(--gold);background:linear-gradient(180deg,var(--gold-soft),var(--card) 60%)}
+h2{margin:.2em 0 .6em;font-size:1.4rem}
+h2 .num{display:inline-block;background:var(--accent);color:#fff;border-radius:8px;padding:0 9px;margin-right:8px}
+h3{font-size:1.1rem;margin:1.4em 0 .5em}
+body.rs .only-gy, body.gy .only-rs{display:none !important}
+.box{border-radius:10px;padding:12px 16px;margin:14px 0}
+.merke{background:var(--accent-soft);border-left:5px solid var(--accent)}
+.merke strong:first-child{display:block;margin-bottom:4px}
+.achtung{background:var(--warn-soft);border-left:5px solid var(--warn)}
+.extra{background:#f3edff;border-left:5px solid var(--gy)}
+.fehler{background:var(--bad-soft);border-left:5px solid var(--bad)}
+.fehler ul{margin:6px 0 0;padding-left:20px}
+.leit-hint{background:var(--gold-soft);border-left:5px solid var(--gold)}
+.words{font-size:.92rem;color:var(--muted)}
+figure{margin:16px 0;text-align:center}
+figure svg{max-width:100%;height:auto}
+figcaption{font-size:.88rem;color:var(--muted);margin-top:4px}
+table.pse{border-collapse:collapse;margin:10px 0;font-size:.95rem;display:block;max-width:100%;overflow-x:auto}
+table.pse th,table.pse td{border:1px solid var(--line);padding:4px 10px;text-align:center}
+table.pse th{background:var(--accent-soft)}
+.calc{font-family:ui-monospace,Consolas,monospace;background:#f2f4f8;border-radius:8px;padding:10px 14px;display:block;margin:10px 0;white-space:pre;overflow-x:auto;max-width:100%}
+.task{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:12px 0;background:#fcfdff}
+.task.correct{border-color:var(--ok);background:var(--ok-soft)}
+.task .q{margin:0 0 8px}
+.task .q b.tn{color:var(--accent)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.row input[type=text]{font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:8px;width:130px}
+.btn{font:inherit;font-size:.9rem;border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;color:var(--ink)}
+.btn:hover:not(:disabled){border-color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.mc{display:flex;flex-direction:column;gap:6px}
+.mc button{text-align:left}
+.mc button.sel-ok{background:var(--ok-soft);border-color:var(--ok)}
+.mc button.sel-bad{background:var(--bad-soft);border-color:var(--bad)}
+.fb{margin-top:8px;font-weight:600}
+.fb.ok{color:var(--ok)} .fb.bad{color:var(--bad)}
+.fb .diag{display:block;font-weight:400;color:var(--ink);margin-top:2px}
+.hint,.sol{margin-top:8px;padding:8px 12px;border-radius:8px;font-size:.95rem}
+.hint{background:var(--warn-soft)}
+.hint::before{content:attr(data-label) ": ";font-weight:600}
+.sol{background:#eef2f7}
+.sol::before{content:"Lösung: ";font-weight:600}
+.lock-note{font-size:.82rem;color:var(--muted)}
+.cloze select{font:inherit;font-size:.95rem;padding:2px 4px;border-radius:6px;border:1px solid var(--line)}
+.cloze select.ok{border-color:var(--ok);background:var(--ok-soft)}
+.cloze select.bad{border-color:var(--bad);background:var(--bad-soft)}
+.wordbank{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.wordbank span{background:#eef2f7;border-radius:6px;padding:2px 8px;font-size:.9rem}
+.progress{position:fixed;right:14px;bottom:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-size:.9rem;box-shadow:0 4px 14px rgba(0,0,0,.08);z-index:15}
+.progress b{color:var(--accent)}
+.progress .xp{color:var(--gold)}
+.gen{border:2px dashed var(--gold);background:var(--gold-soft);border-radius:12px;padding:14px;margin-top:18px}
+.gen h3{margin-top:0}
+.est{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.est button.chosen{background:var(--gold-soft);border-color:var(--gold);font-weight:600}
+dl.glossar{display:grid;grid-template-columns:max-content 1fr;gap:6px 16px;margin:0}
+dl.glossar dt{font-weight:600}
+dl.glossar dd{margin:0;color:var(--muted)}
+footer{max-width:980px;margin:0 auto 80px;padding:0 16px;color:var(--muted);font-size:.85rem}
+@media (max-width:640px){
+  body{font-size:16px}
+  header.top h1 small{display:none}
+  .switch button{padding:7px 10px;font-size:.82rem}
+  section.chapter{padding:16px 14px}
+  dl.glossar{grid-template-columns:1fr}
+  dl.glossar dd{margin-bottom:6px}
+}
+@media print{
+  header.top,.progress,nav.toc,.btn,.gen,.lock-note{display:none !important}
+  .hint,.sol{display:block !important}
+  section.chapter{break-inside:avoid-page;border:0}
+}
+</style>
+</head>
+<body class="rs">
+
+<header class="top">
+  <h1>Stoffmenge, Mol und molare Masse<small>Chemie Klasse 8 – Lernseite mit Übungen</small></h1>
+  <div class="switch" role="group" aria-label="Niveau wählen">
+    <button type="button" data-level="rs" aria-pressed="true">Realschule</button>
+    <button type="button" data-level="gy" aria-pressed="false">Gymnasium</button>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Inhalt">
+  <a href="#start">Leitfrage</a>
+  <a href="#k1">1 Atommasse und u</a>
+  <a href="#k2">2 Moleküle</a>
+  <a href="#k3">3 Das Mol</a>
+  <a href="#k4">4 Molare Masse</a>
+  <a href="#k5">5 Rechnen: n = m : M</a>
+  <a href="#k6">6 Lösung der Leitfrage</a>
+  <a href="#generator">Extrapunkte</a>
+  <a href="#wort">Wortspeicher</a>
+</nav>
+
+<main>
+
+<!-- ================= Einstieg / Leitfrage ================= -->
+<section class="chapter leitfrage" id="start">
+  <h2>Die Leitfrage</h2>
+  <figure>
+    <svg viewBox="0 0 520 150" role="img" aria-label="Ein Eisennagel auf einer Waage, Anzeige 5,6 g">
+      <rect x="120" y="105" width="280" height="30" rx="6" fill="#d9deea" stroke="#5b6475" stroke-width="2"/>
+      <rect x="215" y="112" width="90" height="17" rx="3" fill="#1d2433"/>
+      <text x="260" y="125" text-anchor="middle" font-size="13" fill="#7ee787" font-family="monospace">5,6 g</text>
+      <rect x="128" y="95" width="264" height="10" rx="3" fill="#c5ccda"/>
+      <rect x="150" y="70" width="14" height="30" rx="2" fill="#6b7280"/>
+      <rect x="162" y="80" width="200" height="10" fill="#9ca3af"/>
+      <polygon points="362,80 392,85 362,90" fill="#9ca3af"/>
+      <text x="260" y="40" text-anchor="middle" font-size="18" font-weight="700">Ein Eisennagel</text>
+    </svg>
+    <figcaption>Abb. 0: Ein Nagel aus Eisen auf einer Waage (vereinfacht: Der Nagel besteht nur aus Eisen.)</figcaption>
+  </figure>
+  <p style="font-size:1.15rem"><b>Wie viele Eisen-Atome stecken in einem Eisennagel mit der Masse 5,6 g?</b></p>
+  <p>Diese Frage kannst du jetzt noch nicht beantworten. Am Ende dieser Seite kannst du es. Schätze zuerst:</p>
+  <div class="est" id="estimate">
+    <button class="btn" data-est="etwa 1000 Atome">etwa 1000 Atome</button>
+    <button class="btn" data-est="etwa 1 Million Atome">etwa 1 Million Atome</button>
+    <button class="btn" data-est="etwa 1 Milliarde Atome">etwa 1 Milliarde Atome</button>
+    <button class="btn" data-est="viel, viel mehr als 1 Milliarde Atome">viel, viel mehr</button>
+  </div>
+  <p class="words" id="est-saved">Deine Schätzung wird gespeichert. In Kapitel 6 vergleichst du sie mit dem Ergebnis.</p>
+
+  <h3>Worum geht es?</h3>
+  <p>Atome sind unvorstellbar klein. Man kann sie nicht einzeln auf eine Waage legen und auch nicht zählen. Trotzdem wollen Chemikerinnen und Chemiker genau wissen: <b>Wie viele Teilchen</b> sind in einer Portion eines Stoffes? In sechs Schritten lernst du, wie man das aus der <b>Masse</b> berechnet.</p>
+  <div class="box achtung"><strong>Hinweis zu den Wörtern:</strong> Im Alltag sagen wir oft „Gewicht“. In der Chemie sagen wir <b>Masse</b>. Die Masse misst man in Gramm (g) oder Kilogramm (kg).</div>
+  <div class="box merke"><strong>So arbeitest du mit den Aufgaben</strong>
+    Gib deine Antwort ein und drücke auf <b>Prüfen</b>. Brauchst du Hilfe, drücke auf <b>Hilfe</b>. Es gibt bis zu zwei Hilfen nacheinander. Die <b>Lösung</b> kannst du erst ansehen, wenn du es selbst versucht hast.</div>
+  <p class="words">Unbekannte Wörter? Ganz unten auf der Seite findest du den <a href="#wort">Wortspeicher</a>.</p>
+</section>
+
+<!-- ================= Kapitel 1 ================= -->
+<section class="chapter" id="k1">
+  <h2><span class="num">1</span>Wie schwer ist ein Atom?</h2>
+  <p>Du weißt schon: Jedes Atom hat in der Mitte einen <b>Kern</b>. Der Kern besteht aus <b>Kernteilchen</b>. Fast die gesamte Masse eines Atoms steckt in diesen Kernteilchen.</p>
+
+  <figure>
+    <svg viewBox="0 0 520 235" role="img" aria-label="Kern eines Kohlenstoff-Atoms mit 12 Kernteilchen">
+      <circle cx="140" cy="115" r="100" fill="#f2f4f8" stroke="#c5ccda" stroke-dasharray="5 5"/>
+      <g fill="#e8a33d" stroke="#b7791f" stroke-width="2">
+        <circle cx="125" cy="95" r="14"/><circle cx="153" cy="95" r="14"/>
+        <circle cx="111" cy="119" r="14"/><circle cx="139" cy="119" r="14"/><circle cx="167" cy="119" r="14"/>
+        <circle cx="125" cy="143" r="14"/><circle cx="153" cy="143" r="14"/>
+        <circle cx="139" cy="71" r="14"/><circle cx="97" cy="95" r="14"/><circle cx="181" cy="95" r="14"/>
+        <circle cx="97" cy="143" r="14"/><circle cx="181" cy="143" r="14"/>
+      </g>
+      <text x="140" y="230" text-anchor="middle" font-size="14" fill="#5b6475">Kern eines Kohlenstoff-Atoms</text>
+      <line x1="200" y1="110" x2="290" y2="80" stroke="#5b6475" stroke-width="1.5"/>
+      <circle cx="320" cy="72" r="14" fill="#e8a33d" stroke="#b7791f" stroke-width="2"/>
+      <text x="345" y="66" font-size="16" fill="#1d2433">1 Kernteilchen</text>
+      <text x="345" y="88" font-size="16" fill="#1d2433" font-weight="700">≈ 1 u</text>
+      <text x="290" y="145" font-size="16" fill="#1d2433">12 Kernteilchen</text>
+      <text x="290" y="168" font-size="16" fill="#1d2433">→ Atommasse ≈ <tspan font-weight="700">12 u</tspan></text>
+    </svg>
+    <figcaption>Abb. 1: Der Kern eines Kohlenstoff-Atoms (vereinfachte Zeichnung, nicht maßstabsgetreu)</figcaption>
+  </figure>
+
+  <h3>Eine eigene Einheit für Atome: das u</h3>
+  <p>Ein Atom ist so leicht, dass Gramm eine ungeeignete Einheit ist. Deshalb gibt es eine besondere Einheit für die Masse von Atomen: die <b>atomare Masseneinheit u</b>. Das „u“ kommt vom englischen Wort <i>unit</i> (Einheit).</p>
+  <p>Ein Kernteilchen hat ungefähr die Masse <b>1 u</b>. Deshalb gilt:</p>
+  <div class="box merke"><strong>Merke</strong>Atommasse in u ≈ Anzahl der Kernteilchen im Kern.<br>Beispiel: Ein Sauerstoff-Atom hat 16 Kernteilchen. Seine Masse ist ungefähr 16 u.</div>
+
+  <figure>
+    <svg viewBox="0 0 520 200" role="img" aria-label="Balkenwaage: ein Kohlenstoff-Atom hat dieselbe Masse wie zwölf Wasserstoff-Atome">
+      <polygon points="260,190 240,190 250,95 270,95 280,190" fill="#c5ccda"/>
+      <line x1="90" y1="95" x2="430" y2="95" stroke="#5b6475" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="260" cy="95" r="7" fill="#5b6475"/>
+      <line x1="120" y1="95" x2="120" y2="140" stroke="#5b6475" stroke-width="2"/>
+      <line x1="400" y1="95" x2="400" y2="140" stroke="#5b6475" stroke-width="2"/>
+      <path d="M60 140 Q120 175 180 140 Z" fill="#e7f0ff" stroke="#1f6feb" stroke-width="2"/>
+      <path d="M340 140 Q400 175 460 140 Z" fill="#e7f0ff" stroke="#1f6feb" stroke-width="2"/>
+      <circle cx="120" cy="112" r="26" fill="#4b5563"/>
+      <text x="120" y="119" text-anchor="middle" font-size="20" fill="#fff" font-weight="700">C</text>
+      <g fill="#ffffff" stroke="#1f6feb" stroke-width="2">
+        <circle cx="358" cy="130" r="8"/><circle cx="376" cy="130" r="8"/><circle cx="394" cy="130" r="8"/><circle cx="412" cy="130" r="8"/><circle cx="430" cy="130" r="8"/><circle cx="448" cy="130" r="8"/>
+        <circle cx="367" cy="115" r="8"/><circle cx="385" cy="115" r="8"/><circle cx="403" cy="115" r="8"/><circle cx="421" cy="115" r="8"/><circle cx="439" cy="115" r="8"/>
+        <circle cx="403" cy="100" r="8"/>
+      </g>
+      <text x="120" y="40" text-anchor="middle" font-size="15" fill="#1d2433">1 Kohlenstoff-Atom</text>
+      <text x="120" y="60" text-anchor="middle" font-size="15" font-weight="700" fill="#1d2433">12 u</text>
+      <text x="400" y="40" text-anchor="middle" font-size="15" fill="#1d2433">12 Wasserstoff-Atome</text>
+      <text x="400" y="60" text-anchor="middle" font-size="15" font-weight="700" fill="#1d2433">12 · 1 u = 12 u</text>
+    </svg>
+    <figcaption>Abb. 2: Gedankenexperiment – eine Waage für Atome. Beide Seiten haben dieselbe Masse.</figcaption>
+  </figure>
+
+  <h3>Atommassen im Periodensystem</h3>
+  <p>Die Atommassen aller Elemente stehen im Periodensystem. Für die Aufgaben auf dieser Seite brauchst du nur diese Tabelle:</p>
+  <table class="pse only-rs">
+    <tr><th>Element</th><th>Symbol</th><th>Atommasse</th></tr>
+    <tr><td>Wasserstoff</td><td>H</td><td>1 u</td></tr>
+    <tr><td>Kohlenstoff</td><td>C</td><td>12 u</td></tr>
+    <tr><td>Stickstoff</td><td>N</td><td>14 u</td></tr>
+    <tr><td>Sauerstoff</td><td>O</td><td>16 u</td></tr>
+    <tr><td>Natrium</td><td>Na</td><td>23 u</td></tr>
+    <tr><td>Magnesium</td><td>Mg</td><td>24 u</td></tr>
+    <tr><td>Schwefel</td><td>S</td><td>32 u</td></tr>
+    <tr><td>Calcium</td><td>Ca</td><td>40 u</td></tr>
+    <tr><td>Eisen</td><td>Fe</td><td>56 u</td></tr>
+  </table>
+  <table class="pse only-gy">
+    <tr><th>Element</th><th>Symbol</th><th>Atommasse (gerundet)</th><th>Atommasse (Periodensystem)</th></tr>
+    <tr><td>Wasserstoff</td><td>H</td><td>1 u</td><td>1,008 u</td></tr>
+    <tr><td>Kohlenstoff</td><td>C</td><td>12 u</td><td>12,01 u</td></tr>
+    <tr><td>Stickstoff</td><td>N</td><td>14 u</td><td>14,01 u</td></tr>
+    <tr><td>Sauerstoff</td><td>O</td><td>16 u</td><td>16,00 u</td></tr>
+    <tr><td>Natrium</td><td>Na</td><td>23 u</td><td>22,99 u</td></tr>
+    <tr><td>Magnesium</td><td>Mg</td><td>24 u</td><td>24,31 u</td></tr>
+    <tr><td>Schwefel</td><td>S</td><td>32 u</td><td>32,06 u</td></tr>
+    <tr><td>Chlor</td><td>Cl</td><td>35,5 u</td><td>35,45 u</td></tr>
+    <tr><td>Calcium</td><td>Ca</td><td>40 u</td><td>40,08 u</td></tr>
+    <tr><td>Eisen</td><td>Fe</td><td>56 u</td><td>55,85 u</td></tr>
+    <tr><td>Kupfer</td><td>Cu</td><td>63,5 u</td><td>63,55 u</td></tr>
+  </table>
+  <p class="only-gy">In den Aufgaben darfst du mit den gerundeten Werten rechnen.</p>
+
+  <div class="box extra only-gy"><strong>Vertiefung: Warum stehen im Periodensystem Kommazahlen?</strong><br>
+  Ein einzelnes Atom hat immer eine ganze Zahl von Kernteilchen. Aber: Nicht alle Atome eines Elements haben gleich viele Kernteilchen. Bei Chlor gibt es zum Beispiel Atome mit 35 Kernteilchen und Atome mit 37 Kernteilchen. In der Natur kommen beide Sorten gemischt vor (ungefähr 3 : 1). Im Periodensystem steht der <b>Durchschnittswert</b>: 35,45 u.<br>
+  Außerdem ist „1 Kernteilchen = 1 u“ nur eine gute Näherung. Ganz genau stimmt das nicht.</div>
+
+  <div class="box extra only-gy"><strong>Vertiefung: Wie viel ist 1 u in Gramm?</strong><br>
+  1 u = 0,000 000 000 000 000 000 000 001 66 g = 1,66 · 10<sup>−24</sup> g.<br>
+  Ein Kohlenstoff-Atom (12 u) hat also die Masse 12 · 1,66 · 10<sup>−24</sup> g ≈ 2 · 10<sup>−23</sup> g.</div>
+
+  <h3>Übungen zu Kapitel 1</h3>
+  <div class="tasks">
+    <div class="task" data-type="num" data-answer="16" data-tol="0.01">
+      <p class="q"><b class="tn">1.1</b> Ein Sauerstoff-Atom hat 16 Kernteilchen. Wie groß ist seine Atommasse ungefähr?</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>u</span></div>
+      <div class="hint" hidden>Welche Masse hat ein einzelnes Kernteilchen?</div>
+      <div class="hint" hidden>Rechne: Anzahl der Kernteilchen · 1 u.</div>
+      <div class="sol" hidden>16 Kernteilchen · 1 u = <b>16 u</b></div>
+    </div>
+    <div class="task" data-type="num" data-answer="23" data-tol="0.01">
+      <p class="q"><b class="tn">1.2</b> Ein Natrium-Atom hat die Masse 23 u. Wie viele Kernteilchen hat es?</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>Kernteilchen</span></div>
+      <div class="hint" hidden>Rechne rückwärts. Jedes Kernteilchen bringt ungefähr 1 u.</div>
+      <div class="hint" hidden>23 u : 1 u = ?</div>
+      <div class="sol" hidden>23 u entsprechen <b>23 Kernteilchen</b>.</div>
+    </div>
+    <div class="task" data-type="mc">
+      <p class="q"><b class="tn">1.3</b> Wo steckt fast die gesamte Masse eines Atoms?</p>
+      <div class="mc">
+        <button class="btn" data-msg="Die Masse ist nicht gleichmäßig verteilt. Schau dir Abbildung 1 noch einmal an.">gleichmäßig im ganzen Atom verteilt</button>
+        <button class="btn" data-correct="1">in den Kernteilchen im Kern</button>
+        <button class="btn" data-msg="Um den Kern herum ist fast keine Masse. Die Masse steckt woanders.">im leeren Raum um den Kern</button>
+      </div>
+      <div class="sol" hidden>Die Kernteilchen im Kern tragen fast die gesamte Masse des Atoms.</div>
+    </div>
+    <div class="task" data-type="num" data-answer="32" data-tol="0.01">
+      <p class="q"><b class="tn">1.4</b> Wie viele Wasserstoff-Atome (je 1 u) haben zusammen dieselbe Masse wie ein Schwefel-Atom (32 u)?</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>Wasserstoff-Atome</span></div>
+      <div class="hint" hidden>Denk an die Waage in Abbildung 2.</div>
+      <div class="hint" hidden>Teile die Masse des Schwefel-Atoms durch die Masse eines Wasserstoff-Atoms.</div>
+      <div class="sol" hidden>32 u : 1 u = <b>32 Wasserstoff-Atome</b></div>
+    </div>
+    <div class="task" data-type="num" data-answer="2" data-tol="0.01" data-err='[[0.5,"Du hast die kleinere Masse durch die größere geteilt. Teile die größere Masse durch die kleinere."],[12,"Du hast die beiden Massen voneinander abgezogen. Gefragt ist, wie viel-mal so schwer: Teile."],[36,"Du hast die beiden Massen addiert. Gefragt ist, wie viel-mal so schwer: Teile."]]'>
+      <p class="q"><b class="tn">1.5</b> Ein Magnesium-Atom hat die Masse 24 u, ein Kohlenstoff-Atom 12 u. Wie viel-mal so schwer ist das Magnesium-Atom?</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>-mal so schwer</span></div>
+      <div class="hint" hidden>„Wie viel-mal“ fragt nach einer Division.</div>
+      <div class="hint" hidden>Rechne: 24 u : 12 u</div>
+      <div class="sol" hidden>24 u : 12 u = <b>2</b>. Ein Magnesium-Atom ist 2-mal so schwer wie ein Kohlenstoff-Atom.</div>
+    </div>
+    <div class="task only-gy" data-type="mc">
+      <p class="q"><b class="tn">1.6</b> Im Periodensystem hat Chlor die Atommasse 35,45 u. Warum ist das keine ganze Zahl?</p>
+      <div class="mc">
+        <button class="btn" data-msg="Ein Atom hat immer eine ganze Zahl von Kernteilchen. Lies die Vertiefung zu den Kommazahlen.">Ein Chlor-Atom hat 35,45 Kernteilchen.</button>
+        <button class="btn" data-msg="Beim Messen wird kein Kernteilchen zerstört. Lies die Vertiefung zu den Kommazahlen.">Ein Kernteilchen wird beim Messen teilweise zerstört.</button>
+        <button class="btn" data-correct="1">Es gibt Chlor-Atome mit unterschiedlich vielen Kernteilchen; 35,45 u ist der Durchschnitt.</button>
+      </div>
+      <div class="sol" hidden>Chlor-Atome haben 35 oder 37 Kernteilchen. Der Wert 35,45 u ist der Durchschnitt der natürlichen Mischung.</div>
+    </div>
+    <div class="task only-gy" data-type="mc">
+      <p class="q"><b class="tn">1.7</b> 1 u = 1,66 · 10<sup>−24</sup> g. Welche Masse hat ein Sauerstoff-Atom (16 u) in Gramm?</p>
+      <div class="mc">
+        <button class="btn" data-msg="16 g ist die Masse von 1 mol Sauerstoff-Atomen, nicht von einem einzelnen Atom.">16 g</button>
+        <button class="btn" data-correct="1">2,66 · 10<sup>−23</sup> g</button>
+        <button class="btn" data-msg="Du hast den Exponenten verändert. Multipliziere nur die Zahl vor der Zehnerpotenz mit 16.">1,66 · 10<sup>−16</sup> g</button>
+      </div>
+      <div class="sol" hidden>16 · 1,66 · 10<sup>−24</sup> g = 26,56 · 10<sup>−24</sup> g ≈ <b>2,66 · 10<sup>−23</sup> g</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Kapitel 2 ================= -->
+<section class="chapter" id="k2">
+  <h2><span class="num">2</span>Wie schwer ist ein Molekül?</h2>
+  <p>Viele Stoffe bestehen aus <b>Molekülen</b>. Ein Molekül ist eine feste Gruppe aus mehreren Atomen. Die <b>Formel</b> zeigt dir, welche Atome und wie viele davon in einem Molekül sind.</p>
+  <p>Die kleine Zahl unten rechts (der <b>Index</b>) gibt an, wie viele Atome eines Elements im Molekül sind. Der Index gilt nur für das Symbol direkt davor. Steht keine Zahl da, ist es genau 1 Atom.</p>
+
+  <figure>
+    <svg viewBox="0 0 520 190" role="img" aria-label="Wassermolekül H2O mit Atommassen: 1 u plus 1 u plus 16 u ergibt 18 u">
+      <circle cx="130" cy="95" r="44" fill="#d14b4b"/>
+      <text x="130" y="103" text-anchor="middle" font-size="24" fill="#fff" font-weight="700">O</text>
+      <circle cx="75" cy="140" r="24" fill="#fff" stroke="#5b6475" stroke-width="2"/>
+      <text x="75" y="147" text-anchor="middle" font-size="18" font-weight="700">H</text>
+      <circle cx="185" cy="140" r="24" fill="#fff" stroke="#5b6475" stroke-width="2"/>
+      <text x="185" y="147" text-anchor="middle" font-size="18" font-weight="700">H</text>
+      <text x="130" y="28" text-anchor="middle" font-size="18" font-weight="700">H<tspan font-size="13" dy="5">2</tspan><tspan dy="-5">O (Wasser)</tspan></text>
+      <text x="270" y="70" font-size="17">2 · H: 2 · 1 u = 2 u</text>
+      <text x="270" y="98" font-size="17">1 · O: 1 · 16 u = 16 u</text>
+      <line x1="270" y1="110" x2="470" y2="110" stroke="#1d2433"/>
+      <text x="270" y="136" font-size="17" font-weight="700">Molekülmasse: 18 u</text>
+    </svg>
+    <figcaption>Abb. 3: Die Masse eines Wassermoleküls ist die Summe der Atommassen.</figcaption>
+  </figure>
+
+  <div class="box merke"><strong>Merke</strong>Molekülmasse = Summe aller Atommassen im Molekül.</div>
+
+  <h3>Beispiel: Kohlenstoffdioxid CO<sub>2</sub></h3>
+  <span class="calc">1 · C:  1 · 12 u = 12 u
+2 · O:  2 · 16 u = 32 u
+──────────────────────
+CO₂:              44 u</span>
+
+  <h3>Übungen zu Kapitel 2</h3>
+  <p class="words">Nutze die Tabelle aus Kapitel 1.</p>
+  <div class="tasks">
+    <div class="task" data-type="num" data-answer="32" data-tol="0.3" data-err='[[16,"Du hast nur ein Sauerstoff-Atom gezählt. Der Index 2 bedeutet: 2 Atome."],[18,"Du hast den Index 2 als Masse addiert. Der Index ist eine Anzahl: 2 · 16 u."]]'>
+      <p class="q"><b class="tn">2.1</b> Berechne die Molekülmasse von Sauerstoff O<sub>2</sub>.</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>u</span></div>
+      <div class="hint" hidden>Was bedeutet die kleine 2 in O<sub>2</sub>?</div>
+      <div class="hint" hidden>Im Molekül sind 2 Sauerstoff-Atome mit je 16 u.</div>
+      <div class="sol" hidden>2 · 16 u = <b>32 u</b></div>
+    </div>
+    <div class="task" data-type="num" data-answer="16" data-tol="0.3" data-err='[[13,"Du hast nur ein Wasserstoff-Atom gezählt. Der Index 4 gehört zum H: 4 · 1 u."],[52,"Der Index 4 gilt nur für H, nicht für C. Es gibt nur 1 Kohlenstoff-Atom."],[5,"Du hast die Anzahl der Atome gezählt. Gefragt ist die Masse: Addiere die Atommassen."]]'>
+      <p class="q"><b class="tn">2.2</b> Berechne die Molekülmasse von Methan CH<sub>4</sub>.</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>u</span></div>
+      <div class="hint" hidden>Zu welchem Symbol gehört die 4?</div>
+      <div class="hint" hidden>1 Kohlenstoff-Atom (12 u) und 4 Wasserstoff-Atome (je 1 u).</div>
+      <div class="sol" hidden>12 u + 4 · 1 u = <b>16 u</b></div>
+    </div>
+    <div class="task" data-type="num" data-answer="17" data-tol="0.3" data-err='[[15,"Du hast nur ein Wasserstoff-Atom gezählt. Der Index 3 gehört zum H: 3 · 1 u."],[45,"Der Index 3 gilt nur für H, nicht für N. Es gibt nur 1 Stickstoff-Atom."],[4,"Du hast die Anzahl der Atome gezählt. Gefragt ist die Masse: Addiere die Atommassen."]]'>
+      <p class="q"><b class="tn">2.3</b> Berechne die Molekülmasse von Ammoniak NH<sub>3</sub>.</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>u</span></div>
+      <div class="hint" hidden>Wie viele Atome von jedem Element sind im Molekül?</div>
+      <div class="hint" hidden>1 · N (14 u) + 3 · H (je 1 u)</div>
+      <div class="sol" hidden>14 u + 3 · 1 u = <b>17 u</b></div>
+    </div>
+    <div class="task only-rs" data-type="mc">
+      <p class="q"><b class="tn">2.4</b> Wie viele Atome sind in einem Molekül H<sub>2</sub>O insgesamt?</p>
+      <div class="mc">
+        <button class="btn" data-msg="Du hast nur die Wasserstoff-Atome gezählt. Das O-Atom gehört auch dazu.">2</button>
+        <button class="btn" data-correct="1">3</button>
+        <button class="btn" data-msg="Ohne Index steht 1 Atom. Beim O steht kein Index.">4</button>
+      </div>
+      <div class="sol" hidden>2 Wasserstoff-Atome + 1 Sauerstoff-Atom = 3 Atome.</div>
+    </div>
+    <div class="task only-gy" data-type="num" data-answer="180" data-tol="1" data-err='[[29,"Du hast die Indizes nicht beachtet. Multipliziere jede Atommasse mit ihrem Index."],[24,"Du hast die Anzahl der Atome addiert. Gefragt ist die Masse: Anzahl · Atommasse."]]'>
+      <p class="q"><b class="tn">2.4</b> Berechne die Molekülmasse von Traubenzucker (Glucose) C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>.</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>u</span></div>
+      <div class="hint" hidden>Rechne für jedes Element einzeln: Anzahl · Atommasse.</div>
+      <div class="hint" hidden>6 · 12 u = 72 u; 12 · 1 u = 12 u; 6 · 16 u = 96 u. Jetzt addieren.</div>
+      <div class="sol" hidden>72 u + 12 u + 96 u = <b>180 u</b></div>
+    </div>
+    <div class="task only-gy" data-type="num" data-answer="98" data-tol="0.6" data-err='[[50,"Du hast den Index 4 beim Sauerstoff nicht beachtet: 4 · 16 u."],[97,"Du hast nur ein Wasserstoff-Atom gezählt. Der Index 2 gehört zum H."]]'>
+      <p class="q"><b class="tn">2.5</b> Berechne die Molekülmasse von Schwefelsäure H<sub>2</sub>SO<sub>4</sub>.</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>u</span></div>
+      <div class="hint" hidden>Drei Elemente: H, S und O. Bestimme für jedes die Anzahl.</div>
+      <div class="hint" hidden>2 · H, 1 · S, 4 · O</div>
+      <div class="sol" hidden>2 · 1 u + 32 u + 4 · 16 u = <b>98 u</b></div>
+    </div>
+    <div class="task only-gy" data-type="num" data-answer="46" data-tol="0.5" data-err='[[45,"Du hast das H in der OH-Gruppe vergessen. H steht zweimal in der Formel."]]'>
+      <p class="q"><b class="tn">2.6</b> Ethanol hat die Formel C<sub>2</sub>H<sub>5</sub>OH. Berechne die Molekülmasse.</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>u</span></div>
+      <div class="hint" hidden>Lies die Formel genau. Kommt ein Element mehrmals vor?</div>
+      <div class="hint" hidden>H steht zweimal in der Formel: 5 + 1 = 6 Wasserstoff-Atome.</div>
+      <div class="sol" hidden>2 · 12 u + 6 · 1 u + 1 · 16 u = <b>46 u</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Kapitel 3 ================= -->
+<section class="chapter" id="k3">
+  <h2><span class="num">3</span>Das Mol – ein Zählpaket für Teilchen</h2>
+  <p>Im Alltag zählen wir viele Dinge in <b>Paketen</b>: Eier kauft man im Karton zu 12 Stück (1 Dutzend). Druckerpapier kauft man in Packungen zu 500 Blatt.</p>
+  <p>Auch in der Chemie gibt es ein Zählpaket. Es heißt <b>Mol</b> (Einheitenzeichen: mol). Weil Teilchen so klein sind, ist dieses Paket riesig groß:</p>
+
+  <figure>
+    <svg viewBox="0 0 540 210" role="img" aria-label="Drei Zählpakete: ein Eierkarton mit 12 Eiern, ein Papierpaket mit 500 Blatt, ein Mol Teilchen">
+      <rect x="20" y="40" width="150" height="80" rx="10" fill="#e9dcc3" stroke="#a88b5a" stroke-width="2"/>
+      <g fill="#fffaf0" stroke="#a88b5a">
+        <ellipse cx="37" cy="65" rx="9" ry="12"/><ellipse cx="60" cy="65" rx="9" ry="12"/><ellipse cx="83" cy="65" rx="9" ry="12"/><ellipse cx="106" cy="65" rx="9" ry="12"/><ellipse cx="129" cy="65" rx="9" ry="12"/><ellipse cx="152" cy="65" rx="9" ry="12"/>
+        <ellipse cx="37" cy="97" rx="9" ry="12"/><ellipse cx="60" cy="97" rx="9" ry="12"/><ellipse cx="83" cy="97" rx="9" ry="12"/><ellipse cx="106" cy="97" rx="9" ry="12"/><ellipse cx="129" cy="97" rx="9" ry="12"/><ellipse cx="152" cy="97" rx="9" ry="12"/>
+      </g>
+      <text x="95" y="150" text-anchor="middle" font-size="15" font-weight="700">1 Dutzend</text>
+      <text x="95" y="172" text-anchor="middle" font-size="15">= 12 Stück</text>
+      <rect x="215" y="72" width="110" height="48" fill="#ffffff" stroke="#5b6475" stroke-width="2"/>
+      <rect x="211" y="62" width="110" height="14" fill="#f2f4f8" stroke="#5b6475"/>
+      <rect x="219" y="52" width="110" height="14" fill="#f2f4f8" stroke="#5b6475"/>
+      <text x="270" y="102" text-anchor="middle" font-size="14">Papier</text>
+      <text x="270" y="150" text-anchor="middle" font-size="15" font-weight="700">1 Paket</text>
+      <text x="270" y="172" text-anchor="middle" font-size="15">= 500 Blatt</text>
+      <rect x="370" y="30" width="150" height="95" rx="10" fill="#e7f0ff" stroke="#1f6feb" stroke-width="2"/>
+      <g fill="#1f6feb" id="dots"></g>
+      <text x="445" y="150" text-anchor="middle" font-size="15" font-weight="700">1 mol</text>
+      <text x="445" y="172" text-anchor="middle" font-size="15" class="only-rs">= 602 Trilliarden Teilchen</text>
+      <text x="445" y="172" text-anchor="middle" font-size="15" class="only-gy">= 6,022 · 10²³ Teilchen</text>
+    </svg>
+    <figcaption>Abb. 4: Zählpakete aus dem Alltag und aus der Chemie</figcaption>
+  </figure>
+
+  <div class="box merke only-rs"><strong>Merke</strong>1 mol = 602 000 000 000 000 000 000 000 Teilchen (602 Trilliarden).<br>Die Größe, die man in mol angibt, heißt <b>Stoffmenge</b>. Ihr Formelzeichen ist <b>n</b>.</div>
+  <div class="box merke only-gy"><strong>Merke</strong>1 mol = 6,022 · 10<sup>23</sup> Teilchen.<br>Die Größe, die man in mol angibt, heißt <b>Stoffmenge n</b>.<br>Die Zahl 6,022 · 10<sup>23</sup> mol<sup>−1</sup> heißt <b>Avogadro-Konstante N<sub>A</sub></b>. Für die Teilchenzahl N gilt: <b>N = n · N<sub>A</sub></b>.</div>
+
+  <p>Wie groß ist diese Zahl? Stell dir vor, du zählst jede Sekunde ein Teilchen, Tag und Nacht. Für 1 mol bräuchtest du ungefähr <b>19 Billiarden Jahre</b>. <span class="only-gy">Das ist mehr als eine Million Mal so lange, wie es das Universum gibt (ungefähr 13,8 Milliarden Jahre).</span> Trotzdem ist 1 mol Wasser nur ungefähr ein Schnapsglas voll (18 g).</p>
+
+  <div class="box leit-hint"><strong>Zur Leitfrage:</strong> Jetzt weißt du, wie man Teilchen in Paketen zählt. Es fehlt noch: Wie viel Gramm Eisen sind ein Paket (1 mol)? Das klärt Kapitel 4.</div>
+
+  <h3>Übungen zu Kapitel 3</h3>
+  <div class="tasks">
+    <div class="task" data-type="num" data-answer="36" data-tol="0.01" data-err='[[15,"Du hast 12 + 3 gerechnet. 3 Dutzend bedeutet 3-mal 12."],[4,"Du hast geteilt. 3 Dutzend bedeutet 3-mal 12."]]'>
+      <p class="q"><b class="tn">3.1</b> Aufwärmen: Wie viele Eier sind in 3 Dutzend?</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>Eier</span></div>
+      <div class="hint" hidden>1 Dutzend = 12 Stück.</div>
+      <div class="hint" hidden>Rechne 3 · 12.</div>
+      <div class="sol" hidden>3 · 12 = <b>36 Eier</b></div>
+    </div>
+    <div class="task only-rs" data-type="mc">
+      <p class="q"><b class="tn">3.2</b> Wie viele Eisen-Atome sind in 2 mol Eisen?</p>
+      <div class="mc">
+        <button class="btn" data-msg="2 mol bedeutet nicht 2 Atome, sondern 2 Pakete mit je 602 Trilliarden Atomen.">2 Atome</button>
+        <button class="btn" data-msg="Das ist ein Paket, also 1 mol. Du hast aber 2 mol.">602 Trilliarden Atome</button>
+        <button class="btn" data-correct="1">1204 Trilliarden Atome</button>
+      </div>
+      <div class="sol" hidden>2 · 602 Trilliarden = 1204 Trilliarden Atome</div>
+    </div>
+    <div class="task only-rs" data-type="num" data-answer="3" data-tol="0.01" data-err='[[1087212,"Du hast multipliziert. Gefragt ist, wie viele Pakete zu 602 Trilliarden in 1806 Trilliarden passen: Teile."],[0.333,"Du hast falsch herum geteilt. Rechne 1806 : 602."]]'>
+      <p class="q"><b class="tn">3.3</b> Eine Portion Kupfer enthält 1806 Trilliarden Kupfer-Atome. Wie viel mol sind das?</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>mol</span></div>
+      <div class="hint" hidden>Wie viele Pakete zu 602 Trilliarden passen in 1806 Trilliarden?</div>
+      <div class="hint" hidden>Rechne 1806 : 602.</div>
+      <div class="sol" hidden>1806 : 602 = <b>3 mol</b></div>
+    </div>
+    <div class="task only-rs" data-type="mc">
+      <p class="q"><b class="tn">3.4</b> Was gibt die Stoffmenge n an?</p>
+      <div class="mc">
+        <button class="btn" data-msg="Das ist die Masse m. Die Stoffmenge zählt Teilchen.">wie schwer ein Stoff ist</button>
+        <button class="btn" data-correct="1">wie viele Teilchen-Pakete (mol) vorliegen</button>
+        <button class="btn" data-msg="Die Stoffmenge sagt nichts über die Größe eines Atoms. Sie zählt Teilchen.">wie groß ein einzelnes Atom ist</button>
+      </div>
+      <div class="sol" hidden>Die Stoffmenge zählt die Teilchen in Paketen zu je 602 Trilliarden.</div>
+    </div>
+    <div class="task only-gy" data-type="mc">
+      <p class="q"><b class="tn">3.2</b> Wie viele Moleküle sind in 0,5 mol Wasser?</p>
+      <div class="mc">
+        <button class="btn" data-msg="Du hast 0,5 vor die Zehnerpotenz geschrieben, aber nicht mit 6,022 multipliziert.">0,5 · 10<sup>23</sup></button>
+        <button class="btn" data-correct="1">3,011 · 10<sup>23</sup></button>
+        <button class="btn" data-msg="Du hast mit 2 multipliziert statt mit 0,5. Ein halbes Mol ist weniger als 1 mol.">1,2044 · 10<sup>24</sup></button>
+      </div>
+      <div class="sol" hidden>N = n · N<sub>A</sub> = 0,5 mol · 6,022 · 10<sup>23</sup> mol<sup>−1</sup> = <b>3,011 · 10<sup>23</sup></b></div>
+    </div>
+    <div class="task only-gy" data-type="num" data-answer="3" data-tol="0.01" data-err='[[0.3,"Achte auf die Zehnerpotenzen: 10²⁴ ist 10-mal so groß wie 10²³."],[10.88,"Du hast multipliziert. Gesucht ist n = N : N_A."],[0.333,"Du hast falsch herum geteilt. Rechne N : N_A."]]'>
+      <p class="q"><b class="tn">3.3</b> Eine Portion enthält 1,8066 · 10<sup>24</sup> Atome. Berechne die Stoffmenge.</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>mol</span></div>
+      <div class="hint" hidden>Stelle N = n · N<sub>A</sub> nach n um.</div>
+      <div class="hint" hidden>n = N : N<sub>A</sub>. Schreibe 1,8066 · 10<sup>24</sup> als 18,066 · 10<sup>23</sup>.</div>
+      <div class="sol" hidden>n = 18,066 · 10<sup>23</sup> : 6,022 · 10<sup>23</sup> mol<sup>−1</sup> = <b>3 mol</b></div>
+    </div>
+    <div class="task only-gy" data-type="num" data-answer="6" data-tol="0.01" data-err='[[3,"Das ist die Stoffmenge der Moleküle. Jedes Wassermolekül enthält 2 Wasserstoff-Atome."],[9,"Du hast alle Atome gezählt (3 pro Molekül). Gefragt sind nur die Wasserstoff-Atome."],[1.5,"Du hast geteilt. Jedes Molekül enthält 2 H-Atome, also mehr H-Atome als Moleküle."]]'>
+      <p class="q"><b class="tn">3.4</b> Wie viel mol <b>Wasserstoff-Atome</b> sind in 3 mol Wasser (H<sub>2</sub>O)?</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>mol</span></div>
+      <div class="hint" hidden>Wie viele Wasserstoff-Atome sind in einem Wassermolekül?</div>
+      <div class="hint" hidden>Jedes Molekül enthält 2 H-Atome. Also: 3 mol · 2.</div>
+      <div class="sol" hidden>3 mol Moleküle · 2 = <b>6 mol</b> Wasserstoff-Atome</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Kapitel 4 ================= -->
+<section class="chapter" id="k4">
+  <h2><span class="num">4</span>Die molare Masse – die Brücke zwischen u und g</h2>
+  <p>Jetzt kommt der wichtigste Trick: Die Zahl im Mol ist so gewählt, dass gilt:</p>
+  <div class="box merke"><strong>Merke</strong>Ein Atom hat die Masse 12 u. → 1 mol dieser Atome hat die Masse 12 g.<br>
+  Die Masse von 1 mol eines Stoffes heißt <b>molare Masse M</b>. Ihre Einheit ist <b>g/mol</b> (Gramm pro Mol).<br>
+  Die Zahl ist <b>dieselbe</b> wie bei der Atommasse oder Molekülmasse in u.</div>
+
+  <figure>
+    <svg viewBox="0 0 540 200" role="img" aria-label="Brücke zwischen Teilchenwelt und Laborwelt: 1 Kohlenstoff-Atom hat 12 u, 1 mol Kohlenstoff-Atome hat 12 g">
+      <rect x="10" y="30" width="200" height="130" rx="12" fill="#f2f4f8" stroke="#c5ccda"/>
+      <text x="110" y="55" text-anchor="middle" font-size="15" fill="#5b6475">Teilchenwelt</text>
+      <circle cx="110" cy="95" r="22" fill="#4b5563"/>
+      <text x="110" y="102" text-anchor="middle" font-size="18" fill="#fff" font-weight="700">C</text>
+      <text x="110" y="145" text-anchor="middle" font-size="17" font-weight="700">1 Atom: 12 u</text>
+      <rect x="330" y="30" width="200" height="130" rx="12" fill="#e7f0ff" stroke="#1f6feb"/>
+      <text x="430" y="55" text-anchor="middle" font-size="15" fill="#5b6475">Laborwelt</text>
+      <rect x="385" y="100" width="90" height="16" rx="3" fill="#5b6475"/>
+      <path d="M400 100 Q430 70 460 100 Z" fill="#2d2d2d"/>
+      <text x="430" y="145" text-anchor="middle" font-size="17" font-weight="700">1 mol: 12 g</text>
+      <line x1="215" y1="95" x2="320" y2="95" stroke="#1f6feb" stroke-width="3"/>
+      <polygon points="320,87 334,95 320,103" fill="#1f6feb"/>
+      <text x="270" y="82" text-anchor="middle" font-size="13" class="only-rs">· 602 Trilliarden</text>
+      <text x="270" y="82" text-anchor="middle" font-size="13" class="only-gy">· 6,022 · 10²³</text>
+      <text x="270" y="190" text-anchor="middle" font-size="14" fill="#5b6475">gleiche Zahl – andere Einheit</text>
+    </svg>
+    <figcaption>Abb. 5: Die molare Masse verbindet die Masse eines Teilchens mit der Masse einer abwiegbaren Portion.</figcaption>
+  </figure>
+
+  <span class="calc">Stoff                 Masse eines Teilchens   molare Masse M
+Kohlenstoff C         12 u                    12 g/mol
+Wasser H₂O            18 u                    18 g/mol
+Kohlenstoffdioxid CO₂ 44 u                    44 g/mol</span>
+
+  <div class="box extra only-gy"><strong>Vertiefung: Warum funktioniert das?</strong><br>
+  1 u = 1,66 · 10<sup>−24</sup> g und 1 mol = 6,022 · 10<sup>23</sup> Teilchen.<br>
+  6,022 · 10<sup>23</sup> · 1,66 · 10<sup>−24</sup> g = 9,997 · 10<sup>−1</sup> g ≈ <b>1 g</b> (die kleine Abweichung kommt vom Runden).<br>
+  1 mol Teilchen mit je 1 u hat also die Masse 1 g. Deshalb hat 1 mol Teilchen mit je 12 u die Masse 12 g.<br>
+  Die Avogadro-Konstante ist seit 2019 als fester Zahlenwert festgelegt. Sie ist so gewählt, dass diese Umrechnung <b>sehr genau</b> aufgeht. Die winzige Abweichung spielt in der Schule keine Rolle.</div>
+
+  <div class="box leit-hint"><strong>Zur Leitfrage:</strong> Eisen hat die molare Masse 56 g/mol. 1 mol Eisen-Atome wiegt also 56 g. Der Nagel wiegt aber nur 5,6 g. Wie viel mol sind das? Das rechnest du in Kapitel 5.</div>
+
+  <h3>Übungen zu Kapitel 4</h3>
+  <div class="tasks">
+    <div class="task" data-type="num" data-answer="56" data-tol="0.2">
+      <p class="q"><b class="tn">4.1</b> Ein Eisen-Atom hat die Masse 56 u. Wie groß ist die molare Masse von Eisen?</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>g/mol</span></div>
+      <div class="hint" hidden>Schau dir Abbildung 5 an.</div>
+      <div class="hint" hidden>Gleiche Zahl, andere Einheit.</div>
+      <div class="sol" hidden><b>56 g/mol</b></div>
+    </div>
+    <div class="task" data-type="num" data-answer="44" data-tol="0.3" data-err='[[28,"Du hast nur ein Sauerstoff-Atom gezählt. In CO₂ sind 2 Sauerstoff-Atome."],[3,"Du hast die Anzahl der Atome gezählt. Gefragt ist die Masse."]]'>
+      <p class="q"><b class="tn">4.2</b> Welche Masse hat 1 mol Kohlenstoffdioxid CO<sub>2</sub>?</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>g</span></div>
+      <div class="hint" hidden>Berechne zuerst die Molekülmasse in u (wie in Kapitel 2).</div>
+      <div class="hint" hidden>12 u + 2 · 16 u = ? Dann: gleiche Zahl in g.</div>
+      <div class="sol" hidden>CO<sub>2</sub>: 12 u + 2 · 16 u = 44 u → M = 44 g/mol → 1 mol hat die Masse <b>44 g</b>.</div>
+    </div>
+    <div class="task" data-type="mc">
+      <p class="q"><b class="tn">4.3</b> Was ist der Unterschied zwischen „18 u“ und „18 g/mol“ bei Wasser?</p>
+      <div class="mc">
+        <button class="btn" data-msg="Die Zahl ist gleich, aber die Einheiten bedeuten etwas anderes: ein Teilchen oder ein Paket von Teilchen.">Es gibt keinen Unterschied, beides ist dasselbe.</button>
+        <button class="btn" data-correct="1">18 u ist die Masse eines Moleküls, 18 g/mol ist die Masse von 1 mol Molekülen.</button>
+        <button class="btn" data-msg="Du hast die beiden Einheiten vertauscht. u gilt für ein einzelnes Teilchen.">18 g/mol ist die Masse eines Moleküls, 18 u ist die Masse von 1 mol Molekülen.</button>
+      </div>
+      <div class="sol" hidden>u gilt für ein einzelnes Teilchen, g/mol für ein Paket von 1 mol Teilchen.</div>
+    </div>
+    <div class="task" data-type="cloze">
+      <p class="q"><b class="tn">4.4</b> Lückentext: Wähle die passenden Wörter.</p>
+      <div class="wordbank"><span>g/mol</span><span>Mol</span><span>Kernteilchen</span><span>molare Masse</span><span>u</span></div>
+      <p>Die Masse eines Atoms gibt man in der Einheit
+        <select data-answer="u"></select> an. Sie hängt von der Anzahl der
+        <select data-answer="Kernteilchen"></select> ab. Ein Zählpaket für Teilchen heißt
+        <select data-answer="Mol"></select>. Die Masse von 1 mol eines Stoffes heißt
+        <select data-answer="molare Masse"></select>. Ihre Einheit ist
+        <select data-answer="g/mol"></select>.</p>
+      <div class="row"><button class="btn primary cloze-check">Prüfen</button></div>
+    </div>
+    <div class="task only-gy" data-type="num" data-answer="100" data-tol="0.5" data-err='[[68,"Du hast den Index 3 beim Sauerstoff nicht beachtet: 3 · 16 g/mol."],[156,"Der Index 3 gilt nur für O, nicht für Ca und C."]]'>
+      <p class="q"><b class="tn">4.5</b> Berechne die molare Masse von Calciumcarbonat (Kalk) CaCO<sub>3</sub>.</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>g/mol</span></div>
+      <div class="hint" hidden>Zu welchem Symbol gehört die 3?</div>
+      <div class="hint" hidden>1 · Ca + 1 · C + 3 · O</div>
+      <div class="sol" hidden>40 + 12 + 3 · 16 = <b>100 g/mol</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Kapitel 5 ================= -->
+<section class="chapter" id="k5">
+  <h2><span class="num">5</span>Rechnen mit der Stoffmenge</h2>
+  <p>Mit der molaren Masse kannst du aus der <b>Masse m</b> einer Stoffportion die <b>Stoffmenge n</b> berechnen. Die Formel lautet:</p>
+
+  <figure>
+    <svg viewBox="0 0 520 200" role="img" aria-label="Formeldreieck: m oben, n und M unten. n gleich m durch M, m gleich n mal M, M gleich m durch n">
+      <polygon points="130,15 30,185 230,185" fill="#e7f0ff" stroke="#1f6feb" stroke-width="3"/>
+      <line x1="72" y1="112" x2="188" y2="112" stroke="#1f6feb" stroke-width="3"/>
+      <line x1="130" y1="112" x2="130" y2="185" stroke="#1f6feb" stroke-width="3"/>
+      <text x="130" y="90" text-anchor="middle" font-size="30" font-style="italic" font-weight="700">m</text>
+      <text x="92" y="162" text-anchor="middle" font-size="30" font-style="italic" font-weight="700">n</text>
+      <text x="168" y="162" text-anchor="middle" font-size="30" font-style="italic" font-weight="700">M</text>
+      <text x="280" y="60" font-size="18"><tspan font-style="italic">n</tspan> = <tspan font-style="italic">m</tspan> : <tspan font-style="italic">M</tspan></text>
+      <text x="280" y="100" font-size="18"><tspan font-style="italic">m</tspan> = <tspan font-style="italic">n</tspan> · <tspan font-style="italic">M</tspan></text>
+      <text x="280" y="140" font-size="18"><tspan font-style="italic">M</tspan> = <tspan font-style="italic">m</tspan> : <tspan font-style="italic">n</tspan></text>
+      <text x="280" y="180" font-size="13" fill="#5b6475">Halte die gesuchte Größe zu.</text>
+    </svg>
+    <figcaption>Abb. 6: Das Formeldreieck. Was oben steht, wird geteilt. Was nebeneinander steht, wird multipliziert.</figcaption>
+  </figure>
+
+  <table class="pse">
+    <tr><th>Größe</th><th>Formelzeichen</th><th>Einheit</th></tr>
+    <tr><td>Masse</td><td><i>m</i></td><td>g</td></tr>
+    <tr><td>Stoffmenge</td><td><i>n</i></td><td>mol</td></tr>
+    <tr><td>molare Masse</td><td><i>M</i></td><td>g/mol</td></tr>
+    <tr class="only-gy"><td>Teilchenzahl</td><td><i>N</i></td><td>(ohne Einheit)</td></tr>
+  </table>
+
+  <h3>Musteraufgabe</h3>
+  <p>Du hast 36 g Wasser. Wie viel mol Wassermoleküle sind das?</p>
+  <span class="calc">Gegeben:  m = 36 g;  M(H₂O) = 18 g/mol
+Gesucht:  n
+Rechnung: n = m : M = 36 g : 18 g/mol = 2 mol
+Antwort:  36 g Wasser sind 2 mol Wassermoleküle.</span>
+  <p class="only-gy">Weiter zur Teilchenzahl: N = n · N<sub>A</sub> = 2 mol · 6,022 · 10<sup>23</sup> mol<sup>−1</sup> = 1,2044 · 10<sup>24</sup> Moleküle.</p>
+  <div class="box achtung"><strong>Tipp:</strong> Schreibe immer <i>Gegeben – Gesucht – Rechnung – Antwort</i> auf. Schreibe die Einheiten mit. So erkennst du Fehler schneller: g : g/mol = mol.</div>
+
+  <div class="box fehler"><strong>Achtung, häufige Fehler:</strong>
+    <ul>
+      <li><b>Multiplizieren statt Teilen:</b> Gesucht ist n? Dann teilst du: n = m : M.</li>
+      <li><b>Falsch herum teilen:</b> Die Masse m steht vorne, M steht hinten: m : M, nicht M : m.</li>
+      <li><b>H statt H<sub>2</sub>:</b> Wasserstoff-Gas besteht aus H<sub>2</sub>-Molekülen. M(H<sub>2</sub>) = 2 g/mol, nicht 1 g/mol. Das gilt auch für O<sub>2</sub> und N<sub>2</sub>.</li>
+      <li><b>u und g/mol verwechseln:</b> u gilt für ein Teilchen, g/mol für 1 mol Teilchen.</li>
+    </ul>
+  </div>
+
+  <h3>Übungen zu Kapitel 5</h3>
+  <div class="tasks">
+    <div class="task" data-type="num" data-answer="2" data-tol="0.02" data-err='[[288,"Du hast multipliziert. Gesucht ist n: Teile m durch M."],[0.5,"Du hast falsch herum geteilt (M : m). Richtig ist m : M."]]'>
+      <p class="q"><b class="tn">5.1</b> Wie viel mol Kohlenstoff-Atome sind in 24 g Kohlenstoff? (M = 12 g/mol)</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>mol</span></div>
+      <div class="hint" hidden>Welche Größe ist gesucht? Halte sie im Formeldreieck zu.</div>
+      <div class="hint" hidden>n = m : M = 24 g : 12 g/mol</div>
+      <div class="sol" hidden>n = 24 g : 12 g/mol = <b>2 mol</b></div>
+    </div>
+    <div class="task" data-type="num" data-answer="9" data-tol="0.05" data-err='[[36,"Du hast M durch n geteilt (18 : 0,5). Gesucht ist m: Multipliziere n · M."],[0.028,"Du hast geteilt. Gesucht ist m: Multipliziere n · M."],[18.5,"Du hast addiert. Gesucht ist m: Multipliziere n · M."]]'>
+      <p class="q"><b class="tn">5.2</b> Welche Masse haben 0,5 mol Wasser? (M = 18 g/mol)</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>g</span></div>
+      <div class="hint" hidden>Gesucht ist die Masse m. Halte m im Formeldreieck zu.</div>
+      <div class="hint" hidden>m = n · M = 0,5 mol · 18 g/mol</div>
+      <div class="sol" hidden>m = 0,5 mol · 18 g/mol = <b>9 g</b></div>
+    </div>
+    <div class="task" data-type="num" data-answer="2" data-tol="0.02" data-err='[[3.14,"Deine molare Masse stimmt nicht. In CO₂ sind 2 Sauerstoff-Atome: M = 12 + 2 · 16."],[3872,"Du hast multipliziert. Gesucht ist n: Teile m durch M."],[0.5,"Du hast falsch herum geteilt (M : m). Richtig ist m : M."]]'>
+      <p class="q"><b class="tn">5.3</b> Wie viel mol sind 88 g Kohlenstoffdioxid CO<sub>2</sub>?</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>mol</span></div>
+      <div class="hint" hidden>Du brauchst zuerst die molare Masse von CO<sub>2</sub>.</div>
+      <div class="hint" hidden>M(CO<sub>2</sub>) = 12 + 2 · 16 = 44 g/mol. Dann n = m : M.</div>
+      <div class="sol" hidden>M = 44 g/mol; n = 88 g : 44 g/mol = <b>2 mol</b></div>
+    </div>
+    <div class="task only-rs" data-type="num" data-answer="168" data-tol="0.5" data-err='[[18.67,"Du hast geteilt. Gesucht ist m: Multipliziere n · M."],[0.054,"Du hast geteilt. Gesucht ist m: Multipliziere n · M."],[59,"Du hast addiert. Gesucht ist m: Multipliziere n · M."]]'>
+      <p class="q"><b class="tn">5.4</b> Für ein Experiment braucht man 3 mol Eisen. Wie viel Gramm Eisen muss man abwiegen? (M = 56 g/mol)</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>g</span></div>
+      <div class="hint" hidden>Gesucht ist die Masse m.</div>
+      <div class="hint" hidden>m = n · M = 3 mol · 56 g/mol</div>
+      <div class="sol" hidden>m = 3 mol · 56 g/mol = <b>168 g</b></div>
+    </div>
+    <div class="task only-rs" data-type="num" data-answer="10" data-tol="0.05" data-err='[[3240,"Du hast multipliziert. Gesucht ist n: Teile m durch M."],[0.1,"Du hast falsch herum geteilt (M : m). Richtig ist m : M."]]'>
+      <p class="q"><b class="tn">5.5</b> Ein Glas enthält 180 g Wasser. Wie viel mol Wassermoleküle sind das?</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>mol</span></div>
+      <div class="hint" hidden>Welche molare Masse hat Wasser?</div>
+      <div class="hint" hidden>M(H<sub>2</sub>O) = 18 g/mol. Dann n = m : M.</div>
+      <div class="sol" hidden>n = 180 g : 18 g/mol = <b>10 mol</b></div>
+    </div>
+    <div class="task only-gy" data-type="num" data-answer="0.5" data-tol="0.01" data-err='[[2,"Du hast falsch herum geteilt (M : m). Richtig ist m : M."],[3.10,"Deine molare Masse stimmt nicht. Du hast die Indizes nicht beachtet: M(C₆H₁₂O₆) = 180 g/mol."],[16200,"Du hast multipliziert. Gesucht ist n: Teile m durch M."]]'>
+      <p class="q"><b class="tn">5.4</b> Wie viel mol Glucose (C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>) sind in 90 g Glucose?</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>mol</span></div>
+      <div class="hint" hidden>Die Molekülmasse hast du in Aufgabe 2.4 berechnet.</div>
+      <div class="hint" hidden>M = 180 g/mol; n = m : M</div>
+      <div class="sol" hidden>n = 90 g : 180 g/mol = <b>0,5 mol</b></div>
+    </div>
+    <div class="task only-gy" data-type="num" data-answer="5" data-tol="0.05" data-err='[[10,"Du hast M(H) = 1 g/mol verwendet. Wasserstoff-Gas besteht aus H₂-Molekülen: M(H₂) = 2 g/mol."],[0.2,"Du hast falsch herum geteilt (M : m). Richtig ist m : M."],[20,"Du hast multipliziert. Gesucht ist n: Teile m durch M."]]'>
+      <p class="q"><b class="tn">5.5</b> Wasserstoff-Gas besteht aus H<sub>2</sub>-Molekülen. Wie viel mol H<sub>2</sub>-Moleküle sind in 10 g Wasserstoff?</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>mol</span></div>
+      <div class="hint" hidden>Lies die Formel genau: Wie viele H-Atome hat ein Molekül?</div>
+      <div class="hint" hidden>M(H<sub>2</sub>) = 2 · 1 g/mol = 2 g/mol</div>
+      <div class="sol" hidden>n = 10 g : 2 g/mol = <b>5 mol</b></div>
+    </div>
+    <div class="task only-gy" data-type="mc">
+      <p class="q"><b class="tn">5.6</b> Wie viele Wassermoleküle sind in 9 g Wasser?</p>
+      <div class="mc">
+        <button class="btn" data-msg="Du hast die Masse (9 g) mit N_A multipliziert. Berechne zuerst die Stoffmenge n = m : M.">9 · 6,022 · 10<sup>23</sup></button>
+        <button class="btn" data-correct="1">3,011 · 10<sup>23</sup></button>
+        <button class="btn" data-msg="Das ist die Teilchenzahl von 1 mol. 9 g Wasser sind aber nur 0,5 mol.">6,022 · 10<sup>23</sup></button>
+      </div>
+      <div class="sol" hidden>n = 9 g : 18 g/mol = 0,5 mol; N = 0,5 mol · 6,022 · 10<sup>23</sup> mol<sup>−1</sup> = <b>3,011 · 10<sup>23</sup></b></div>
+    </div>
+    <div class="task only-gy" data-type="num" data-answer="24" data-tol="0.3" data-err='[[1.5,"Du hast multipliziert. Gesucht ist M: Teile m durch n."],[0.0417,"Du hast falsch herum geteilt (n : m). Richtig ist m : n."]]'>
+      <p class="q"><b class="tn">5.7</b> Knobelaufgabe: 0,25 mol eines Metalls haben die Masse 6 g. Berechne die molare Masse. Um welches Metall aus der Tabelle handelt es sich? <i>Gib die molare Masse ein.</i></p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>g/mol</span></div>
+      <div class="hint" hidden>Halte M im Formeldreieck zu.</div>
+      <div class="hint" hidden>M = m : n = 6 g : 0,25 mol. Suche den Wert danach in der Tabelle.</div>
+      <div class="sol" hidden>M = 6 g : 0,25 mol = <b>24 g/mol</b> → Magnesium (Mg)</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Kapitel 6 ================= -->
+<section class="chapter leitfrage" id="k6">
+  <h2><span class="num">6</span>Zurück zur Leitfrage</h2>
+  <p><b>Wie viele Eisen-Atome stecken in einem Eisennagel mit der Masse 5,6 g?</b> Jetzt hast du alle Werkzeuge. Löse die Frage in zwei Schritten.</p>
+  <div class="tasks">
+    <div class="task" data-type="num" data-answer="0.1" data-tol="0.002" data-err='[[313.6,"Du hast multipliziert. Gesucht ist n: Teile m durch M."],[10,"Du hast falsch herum geteilt (M : m). Richtig ist m : M."]]'>
+      <p class="q"><b class="tn">6.1</b> Schritt 1: Berechne die Stoffmenge n der Eisen-Atome im Nagel.</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>mol</span></div>
+      <div class="hint" hidden>Gegeben: m = 5,6 g. Welche molare Masse hat Eisen?</div>
+      <div class="hint" hidden>M(Fe) = 56 g/mol; n = m : M = 5,6 g : 56 g/mol</div>
+      <div class="sol" hidden>n = 5,6 g : 56 g/mol = <b>0,1 mol</b></div>
+    </div>
+    <div class="task only-rs" data-type="num" data-answer="60.2" data-tol="0.3" data-err='[[0.1,"Das ist die Stoffmenge. Multipliziere sie noch mit 602 Trilliarden."],[3371.2,"Du hast die Masse (5,6) mit 602 multipliziert. Nimm die Stoffmenge aus Schritt 1."],[6020,"Du hast durch 0,1 geteilt. Multipliziere: 0,1 · 602."]]'>
+      <p class="q"><b class="tn">6.2</b> Schritt 2: Wie viele Eisen-Atome sind das? Gib die Antwort in Trilliarden an.</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>Trilliarden Atome</span></div>
+      <div class="hint" hidden>1 mol = 602 Trilliarden Atome. Du hast 0,1 mol.</div>
+      <div class="hint" hidden>Rechne 0,1 · 602.</div>
+      <div class="sol" hidden>0,1 · 602 Trilliarden = <b>60,2 Trilliarden Eisen-Atome</b> (das sind 60 200 000 000 000 000 000 000 Atome)</div>
+    </div>
+    <div class="task only-gy" data-type="num" data-answer="6.022" data-tol="0.02" data-err='[[0.6022,"Du hast die Zahl vor 10²³ angegeben. Gefragt ist die Zahl vor 10²²: 0,6022 · 10²³ = 6,022 · 10²²."],[0.1,"Das ist die Stoffmenge. Multipliziere sie noch mit N_A."],[33.72,"Du hast die Masse (5,6 g) mit N_A multipliziert. Nimm die Stoffmenge aus Schritt 1."]]'>
+      <p class="q"><b class="tn">6.2</b> Schritt 2: Berechne die Teilchenzahl N. Gib die Zahl vor „· 10<sup>22</sup>“ an.</p>
+      <div class="row"><input type="text" inputmode="decimal" aria-label="Antwort"> <span>· 10<sup>22</sup> Atome</span></div>
+      <div class="hint" hidden>N = n · N<sub>A</sub></div>
+      <div class="hint" hidden>0,1 mol · 6,022 · 10<sup>23</sup> mol<sup>−1</sup> = 0,6022 · 10<sup>23</sup>. Verschiebe das Komma.</div>
+      <div class="sol" hidden>N = 0,1 mol · 6,022 · 10<sup>23</sup> mol<sup>−1</sup> = <b>6,022 · 10<sup>22</sup> Eisen-Atome</b></div>
+    </div>
+  </div>
+  <div class="box leit-hint" id="est-compare">Deine Schätzung vom Anfang: <b id="est-value">noch keine Schätzung abgegeben</b>.<br>
+    <span class="only-rs">Ergebnis: 60,2 Trilliarden Atome – das ist eine Zahl mit 23 Stellen. Viel, viel mehr als eine Milliarde.</span>
+    <span class="only-gy">Ergebnis: 6,022 · 10<sup>22</sup> Atome – das ist ungefähr 60 Billionen Mal so viel wie eine Milliarde.</span></div>
+
+  <h3>Zusammenfassung</h3>
+  <span class="calc only-rs">Teilchen  ──Atommasse in u──►  Molekülmasse in u
+                                │ gleiche Zahl
+                                ▼
+Portion   ◄── n = m : M ──  molare Masse M in g/mol</span>
+  <span class="calc only-gy">Masse m (g) ──: M──►  Stoffmenge n (mol) ──· N_A──►  Teilchenzahl N
+            ◄──· M──                       ◄──: N_A──</span>
+
+  <div class="tasks">
+    <div class="task" data-type="cloze">
+      <p class="q"><b class="tn">6.3</b> Abschluss-Lückentext</p>
+      <div class="wordbank only-rs"><span>gleich</span><span>Kern</span><span>n = m : M</span><span>602 Trilliarden</span><span>Masse</span><span>addiert</span></div>
+      <div class="wordbank only-gy"><span>gleich</span><span>Kern</span><span>n = m : M</span><span>6,022 · 10²³</span><span>Masse</span><span>addiert</span></div>
+      <p>Fast die gesamte Masse eines Atoms befindet sich im
+        <select data-answer="Kern"></select>. Die Masse eines Moleküls erhält man, wenn man die Atommassen
+        <select data-answer="addiert"></select>. 1 mol enthält
+        <select class="only-rs" data-answer="602 Trilliarden"></select><select class="only-gy" data-answer="6,022 · 10²³"></select> Teilchen. Die Zahlenwerte von Molekülmasse in u und molarer Masse in g/mol sind
+        <select data-answer="gleich"></select>. Die Stoffmenge berechnet man aus der
+        <select data-answer="Masse"></select> mit der Formel
+        <select data-answer="n = m : M"></select>.</p>
+      <div class="row"><button class="btn primary cloze-check">Prüfen</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Generator ================= -->
+<section class="chapter" id="generator">
+  <h2>Extrapunkte: Übungsgenerator</h2>
+  <p>Hier bekommst du immer neue Aufgaben. Für jede richtig gelöste Aufgabe gibt es einen <b>Extrapunkt</b>. Wenn du vorher die Lösung ansiehst, gibt es für diese Aufgabe keinen Extrapunkt.</p>
+  <div class="gen">
+    <h3 id="gen-title">Aufgabe</h3>
+    <p class="q" id="gen-q">…</p>
+    <div class="row">
+      <input type="text" inputmode="decimal" id="gen-in" aria-label="Antwort"> <span id="gen-unit"></span>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn primary" id="gen-check">Prüfen</button>
+      <button class="btn" id="gen-hint">Hilfe 1</button>
+      <button class="btn" id="gen-sol" disabled title="Erst selbst versuchen">Lösung</button>
+      <button class="btn" id="gen-new">Neue Aufgabe</button>
+    </div>
+    <div class="fb" id="gen-fb"></div>
+    <div class="hint" id="gen-h1" data-label="Hilfe 1" hidden></div>
+    <div class="hint" id="gen-h2" data-label="Hilfe 2" hidden></div>
+    <div class="sol" id="gen-solbox" hidden></div>
+    <p class="words" style="margin-bottom:0">Extrapunkte: <b id="gen-count">0</b></p>
+  </div>
+</section>
+
+<!-- ================= Wortspeicher ================= -->
+<section class="chapter" id="wort">
+  <h2>Wortspeicher</h2>
+  <dl class="glossar">
+    <dt>das Atom, die Atome</dt><dd>sehr kleines Teilchen; jedes Element besteht aus einer Sorte von Atomen</dd>
+    <dt>der Kern, die Kerne</dt><dd>Mitte des Atoms; hier ist fast die gesamte Masse</dd>
+    <dt>das Kernteilchen</dt><dd>Baustein des Kerns; Masse ungefähr 1 u</dd>
+    <dt>die Masse</dt><dd>wie schwer etwas ist (Alltag: „Gewicht“); Einheit g oder u</dd>
+    <dt>die Einheit u</dt><dd>atomare Masseneinheit; für die Masse von Atomen und Molekülen</dd>
+    <dt>die Atommasse</dt><dd>Masse eines Atoms in u</dd>
+    <dt>das Molekül, die Moleküle</dt><dd>feste Gruppe aus mehreren Atomen</dd>
+    <dt>die Molekülmasse</dt><dd>Summe der Atommassen eines Moleküls, in u</dd>
+    <dt>die Formel</dt><dd>Kurzschrift für einen Stoff, z. B. H<sub>2</sub>O</dd>
+    <dt>der Index</dt><dd>kleine Zahl in der Formel; zeigt die Anzahl der Atome</dd>
+    <dt>das Mol</dt><dd>Zählpaket für Teilchen; Einheitenzeichen mol</dd>
+    <dt>die Stoffmenge <i>n</i></dt><dd>Anzahl der Teilchen, angegeben in mol</dd>
+    <dt>die molare Masse <i>M</i></dt><dd>Masse von 1 mol eines Stoffes, in g/mol</dd>
+    <dt class="only-gy">die Avogadro-Konstante <i>N</i><sub>A</sub></dt><dd class="only-gy">6,022 · 10<sup>23</sup> Teilchen pro mol</dd>
+    <dt>die Leitfrage</dt><dd>eine Frage, die du am Ende der Einheit beantworten kannst</dd>
+    <dt>schätzen</dt><dd>ungefähr sagen, ohne genau zu rechnen</dd>
+    <dt>berechnen</dt><dd>mit einer Rechnung herausfinden</dd>
+    <dt>addieren / multiplizieren / dividieren</dt><dd>plus rechnen / mal rechnen / geteilt rechnen</dd>
+  </dl>
+</section>
+</main>
+
+<div class="progress" aria-live="polite">Gelöst: <b id="p-done">0</b> / <span id="p-total">0</span> · <span class="xp">Extrapunkte: <b id="p-xp" class="xp">0</b></span></div>
+
+<footer>
+  Vereinfachungen für Klasse 8: „1 Kernteilchen ≈ 1 u“ ist eine Näherung. Der Nagel wird vereinfacht als reines Eisen betrachtet. Für Rechenaufgaben werden gerundete Atommassen verwendet; Antworten mit genauen Periodensystem-Werten werden ebenfalls als richtig gewertet.
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var body = document.body;
+  var solved = new Set();
+  var xp = 0;
+
+  /* ---------- Speicher (fehlertolerant) ---------- */
+  function store(k, v){ try{ localStorage.setItem("stoffmenge-" + k, v); }catch(e){} }
+  function load(k){ try{ return localStorage.getItem("stoffmenge-" + k); }catch(e){ return null; } }
+
+  /* ---------- Niveau-Umschalter ---------- */
+  function setLevel(lvl){
+    body.classList.remove("rs","gy");
+    body.classList.add(lvl);
+    document.querySelectorAll(".switch button").forEach(function(b){
+      b.setAttribute("aria-pressed", b.dataset.level === lvl ? "true" : "false");
+    });
+    store("level", lvl);
+    updateProgress();
+    newGen();
+  }
+  document.querySelectorAll(".switch button").forEach(function(b){
+    b.addEventListener("click", function(){ setLevel(b.dataset.level); });
+  });
+
+  /* ---------- Hilfsfunktionen ---------- */
+  function parseNum(s){
+    if(!s) return NaN;
+    s = String(s).trim().replace(/\s/g,"").replace(",",".");
+    s = s.replace(/[^0-9.\-eE]/g,"");
+    return parseFloat(s);
+  }
+  function fmt(x){ return String(Math.round(x*1000)/1000).replace(".",","); }
+  function near(v, target, tol){
+    return Math.abs(v - target) <= Math.max(tol, Math.abs(target) * 0.02) + 1e-9;
+  }
+  function isActive(el){
+    if(el.classList.contains("only-gy") && body.classList.contains("rs")) return false;
+    if(el.classList.contains("only-rs") && body.classList.contains("gy")) return false;
+    return true;
+  }
+  function showFb(box, ok, main, diag){
+    box.className = "fb " + (ok ? "ok" : "bad");
+    box.textContent = main;
+    if(diag){ var d = document.createElement("span"); d.className = "diag"; d.textContent = diag; box.appendChild(d); }
+  }
+
+  /* ---------- Aufgaben ---------- */
+  var tasks = Array.prototype.slice.call(document.querySelectorAll(".task"));
+  tasks.forEach(function(task, i){
+    task.dataset.id = "t" + i;
+    var type = task.dataset.type;
+    var hints = Array.prototype.slice.call(task.querySelectorAll(".hint"));
+    var sol = task.querySelector(".sol");
+    var fb = document.createElement("div"); fb.className = "fb";
+
+    var btnRow = task.querySelector(".row");
+    if(type === "mc"){
+      btnRow = document.createElement("div"); btnRow.className = "row"; btnRow.style.marginTop = "8px";
+      task.querySelector(".mc").after(btnRow);
+    }
+    btnRow.after(fb);
+
+    hints.forEach(function(h, k){ h.dataset.label = "Hilfe " + (k + 1); });
+
+    var solBtn = null, note = null;
+    function unlock(){
+      if(solBtn && solBtn.disabled){
+        solBtn.disabled = false; solBtn.removeAttribute("title");
+        if(note) note.remove();
+      }
+    }
+    function result(ok, main, diag){
+      showFb(fb, ok, main, diag);
+      if(ok){ task.classList.add("correct"); solved.add(task.dataset.id); }
+      else task.classList.remove("correct");
+      unlock();
+      updateProgress();
+    }
+
+    if(type === "num"){
+      var check = document.createElement("button");
+      check.className = "btn primary"; check.textContent = "Prüfen";
+      btnRow.appendChild(check);
+      var input = task.querySelector("input");
+      var errs = [];
+      try{ errs = JSON.parse(task.dataset.err || "[]"); }catch(e){ errs = []; }
+      var doCheck = function(){
+        var v = parseNum(input.value);
+        var a = parseFloat(task.dataset.answer), tol = parseFloat(task.dataset.tol || "0.01");
+        if(isNaN(v)){ showFb(fb, false, "Bitte gib eine Zahl ein."); return; }
+        if(Math.abs(v - a) <= tol + 1e-9){ result(true, "Richtig!"); return; }
+        for(var k = 0; k < errs.length; k++){
+          if(near(v, errs[k][0], 0.01)){ result(false, "Falsch.", errs[k][1]); return; }
+        }
+        result(false, "Falsch.", hints.length ? "Prüfe deine Rechnung oder nutze eine Hilfe." : "Prüfe deine Rechnung.");
+      };
+      check.addEventListener("click", doCheck);
+      input.addEventListener("keydown", function(e){ if(e.key === "Enter") doCheck(); });
+    }
+
+    if(type === "mc"){
+      task.querySelectorAll(".mc button").forEach(function(b){
+        b.addEventListener("click", function(){
+          task.querySelectorAll(".mc button").forEach(function(x){ x.classList.remove("sel-ok","sel-bad"); });
+          if(b.dataset.correct){ b.classList.add("sel-ok"); result(true, "Richtig!"); }
+          else { b.classList.add("sel-bad"); result(false, "Falsch.", b.dataset.msg || "Versuche es noch einmal."); }
+        });
+      });
+    }
+
+    if(type === "cloze"){
+      var selects = Array.prototype.slice.call(task.querySelectorAll("select"));
+      selects.forEach(function(sel){
+        var banks = sel.classList.contains("only-gy") ? [task.querySelector(".wordbank.only-gy")] :
+                    sel.classList.contains("only-rs") ? [task.querySelector(".wordbank.only-rs")] :
+                    Array.prototype.slice.call(task.querySelectorAll(".wordbank"));
+        var words = [];
+        banks.forEach(function(bk){ bk.querySelectorAll("span").forEach(function(s){ if(words.indexOf(s.textContent) < 0) words.push(s.textContent); }); });
+        words.sort(function(a,b){ return a.localeCompare(b,"de"); });
+        var o = document.createElement("option"); o.value = ""; o.textContent = "…"; sel.appendChild(o);
+        words.forEach(function(w){ var op = document.createElement("option"); op.value = w; op.textContent = w; sel.appendChild(op); });
+      });
+      task.querySelector(".cloze-check").addEventListener("click", function(){
+        var all = true, wrong = 0;
+        selects.forEach(function(sel){
+          if(!isActive(sel)) return;
+          sel.classList.remove("ok","bad");
+          if(sel.value === sel.dataset.answer) sel.classList.add("ok");
+          else { sel.classList.add("bad"); all = false; wrong++; }
+        });
+        result(all, all ? "Richtig! Alle Lücken stimmen." : "Falsch.", all ? "" : (wrong === 1 ? "Eine Lücke ist rot markiert." : wrong + " Lücken sind rot markiert."));
+      });
+    }
+
+    if(hints.length){
+      var hb = document.createElement("button");
+      hb.className = "btn"; hb.textContent = "Hilfe 1";
+      var shown = 0;
+      hb.addEventListener("click", function(){
+        if(shown < hints.length){ hints[shown].hidden = false; shown++; }
+        if(shown < hints.length) hb.textContent = "Hilfe " + (shown + 1);
+        else { hb.textContent = "Keine weitere Hilfe"; hb.disabled = true; }
+      });
+      btnRow.appendChild(hb);
+    }
+    if(sol){
+      solBtn = document.createElement("button");
+      solBtn.className = "btn"; solBtn.textContent = "Lösung";
+      solBtn.disabled = true; solBtn.title = "Erst selbst versuchen";
+      solBtn.addEventListener("click", function(){ sol.hidden = !sol.hidden; });
+      btnRow.appendChild(solBtn);
+      note = document.createElement("span");
+      note.className = "lock-note"; note.textContent = "Lösung nach dem ersten Versuch";
+      btnRow.appendChild(note);
+    }
+  });
+
+  function updateProgress(){
+    var active = tasks.filter(isActive);
+    var done = active.filter(function(t){ return solved.has(t.dataset.id); }).length;
+    document.getElementById("p-done").textContent = done;
+    document.getElementById("p-total").textContent = active.length;
+    document.getElementById("p-xp").textContent = xp;
+    document.getElementById("gen-count").textContent = xp;
+  }
+
+  /* ---------- Schätzung zur Leitfrage ---------- */
+  function showEstimate(val){
+    document.querySelectorAll("#estimate button").forEach(function(b){ b.classList.toggle("chosen", b.dataset.est === val); });
+    document.getElementById("est-value").textContent = val || "noch keine Schätzung abgegeben";
+    if(val) document.getElementById("est-saved").textContent = "Deine Schätzung: " + val + ". In Kapitel 6 vergleichst du sie mit dem Ergebnis.";
+  }
+  document.querySelectorAll("#estimate button").forEach(function(b){
+    b.addEventListener("click", function(){ store("estimate", b.dataset.est); showEstimate(b.dataset.est); });
+  });
+  showEstimate(load("estimate"));
+
+  /* ---------- Punktwolke im Mol-Symbol ---------- */
+  (function(){
+    var g = document.getElementById("dots"); if(!g) return;
+    var ns = "http://www.w3.org/2000/svg", seed = 7;
+    function rnd(){ seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+    for(var i = 0; i < 260; i++){
+      var c = document.createElementNS(ns,"circle");
+      c.setAttribute("cx", (378 + rnd()*134).toFixed(1));
+      c.setAttribute("cy", (38 + rnd()*80).toFixed(1));
+      c.setAttribute("r", "1.6");
+      g.appendChild(c);
+    }
+  })();
+
+  /* ---------- Übungsgenerator (Extrapunkte) ---------- */
+  var stoffe = [
+    {name:"Kohlenstoff", f:"C", M:12, calc:"M(C) = 12 g/mol"},
+    {name:"Eisen", f:"Fe", M:56, calc:"M(Fe) = 56 g/mol"},
+    {name:"Magnesium", f:"Mg", M:24, calc:"M(Mg) = 24 g/mol"},
+    {name:"Schwefel", f:"S", M:32, calc:"M(S) = 32 g/mol"},
+    {name:"Calcium", f:"Ca", M:40, calc:"M(Ca) = 40 g/mol"},
+    {name:"Natrium", f:"Na", M:23, calc:"M(Na) = 23 g/mol"},
+    {name:"Wasser", f:"H<sub>2</sub>O", M:18, calc:"2 · 1 + 16 = 18 g/mol"},
+    {name:"Kohlenstoffdioxid", f:"CO<sub>2</sub>", M:44, calc:"12 + 2 · 16 = 44 g/mol"},
+    {name:"Methan", f:"CH<sub>4</sub>", M:16, calc:"12 + 4 · 1 = 16 g/mol"},
+    {name:"Sauerstoff", f:"O<sub>2</sub>", M:32, calc:"2 · 16 = 32 g/mol (Sauerstoff-Gas besteht aus O<sub>2</sub>-Molekülen)"},
+    {name:"Ammoniak", f:"NH<sub>3</sub>", M:17, calc:"14 + 3 · 1 = 17 g/mol"}
+  ];
+  var stoffeGy = stoffe.concat([
+    {name:"Wasserstoff", f:"H<sub>2</sub>", M:2, calc:"2 · 1 = 2 g/mol (Wasserstoff-Gas besteht aus H<sub>2</sub>-Molekülen)"},
+    {name:"Glucose", f:"C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>", M:180, calc:"6 · 12 + 12 · 1 + 6 · 16 = 180 g/mol"},
+    {name:"Calciumcarbonat", f:"CaCO<sub>3</sub>", M:100, calc:"40 + 12 + 3 · 16 = 100 g/mol"},
+    {name:"Schwefelsäure", f:"H<sub>2</sub>SO<sub>4</sub>", M:98, calc:"2 · 1 + 32 + 4 · 16 = 98 g/mol"},
+    {name:"Ethanol", f:"C<sub>2</sub>H<sub>5</sub>OH", M:46, calc:"2 · 12 + 6 · 1 + 16 = 46 g/mol"}
+  ]);
+  var cur = null;
+  var el = function(id){ return document.getElementById(id); };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+
+  function newGen(){
+    var gy = body.classList.contains("gy");
+    var s = pick(gy ? stoffeGy : stoffe);
+    var n = pick(gy ? [0.1,0.2,0.25,0.5,1.5,2,2.5,3,4,5] : [0.5,1,2,3,4,5,10]);
+    var t = pick(gy ? ["m2n","n2m","m2n","n2m","m2N"] : ["m2n","n2m"]);
+    var m = Math.round(n * s.M * 1000) / 1000;
+    var mInfo = gy ? "" : " (M = " + s.M + " g/mol)";
+    var q, ans, unit, sol, h1, h2, diags;
+    if(t === "m2n"){
+      q = "Wie viel mol sind " + fmt(m) + " g " + s.name + " (" + s.f + ")?" + mInfo;
+      ans = n; unit = "mol";
+      h1 = "Gesucht ist die Stoffmenge n. Halte n im Formeldreieck zu.";
+      h2 = (gy ? s.calc + "; " : "") + "n = m : M = " + fmt(m) + " g : " + s.M + " g/mol";
+      sol = "n = " + fmt(m) + " g : " + s.M + " g/mol = <b>" + fmt(n) + " mol</b>";
+      diags = [[m * s.M, "Du hast multipliziert. Gesucht ist n: Teile m durch M."],
+               [s.M / m, "Du hast falsch herum geteilt (M : m). Richtig ist m : M."]];
+    } else if(t === "n2m"){
+      q = "Welche Masse haben " + fmt(n) + " mol " + s.name + " (" + s.f + ")?" + mInfo;
+      ans = m; unit = "g";
+      h1 = "Gesucht ist die Masse m. Halte m im Formeldreieck zu.";
+      h2 = (gy ? s.calc + "; " : "") + "m = n · M = " + fmt(n) + " mol · " + s.M + " g/mol";
+      sol = "m = " + fmt(n) + " mol · " + s.M + " g/mol = <b>" + fmt(m) + " g</b>";
+      diags = [[s.M / n, "Du hast geteilt (M : n). Gesucht ist m: Multipliziere n · M."],
+               [n / s.M, "Du hast geteilt (n : M). Gesucht ist m: Multipliziere n · M."],
+               [n + s.M, "Du hast addiert. Gesucht ist m: Multipliziere n · M."]];
+    } else {
+      var N = Math.round(n * 6.022 * 1000) / 1000;
+      q = "Wie viele Teilchen sind in " + fmt(m) + " g " + s.name + " (" + s.f + ")? Gib die Zahl vor „· 10<sup>23</sup>“ an.";
+      ans = N; unit = "· 10<sup>23</sup> Teilchen";
+      h1 = "Zwei Schritte: Berechne zuerst n = m : M, dann N = n · N<sub>A</sub>.";
+      h2 = s.calc + "; n = " + fmt(n) + " mol; N = " + fmt(n) + " · 6,022 · 10<sup>23</sup>";
+      sol = "n = " + fmt(m) + " g : " + s.M + " g/mol = " + fmt(n) + " mol; N = " + fmt(n) + " · 6,022 · 10<sup>23</sup> = <b>" + fmt(N) + " · 10<sup>23</sup></b>";
+      diags = [[n, "Das ist die Stoffmenge n. Multipliziere sie noch mit N_A."],
+               [m * 6.022, "Du hast die Masse mit N_A multipliziert. Berechne zuerst n = m : M."],
+               [6.022 / n, "Du hast N_A durch n geteilt. Richtig ist N = n · N_A."]];
+    }
+    cur = {ans: ans, tol: Math.max(0.01, Math.abs(ans) * 0.01), diags: diags, solved: false, sawSol: false, hints: 0};
+    el("gen-q").innerHTML = q;
+    el("gen-unit").innerHTML = unit;
+    el("gen-in").value = "";
+    el("gen-fb").textContent = ""; el("gen-fb").className = "fb";
+    el("gen-h1").innerHTML = h1; el("gen-h1").hidden = true;
+    el("gen-h2").innerHTML = h2; el("gen-h2").hidden = true;
+    el("gen-hint").textContent = "Hilfe 1"; el("gen-hint").disabled = false;
+    el("gen-solbox").innerHTML = sol; el("gen-solbox").hidden = true;
+    el("gen-sol").disabled = true; el("gen-sol").title = "Erst selbst versuchen";
+  }
+  function genCheck(){
+    var v = parseNum(el("gen-in").value), fb = el("gen-fb");
+    if(isNaN(v)){ showFb(fb, false, "Bitte gib eine Zahl ein."); return; }
+    el("gen-sol").disabled = false; el("gen-sol").removeAttribute("title");
+    if(Math.abs(v - cur.ans) <= cur.tol){
+      if(!cur.solved && !cur.sawSol){ xp++; updateProgress(); showFb(fb, true, "Richtig! +1 Extrapunkt"); }
+      else showFb(fb, true, cur.sawSol ? "Richtig! (Kein Extrapunkt, weil du die Lösung angesehen hast.)" : "Richtig!");
+      cur.solved = true;
+      return;
+    }
+    for(var k = 0; k < cur.diags.length; k++){
+      if(near(v, cur.diags[k][0], 0.01)){ showFb(fb, false, "Falsch.", cur.diags[k][1]); return; }
+    }
+    showFb(fb, false, "Falsch.", "Prüfe deine Rechnung oder nutze eine Hilfe.");
+  }
+  el("gen-check").addEventListener("click", genCheck);
+  el("gen-in").addEventListener("keydown", function(e){ if(e.key === "Enter") genCheck(); });
+  el("gen-new").addEventListener("click", newGen);
+  el("gen-hint").addEventListener("click", function(){
+    cur.hints++;
+    if(cur.hints === 1){ el("gen-h1").hidden = false; el("gen-hint").textContent = "Hilfe 2"; }
+    else { el("gen-h2").hidden = false; el("gen-hint").textContent = "Keine weitere Hilfe"; el("gen-hint").disabled = true; }
+  });
+  el("gen-sol").addEventListener("click", function(){
+    if(!cur.solved) cur.sawSol = true;
+    el("gen-solbox").hidden = !el("gen-solbox").hidden;
+  });
+
+  /* ---------- Start ---------- */
+  var start = load("level");
+  setLevel(start === "gy" ? "gy" : "rs");
+})();
+</script>
+</body>
+</html>
