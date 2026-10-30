@@ -1,14 +1,439 @@
-<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Meiose-Match – Zuordnungsspiel</title><style>:root{font-family:system-ui,Arial,sans-serif;color:#14243a;background:#eef4fa}*{box-sizing:border-box}body{margin:0}header{background:#18365c;color:white;padding:20px max(20px,calc((100vw - 1120px)/2))}h1{margin:0 0 5px;font-size:clamp(1.6rem,4vw,2.5rem)}main{max-width:1120px;margin:auto;padding:18px}p{line-height:1.45}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0}.stat{background:white;border-radius:12px;padding:10px 14px;font-weight:650}button{font:inherit;cursor:pointer}button.action{background:#1b6198;color:white;border:0;border-radius:10px;padding:11px 16px;font-weight:700}button.action:focus-visible,.tile:focus-visible{outline:4px solid #ffb636;outline-offset:2px}.secondary{background:#fff!important;color:#1b4b76!important;border:1px solid #acc2d6!important}.instructions{background:#fff;border-left:5px solid #2e85b9;padding:12px 18px;border-radius:10px}.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:15px 0}.column{min-width:0;background:#dce8f3;border-radius:15px;padding:10px}.column h2{font-size:1.05rem;text-align:center;margin:5px 0 12px}.tiles{display:grid;gap:8px}.tile{border:2px solid transparent;background:white;border-radius:12px;min-height:92px;padding:12px;text-align:left;box-shadow:0 2px 5px #153d5812;transition:transform .12s,border .12s;display:flex;align-items:center;justify-content:center;width:100%;font-weight:600;font-size:clamp(.8rem,1.35vw,1rem);line-height:1.35}.tile:hover:not(:disabled){transform:translateY(-2px)}.tile.selected{border-color:#146ca9;background:#e3f3ff}.tile.matched{border-color:#27865a;background:#e3f6e9;color:#1e6745;opacity:.72}.tile:disabled{cursor:default}.tile svg{max-width:100%;width:135px;height:76px}.notice{min-height:50px;font-weight:650;padding:12px;background:#fff;border-radius:10px}.role{font-weight:750;color:#1b6198}.footer{font-size:.85rem;color:#53657a;padding:10px 0 25px}.progress{height:12px;background:#c9d8e7;border-radius:99px;overflow:hidden}.progress>div{height:100%;background:#27865a;transition:width .25s}.win{background:#e3f6e9;border:2px solid #27865a;border-radius:12px;padding:18px;margin:12px 0}@media(max-width:650px){main{padding:10px}.board{gap:5px}.column{padding:5px}.tile{padding:5px;min-height:105px;font-size:.73rem}.tile svg{height:68px}.column h2{font-size:.82rem}}@media(prefers-reduced-motion:reduce){*{transition:none!important}}</style></head><body><header><h1>🧬 Meiose-Match</h1><div>Das digitale Zuordnungsspiel für Vierergruppen · alle Begriffe auf einem Spielfeld</div></header><main><div class="instructions"><strong>Spielregel:</strong> Findet jeweils <strong>einen Begriff + die passende Erklärung + das richtige Bild</strong>. Klickt nacheinander auf drei Karten. Nach jeder Prüfung ist die nächste Person dran. Diskutiert eure Wahl gemeinsam!<br><span class="role" id="role"></span></div><div class="toolbar"><button class="action" id="check">Zuordnung prüfen</button><button class="action secondary" id="reset">Neu mischen</button><button class="action secondary" id="tip">Tipp anzeigen</button></div><div class="toolbar"><span class="stat" id="matched">Gefunden: 0/16</span><span class="stat" id="attempts">Versuche: 0</span><span class="stat" id="points">Punkte: 0</span></div><div class="progress" aria-label="Fortschritt"><div id="bar" style="width:0%"></div></div><div id="message" class="notice" role="status" aria-live="polite">Wählt eine Karte aus jeder Spalte.</div><div class="board"><section class="column"><h2>1. Begriff</h2><div class="tiles" id="terms"></div></section><section class="column"><h2>2. Erklärung</h2><div class="tiles" id="definitions"></div></section><section class="column"><h2>3. Abbildung</h2><div class="tiles" id="pictures"></div></section></div><div id="finish"></div><p class="footer">Die Abbildungen sind selbst erstellte schematische Lernbilder (nicht maßstabsgetreu). Ohne Anmeldung, Werbung oder Datenerfassung; funktioniert auch offline. Hinweis: Beim Menschen bedeutet 2n = 46 und n = 23.</p></main><script>
-const svg=(body)=>`<svg viewBox="0 0 160 90" role="img" aria-label="Schematische Abbildung" xmlns="http://www.w3.org/2000/svg">${body}</svg>`;
-const X=(x,y,c='#387bb5',scale=1)=>`<g transform="translate(${x} ${y}) scale(${scale})" stroke="${c}" stroke-width="9" stroke-linecap="round"><path d="M-12 -23 L12 23 M12 -23 L-12 23"/></g>`;
-const I=(x,y,c='#387bb5')=>`<path d="M${x} ${y-19}v38" stroke="${c}" stroke-width="9" stroke-linecap="round"/>`;
-const cell=(x,y,content,r=30)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#e9f4ff" stroke="#4487ba" stroke-width="2"/>${content}`;
-const label=(t,x,y)=>`<text x="${x}" y="${y}" font-size="12" text-anchor="middle" fill="#244866" font-weight="700">${t}</text>`;
-const art={chromosome:svg(X(80,45)),chromatid:svg(`${X(80,45)}<path d="M68 22 L92 68" stroke="#ffae32" stroke-width="11" stroke-linecap="round"/>`),centromere:svg(`${X(80,45)}<circle cx="80" cy="45" r="8" fill="#e94c69"/>`),homolog:svg(`${X(48,45)}${X(112,45,'#e89b40')}`),diploid:svg(cell(80,45,`${I(65,35)}${I(95,35,'#e89b40')}${I(65,57)}${I(95,57,'#e89b40')}`,39)),haploid:svg(cell(80,45,`${I(72,37)}${I(91,55)}`,39)),mitosis:svg(`${cell(33,45,X(33,45,'#387bb5',.55),25)}<path d="M63 45h30m-8 -7 8 7 -8 7" stroke="#234" fill="none" stroke-width="2"/>${cell(119,24,I(119,24),18)}${cell(119,67,I(119,67),18)}`),meiosis:svg(`${cell(30,45,X(30,45,'#387bb5',.5),23)}<path d="M54 45h23" stroke="#234" stroke-width="2"/><path d="m70 39 8 6-8 6" fill="none" stroke="#234" stroke-width="2"/>${[17,35,55,73].map(y=>cell(116,y,I(116,y,'#387bb5'),8)).join('')}`),gamete:svg(`${cell(48,45,I(48,45),26)}${cell(113,45,I(113,45,'#e89b40'),16)}<path d="M129 45q22 8 12 24" stroke="#e89b40" fill="none" stroke-width="3"/>`),daughter:svg(`${cell(46,45,I(46,45),24)}${cell(115,45,I(115,45),24)}`),meiosis1:svg(`${cell(29,45,`${X(20,45,'#387bb5',.45)}${X(39,45,'#e89b40',.45)}`,24)}<path d="M56 45h22m-8 -6 8 6-8 6" stroke="#234" fill="none" stroke-width="2"/>${cell(107,25,X(107,25,'#387bb5',.43),18)}${cell(107,66,X(107,66,'#e89b40',.43),18)}`),meiosis2:svg(`${cell(27,45,X(27,45,'#387bb5',.45),23)}<path d="M54 45h25m-7 -6 7 6-7 6" stroke="#234" fill="none" stroke-width="2"/>${cell(113,24,I(113,24),17)}${cell(113,66,I(113,66),17)}`),crossing:svg(`${X(50,45,'#387bb5')}${X(110,45,'#e89b40')}<path d="M38 22L122 68" stroke="#de5970" stroke-width="3" stroke-dasharray="5 4"/>${label('Austausch',80,86)}`),diversity:svg(`${[28,62,98,132].map((x,i)=>cell(x,45,I(x,45,['#387bb5','#e89b40','#9a5ab4','#258a69'][i]),16)).join('')}`),fertilization:svg(`${cell(36,45,I(36,45),22)}${label('+',78,50)}${cell(118,45,I(108,45,'#e89b40')+I(128,45),28)}`),bodycell:svg(cell(80,45,`${I(65,35)}${I(95,35,'#e89b40')}${I(65,57)}${I(95,57,'#e89b40')}`,39)),sisters:svg(`${X(80,45)}<circle cx="80" cy="45" r="5" fill="#e94c69"/>`)};
-const levels=[[
-['chromosome','Chromosom','Struktur aus DNA und Proteinen, die Erbinformation trägt.'],['diploid','diploid (2n)','Zwei Chromosomensätze: beim Menschen normalerweise 46 Chromosomen.'],['haploid','haploid (n)','Ein Chromosomensatz: beim Menschen 23 Chromosomen.'],['gamete','Geschlechtszelle','Haploide Zelle zur Fortpflanzung, z. B. Eizelle oder Spermium.']],
-[['chromatid','Chromatid','Eine Längshälfte eines verdoppelten Chromosoms.'],['sisters','Schwesterchromatiden','Zwei identische Chromatiden eines verdoppelten Chromosoms.'],['centromere','Centromer','Bereich, in dem die Schwesterchromatiden verbunden sind.'],['homolog','Homologe Chromosomen','Zusammengehörige Chromosomen mit denselben Genorten; je eines von jedem Elternteil.']],
-[['meiosis','Meiose','Zwei aufeinanderfolgende Zellteilungen, die gewöhnlich vier haploide Zellen hervorbringen.'],['meiosis1','Meiose I','Homologe Chromosomen werden getrennt; der Chromosomensatz wird halbiert.'],['meiosis2','Meiose II','Schwesterchromatiden werden voneinander getrennt.'],['crossing','Crossing-over','Austausch von DNA-Abschnitten zwischen Nicht-Schwesterchromatiden homologer Chromosomen.']],
-[['mitosis','Mitose','Kernteilung, bei der die Chromosomenzahl erhalten bleibt; meist entstehen zwei genetisch gleiche Tochterzellen.'],['daughter','Tochterzelle','Neue Zelle, die aus einer Zellteilung hervorgeht.'],['diversity','Genetische Vielfalt','Unterschiede in der Erbinformation, die unter anderem durch die Meiose entstehen.'],['fertilization','Befruchtung','Verschmelzung haploider Geschlechtszellen, wodurch ein diploider Chromosomensatz entsteht.']]];
-const allCards=levels.flat();let selection={},solved=new Set(),attempts=0,points=0,turn=0;const $=id=>document.getElementById(id);const shuffle=a=>[...a].sort(()=>Math.random()-.5);function role(){ $('role').textContent=`Aktiv: Person ${turn%4+1} – ${['Begriff vorlesen','Erklärung prüfen','Bild deuten','Zuordnung begründen'][turn%4]}. Danach wechseln.`}function render(){selection={};solved=new Set();attempts=0;points=0;turn=0;$('finish').innerHTML='';for(const [idx,target] of ['terms','definitions','pictures'].entries()){const el=$(target);el.innerHTML='';shuffle(allCards).forEach(([id,term,def])=>{const b=document.createElement('button');b.className='tile';b.dataset.id=id;b.dataset.col=idx;b.setAttribute('aria-pressed','false');if(idx===2){b.innerHTML=art[id]}else b.textContent=idx===0?term:def;b.onclick=()=>{if(solved.has(id))return;const old=selection[idx];if(old)old.classList.remove('selected');if(old===b){delete selection[idx]}else{selection[idx]=b;b.classList.add('selected')}b.setAttribute('aria-pressed',String(selection[idx]===b));$('message').textContent=`${Object.keys(selection).length} von 3 Karten ausgewählt.`};el.appendChild(b)})}update();role();$('message').textContent='Wählt eine Karte aus jeder Spalte.'}function update(){$('matched').textContent=`Gefunden: ${solved.size}/4`;$('attempts').textContent=`Versuche: ${attempts}`;$('points').textContent=`Punkte: ${points}`;$('bar').style.width=(solved.size/16*100)+'%'}function check(){if(Object.keys(selection).length!==3){$('message').textContent='Bitte zuerst je eine Karte aus allen drei Spalten auswählen.';return}attempts++;const ids=Object.values(selection).map(b=>b.dataset.id);const good=ids.every(id=>id===ids[0]);if(good){solved.add(ids[0]);points+=10;document.querySelectorAll(`.tile[data-id="${ids[0]}"]`).forEach(b=>{b.classList.remove('selected');b.classList.add('matched');b.disabled=true});$('message').textContent='✓ Richtig zugeordnet! +10 Punkte. Erklärt euch kurz, warum es passt.'}else{$('message').textContent='Noch nicht richtig. Vergleicht die Karten und versucht es erneut.'}selection={};turn++;role();update();if(solved.size===16){$('finish').innerHTML=`<div class="win"><h2>🎉 Alle Begriffe geschafft!</h2><p>Ihr habt alle 16 Dreiergruppen gefunden – ${points} Punkte in ${attempts} Versuchen.</p><button class="action" id="again">Noch einmal spielen</button></div>`;$('again').onclick=render}} $('check').onclick=check;$('reset').onclick=render;$('tip').onclick=()=>{$('message').textContent='Tipp: Achtet auf Schlüsselwörter wie „doppelt“, „einfach“, „getrennt“, „identisch“ und „Austausch“. Jede Abbildung ist schematisch.'};render();
-</script></body></html>
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Meiose-Match – Zuordnungsspiel</title>
+<style>
+:root{font-family:system-ui,Arial,sans-serif;color:#14243a;background:#eef4fa}
+*{box-sizing:border-box}
+body{margin:0}
+header{background:#18365c;color:#fff;padding:18px max(18px,calc((100vw - 1180px)/2))}
+h1{margin:0 0 4px;font-size:clamp(1.5rem,4vw,2.3rem)}
+header div{opacity:.92}
+main{max-width:1180px;margin:auto;padding:14px 18px 10px}
+p{line-height:1.45}
+button{font:inherit;cursor:pointer}
+button:focus-visible{outline:4px solid #ffb636;outline-offset:2px}
+
+.modebar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:4px 0 12px}
+.seg{display:inline-flex;background:#fff;border:1px solid #acc2d6;border-radius:12px;padding:3px}
+.seg button{border:0;background:transparent;border-radius:9px;padding:9px 20px;font-weight:700;color:#1b4b76}
+.seg button[aria-checked="true"]{background:#1b6198;color:#fff}
+.modeinfo{font-size:.95rem;color:#2f4a63}
+
+.instructions{background:#fff;border-left:5px solid #2e85b9;padding:10px 16px;border-radius:10px;font-size:.95rem}
+.instructions p{margin:0}
+.role{font-weight:750;color:#1b6198}
+
+details.legend{background:#fff;border-radius:10px;margin:12px 0;padding:8px 14px;border:1px solid #d3e0ec}
+details.legend summary{cursor:pointer;font-weight:700;color:#1b4b76}
+.legend-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px 18px;margin-top:10px}
+.legend-item{display:flex;align-items:center;gap:10px;font-size:.88rem;line-height:1.3}
+.legend-item svg{flex:0 0 74px;width:74px;height:44px;background:#f3f9ff;border:1px solid #d3e0ec;border-radius:8px}
+.legend-note{font-size:.85rem;color:#44596e;margin:10px 0 2px}
+
+.sticky{position:sticky;top:0;z-index:10;background:#eef4fa;padding:8px 0;border-bottom:1px solid #d3e0ec;display:flex;gap:10px;align-items:stretch;margin-top:6px}
+.sticky .action{flex:0 0 auto}
+.sticky .slots{flex:1 1 auto;min-width:0}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.stat{background:#fff;border-radius:10px;padding:7px 12px;font-weight:650;font-size:.92rem}
+button.action{background:#1b6198;color:#fff;border:0;border-radius:10px;padding:10px 16px;font-weight:700}
+button.secondary{background:#fff;color:#1b4b76;border:1px solid #acc2d6}
+.progress{height:10px;background:#c9d8e7;border-radius:99px;overflow:hidden;margin:8px 0 6px}
+.progress>div{height:100%;background:#27865a;transition:width .25s}
+.slots{display:grid;grid-template-columns:1fr 1.4fr .9fr;gap:6px}
+.slot{background:#fff;border:2px dashed #acc2d6;border-radius:10px;padding:5px 9px;min-height:44px;font-size:.82rem;display:flex;align-items:center;gap:8px;overflow:hidden;color:#6a7e92}
+.slot.filled{border-style:solid;border-color:#146ca9;background:#e3f3ff;color:#14243a;font-weight:600}
+.slot svg{height:34px;width:auto;flex:0 0 auto}
+.slot span{overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+
+.notice{min-height:46px;font-weight:650;padding:11px 14px;background:#fff;border-radius:10px;margin:10px 0}
+.notice.ok{background:#e3f6e9;color:#1e6745}
+.notice.part{background:#fff6dc;color:#6b4d00}
+.notice.bad{background:#fde8ea;color:#8a2336}
+
+.board{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.25fr) minmax(0,1.15fr);gap:12px;margin:10px 0}
+.column{min-width:0;background:#dce8f3;border-radius:15px;padding:10px}
+.column h2{font-size:1rem;text-align:center;margin:4px 0 10px;color:#1b3e63}
+.tiles{display:grid;gap:8px}
+.tile{border:2px solid transparent;background:#fff;border-radius:12px;padding:10px 12px;text-align:left;box-shadow:0 2px 5px #153d5812;transition:transform .12s,border .12s;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;font-size:.95rem;line-height:1.35;color:inherit}
+.tile:hover:not(:disabled){transform:translateY(-2px)}
+.tile.term{font-weight:750;text-align:center;min-height:58px;font-size:1rem}
+.tile.def{align-items:flex-start;min-height:84px}
+.tile.pic{padding:6px}
+.tile.pic svg{display:block;width:100%;height:auto}
+.tile.selected{border-color:#146ca9;background:#e3f3ff}
+.tile.matched{border-color:#27865a;background:#e3f6e9;color:#1e6745}
+.tile.matched:disabled{opacity:1}
+.cap{font-size:.8rem;font-weight:750;color:#1e6745;margin-top:2px}
+.win{background:#e3f6e9;border:2px solid #27865a;border-radius:12px;padding:16px;margin:12px 0}
+.win h2{margin:0 0 6px}
+.footer{font-size:.84rem;color:#53657a;padding:6px 0 24px}
+
+@media(max-width:820px){
+  main{padding:10px}
+  .board{grid-template-columns:1fr;gap:10px}
+  #terms,#pictures{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sticky{flex-direction:column;gap:6px}
+  .slots{grid-template-columns:1fr 1fr 1fr}
+  .slot{min-height:38px;font-size:.75rem;padding:3px 6px}
+  .slot svg{height:28px}
+  .tile.def{min-height:0}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Meiose-Match</h1>
+  <div>Zuordnungsspiel für Vierergruppen · Begriff, Erklärung und Abbildung gehören zusammen</div>
+</header>
+
+<main>
+  <div class="modebar">
+    <div class="seg" role="radiogroup" aria-label="Schwierigkeit">
+      <button type="button" role="radio" id="m-easy" aria-checked="true">Einfach</button>
+      <button type="button" role="radio" id="m-hard" aria-checked="false">Schwer</button>
+    </div>
+    <div class="modeinfo" id="modeinfo"></div>
+  </div>
+
+  <div class="instructions">
+    <p><strong>Spielregel:</strong> Wählt je <strong>einen Begriff</strong>, <strong>eine Erklärung</strong> und <strong>eine Abbildung</strong> aus, die zusammenpassen. Dann klickt auf „Lösung prüfen“. Sind alle drei richtig, gibt es 10 Punkte. Passen mindestens <strong>zwei von drei</strong> Karten zusammen, zählt die Gruppe auch als gefunden (5 Punkte). Danach ist die nächste Person dran.</p>
+    <p class="role" id="role"></p>
+  </div>
+
+  <details class="legend" open>
+    <summary>Legende zu den Abbildungen</summary>
+    <div class="legend-grid" id="legend"></div>
+    <p class="legend-note">Alle Abbildungen zeigen dieselbe Modellzelle mit 2n = 4: zwei lange und zwei kurze Chromosomen. Sie sind schematisch und nicht maßstabsgetreu.</p>
+  </details>
+
+  <div class="toolbar">
+    <button class="action secondary" id="clear" type="button">Auswahl löschen</button>
+    <button class="action secondary" id="reset" type="button">Neu mischen</button>
+    <button class="action secondary" id="tip" type="button">Tipp</button>
+    <span class="stat" id="matched">Gefunden: 0/0</span>
+    <span class="stat" id="attempts">Versuche: 0</span>
+    <span class="stat" id="points">Punkte: 0</span>
+  </div>
+  <div class="progress" aria-label="Fortschritt"><div id="bar" style="width:0%"></div></div>
+
+  <div class="sticky">
+    <button class="action" id="check" type="button">Lösung prüfen</button>
+    <div class="slots" aria-label="Aktuelle Auswahl">
+      <div class="slot" id="slot0">Begriff</div>
+      <div class="slot" id="slot1">Erklärung</div>
+      <div class="slot" id="slot2">Abbildung</div>
+    </div>
+  </div>
+
+  <div id="message" class="notice" role="status" aria-live="polite">Wählt aus jeder Spalte eine Karte.</div>
+
+  <div class="board">
+    <section class="column"><h2>1. Begriff</h2><div class="tiles" id="terms"></div></section>
+    <section class="column"><h2>2. Erklärung</h2><div class="tiles" id="definitions"></div></section>
+    <section class="column"><h2>3. Abbildung</h2><div class="tiles" id="pictures"></div></section>
+  </div>
+
+  <div id="finish"></div>
+  <p class="footer">Ohne Anmeldung, Werbung oder Datenerfassung; funktioniert auch offline. Zum Vergleich: Beim Menschen bedeutet 2n = 46 und n = 23.</p>
+</main>
+
+<script>
+/* ============ Zeichenhilfen ============ */
+const BL='#2c6fb3', OR='#e0872b', RD='#d3365a', GY='#93a5b8', DK='#2b4a68', NUC='#f3f9ff';
+const svg=(b,vb='0 0 200 120')=>`<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">${b}</svg>`;
+const rod=(x,y,l,c,w=5,a=0)=>`<line x1="${x}" y1="${y-l/2}" x2="${x}" y2="${y+l/2}" stroke="${c}" stroke-width="${w}" stroke-linecap="round" transform="rotate(${a} ${x} ${y})"/>`;
+const xch=(x,y,l,c,w=5,a=0)=>{const d=l*.17;return `<g transform="rotate(${a} ${x} ${y})" stroke="${c}" stroke-width="${w}" stroke-linecap="round"><line x1="${x-d}" y1="${y-l/2}" x2="${x+d}" y2="${y+l/2}"/><line x1="${x+d}" y1="${y-l/2}" x2="${x-d}" y2="${y+l/2}"/></g>`};
+/* LG = langes Chromosom, SH = kurzes Chromosom; t = 'I' (ein Chromatid) oder 'X' (zwei Chromatiden); s = Maßstab */
+const LG=(x,y,c,t,s=1,a=0)=>t==='X'?xch(x,y,40*s,c,Math.max(2.4,5*s),a):rod(x,y,40*s,c,Math.max(2.4,5*s),a);
+const SH=(x,y,c,t,s=1,a=0)=>t==='X'?xch(x,y,26*s,c,Math.max(2.4,5*s),a):rod(x,y,26*s,c,Math.max(2.4,5*s),a);
+const cell=(cx,cy,rx,ry,o={})=>`<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${o.fill||NUC}" stroke="${o.stroke||'#5d8fba'}" stroke-width="${o.sw||2}"${o.dash?' stroke-dasharray="4 3"':''}/>`;
+const ln=(x1,y1,x2,y2,c=GY,w=1,dash)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="${w}"${dash?` stroke-dasharray="${dash}"`:''}/>`;
+const dot=(x,y,r=2.6,c='#6b7f94')=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${c}"/>`;
+const txt=(t,x,y,s=10,c=DK,w=700,anchor='middle')=>`<text x="${x}" y="${y}" font-size="${s}" text-anchor="${anchor}" fill="${c}" font-weight="${w}" font-family="system-ui,Arial,sans-serif">${t}</text>`;
+const arr=(x1,y1,x2,y2,c=DK,w=2)=>{const a=Math.atan2(y2-y1,x2-x1),h=7,p1=[x2-h*Math.cos(a-.5),y2-h*Math.sin(a-.5)],p2=[x2-h*Math.cos(a+.5),y2-h*Math.sin(a+.5)];return `<line x1="${x1}" y1="${y1}" x2="${x2-3*Math.cos(a)}" y2="${y2-3*Math.sin(a)}" stroke="${c}" stroke-width="${w}"/><polygon points="${x2},${y2} ${p1.map(v=>v.toFixed(1))} ${p2.map(v=>v.toFixed(1))}" fill="${c}"/>`};
+const aster=(x,y,dir)=>[-35,0,35].map(a=>{const r=a*Math.PI/180;return ln(x,y,x+dir*10*Math.cos(r),y+10*Math.sin(r),'#6b7f94',1.2)}).join('')+dot(x,y,2.8);
+/* vier Chromosomen eines diploiden Satzes: 2 lange (blau/orange), 2 kurze (blau/orange) */
+const set4=(cx,cy,t,s=1,sp=13)=>LG(cx-1.5*sp*s,cy,BL,t,s)+LG(cx-.5*sp*s,cy,OR,t,s)+SH(cx+.5*sp*s,cy,BL,t,s)+SH(cx+1.5*sp*s,cy,OR,t,s);
+
+/* ============ Abbildungen ============ */
+const P={
+/* ---- Meiose-Ablauf (Einfach) ---- */
+meiose:()=>svg(
+  cell(30,60,22,22)+rod(20,60,22,BL,3)+rod(27,60,22,OR,3)+rod(34,62,13,BL,3)+rod(41,62,13,OR,3)
+  +arr(55,54,77,34)+arr(55,66,77,86)
+  +cell(96,29,17,17)+LG(90,29,BL,'X',.4)+SH(102,30,OR,'X',.4)
+  +cell(96,91,17,17)+LG(90,91,OR,'X',.4)+SH(102,92,BL,'X',.4)
+  +arr(115,26,146,15)+arr(115,32,146,43)+arr(115,88,146,77)+arr(115,94,146,105)
+  +[15,43].map(y=>cell(162,y,12,12)+LG(157,y,BL,'I',.3)+SH(167,y+1,OR,'I',.3)).join('')
+  +[77,105].map(y=>cell(162,y,12,12)+LG(157,y,OR,'I',.3)+SH(167,y+1,BL,'I',.3)).join('')
+),
+sphase:()=>svg(
+  cell(46,60,42,42,{fill:'#e4f0fb',stroke:DK,sw:2.6})+set4(46,60,'I',.8,19)
+  +arr(94,60,108,60)
+  +cell(154,60,42,42,{fill:'#e4f0fb',stroke:DK,sw:2.6})+set4(154,60,'X',.8,19)
+),
+prophase1:()=>svg(
+  cell(100,60,88,52)+cell(100,60,46,46,{fill:'none',stroke:DK,sw:1.6,dash:1})
+  +aster(14,60,1)+aster(186,60,-1)
+  +LG(80,44,BL,'X')+LG(98,44,OR,'X')+SH(104,86,BL,'X')+SH(118,86,OR,'X')
+),
+metaphase1:()=>svg(
+  cell(100,60,88,52)+ln(100,12,100,108,'#b6c6d6',1.2,'3 3')
+  +[38,82].map(y=>ln(14,60,86,y)+ln(186,60,114,y)).join('')
+  +dot(14,60)+dot(186,60)
+  +LG(88,38,BL,'X')+LG(112,38,OR,'X')+SH(90,82,OR,'X')+SH(110,82,BL,'X')
+),
+anaphase1:()=>svg(
+  cell(100,60,92,46)
+  +ln(12,60,50,40)+ln(12,60,56,82)+ln(188,60,150,40)+ln(188,60,144,82)
+  +dot(12,60)+dot(188,60)
+  +LG(50,40,BL,'X')+SH(56,82,OR,'X')+LG(150,40,OR,'X')+SH(144,82,BL,'X')
+),
+telophase1:()=>svg(
+  cell(52,60,46,46)+cell(148,60,46,46)
+  +cell(52,60,34,34,{fill:'none',stroke:DK,sw:1.4,dash:1})+cell(148,60,34,34,{fill:'none',stroke:DK,sw:1.4,dash:1})
+  +LG(40,60,BL,'X')+SH(64,60,OR,'X')+LG(136,60,OR,'X')+SH(160,60,BL,'X')
+),
+prophase2:()=>svg(
+  cell(100,60,76,50)+aster(32,60,1)+aster(168,60,-1)
+  +LG(80,50,BL,'X',1,25)+SH(122,72,OR,'X',1,-30)
+),
+metaphase2:()=>svg(
+  cell(100,60,76,50)+ln(100,14,100,106,'#b6c6d6',1.2,'3 3')
+  +[38,84].map(y=>ln(30,60,94,y)+ln(170,60,106,y)).join('')
+  +dot(30,60)+dot(170,60)
+  +LG(100,38,BL,'X')+SH(100,84,OR,'X')
+),
+anaphase2:()=>svg(
+  cell(100,60,92,46)
+  +ln(12,60,50,40)+ln(12,60,56,82)+ln(188,60,150,40)+ln(188,60,144,82)
+  +dot(12,60)+dot(188,60)
+  +LG(50,40,BL,'I')+SH(56,82,OR,'I')+LG(150,40,BL,'I')+SH(144,82,OR,'I')
+),
+telophase2:()=>svg(
+  [[24,BL,OR],[70,BL,OR],[130,OR,BL],[176,OR,BL]].map(([x,a,b])=>cell(x,60,22,34)+cell(x,60,15,22,{fill:'none',stroke:DK,sw:1.2,dash:1})+LG(x-6,60,a,'I',.55)+SH(x+6,61,b,'I',.55)).join('')
+),
+crossing:()=>svg(
+  rod(58,60,96,BL,8)+rod(142,60,96,OR,8)
+  +`<g fill="none" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">`
+  +`<polyline points="78,12 78,40 122,80 122,86" stroke="${BL}"/><polyline points="122,92 122,108" stroke="${OR}"/>`
+  +`<polyline points="122,12 122,40 78,80 78,86" stroke="${OR}"/><polyline points="78,92 78,108" stroke="${BL}"/></g>`
+  +`<circle cx="100" cy="60" r="15" fill="none" stroke="${RD}" stroke-width="2" stroke-dasharray="4 3"/>`
+),
+/* ---- Begriffe (Schwer) ---- */
+haploid:()=>svg(
+  cell(100,60,58,50)+LG(84,60,BL,'I',1.3)+SH(116,60,OR,'I',1.3)
+),
+diploid:()=>svg(
+  cell(100,60,76,50)+set4(100,60,'I',1.3,17)
+),
+homolog:()=>svg(
+  `<rect x="63" y="14" width="14" height="92" rx="7" fill="${BL}"/><rect x="123" y="14" width="14" height="92" rx="7" fill="${OR}"/>`
+  +[[36,'A','a'],[60,'B','B'],[84,'C','c']].map(([y,l,r])=>ln(63,y,77,y,'#fff',2.4)+ln(123,y,137,y,'#fff',2.4)+ln(77,y,123,y,GY,1,'2 3')+txt(l,52,y+4,11,BL)+txt(r,148,y+4,11,OR)).join('')
+),
+sisters:()=>svg(
+  `<g stroke-linecap="round" stroke-width="10"><line x1="78" y1="18" x2="122" y2="102" stroke="${BL}"/><line x1="122" y1="18" x2="78" y2="102" stroke="#7bb0e0"/></g>`
+  +txt('=',150,66,26,DK)+txt('identisch',100,116,10,DK,650)
+),
+centromere:()=>svg(
+  `<g stroke-linecap="round" stroke-width="10" stroke="${BL}"><line x1="78" y1="14" x2="122" y2="98"/><line x1="122" y1="14" x2="78" y2="98"/></g>`
+  +`<circle cx="100" cy="56" r="8" fill="${RD}"/>`+arr(160,30,112,52,RD,2.4)
+),
+meiosis1:()=>svg(
+  cell(42,60,40,40)+set4(42,60,'X',.7,19)+arr(88,60,110,60)
+  +cell(152,30,26,26)+LG(142,30,BL,'X',.7)+SH(162,31,OR,'X',.7)
+  +cell(152,90,26,26)+LG(142,90,OR,'X',.7)+SH(162,91,BL,'X',.7)
+),
+meiosis2:()=>svg(
+  cell(40,60,32,32)+LG(30,60,BL,'X',.7)+SH(50,61,OR,'X',.7)+arr(80,60,106,60)
+  +cell(152,30,26,26)+LG(142,30,BL,'I',.7)+SH(162,31,OR,'I',.7)
+  +cell(152,90,26,26)+LG(142,90,BL,'I',.7)+SH(162,91,OR,'I',.7)
+),
+mitosis:()=>svg(
+  cell(42,60,40,40)+set4(42,60,'X',.7,19)+arr(88,60,110,60)
+  +[30,90].map(y=>cell(152,y,28,26)+set4(152,y,'I',.65,14)).join('')
+),
+fertilization:()=>svg(
+  cell(28,60,24,24)+LG(21,60,BL,'I',.6)+SH(35,61,BL,'I',.6)
+  +txt('+',58,66,16,DK)
+  +`<ellipse cx="82" cy="60" rx="11" ry="9" fill="${NUC}" stroke="#5d8fba" stroke-width="1.8"/>`+LG(78,60,OR,'I',.3)+SH(86,60,OR,'I',.3)
+  +`<path d="M93 60 Q98 66 103 60 T113 60" fill="none" stroke="#5d8fba" stroke-width="1.6"/>`
+  +arr(120,60,136,60)
+  +cell(168,60,30,30)+LG(154,60,BL,'I',.7)+LG(164,60,OR,'I',.7)+SH(174,61,BL,'I',.7)+SH(184,61,OR,'I',.7)
+),
+random:()=>svg(
+  [[44,BL,OR],[156,OR,BL]].map(([cx,a,b],i)=>cell(cx,60,38,48)+ln(cx,16,cx,104,'#b6c6d6',1.2,'3 3')
+    +LG(cx-10,38,BL,'X',.7)+LG(cx+10,38,OR,'X',.7)
+    +SH(cx-9,82,i?OR:BL,'X',.7)+SH(cx+9,82,i?BL:OR,'X',.7)).join('')
+  +txt('oder',100,64,11,DK)
+),
+nondisjunction:()=>svg(
+  cell(100,58,92,50)
+  +ln(12,58,46,48)+ln(12,58,68,48)+ln(12,58,58,84)+ln(188,58,150,70)
+  +dot(12,58)+dot(188,58)
+  +LG(46,48,BL,'X',.8)+LG(68,48,OR,'X',.8)+SH(58,84,OR,'X',.8)+SH(150,70,BL,'X',.8)
+  +txt('3',40,118,12,RD)+txt('1',152,118,12,RD)
+)
+};
+
+/* ============ Inhalte ============ */
+const MODES={
+ easy:{
+  label:'Einfach',
+  info:'Meiose und ihr Ablauf: Phasen von der DNA-Verdopplung bis zu den vier Zellen',
+  tip:'Reihenfolge: S-Phase, Prophase I, Metaphase I, Anaphase I, Telophase I, Prophase II, Metaphase II, Anaphase II, Telophase II. Achtet darauf, ob die Chromosomen aus einem Strich (I) oder aus einem X bestehen, ob homologe Chromosomen noch paarweise zusammenliegen und wie viele Zellen zu sehen sind.',
+  cards:[
+   ['meiose','Meiose','Zellteilung zur Bildung von Keimzellen. Aus einer diploiden Zelle entstehen durch zwei Teilungen vier haploide Zellen.'],
+   ['sphase','S-Phase (vor der Meiose)','Die DNA wird verdoppelt. Danach besteht jedes Chromosom aus zwei Chromatiden.'],
+   ['prophase1','Prophase I','Die Chromosomen verkürzen sich. Homologe Chromosomen legen sich paarweise aneinander. Die Kernhülle löst sich auf.'],
+   ['metaphase1','Metaphase I','Die Chromosomenpaare liegen in der Zellmitte (Äquatorialebene). Die beiden homologen Chromosomen eines Paares liegen auf verschiedenen Seiten.'],
+   ['anaphase1','Anaphase I','Die homologen Chromosomen werden voneinander getrennt und zu entgegengesetzten Zellpolen bewegt. Jedes Chromosom besteht noch aus zwei Chromatiden.'],
+   ['telophase1','Telophase I','Zwei Zellen sind entstanden. Sie sind haploid. Jedes Chromosom besteht noch aus zwei Chromatiden.'],
+   ['prophase2','Prophase II','Zweite Teilung beginnt: Die Spindel bildet sich neu. Die einzelnen Chromosomen liegen noch ungeordnet in der Zelle. Die DNA wird vorher nicht verdoppelt.'],
+   ['metaphase2','Metaphase II','Die einzelnen Chromosomen mit je zwei Chromatiden liegen untereinander in der Zellmitte (Äquatorialebene).'],
+   ['anaphase2','Anaphase II','Die Schwesterchromatiden werden getrennt und zu entgegengesetzten Zellpolen bewegt. Jetzt besteht jedes Chromosom nur noch aus einem Chromatid.'],
+   ['telophase2','Telophase II','Letzte Phase: Aus den zwei Zellen werden vier Zellen. Jede Zelle ist haploid, ihre Chromosomen bestehen aus einem Chromatid.'],
+   ['crossing','Crossing-over','Austausch von Chromosomenabschnitten zwischen Chromatiden homologer Chromosomen. Es entstehen neue Kombinationen von Allelen.']
+  ]},
+ hard:{
+  label:'Schwer',
+  info:'Grundbegriffe, Teilungsarten und Ursachen genetischer Vielfalt im Vergleich',
+  tip:'Achtet auf die Zahl der Chromosomen vor und nach der Teilung, auf I (ein Chromatid) und X (zwei Chromatiden) und auf die Farben (blau und orange stehen für die Eltern). Bei „Pfeil-Abbildungen“ vergleicht links und rechts.',
+  cards:[
+   ['haploid','haploid (n)','Die Zelle hat von jedem Chromosomentyp nur ein Chromosom. Beim Menschen sind das 23 Chromosomen.'],
+   ['diploid','diploid (2n)','Die Zelle hat von jedem Chromosomentyp zwei Chromosomen. Beim Menschen sind das 46 Chromosomen.'],
+   ['homolog','Homologe Chromosomen','Zwei Chromosomen mit gleicher Länge und gleichen Genorten. Eines stammt von der Mutter, eines vom Vater. Die Allele können verschieden sein.'],
+   ['sisters','Schwesterchromatiden','Die zwei Chromatiden eines Chromosoms nach der DNA-Verdopplung. Sie tragen identische Erbinformation.'],
+   ['centromere','Centromer','Eingeschnürte Stelle eines Chromosoms. Hier hängen die Schwesterchromatiden zusammen. Hier setzen die Spindelfasern an.'],
+   ['crossing','Crossing-over','In der Prophase I tauschen zwei Chromatiden homologer Chromosomen Abschnitte aus. Es entstehen neue Allelkombinationen innerhalb eines Chromosoms.'],
+   ['random','Zufällige Verteilung der Chromosomen','Mütterliche und väterliche Chromosomen ordnen sich in der Metaphase I zufällig an. Dadurch entstehen viele verschiedene Kombinationen in den Keimzellen.'],
+   ['meiosis1','Meiose I (Reduktionsteilung)','Homologe Chromosomen werden getrennt. Die Chromosomenzahl wird halbiert: Aus 2n wird n.'],
+   ['meiosis2','Meiose II (Äquationsteilung)','Die Schwesterchromatiden werden getrennt. Die Chromosomenzahl bleibt gleich (n).'],
+   ['mitosis','Mitose','Eine Kernteilung ohne Halbierung des Chromosomensatzes. Es entstehen zwei diploide Tochterzellen mit gleicher Erbinformation.'],
+   ['fertilization','Befruchtung','Eine haploide Eizelle und eine haploide Spermienzelle verschmelzen. Es entsteht eine diploide Zygote.'],
+   ['nondisjunction','Nondisjunktion','Fehler bei der Trennung: Chromosomen oder Chromatiden bleiben zusammen. Zellen haben dann zu viele oder zu wenige Chromosomen, z. B. bei Trisomie 21.']
+  ]}
+};
+
+/* ============ Legende ============ */
+const LEG=[
+ [svg(rod(37,22,32,BL,6)+rod(55,22,32,OR,6),'0 0 92 44'),'Blau und orange: Chromosomen von den beiden Eltern (mütterlich und väterlich)'],
+ [svg(rod(46,22,30,BL,6),'0 0 92 44'),'Strich (I): Chromosom aus einem Chromatid'],
+ [svg(xch(46,22,32,BL,6),'0 0 92 44'),'X: Chromosom aus zwei Chromatiden (nach der DNA-Verdopplung)'],
+ [svg(ln(10,22,82,10,GY,1.4)+ln(10,22,82,34,GY,1.4)+dot(10,22,3),'0 0 92 44'),'Graue Linien: Spindelfasern, Punkte: Zellpole'],
+ [svg(`<circle cx="46" cy="22" r="17" fill="none" stroke="${DK}" stroke-width="1.6" stroke-dasharray="4 3"/>`,'0 0 92 44'),'Gestrichelter Kreis: Kernhülle löst sich auf oder bildet sich neu'],
+ [svg(ln(46,4,46,40,'#b6c6d6',1.4,'3 3'),'0 0 92 44'),'Gestrichelte Linie: Äquatorialebene (Zellmitte)']
+];
+
+/* ============ Spiellogik ============ */
+const $=id=>document.getElementById(id);
+let mode='easy', selection={}, solved=new Set(), attempts=0, points=0, turn=0;
+const cardsNow=()=>MODES[mode].cards;
+const shuffle=a=>{const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}return r};
+const termOf=id=>cardsNow().find(c=>c[0]===id)[1];
+
+function role(){$('role').textContent=`Aktiv: Person ${turn%4+1} – ${['Begriff vorlesen','Erklärung prüfen','Abbildung beschreiben','Zuordnung begründen'][turn%4]}. Danach wechseln.`}
+function say(text,cls=''){const m=$('message');m.textContent=text;m.className='notice '+cls}
+function update(){
+  const total=cardsNow().length;
+  $('matched').textContent=`Gefunden: ${solved.size}/${total}`;
+  $('attempts').textContent=`Versuche: ${attempts}`;
+  $('points').textContent=`Punkte: ${points}`;
+  $('bar').style.width=(solved.size/total*100)+'%';
+}
+function updateSlots(){
+  [0,1,2].forEach(c=>{
+    const s=$('slot'+c), b=selection[c];
+    s.className='slot'+(b?' filled':'');
+    if(!b){s.textContent=['Begriff','Erklärung','Abbildung'][c];return}
+    if(c===0)s.innerHTML='<span></span>',s.firstChild.textContent=b.textContent;
+    else if(c===1){s.innerHTML='<span></span>';s.firstChild.textContent=b.textContent}
+    else s.innerHTML=b.querySelector('svg').outerHTML;
+  });
+}
+function clearSelection(){
+  Object.values(selection).forEach(b=>{b.classList.remove('selected');b.setAttribute('aria-pressed','false')});
+  selection={};updateSlots();
+}
+function buildLegend(){
+  $('legend').innerHTML=LEG.map(([s,t])=>`<div class="legend-item">${s}<span>${t}</span></div>`).join('');
+}
+function render(){
+  selection={};solved=new Set();attempts=0;points=0;turn=0;$('finish').innerHTML='';
+  $('modeinfo').textContent=MODES[mode].info;
+  ['easy','hard'].forEach(m=>$('m-'+m).setAttribute('aria-checked',String(m===mode)));
+  const cols=['terms','definitions','pictures'];
+  cols.forEach((target,idx)=>{
+    const el=$(target);el.innerHTML='';
+    shuffle(cardsNow()).forEach(([id,term,def],k)=>{
+      const b=document.createElement('button');
+      b.type='button';
+      b.className='tile '+['term','def','pic'][idx];
+      b.dataset.id=id;b.dataset.col=idx;
+      b.setAttribute('aria-pressed','false');
+      if(idx===2){b.innerHTML=P[id]();b.setAttribute('aria-label','Abbildung '+(k+1))}
+      else b.textContent=idx===0?term:def;
+      b.onclick=()=>{
+        if(solved.has(id))return;
+        const old=selection[idx];
+        if(old){old.classList.remove('selected');old.setAttribute('aria-pressed','false')}
+        if(old===b){delete selection[idx]}
+        else{selection[idx]=b;b.classList.add('selected');b.setAttribute('aria-pressed','true')}
+        updateSlots();
+        const n=Object.keys(selection).length;
+        say(n===3?'Alle drei Karten gewählt. Jetzt „Lösung prüfen“ drücken.':`${n} von 3 Karten ausgewählt.`);
+      };
+      el.appendChild(b);
+    });
+  });
+  updateSlots();update();role();say('Wählt aus jeder Spalte eine Karte.');
+}
+function markSolved(id){
+  solved.add(id);
+  document.querySelectorAll(`.tile[data-id="${id}"]`).forEach(b=>{
+    b.classList.remove('selected');b.classList.add('matched');b.disabled=true;b.setAttribute('aria-pressed','false');
+    if(b.classList.contains('pic')&&!b.querySelector('.cap')){const c=document.createElement('div');c.className='cap';c.textContent=termOf(id);b.appendChild(c)}
+  });
+}
+function check(){
+  if(Object.keys(selection).length!==3){say('Bitte zuerst aus allen drei Spalten je eine Karte auswählen.','bad');return}
+  attempts++;
+  const ids=[0,1,2].map(c=>selection[c].dataset.id);
+  const count={};ids.forEach(i=>count[i]=(count[i]||0)+1);
+  const [bestId,n]=Object.entries(count).sort((a,b)=>b[1]-a[1])[0];
+  const colNames=['der Begriff','die Erklärung','die Abbildung'];
+  clearSelection();
+  if(n===3){
+    points+=10;markSolved(bestId);
+    say(`Richtig zugeordnet: ${termOf(bestId)}. +10 Punkte. Erklärt euch kurz, warum es passt.`,'ok');
+  }else if(n===2){
+    const odd=ids.findIndex(i=>i!==bestId);
+    points+=5;markSolved(bestId);
+    say(`Zwei von drei Karten passen zusammen und zählen als richtig: ${termOf(bestId)}. +5 Punkte. Nicht passend war ${colNames[odd]}. Die richtige Karte ist jetzt grün markiert.`,'part');
+  }else{
+    say('Noch nicht richtig: Keine zwei Karten gehören zusammen. Vergleicht die Karten und versucht es erneut.','bad');
+  }
+  turn++;role();update();
+  const total=cardsNow().length;
+  if(solved.size===total){
+    $('finish').innerHTML=`<div class="win"><h2>Alle Gruppen gefunden</h2><p>Ihr habt alle ${total} Gruppen geschafft: ${points} von ${total*10} Punkten in ${attempts} Versuchen.</p><button class="action" id="again" type="button">Noch einmal spielen</button></div>`;
+    $('again').onclick=render;
+    $('finish').scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+}
+function setMode(m){mode=m;render()}
+
+$('check').onclick=check;
+$('clear').onclick=()=>{clearSelection();say('Auswahl gelöscht.')};
+$('reset').onclick=render;
+$('tip').onclick=()=>say('Tipp: '+MODES[mode].tip);
+$('m-easy').onclick=()=>setMode('easy');
+$('m-hard').onclick=()=>setMode('hard');
+buildLegend();render();
+</script>
+</body>
+</html>
