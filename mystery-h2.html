@@ -181,10 +181,15 @@ const team=()=>S.names.filter(Boolean).join(' & ')||'ihr';
 
 const THREE=window.THREE;
 const stage=document.getElementById('stage');
-if(!THREE){stage.insertAdjacentHTML('afterbegin','<div class="nogl">Die 3D-Grafik konnte nicht geladen werden. Bitte die Seite neu laden oder ein anderes Gerät bzw. einen anderen Browser verwenden.</div>');return}
+function noGL(msg){const sb=document.getElementById('bStart'),cb=document.getElementById('bCont');
+ if(sb){sb.disabled=true;sb.insertAdjacentHTML('beforebegin','<div class="hint" style="border-left-color:var(--bad);width:100%"><b>Das Spiel kann hier nicht starten.</b> '+msg+'</div>')}
+ if(cb)cb.disabled=true}
+if(!THREE){noGL('Die 3D-Grafik (three.js) konnte nicht geladen werden. Bitte Internetverbindung prüfen und die Seite neu laden.');return}
 
 /* ================= Renderer ================= */
-const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+let renderer;
+try{renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'})}
+catch(e){try{renderer=new THREE.WebGLRenderer({antialias:false})}catch(e2){noGL('Dieser Browser unterstützt kein WebGL (3D-Grafik) oder es ist ausgeschaltet. Bitte einen aktuellen Browser wie Chrome, Edge, Firefox oder Safari verwenden und dort die Hardwarebeschleunigung einschalten, oder ein anderes Gerät nutzen.');return}}
 renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 stage.prepend(renderer.domElement);

@@ -37,6 +37,7 @@ git clone https://github.com/makro5652/animationen.git
 | Salzlösung: Leitfähigkeit und Elektrolyse | [`Salzloesung_Leitfaehigkeit Elektrolyse.html`](Salzloesung_Leitfaehigkeit%20Elektrolyse.html) |
 | Elektrolyse einer NaCl-Schmelze | [`Elektrolyse_klasse9.html`](Elektrolyse_klasse9.html) |
 | Doppelschicht und galvanische Zelle | [`redox-galvanik-doppelschicht.html`](redox-galvanik-doppelschicht.html) |
+| Mystery Q12: Stromausfall im Chemieraum (galvanische Zellen) | [`galvanik-q12.html`](galvanik-q12.html) |
 | Säure-Base-Konzepte (Arrhenius, Brønsted) | [`saeure-base-konzepte.html`](saeure-base-konzepte.html) |
 | Protolyse von HCl in Wasser | [`Animation_Protolyse_HCL_in_Wasser.html`](Animation_Protolyse_HCL_in_Wasser.html) |
 | Fehling-Probe | [`Animation_Fehling_Probe_v2.html`](Animation_Fehling_Probe_v2.html) |
