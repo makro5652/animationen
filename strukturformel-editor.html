@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" class="paper-white">
+<html lang="de" class="paper-white" data-ws="formel">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -7,335 +7,25 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style id="printStyle"></style>
 <style>
 :root{
   /* Catppuccin Mocha – Oberfläche */
-  --ink:#1e1e2e;           /* base */
-  --ink-0:#181825;         /* mantle */
-  --ink-2:#313244;         /* surface0 */
-  --ink-3:#45475a;         /* surface1 */
-  --ink-4:#585b70;         /* surface2 */
-  --text-on-ink:#cdd6f4;   /* text */
-  --text-dim:#a6adc8;      /* subtext0 */
-  --accent:#cba6f7;        /* mauve */
-  --on-accent:#11111b;     /* crust – Schrift auf Akzentflächen */
-  --danger:#f38ba8;        /* red */
-  --danger-bg:rgba(243,139,168,.12);
-  --danger-line:rgba(243,139,168,.45);
-  --warn:#fab387;          /* peach */
-  --alert:#f38ba8;
-  --ok:#a6e3a1;
-  --radius:6px;
-  /* Catppuccin Latte – Zeichenblatt (hell, gut druckbar) */
-  --paper:#eff1f5;         /* base */
-  --paper-line:#dce0e8;    /* crust */
-  --paper-line-strong:#ccd0da;
-  --paper-text:#4c4f69;
-  --paper-dim:#6c6f85;
-  --draw-accent:#1e66f5;   /* blue */
-  --draw-accent-soft:#dbe5fd;
-  --accent-soft:#dbe5fd;
-  --el-C:#1e1e2e;          /* Kohlenstoffgerüst bewusst fast schwarz (Druck, Kopie) */
-  --el-H:#5c5f77;
-  --el-O:#d20f39;
-  --el-N:#1e66f5;
-  --el-S:#df8e1d;
-  --el-P:#fe640b;
-  --el-Hal:#40a02b;
-  --el-R:#8839ef;
-  --el-X:#179299;          /* teal – weitere Elemente */
-  --ui-el-X:#94e2d5;
-  --ui-el-C:#cdd6f4; --ui-el-H:#9399b2; --ui-el-O:#f38ba8; --ui-el-N:#89b4fa;
+  --ink:#1e1e2e; --ink-0:#181825; --ink-2:#313244; --ink-3:#45475a; --ink-4:#585b70;
+  --text-on-ink:#cdd6f4; --text-dim:#a6adc8; --accent:#cba6f7; --on-accent:#11111b;
+  --danger:#f38ba8; --danger-bg:rgba(243,139,168,.12); --danger-line:rgba(243,139,168,.45);
+  --warn:#fab387; --ok:#a6e3a1; --radius:6px;
+  /* Zeichenblatt (hell, druckbar) */
+  --paper:#eff1f5; --paper-line:#dce0e8; --paper-line-strong:#ccd0da;
+  --paper-text:#4c4f69; --paper-dim:#6c6f85;
+  --draw-accent:#1e66f5; --draw-accent-soft:#dbe5fd; --accent-soft:#dbe5fd;
+  --el-C:#1e1e2e; --el-H:#5c5f77; --el-O:#d20f39; --el-N:#1e66f5; --el-S:#df8e1d;
+  --el-P:#fe640b; --el-Hal:#40a02b; --el-R:#8839ef; --el-X:#179299;
+  --ui-el-X:#94e2d5; --ui-el-C:#cdd6f4; --ui-el-H:#9399b2; --ui-el-O:#f38ba8; --ui-el-N:#89b4fa;
   --ui-el-S:#f9e2af; --ui-el-P:#fab387; --ui-el-Hal:#a6e3a1; --ui-el-R:#cba6f7;
+  color-scheme:dark;
 }
-html.paper-white{
-  --paper:#FFFFFF;
-  --paper-line:#E6E9EF;
-  --paper-line-strong:#DCE0E8;
-}
-*{box-sizing:border-box}
-[hidden]{display:none !important}
-html,body{height:100%}
-body{
-  margin:0;display:flex;flex-direction:column;
-  background:var(--ink);
-  color:var(--text-on-ink);
-  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  font-size:14px;
-  -webkit-text-size-adjust:100%;
-}
-header{
-  display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
-  padding:7px 16px 6px;border-bottom:1px solid var(--ink-3);flex:none;
-}
-header h1{
-  margin:0;font-size:15px;font-weight:600;letter-spacing:-0.01em;
-}
-header .sub{
-  font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--text-dim);
-  letter-spacing:0.06em;text-transform:uppercase;
-}
-.layout{
-  display:grid;
-  grid-template-columns:212px minmax(0,1fr) 268px;
-  gap:1px;background:var(--ink-3);
-  flex:1;min-height:0;
-}
-.panel{background:var(--ink);overflow-y:auto;padding:14px 14px 40px}
-.stage{background:var(--ink);display:flex;flex-direction:column;min-width:0;min-height:0;padding:8px 10px 6px}
-
-/* ---- Panelstruktur ---- */
-.group{margin-bottom:18px}
-.group > h2{
-  margin:0 0 8px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;
-  letter-spacing:0.13em;text-transform:uppercase;color:var(--text-dim);
-  border-bottom:1px solid var(--ink-3);padding-bottom:5px;
-}
-.stack{display:flex;flex-direction:column;gap:5px}
-.row{display:flex;flex-wrap:wrap;gap:5px}
-
-button, select{
-  font-family:inherit;font-size:13px;color:var(--text-on-ink);
-  background:var(--ink-2);border:1px solid var(--ink-3);border-radius:var(--radius);
-  padding:7px 9px;cursor:pointer;text-align:left;line-height:1.25;
-}
-button:hover{border-color:var(--ink-4)}
-button:focus-visible, select:focus-visible, input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-button.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
-button.tool{display:flex;align-items:baseline;gap:7px}
-button.tool .key{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--text-dim)}
-button.on .key{color:var(--on-accent);opacity:.7}
-button.el{
-  font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:14px;
-  width:38px;text-align:center;padding:7px 0;
-}
-button.ghost{background:transparent}
-button.wide{width:100%}
-
-button.sw{
-  width:28px;height:26px;padding:0;border-radius:5px;border:1px solid var(--ink-3);
-}
-button.sw.on{outline:2px solid var(--accent);outline-offset:1px}
-input[type=range]{width:100%;accent-color:var(--accent);background:transparent}
-
-label.check{display:flex;align-items:flex-start;gap:8px;cursor:pointer;padding:3px 0;line-height:1.35}
-label.check input{margin:2px 0 0;accent-color:var(--accent);flex:none}
-label.check.off{opacity:.45;cursor:default}
-
-details{border:1px solid var(--ink-3);border-radius:var(--radius);padding:7px 9px;background:var(--ink-2)}
-details summary{cursor:pointer;font-size:12.5px;color:var(--text-dim);list-style:none}
-details summary::-webkit-details-marker{display:none}
-details summary::before{content:"▸ ";}
-details[open] summary::before{content:"▾ ";}
-details .stack{margin-top:8px}
-textarea{
-  width:100%;min-height:70px;resize:vertical;
-  font-family:"IBM Plex Mono",monospace;font-size:11px;line-height:1.45;
-  color:var(--text-on-ink);background:var(--ink);border:1px solid var(--ink-3);
-  border-radius:var(--radius);padding:6px 7px;
-}
-
-/* ---- Darstellungs-Reiter ---- */
-.modes{display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap;flex:none}
-.modes button{
-  flex:1 1 0;min-width:118px;text-align:center;padding:5px 8px;
-  font-weight:500;letter-spacing:-0.005em;
-}
-.modes button small{display:block;font-family:"IBM Plex Mono",monospace;font-size:9.5px;
-  letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim);margin-top:1px}
-.modes button.on small{color:var(--on-accent);opacity:.7}
-
-/* ---- Zeichenfläche ---- */
-.board{
-  position:relative;flex:1;min-height:0;border-radius:8px;overflow:hidden;
-  background:var(--paper);border:1px solid var(--ink-3);
-}
-canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
-.hint{
-  margin-top:5px;font-size:11.5px;color:var(--text-dim);min-height:15px;flex:none;
-  display:flex;justify-content:space-between;gap:12px;line-height:1.3;
-}
-.hint #hint{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-.hint .warn{white-space:nowrap}
-
-/* ---- Text direkt auf der Fläche ---- */
-#labelEditor{
-  position:absolute;transform:translate(-50%,-50%);z-index:3;
-  font:500 16.5px "IBM Plex Sans",-apple-system,"Segoe UI",sans-serif;
-  width:14ch;min-width:90px;padding:3px 6px;text-align:center;
-  background:#fff;color:var(--paper-text);border:1.5px solid var(--draw-accent);border-radius:5px;
-  box-shadow:0 2px 10px rgba(17,17,27,.22);outline:none;
-}
-
-/* ---- Schwebende Leiste an der Auswahl ---- */
-#selBar{
-  position:absolute;z-index:2;display:flex;gap:3px;padding:3px;
-  background:var(--ink);border:1px solid var(--ink-3);border-radius:7px;
-  box-shadow:0 3px 12px rgba(17,17,27,.35);
-}
-#selBar button{padding:5px 9px;font-size:12.5px;text-align:center;line-height:1.1}
-#selBar button.danger{color:var(--danger);border-color:var(--danger-line)}
-#selBar button.danger:hover{background:var(--danger-bg)}
-.hint .warn{color:var(--warn)}
-
-/* ---- Textausgabe (Halbstruktur-/Summenformel) ---- */
-.textout{
-  flex:1;min-height:0;border-radius:8px;border:1px solid var(--ink-3);
-  background:var(--paper);color:var(--paper-text);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:18px;padding:26px;text-align:center;overflow:auto;
-}
-.textout .eyebrow{
-  font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--paper-dim);
-}
-.formula{
-  font-family:"IBM Plex Mono",monospace;font-weight:500;
-  font-size:clamp(20px,3.6vw,38px);line-height:1.5;color:var(--paper-text);
-  word-break:break-word;max-width:100%;
-}
-.formula sub{font-size:.62em;vertical-align:-0.22em;font-weight:600}
-.formula sup{font-size:.62em;vertical-align:0.42em;font-weight:600}
-.formula .frag{display:block;margin:6px 0}
-.textout .note{font-size:12.5px;color:var(--paper-dim);max-width:44ch;line-height:1.5}
-.textout button{background:#fff;color:var(--paper-text);border-color:var(--paper-line-strong)}
-.textout button:hover{border-color:var(--accent)}
-
-/* ---- Auswertung rechts ---- */
-.readout{background:var(--ink-2);border:1px solid var(--ink-3);border-radius:var(--radius);padding:10px 11px;margin-bottom:8px}
-.readout .k{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
-.readout .v{font-family:"IBM Plex Mono",monospace;font-size:17px;margin-top:3px;word-break:break-word}
-.readout .v.small{font-size:13.5px;line-height:1.5}
-.readout .v sub{font-size:.65em;vertical-align:-0.2em}
-.msg{font-size:12.5px;line-height:1.45;padding:8px 10px;border-radius:var(--radius);margin-bottom:6px}
-.msg.err{background:var(--danger-bg);border:1px solid var(--danger-line);color:var(--danger)}
-.msg.info{background:var(--ink-2);border:1px solid var(--ink-3);color:var(--text-dim)}
-
-/* =====================================================================
-   Layout: Werkzeugleiste, Kontextzeile, einklappbare Auswertung
-   ===================================================================== */
-header{align-items:center;gap:10px 14px;padding:6px 12px}
-header h1{font-size:15px;white-space:nowrap}
-header .modes{margin:0;gap:3px;flex:0 1 auto}
-header .modes button{flex:none;min-width:0;padding:5px 8px;font-size:12.5px}
-header .modes button small{display:none}
-.hdr-actions{margin-left:auto;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.hdr-actions > button, .hdr-actions > select, .hdr-actions .seg button, .menu > summary{padding:5px 9px;font-size:12.5px}
-.hdr-actions > select{max-width:170px}
-.hdr-actions > select#flavor{width:100px}
-.hdr-actions > select#templates{width:140px}
-button.on.ghost{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
-button.danger{color:var(--danger);border-color:var(--danger-line)}
-button.danger:hover{background:var(--danger-bg)}
-
-.seg{display:flex;gap:0 !important}
-.seg button{border-radius:0;margin-left:-1px;text-align:center}
-.seg button:first-child{border-radius:var(--radius) 0 0 var(--radius);margin-left:0}
-.seg button:last-child{border-radius:0 var(--radius) var(--radius) 0}
-
-details.menu{position:relative;border:none;padding:0;background:none}
-.menu > summary{display:block;cursor:pointer;color:var(--text-on-ink);background:var(--ink-2);
-  border:1px solid var(--ink-3);border-radius:var(--radius);line-height:1.25}
-.menu > summary::before{content:none}
-.menu > summary::after{content:" ▾";color:var(--text-dim)}
-.menu-pop{position:absolute;right:0;top:calc(100% + 5px);z-index:30;width:260px;
-  background:var(--ink);border:1px solid var(--ink-3);border-radius:8px;padding:8px;
-  display:flex;flex-direction:column;gap:5px;box-shadow:0 8px 24px rgba(17,17,27,.5)}
-.menu-sep{margin-top:6px;padding-top:7px;border-top:1px solid var(--ink-3);font-size:11.5px;color:var(--text-dim)}
-
-.layout{display:grid;grid-template-columns:auto minmax(0,1fr) auto;position:relative}
-.rail{background:var(--ink-0);display:flex;flex-direction:column;gap:4px;padding:8px 6px;overflow-y:auto;width:56px}
-.rail-tools{display:flex;flex-direction:column;gap:inherit}
-.rail button.tool{flex-direction:column;align-items:center;justify-content:center;gap:3px;
-  padding:8px 0;text-align:center;width:100%;position:relative}
-.rail svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-.rail .tl{display:none}
-.rail .key{position:absolute;right:4px;top:2px;font-size:9px;opacity:.8}
-
-.stage{padding:6px 10px 6px}
-.ctx{display:flex;flex-wrap:wrap;align-items:center;align-content:flex-start;gap:6px 18px;padding:0 0 6px;flex:none;
-  min-height:70px}   /* feste Höhe für zwei Zeilen: die Zeichenfläche springt beim Werkzeugwechsel nicht */
-.cg{display:none;align-items:center;gap:6px;flex-wrap:wrap}
-.cl{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim)}
-.ctx-note{font-size:12.5px;color:var(--text-dim)}
-.ctx .row{gap:4px}
-.ctx button{padding:5px 9px;font-size:12.5px;text-align:center}
-.ctx button.el{width:32px;padding:5px 0;font-size:13px}
-.ctx button.el.wide-el{width:42px}
-.ctx input[type=number]{width:104px;font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--text-on-ink);
-  background:var(--ink-2);border:1px solid var(--ink-3);border-radius:6px;padding:6px 8px}
-#elCustom{width:84px !important}
-html:not(.view-classic) #ctx:not(.show-custom) .cg.custom-el{display:none !important}
-html.view-classic #btnElMore{display:none}
-#qCustom{width:70px !important}
-.ctx input.bad{border-color:var(--danger)}
-.ctx input[type=text]{width:150px;font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--text-on-ink);
-  background:var(--ink-2);border:1px solid var(--ink-3);border-radius:6px;padding:6px 8px}
-#bendRange{width:130px}
-body[data-tool="build"]   .cg[data-for~="build"],
-body[data-tool="select"]  .cg[data-for~="select"],
-body[data-tool="element"] .cg[data-for~="element"],
-body[data-tool="bond"]    .cg[data-for~="bond"],
-body[data-tool="charge"]  .cg[data-for~="charge"],
-body[data-tool="arrow"]   .cg[data-for~="arrow"],
-body[data-tool="text"]    .cg[data-for~="text"],
-body[data-tool="erase"]   .cg[data-for~="erase"]{display:flex}
-
-.side{width:260px}
-.layout.side-closed .side{display:none}
-.hint .warn{cursor:pointer;text-decoration:underline dotted}
-
-/* ---- Klassische Ansicht: breite Leiste, alle Optionen sichtbar ---- */
-html.view-classic .rail{width:236px;padding:10px 12px 40px;gap:0}
-html.view-classic .rail-tools{display:flex;flex-direction:column;gap:5px;margin-bottom:16px}
-html.view-classic .rail button.tool{flex-direction:row;justify-content:flex-start;gap:9px;padding:7px 9px;text-align:left}
-html.view-classic .rail svg{width:18px;height:18px}
-html.view-classic .rail .tl{display:inline;font-size:13px}
-html.view-classic .rail .key{position:static;margin-left:auto;font-size:10px}
-html.view-classic #classicSlot .ctx{display:block;padding:0;min-height:0}
-html.view-classic #classicSlot .cg{display:flex !important;flex-direction:column;align-items:stretch;gap:6px;margin-bottom:16px}
-html.view-classic #classicSlot .cg[data-for="bond"],
-html.view-classic #classicSlot #cgErase .ctx-note{display:none !important}
-html.view-classic #classicSlot .cl{display:block;border-bottom:1px solid var(--ink-3);padding-bottom:5px;font-size:10.5px}
-html.view-classic #classicSlot .row{flex-wrap:wrap}
-html.view-classic #classicSlot .seg button{flex:1}
-html.view-classic #classicSlot input[type=text], html.view-classic #classicSlot input[type=number]{width:100% !important}
-html.view-classic #classicSlot #bendRange{width:100%}
-html.view-classic #classicSlot #arrowKinds button{flex:1 1 45%}
-html.view-classic .ctx button.el{width:36px}
-
-/* ---- Touch-Ansicht: beschriftet und mit großen Zielen ---- */
-html.view-touch .rail{width:80px;gap:5px}
-html.view-touch .rail button.tool{padding:9px 2px;min-height:60px}
-html.view-touch .rail .tl{display:block;font-size:11.5px;line-height:1.15}
-html.view-touch .rail .key{display:none}
-html.view-touch .rail svg{width:24px;height:24px}
-html.view-touch .ctx{gap:8px 20px;padding-bottom:8px;min-height:100px}
-html.view-touch .ctx button{padding:9px 13px;font-size:14px;min-height:42px}
-html.view-touch .ctx button.el{width:44px;padding:9px 0;font-size:15px}
-html.view-touch .ctx button.el.wide-el{width:54px}
-html.view-touch .ctx input[type=text], html.view-touch .ctx input[type=number]{padding:10px;font-size:14px}
-html.view-touch button.sw{width:38px;height:38px}
-html.view-touch .hdr-actions > button, html.view-touch .hdr-actions > select,
-html.view-touch .hdr-actions .seg button, html.view-touch .menu > summary,
-html.view-touch header .modes button{padding:9px 12px;font-size:14px}
-html.view-touch #selBar button{padding:9px 13px;font-size:14px}
-html.view-touch .side button{padding:10px 11px}
-html.view-touch .ctx-note{font-size:14px}
-
-/* ---- Schmale Fenster: Auswertung schwebt über der Fläche ---- */
-@media (max-width:1100px){
-  .side{position:absolute;right:0;top:0;bottom:0;z-index:15;box-shadow:-10px 0 28px rgba(17,17,27,.5)}
-  .hdr-actions .lbl{display:none}
-}
-@media (max-width:640px){
-  header h1{display:none}
-}
-
-/* =====================================================================
-   Catppuccin-Varianten für die Oberfläche (das Zeichenblatt bleibt hell)
-   ===================================================================== */
-:root{color-scheme:dark}
+html.paper-white{ --paper:#FFFFFF; --paper-line:#E6E9EF; --paper-line-strong:#DCE0E8; }
 html[data-flavor="macchiato"]{
   --ink:#24273a; --ink-0:#1e2030; --ink-2:#363a4f; --ink-3:#494d64; --ink-4:#5b6078;
   --text-on-ink:#cad3f5; --text-dim:#a5adcb; --accent:#c6a0f6; --on-accent:#181926;
@@ -354,40 +44,220 @@ html[data-flavor="frappe"]{
 }
 html[data-flavor="latte"]{
   color-scheme:light;
-  --ink:#eff1f5; --ink-0:#e6e9ef; --ink-2:#dce0e8; --ink-3:#bcc0cc; --ink-4:#9ca0b0;
+  --ink:#eff1f5; --ink-0:#dce0e8; --ink-2:#e6e9ef; --ink-3:#bcc0cc; --ink-4:#9ca0b0;
   --text-on-ink:#4c4f69; --text-dim:#6c6f85; --accent:#8839ef; --on-accent:#eff1f5;
   --danger:#d20f39; --danger-bg:rgba(210,15,57,.08); --danger-line:rgba(210,15,57,.40);
   --warn:#fe640b; --ok:#40a02b;
   --ui-el-C:#4c4f69; --ui-el-H:#7c7f93; --ui-el-O:#d20f39; --ui-el-N:#1e66f5;
   --ui-el-S:#df8e1d; --ui-el-P:#fe640b; --ui-el-Hal:#40a02b; --ui-el-R:#8839ef; --ui-el-X:#179299;
 }
-html[data-flavor="latte"] .board, html[data-flavor="latte"] .textout{border-color:var(--ink-3)}
-html[data-flavor="latte"] .menu-pop, html[data-flavor="latte"] .side{box-shadow:0 8px 24px rgba(76,79,105,.18)}
-#flavor{max-width:132px}
-@media (max-width:1500px){ .hdr-actions .lbl{display:none} }
 
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{height:100%}
+body{
+  margin:0;display:flex;flex-direction:column;background:var(--ink);color:var(--text-on-ink);
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px;
+  -webkit-text-size-adjust:100%;
+}
+html:not([data-ws="mech"]) .mech-only{display:none !important}
+html[data-ws="mech"] .formel-only{display:none !important}
+
+button, select{
+  font-family:inherit;font-size:13px;color:var(--text-on-ink);
+  background:var(--ink-2);border:1px solid var(--ink-3);border-radius:var(--radius);
+  padding:6px 9px;cursor:pointer;text-align:center;line-height:1.25;
+}
+button:hover{border-color:var(--ink-4)}
+button:focus-visible, select:focus-visible, input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+button.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+button.ghost{background:transparent}
+button.danger{color:var(--danger);border-color:var(--danger-line)}
+button.danger:hover{background:var(--danger-bg)}
+button.el{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:14px;min-width:34px;padding:6px 0}
+button.sw{width:26px;height:26px;padding:0;border-radius:5px}
+button.sw.on{outline:2px solid var(--accent);outline-offset:1px}
+input[type=range]{accent-color:var(--accent);background:transparent}
+input[type=text], input[type=number]{
+  font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--text-on-ink);
+  background:var(--ink-2);border:1px solid var(--ink-3);border-radius:6px;padding:6px 8px;
+}
+input.bad{border-color:var(--danger)}
+
+.seg{display:flex}
+.seg > button{border-radius:0;margin-left:-1px}
+.seg > button:first-child{border-radius:var(--radius) 0 0 var(--radius);margin-left:0}
+.seg > button:last-child{border-radius:0 var(--radius) var(--radius) 0}
+.seg > button.on{position:relative;z-index:1}
+
+/* ---- Kopfzeile ---- */
+header{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;padding:6px 10px;border-bottom:1px solid var(--ink-3);flex:none}
+header h1{margin:0 4px 0 2px;font-size:15px;font-weight:600;white-space:nowrap}
+#workspace button{padding:6px 14px;font-weight:600;font-size:13.5px}
+#workspace button small{display:block;font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.08em;
+  text-transform:uppercase;font-weight:500;opacity:.7}
+#modes button{font-size:12.5px;padding:6px 9px}
+.hdr-actions{margin-left:auto;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.hdr-actions button, .hdr-actions select, .menu > summary{font-size:12.5px;padding:6px 9px}
+#zoomVal{min-width:58px;font-family:"IBM Plex Mono",monospace;font-size:12px}
+#templates{width:118px;text-align:left}
+details.menu{position:relative}
+.menu > summary{display:block;cursor:pointer;list-style:none;background:var(--ink-2);border:1px solid var(--ink-3);
+  border-radius:var(--radius);line-height:1.25;white-space:nowrap}
+.menu > summary::-webkit-details-marker{display:none}
+.menu > summary::after{content:" ▾";color:var(--text-dim)}
+.menu-pop{position:absolute;right:0;top:calc(100% + 5px);z-index:40;width:280px;background:var(--ink);
+  border:1px solid var(--ink-3);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:5px;
+  box-shadow:0 8px 24px rgba(17,17,27,.5)}
+.menu-pop > button{text-align:left}
+.menu-sep{margin-top:6px;padding-top:7px;border-top:1px solid var(--ink-3);font-size:11px;color:var(--text-dim);
+  font-family:"IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase}
+.menu-pop textarea{width:100%;min-height:64px;resize:vertical;font-family:"IBM Plex Mono",monospace;font-size:11px;
+  color:var(--text-on-ink);background:var(--ink-0);border:1px solid var(--ink-3);border-radius:6px;padding:6px}
+.menu-pop .row{display:flex;gap:5px}
+.menu-pop .row > *{flex:1}
+
+/* ---- Hauptbereich ---- */
+.layout{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:1px;background:var(--ink-3);flex:1;min-height:0;position:relative}
+.rail{background:var(--ink-0);display:flex;flex-direction:column;gap:4px;padding:8px 6px;overflow-y:auto;width:74px}
+.rail button.tool{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0 6px;width:100%;position:relative}
+.rail svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.rail .tl{font-size:11px;line-height:1.1}
+.rail .key{position:absolute;right:4px;top:3px;font-family:"IBM Plex Mono",monospace;font-size:9px;opacity:.6}
+.rail .sep{height:1px;background:var(--ink-3);margin:4px 2px}
+
+.stage{background:var(--ink);display:flex;flex-direction:column;min-width:0;min-height:0;padding:6px 8px}
+.ctx{display:flex;flex-wrap:wrap;align-items:center;align-content:flex-start;gap:6px 16px;padding:0 0 6px;flex:none;min-height:42px}
+.cg{display:none;align-items:center;gap:5px;flex-wrap:wrap}
+.cl{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);margin-right:2px}
+.ctx-note{font-size:12.5px;color:var(--text-dim)}
+.ctx .row{display:flex;gap:3px;flex-wrap:wrap}
+.ctx button{font-size:12.5px;padding:5px 9px}
+.ctx button.el{min-width:32px;padding:5px 0;font-size:13.5px}
+.ctx button.bo{min-width:38px;font-family:"IBM Plex Mono",monospace;font-size:15px;padding:3px 0;line-height:1.2}
+#elCustom{width:80px} #elCustomV{width:100px} #qCustom{width:70px} #textVal{width:140px} #bendRange{width:120px}
+#ctx:not(.show-custom) .cg.custom-el{display:none !important}
+body[data-tool="draw"]   .cg[data-for~="draw"],
+body[data-tool="ring"]   .cg[data-for~="ring"],
+body[data-tool="select"] .cg[data-for~="select"],
+body[data-tool="charge"] .cg[data-for~="charge"],
+body[data-tool="arrow"]  .cg[data-for~="arrow"],
+body[data-tool="text"]   .cg[data-for~="text"],
+body[data-tool="erase"]  .cg[data-for~="erase"]{display:flex}
+
+.board{position:relative;flex:1;min-height:0;border-radius:8px;overflow:hidden;background:var(--paper);border:1px solid var(--ink-3)}
+html[data-ws="mech"] .board{background:var(--ink-0)}
+canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.hint{margin-top:5px;font-size:11.5px;color:var(--text-dim);min-height:15px;flex:none;display:flex;justify-content:space-between;gap:12px;line-height:1.3}
+.hint #hint{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.hint .warn{white-space:nowrap;color:var(--warn);cursor:pointer;text-decoration:underline dotted}
+
+#labelEditor{position:absolute;transform:translate(-50%,-50%);z-index:3;font:500 16.5px "IBM Plex Sans",-apple-system,"Segoe UI",sans-serif;
+  width:14ch;min-width:90px;padding:3px 6px;text-align:center;background:#fff;color:var(--paper-text);
+  border:1.5px solid var(--draw-accent);border-radius:5px;box-shadow:0 2px 10px rgba(17,17,27,.22);outline:none}
+#selBar{position:absolute;z-index:2;display:flex;gap:3px;padding:3px;background:var(--ink);border:1px solid var(--ink-3);
+  border-radius:7px;box-shadow:0 3px 12px rgba(17,17,27,.35)}
+#selBar button{padding:5px 9px;font-size:12.5px;line-height:1.1}
+
+.textout{flex:1;min-height:0;border-radius:8px;border:1px solid var(--ink-3);background:var(--paper);color:var(--paper-text);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:26px;text-align:center;overflow:auto}
+.textout .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-dim)}
+.formula{font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:clamp(22px,4vw,46px);line-height:1.5;color:var(--paper-text);word-break:break-word;max-width:100%}
+.formula sub{font-size:.62em;vertical-align:-0.22em;font-weight:600}
+.formula sup{font-size:.62em;vertical-align:0.42em;font-weight:600}
+.formula .frag{display:block;margin:6px 0}
+.textout .note{font-size:12.5px;color:var(--paper-dim);max-width:44ch;line-height:1.5}
+.textout button{background:#fff;color:var(--paper-text);border-color:var(--paper-line-strong)}
+
+/* ---- Auswertung rechts ---- */
+.side{background:var(--ink);overflow-y:auto;padding:14px 14px 40px;width:262px}
+.layout.side-closed .side{display:none}
+.group{margin-bottom:18px}
+.group > h2{margin:0 0 8px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--ink-3);padding-bottom:5px}
+.stack{display:flex;flex-direction:column;gap:5px}
+.stack > button{text-align:left}
+.side .row{display:flex;gap:5px}
+.side .row > button{flex:1}
+label.check{display:flex;align-items:flex-start;gap:8px;cursor:pointer;padding:3px 0;line-height:1.35}
+label.check input{margin:2px 0 0;accent-color:var(--accent);flex:none}
+label.check.off{opacity:.45;cursor:default}
+.readout{background:var(--ink-2);border:1px solid var(--ink-3);border-radius:var(--radius);padding:10px 11px;margin-bottom:8px}
+.readout .k{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
+.readout .v{font-family:"IBM Plex Mono",monospace;font-size:17px;margin-top:3px;word-break:break-word}
+.readout .v.small{font-size:13.5px;line-height:1.5}
+.readout .v sub{font-size:.65em;vertical-align:-0.2em}
+.msg{font-size:12.5px;line-height:1.45;padding:8px 10px;border-radius:var(--radius);margin-bottom:6px}
+.msg.err{background:var(--danger-bg);border:1px solid var(--danger-line);color:var(--danger)}
+.msg.info{background:var(--ink-2);border:1px solid var(--ink-3);color:var(--text-dim)}
+
+/* ---- Touch-Bedienung: große Ziele ---- */
+html.view-touch .rail{width:86px;gap:6px}
+html.view-touch .rail button.tool{padding:10px 0 8px;min-height:62px}
+html.view-touch .rail .tl{font-size:12px}
+html.view-touch .rail .key{display:none}
+html.view-touch .rail svg{width:26px;height:26px}
+html.view-touch .ctx{gap:8px 18px;padding-bottom:8px}
+html.view-touch .ctx button{padding:9px 13px;font-size:14px;min-height:42px}
+html.view-touch .ctx button.el{min-width:44px;font-size:15px}
+html.view-touch .ctx button.bo{min-width:50px;font-size:18px}
+html.view-touch button.sw{width:38px;height:38px}
+html.view-touch header button, html.view-touch header select, html.view-touch .menu > summary{padding:9px 12px;font-size:14px}
+html.view-touch #selBar button{padding:10px 14px;font-size:14px}
+html.view-touch .side button{padding:10px 11px}
+
+@media (max-width:1100px){
+  .side{position:absolute;right:0;top:0;bottom:0;z-index:15;box-shadow:-10px 0 28px rgba(17,17,27,.5)}
+}
+@media (max-width:1500px){ .lbl{display:none} html[data-ws="mech"] header h1{display:none} }
+@media (max-width:700px){ header h1{display:none} }
+
+/* ---- Druck: nur das Blatt ---- */
+#printArea{display:none}
+@media print{
+  html, body{height:auto;background:#fff}
+  body > *:not(#printArea){display:none !important}
+  #printArea{display:block}
+  #printArea img{display:block}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
-<body data-tool="build">
+<body data-tool="draw">
 
 <header>
   <h1>Strukturformel-Editor</h1>
-  <nav class="modes" id="modes" aria-label="Darstellung">
-    <button class="on" data-mode="skelett" title="Skelettschreibweise (Zeichnung)">Skelett<small>Zeichnung</small></button>
-    <button data-mode="struktur" title="Strukturformel (Zeichnung)">Strukturformel<small>Zeichnung</small></button>
-    <button data-mode="halb" title="Halbstrukturformel (Text)">Halbstruktur<small>Text</small></button>
-    <button data-mode="summe" title="Summenformel (Text)">Summenformel<small>Text</small></button>
+  <div class="seg" id="workspace" role="group" aria-label="Arbeitsbereich">
+    <button data-ws="formel" class="on" title="Eine einzelne Strukturformel, groß in der Mitte">Formel<small>Einzelstruktur</small></button>
+    <button data-ws="mech" title="Weißes DIN-A4-Blatt für Reaktionsmechanismen">Mechanismus<small>A4-Blatt</small></button>
+  </div>
+  <nav class="seg" id="modes" aria-label="Darstellung">
+    <button class="on" data-mode="skelett" title="Skelettformel (Zeichnung)">Skelett</button>
+    <button data-mode="struktur" title="Strukturformel mit allen Atomen (Zeichnung)">Strukturformel</button>
+    <button data-mode="halb" title="Halbstrukturformel (Text)">Halbstruktur</button>
+    <button data-mode="summe" title="Summenformel (Text)">Summe</button>
   </nav>
   <div class="hdr-actions">
-    <button class="ghost" id="btnUndo" title="Rückgängig (Strg+Z)">↶ <span class="lbl">Rückgängig</span></button>
-    <button class="ghost" id="btnRedo" title="Wiederholen (Strg+Y)">↷</button>
-    <button class="ghost" id="btnCenter" title="Zeichnung in die Mitte der Fläche setzen">Zentrieren</button>
-    <select id="templates" title="Beispielmolekül laden">
-      <option value="">Beispiel laden …</option>
+    <div class="seg mech-only" id="pageOrient" title="Ausrichtung des A4-Blattes">
+      <button data-or="land" class="on" title="A4 Querformat">Quer</button>
+      <button data-or="port" title="A4 Hochformat">Hoch</button>
+    </div>
+    <div class="seg">
+      <button id="btnUndo" title="Rückgängig (Strg+Z)">↶ <span class="lbl">Rückgängig</span></button>
+      <button id="btnRedo" title="Wiederholen (Strg+Y)">↷</button>
+    </div>
+    <div class="seg" title="Zoom: Strg+Mausrad oder zwei Finger. Verschieben: Mausrad, Leertaste+Ziehen oder mittlere Maustaste.">
+      <button id="zoomOut" title="Verkleinern">−</button>
+      <button id="zoomVal" title="Auf 100 % setzen">160 %</button>
+      <button id="zoomIn" title="Vergrößern">+</button>
+      <button id="btnFit" title="Einpassen (Strg+0): Formel bzw. Blatt in die Mitte">Einpassen</button>
+    </div>
+    <select id="templates" title="Beispielmolekül laden (Mechanismus: wird auf dem Blatt ergänzt)">
+      <option value="">Beispiel …</option>
       <option value="methan">Methan</option>
       <option value="ethan">Ethan</option>
       <option value="propan">Propan</option>
+      <option value="hexan">Hexan</option>
       <option value="ethanol">Ethanol</option>
       <option value="ethanal">Ethanal</option>
       <option value="essigsaeure">Essigsäure</option>
@@ -403,143 +273,148 @@ html[data-flavor="latte"] .menu-pop, html[data-flavor="latte"] .side{box-shadow:
       <option value="ammoniak">Ammoniak</option>
       <option value="co2">Kohlenstoffdioxid</option>
     </select>
-    <details class="menu" id="exportMenu">
-      <summary>Exportieren</summary>
+    <details class="menu" id="fileMenu">
+      <summary>Datei</summary>
       <div class="menu-pop">
+        <button class="ghost mech-only" id="btnPagePng">Blatt als PNG (300 dpi)</button>
+        <button class="ghost mech-only" id="btnPageSvg">Blatt als SVG (A4, Vektor)</button>
+        <button class="ghost mech-only" id="btnPrint">Blatt drucken / als PDF</button>
+        <div class="menu-sep mech-only">Nur die Zeichnung (zugeschnitten)</div>
         <button class="ghost" id="btnPng">Als PNG speichern</button>
         <button class="ghost" id="btnSvg">Als SVG speichern (Vektor)</button>
         <button class="ghost" id="btnCopyImg">Bild in Zwischenablage</button>
+        <div class="menu-sep">Übertragen</div>
+        <button class="ghost formel-only" id="btnToMech">Formel auf das Mechanismus-Blatt kopieren</button>
+        <button class="ghost mech-only" id="btnToFormel">Auswahl als Formel öffnen</button>
         <div class="menu-sep">Molekül-Code (speichern und laden)</div>
         <textarea id="code" spellcheck="false" placeholder="Code erzeugen oder hier einfügen …"></textarea>
         <div class="row">
-          <button class="ghost" id="btnCodeGet" style="flex:1;text-align:center">Erzeugen</button>
-          <button class="ghost" id="btnCodeSet" style="flex:1;text-align:center">Laden</button>
+          <button class="ghost" id="btnCodeGet">Erzeugen</button>
+          <button class="ghost" id="btnCodeSet">Laden</button>
+        </div>
+        <div class="menu-sep">Blatt</div>
+        <button class="ghost danger" id="btnClearAll">Alles löschen</button>
+      </div>
+    </details>
+    <details class="menu" id="setMenu">
+      <summary>Ansicht</summary>
+      <div class="menu-pop">
+        <div class="menu-sep" style="margin-top:0;padding-top:0;border:0">Bedienung</div>
+        <div class="seg" id="viewMode">
+          <button data-view="compact" style="flex:1">Maus / Stift</button>
+          <button data-view="touch" style="flex:1">Touch (große Knöpfe)</button>
+        </div>
+        <div class="menu-sep">Farbthema (Catppuccin)</div>
+        <div class="seg" id="flavor">
+          <button data-flavor="latte" style="flex:1">Latte</button>
+          <button data-flavor="frappe" style="flex:1">Frappé</button>
+          <button data-flavor="macchiato" style="flex:1">Macch.</button>
+          <button data-flavor="mocha" style="flex:1">Mocha</button>
         </div>
       </div>
     </details>
-    <select id="flavor" title="Farbthema der Oberfläche (Catppuccin): Latte hell, Frappé und Macchiato mittel, Mocha dunkel. Das Zeichenblatt bleibt hell und druckfreundlich.">
-      <option value="latte">Latte</option>
-      <option value="frappe">Frappé</option>
-      <option value="macchiato">Macchiato</option>
-      <option value="mocha">Mocha</option>
-    </select>
-    <div class="seg" id="viewMode" title="Klassisch: alle Optionen links sichtbar. Kompakt: kleine Knöpfe, Optionen je Werkzeug. Touch: beschriftete, große Knöpfe für Tablets.">
-      <button data-view="classic">Klassisch</button>
-      <button data-view="compact">Kompakt</button>
-      <button data-view="touch">Touch</button>
-    </div>
-    <button class="ghost" id="btnPanel" title="Auswertung und Anzeigeoptionen ein- oder ausblenden">Auswertung</button>
+    <button id="btnPanel" title="Auswertung und Anzeigeoptionen ein- oder ausblenden">Auswertung</button>
   </div>
 </header>
 
 <div class="layout">
-
-  <!-- ============ WERKZEUGLEISTE ============ -->
-  <nav class="rail" aria-label="Werkzeuge">
-    <div class="rail-tools" id="tools">
-    <button class="tool on" data-tool="build" title="Bauen (B)"><svg viewBox="0 0 24 24"><path d="M12 3l7.8 4.5v9L12 21l-7.8-4.5v-9z"/></svg><span class="tl">Bauen</span><span class="key">B</span></button>
-    <button class="tool" data-tool="select" title="Auswählen (A)"><svg viewBox="0 0 24 24"><path d="M6 3l12 7.5-5.2 1.3L10 17.5z"/><path d="M3 20h3M9 20h3M15 20h3M21 20v-3"/></svg><span class="tl">Auswählen</span><span class="key">A</span></button>
-    <button class="tool" data-tool="element" title="Element ändern (E)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><text x="12" y="16" text-anchor="middle" font-size="11" font-weight="600" stroke="none" fill="currentColor">N</text></svg><span class="tl">Element</span><span class="key">E</span></button>
-    <button class="tool" data-tool="bond" title="Bindung ändern (V)"><svg viewBox="0 0 24 24"><path d="M4 16.5L16.5 4M7.5 20L20 7.5"/></svg><span class="tl">Bindung</span><span class="key">V</span></button>
-    <button class="tool" data-tool="charge" title="Ladung setzen (L)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M8 12h8"/></svg><span class="tl">Ladung</span><span class="key">L</span></button>
-    <button class="tool" data-tool="arrow" title="Pfeil zeichnen (P)"><svg viewBox="0 0 24 24"><path d="M4 17c2.5-8.5 10.5-10 15-5"/><path d="M19.5 6.5v5.5H14"/></svg><span class="tl">Pfeil</span><span class="key">P</span></button>
+  <!-- ============ WERKZEUGE ============ -->
+  <nav class="rail" id="tools" aria-label="Werkzeuge">
+    <button class="tool on" data-tool="draw" title="Zeichnen: Atome, Bindungen, Ketten (Z)"><svg viewBox="0 0 24 24"><path d="M3 15l5-6 5 6 5-6 3 3.5"/><circle cx="3" cy="15" r="1.2" fill="currentColor"/></svg><span class="tl">Zeichnen</span><span class="key">Z</span></button>
+    <button class="tool" data-tool="ring" title="Ring setzen, anellieren oder anhängen (R)"><svg viewBox="0 0 24 24"><path d="M12 3l7.8 4.5v9L12 21l-7.8-4.5v-9z"/></svg><span class="tl">Ring</span><span class="key">R</span></button>
+    <button class="tool" data-tool="select" title="Auswählen, verschieben, drehen (A)"><svg viewBox="0 0 24 24"><path d="M6 3l12 7.5-5.2 1.3L10 17.5z"/><path d="M3 20h3M9 20h3M15 20h3M21 20v-3"/></svg><span class="tl">Auswahl</span><span class="key">A</span></button>
+    <div class="sep"></div>
+    <button class="tool" data-tool="charge" title="Ladung und Partialladung (L)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M8 12h8"/></svg><span class="tl">Ladung</span><span class="key">L</span></button>
+    <button class="tool" data-tool="arrow" title="Pfeile: Reaktion, Gleichgewicht, Elektronen (P)"><svg viewBox="0 0 24 24"><path d="M4 17c2.5-8.5 10.5-10 15-5"/><path d="M19.5 6.5v5.5H14"/></svg><span class="tl">Pfeil</span><span class="key">P</span></button>
     <button class="tool" data-tool="text" title="Text setzen (T)"><svg viewBox="0 0 24 24"><path d="M5 7V4.5h14V7M12 4.5v15M9 19.5h6"/></svg><span class="tl">Text</span><span class="key">T</span></button>
-    <button class="tool" data-tool="erase" title="Löschen (X)"><svg viewBox="0 0 24 24"><path d="M15 4.5l5 5-9.5 9.5H6l-3-3z"/><path d="M10 9.5l5 5M11 20h9"/></svg><span class="tl">Löschen</span><span class="key">X</span></button>
-    </div>
-    <div id="classicSlot"></div>
+    <div class="sep"></div>
+    <button class="tool" data-tool="erase" title="Radierer (X)"><svg viewBox="0 0 24 24"><path d="M15 4.5l5 5-9.5 9.5H6l-3-3z"/><path d="M10 9.5l5 5M11 20h9"/></svg><span class="tl">Radierer</span><span class="key">X</span></button>
   </nav>
 
   <!-- ============ BÜHNE ============ -->
   <section class="stage">
     <div class="ctx" id="ctx">
-      <div class="cg" data-for="build element"><span class="cl">Element</span><div class="row" id="elements"></div>
-        <button class="ghost" id="btnElMore" title="Weiteres Element per Symbol eingeben, z. B. Rb, Fe, Xe">+ weiteres</button></div>
-      <div class="cg custom-el" data-for="build element">
-        <span class="cl">Weiteres Element</span>
+      <div class="cg" data-for="draw select"><span class="cl">Element</span><div class="row" id="elements"></div>
+        <button class="ghost" id="btnElMore" title="Weiteres Element per Symbol eingeben, z. B. Rb, Fe, Xe">+</button></div>
+      <div class="cg custom-el" data-for="draw select">
         <input id="elCustom" type="text" maxlength="3" placeholder="z. B. Rb" title="Elementsymbol eintippen, Enter übernimmt" autocomplete="off" spellcheck="false">
-        <input id="elCustomV" type="number" min="0" max="8" step="1" placeholder="Bindigkeit" title="optional: Zahl der Bindungen. Leer lassen = übliche Bindigkeit der Gruppe">
+        <input id="elCustomV" type="number" min="0" max="8" step="1" placeholder="Bindigkeit" title="optional: Zahl der Bindungen. Leer = übliche Bindigkeit der Gruppe">
         <button id="btnElCustom">Hinzufügen</button>
       </div>
-      <div class="cg" data-for="build element"><span class="cl">Rest</span><div class="row" id="rests"></div></div>
-      <div class="cg" data-for="build">
-        <span class="cl">Ring</span>
-        <div class="row">
-          <button class="ghost" data-ring="3">3</button>
-          <button class="ghost" data-ring="4">4</button>
-          <button class="ghost" data-ring="5">5</button>
-          <button class="ghost" data-ring="6">6</button>
-          <button class="ghost" data-ring="7">7</button>
-          <button class="ghost" id="btnBenzol">Benzol</button>
+      <div class="cg" data-for="draw select"><span class="cl">Rest</span><div class="row" id="rests"></div></div>
+      <div class="cg" data-for="draw select">
+        <span class="cl">Bindung</span>
+        <div class="seg" id="bondOrder" title="Bindungsart für neue Bindungen (Tasten 1, 2, 3; über einer Bindung: diese ändern)">
+          <button class="bo on" data-order="1" title="Einfachbindung (1)">–</button>
+          <button class="bo" data-order="2" title="Doppelbindung (2)">=</button>
+          <button class="bo" data-order="3" title="Dreifachbindung (3)">≡</button>
         </div>
       </div>
 
+      <div class="cg" data-for="ring">
+        <span class="cl">Ring</span>
+        <div class="seg" id="ringKinds">
+          <button data-ring="3" title="Dreiring (Taste 3)">3</button>
+          <button data-ring="4" title="Vierring (4)">4</button>
+          <button data-ring="5" title="Fünfring (5)">5</button>
+          <button data-ring="6" class="on" title="Sechsring (6)">6</button>
+          <button data-ring="7" title="Siebenring (7)">7</button>
+          <button data-ring="6" data-arom="1" title="Benzolring (Taste B)">Benzol</button>
+        </div>
+        <span class="ctx-note">Freie Fläche: Ring setzen · Bindung: anellieren · Atom: anhängen</span>
+      </div>
+
       <div class="cg" data-for="select">
-        <span class="cl">Auswahlform</span>
-        <div class="row seg" id="selShape" title="Form beim Aufziehen einer Auswahl; mit gedrückter Alt-Taste wird die andere Form verwendet">
-          <button data-shape="rect" class="on">Rahmen</button>
+        <span class="cl">Rahmen</span>
+        <div class="seg" id="selShape" title="Form beim Aufziehen; mit Alt wird die andere Form verwendet">
+          <button data-shape="rect" class="on">Rechteck</button>
           <button data-shape="lasso">Lasso</button>
         </div>
       </div>
       <div class="cg" data-for="select">
-        <span class="cl">Auswahl drehen</span>
-        <div class="row" id="transform">
-          <button data-rot="-15" title="15° gegen den Uhrzeigersinn">↺ 15°</button>
-          <button data-rot="15" title="15° im Uhrzeigersinn">↻ 15°</button>
-          <button id="btnMirror" title="waagerecht spiegeln">⇋ Spiegeln</button>
-        </div>
-      </div>
-      <div class="cg" data-for="select">
-        <span class="cl">Kette ausrichten</span>
-        <div class="row seg" id="alignMode">
-          <button data-align="90" class="on">gerade 90°</button>
+        <span class="cl">Ausrichten</span>
+        <div class="seg" id="alignMode">
+          <button data-align="zz" class="on">Zickzack</button>
+          <button data-align="90">gerade 90°</button>
           <button data-align="45">gerade 45°</button>
-          <button data-align="zz">Zickzack</button>
         </div>
-        <button id="btnStraight">Ausrichten</button>
+        <button id="btnStraight" title="Kette der Auswahl (ohne Auswahl: alles) neu anordnen">Anwenden</button>
       </div>
-
-      <div class="cg" data-for="bond"><span class="ctx-note">Tipp auf eine Bindung: Einfach- → Doppel- → Dreifachbindung. Ziehen mit „Bauen“ zwischen zwei Atomen erzeugt eine neue Bindung.</span></div>
 
       <div class="cg" data-for="charge">
         <span class="cl">Ladung</span>
         <div class="row" id="charges">
-          <button class="el on" data-q="1" title="einfach positiv, z. B. Carbenium-Ion">+</button>
-          <button class="el" data-q="-1" title="einfach negativ, z. B. Carbanion">−</button>
+          <button class="el on" data-q="1" title="einfach positiv (über Atom: Taste +)">+</button>
+          <button class="el" data-q="-1" title="einfach negativ (über Atom: Taste −)">−</button>
           <button class="el" data-q="2" title="zweifach positiv">2+</button>
           <button class="el" data-q="-2" title="zweifach negativ">2−</button>
-          <button class="el wide-el" data-d="+" title="Partialladung positiv">δ+</button>
-          <button class="el wide-el" data-d="-" title="Partialladung negativ">δ−</button>
-          <button class="el wide-el" data-q="0" title="Ladung entfernen">ohne</button>
+          <button class="el" data-d="+" title="Partialladung positiv">δ+</button>
+          <button class="el" data-d="-" title="Partialladung negativ">δ−</button>
+          <button class="el" data-q="0" title="Ladung entfernen">ohne</button>
         </div>
       </div>
-
       <div class="cg" data-for="charge">
-        <span class="cl">Eigene Ladung</span>
+        <span class="cl">Eigene</span>
         <input id="qCustom" type="text" maxlength="4" placeholder="z. B. 3+" title="Ladung eintippen, z. B. 3+, 2−, -4 oder 0. Enter übernimmt" autocomplete="off" spellcheck="false">
         <button id="btnQCustom">Übernehmen</button>
       </div>
+
       <div class="cg" data-for="arrow"><span class="cl">Pfeilart</span><div class="row" id="arrowKinds"></div></div>
-      <div class="cg" data-for="arrow"><span class="cl">Pfeilfarbe</span><div class="row" id="arrowColors"></div></div>
-      <div class="cg" data-for="arrow">
-        <span class="cl">Krümmung <span id="bendVal">0</span></span>
-        <input type="range" id="bendRange" min="-80" max="80" step="5" value="0">
-      </div>
+      <div class="cg" data-for="arrow"><span class="cl">Farbe</span><div class="row" id="arrowColors"></div></div>
+      <div class="cg" data-for="arrow"><span class="cl">Krümmung <span id="bendVal">0</span></span>
+        <input type="range" id="bendRange" min="-80" max="80" step="5" value="0"></div>
 
-      <div class="cg" data-for="text">
-        <span class="cl">Textvorlage</span>
-        <input id="textVal" type="text" placeholder="optional, z. B. Δ" title="Wird beim Anlegen eines neuen Textes vorausgefüllt">
-      </div>
-      <div class="cg" data-for="text"><span class="cl">Textfarbe</span><div class="row" id="textColors"></div></div>
+      <div class="cg" data-for="text"><span class="cl">Vorlage</span>
+        <input id="textVal" type="text" placeholder="optional, z. B. Δ" title="Wird beim Anlegen eines neuen Textes vorausgefüllt"></div>
+      <div class="cg" data-for="text"><span class="cl">Farbe</span><div class="row" id="textColors"></div></div>
 
-      <div class="cg" data-for="erase" id="cgErase">
+      <div class="cg" data-for="erase">
         <span class="ctx-note">Tippen oder wischen löscht. Entf löscht die Auswahl.</span>
         <button class="danger" id="btnClear">Alles löschen</button>
       </div>
     </div>
 
-    <div class="board" id="board">
-      <canvas id="cv"></canvas>
-    </div>
+    <div class="board" id="board"><canvas id="cv"></canvas></div>
 
     <div class="textout" id="textout" hidden>
       <div class="eyebrow" id="toEyebrow">Halbstrukturformel</div>
@@ -548,14 +423,11 @@ html[data-flavor="latte"] .menu-pop, html[data-flavor="latte"] .side{box-shadow:
       <button id="btnCopy">Formel kopieren</button>
     </div>
 
-    <div class="hint">
-      <span id="hint"></span>
-      <span id="hintWarn" class="warn"></span>
-    </div>
+    <div class="hint"><span id="hint"></span><span id="hintWarn" class="warn"></span></div>
   </section>
 
   <!-- ============ AUSWERTUNG + ANZEIGE ============ -->
-  <aside class="panel side" id="side">
+  <aside class="side" id="side">
     <div class="group">
       <h2>Auswertung</h2>
       <div class="readout"><div class="k">Summenformel</div><div class="v" id="outSum">—</div></div>
@@ -563,26 +435,23 @@ html[data-flavor="latte"] .menu-pop, html[data-flavor="latte"] .side{box-shadow:
       <div class="readout"><div class="k">Halbstrukturformel</div><div class="v small" id="outCond">—</div></div>
       <div id="checks"></div>
     </div>
-
     <div class="group">
       <h2>Anzeige</h2>
       <div class="stack">
         <label class="check" id="lblShowC"><input type="checkbox" id="showC"><span>C-Symbole schreiben</span></label>
         <label class="check" title="Atomsymbole, Ladungen, δ-Zeichen und freie Elektronenpaare schwarz statt farbig – auch im Export"><input type="checkbox" id="mono"><span>Alle Symbole schwarz (ohne Farbe)</span></label>
         <label class="check"><input type="checkbox" id="showGrid"><span>Raster</span></label>
-        <label class="check"><input type="checkbox" id="whiteBg" checked><span>Weißer Hintergrund</span></label>
+        <label class="check formel-only"><input type="checkbox" id="whiteBg" checked><span>Weißer Hintergrund</span></label>
       </div>
     </div>
-
     <div class="group">
       <h2>Freie Elektronenpaare</h2>
       <div class="row" id="lpMode">
-        <button data-lp="none" class="on" style="flex:1;text-align:center">aus</button>
-        <button data-lp="dots" style="flex:1;text-align:center">Punkte</button>
-        <button data-lp="line" style="flex:1;text-align:center">Strich</button>
+        <button data-lp="none" class="on">aus</button>
+        <button data-lp="dots">Punkte</button>
+        <button data-lp="line">Strich</button>
       </div>
     </div>
-
     <div class="group">
       <h2>Wasserstoff-Atome</h2>
       <div class="stack" id="hmodes">
@@ -602,6 +471,8 @@ html[data-flavor="latte"] .menu-pop, html[data-flavor="latte"] .side{box-shadow:
     </div>
   </aside>
 </div>
+
+<div id="printArea"><img id="printImg" alt=""></div>
 
 <script>
 "use strict";
@@ -768,24 +639,30 @@ function lonePairs(a){
    3. Zustand der Oberfläche
    ======================================================================= */
 const state = {
-  tool: 'build',
-  el: 'C',
+  tool: 'draw',
+  el: 'C',             // Element für neue Atome
+  order: 1,            // Bindungsart für neue Bindungen
+  ring: 6, aromatic: false,
+  ws: 'formel',        // Arbeitsbereich: 'formel' | 'mech'
   mode: 'skelett',
   showC: false,
   hMode: 'hetero',
   lp: 'none',          // 'none' | 'dots' | 'line'
   showGrid: false,
   white: true,
-  align: '90',         // '90' | '45' | 'zz'
+  align: 'zz',         // '90' | '45' | 'zz'
   charge: {q:1, d:null},
   manualH: false,
   arrowKind: 'reaction',
   arrowColor: 'ink',
   bend: 0,
-  text: '',
   textColor: 'ink',
   selShape: 'rect',    // 'rect' | 'lasso'
-  mono: false          // alle Symbole schwarz (ohne Elementfarben)
+  mono: false
+};
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v){ try { localStorage.setItem(k, v); } catch (e) {} }
 };
 /* Farbwahl für Pfeile und Texte. 'ink' folgt dem Zeichenstil, die übrigen
    sind feste Werte, damit sie auch im Export erhalten bleiben. */
@@ -799,8 +676,9 @@ const PALETTE = [
 ];
 const paletteHex = key => (PALETTE.find(p => p.key === key) || {}).hex || null;
 const effShowC = () => state.showC || state.hMode === 'allText' || state.hMode === 'allLine';
-const undoStack = [];
-const redoStack = [];
+
+let undoStack = [];
+let redoStack = [];
 const snapshot = () => JSON.stringify({atoms, bonds, arrows, labels, nid});
 function apply(s){
   const d = JSON.parse(s);
@@ -810,9 +688,9 @@ function apply(s){
 }
 function pushUndo(){
   const s = snapshot();
-  if (undoStack.length && undoStack[undoStack.length - 1] === s) return;   // nichts geändert
+  if (undoStack.length && undoStack[undoStack.length - 1] === s) return;
   undoStack.push(s);
-  if (undoStack.length > 60) undoStack.shift();
+  if (undoStack.length > 80) undoStack.shift();
   redoStack.length = 0;
 }
 function undo(){
@@ -1296,31 +1174,79 @@ function drawScene(c, opt){
   }
 }
 
+/* =======================================================================
+   6b. Ansicht: Zoom, Verschiebung, A4-Blatt
+   Alle Objekte liegen in Weltkoordinaten (Bindungslänge L = 54).
+   Bildschirm = Welt · s + o.
+   ======================================================================= */
+const view = {s: 1.6, ox: 0, oy: 0};
+const FORMEL_ZOOM = 1.6;          // Standardgröße im Formel-Modus
+const MM = L / 7;                 // Blattmaßstab: eine Bindung = 7 mm
+const PAGE = {land: {w: 297 * MM, h: 210 * MM}, port: {w: 210 * MM, h: 297 * MM}};
+const MARGIN = 12 * MM;           // Satzspiegel (nur Orientierung, wird nicht exportiert)
+let orient = 'land';
+const isMech = () => state.ws === 'mech';
+const pageRect = () => ({x0: 0, y0: 0, x1: PAGE[orient].w, y1: PAGE[orient].h});
+const toWorld = (sx, sy) => ({x: (sx - view.ox) / view.s, y: (sy - view.oy) / view.s});
+const toScreen = (x, y) => ({x: x * view.s + view.ox, y: y * view.s + view.oy});
+const px = v => v / view.s;       // Bildschirmpixel in Weltmaß
+const ZMIN = 0.15, ZMAX = 6;
+
+function syncZoom(){ const z = document.getElementById('zoomVal'); if (z) z.textContent = Math.round(view.s * 100) + ' %'; }
+function afterView(){
+  if (editLabel) commitEdit();
+  hover = null; ringGhost = null;
+  render(); syncZoom();
+}
+function zoomAt(sx, sy, f){
+  const s = Math.max(ZMIN, Math.min(ZMAX, view.s * f));
+  const w = toWorld(sx, sy);
+  view.s = s; view.ox = sx - w.x * s; view.oy = sy - w.y * s;
+  afterView();
+}
+function setZoom(s){ zoomAt(W / 2, H / 2, s / view.s); }
+/* Formel: Zeichnung mittig, höchstens in Standardgröße. Mechanismus: ganzes Blatt. */
+function fitView(){
+  let bb, maxS, m;
+  if (isMech()){ bb = pageRect(); maxS = 3; m = 22; }
+  else { bb = sceneBounds(); maxS = FORMEL_ZOOM; m = 70; }
+  if (!bb || !isFinite(bb.x0)){ view.s = FORMEL_ZOOM; view.ox = W / 2; view.oy = H / 2; afterView(); return; }
+  const bw = Math.max(bb.x1 - bb.x0, 1), bh = Math.max(bb.y1 - bb.y0, 1);
+  const s = Math.max(ZMIN, Math.min(maxS, (W - 2 * m) / bw, (H - 2 * m) / bh));
+  view.s = s;
+  view.ox = W / 2 - (bb.x0 + bb.x1) / 2 * s;
+  view.oy = H / 2 - (bb.y0 + bb.y1) / 2 * s;
+  afterView();
+}
+const viewCenter = () => toWorld(W / 2, H / 2);
+
+/* ---- Raster ---- */
 function drawGrid(){
   if (!state.showGrid) return;
-  const step = 24;
+  const step = isMech() ? 5 * MM : 24;
+  let a = toWorld(0, 0), b = toWorld(W, H);
+  if (isMech()){
+    const P = pageRect();
+    a = {x: Math.max(a.x, 0), y: Math.max(a.y, 0)};
+    b = {x: Math.min(b.x, P.x1), y: Math.min(b.y, P.y1)};
+  }
   ctx.strokeStyle = css('--paper-line');
-  ctx.lineWidth = 1;
+  ctx.lineWidth = px(1);
   ctx.beginPath();
-  for (let x = 0; x <= W; x += step){ ctx.moveTo(x + .5, 0); ctx.lineTo(x + .5, H); }
-  for (let y = 0; y <= H; y += step){ ctx.moveTo(0, y + .5); ctx.lineTo(W, y + .5); }
+  for (let x = Math.ceil(a.x / step) * step; x <= b.x; x += step){ ctx.moveTo(x, a.y); ctx.lineTo(x, b.y); }
+  for (let y = Math.ceil(a.y / step) * step; y <= b.y; y += step){ ctx.moveTo(a.x, y); ctx.lineTo(b.x, y); }
   ctx.stroke();
 }
 
-let hover = null;     // {type:'atom'|'bond'|'arrow'|'label', id}
-let drag = null;      // {from} | {selMove} | {area} | {erase} | {arrowNew} …
+/* ---- Interaktionszustand ---- */
+let hover = null;            // {type:'atom'|'bond'|'arrow'|'label', id}
+let drag = null;
 let selection = new Set();   // markierte Atome
 let selArrows = new Set();   // markierte Pfeile
 let selLabels = new Set();   // markierte Texte
 let selArrow = null;         // ausgewählter Pfeil (Werkzeug „Pfeil“)
-
-function arrowMidAt(p, r = 14 * hitScale()){
-  for (let i = arrows.length-1; i >= 0; i--){
-    const m = arrowPoint(arrows[i], 0.5);
-    if (Math.hypot(m.x-p.x, m.y-p.y) < r) return arrows[i];
-  }
-  return null;
-}
+let ringGhost = null;        // Vorschau des Ringwerkzeugs
+let editLabel = null;        // {id} beim Bearbeiten, {id:null, x, y} beim Neuanlegen
 
 function inPoly(pt, poly){
   let inside = false;
@@ -1332,10 +1258,30 @@ function inPoly(pt, poly){
   return inside;
 }
 
+/* Drehgriff über der Auswahl */
+function rotHandle(){
+  if (state.tool !== 'select' || selection.size + 2 * selArrows.size + selLabels.size < 2) return null;
+  const b = selBox(px(14)); if (!b) return null;
+  return {x: (b.x0 + b.x1) / 2, y: b.y0 - px(30), bx: b, cx: (b.x0 + b.x1) / 2, cy: (b.y0 + b.y1) / 2};
+}
+
 function render(){
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  ctx.fillStyle = css('--paper');
-  ctx.fillRect(0,0,W,H);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = isMech() ? css('--ink-0') : css('--paper');
+  ctx.fillRect(0, 0, W, H);
+  ctx.setTransform(dpr * view.s, 0, 0, dpr * view.s, dpr * view.ox, dpr * view.oy);
+
+  if (isMech()){
+    const P = pageRect();
+    ctx.save();
+    ctx.shadowColor = 'rgba(17,17,27,.35)'; ctx.shadowBlur = 16 * dpr; ctx.shadowOffsetY = 3 * dpr;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, P.x1, P.y1);
+    ctx.restore();
+    ctx.strokeStyle = '#DCE0E8'; ctx.lineWidth = px(1); ctx.setLineDash([px(5), px(5)]);
+    ctx.strokeRect(MARGIN, MARGIN, P.x1 - 2 * MARGIN, P.y1 - 2 * MARGIN);
+    ctx.setLineDash([]);
+  }
   drawGrid();
 
   // Markierung unter der Zeichnung
@@ -1344,14 +1290,14 @@ function render(){
     ctx.beginPath(); ctx.moveTo(ar.x1, ar.y1);
     if (ar.bend) ctx.quadraticCurveTo(g.cx, g.cy, ar.x2, ar.y2); else ctx.lineTo(ar.x2, ar.y2);
   };
-  const labelRect = lb => { const b = labelBox(lb); ctx.beginPath(); ctx.rect(lb.x-b.hw, lb.y-b.hh, 2*b.hw, 2*b.hh); };
+  const labelRect = lb => { const b = labelBox(lb); ctx.beginPath(); ctx.rect(lb.x - b.hw, lb.y - b.hh, 2 * b.hw, 2 * b.hh); };
   if (selCount()){
     const soft = css('--draw-accent-soft');
     ctx.fillStyle = soft; ctx.strokeStyle = soft; ctx.lineCap = 'round';
     ctx.lineWidth = 14;
     for (const b of bonds) if (selection.has(b.a) && selection.has(b.b)){
       const A = byId(b.a), B = byId(b.b);
-      ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.stroke();
     }
     for (const id of selection){
       const a = byId(id); if (!a) continue;
@@ -1374,7 +1320,7 @@ function render(){
       if (b){
         const A = byId(b.a), B = byId(b.b);
         ctx.lineWidth = 12;
-        ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.stroke();
       }
     } else if (hover.type === 'arrow'){
       const ar = arrows.find(x => x.id === hover.id);
@@ -1387,66 +1333,95 @@ function render(){
 
   drawScene(ctx, {});
 
-  // Vorschau beim Ziehen
+  const accent = css('--draw-accent');
+  // ausgewählter Pfeil (Werkzeug „Pfeil“) mit Griffen
   if (state.tool === 'arrow' && selArrow != null){
     const ar = arrows.find(x => x.id === selArrow);
     if (ar){
-      const g = arrowGeom(ar);
       ctx.strokeStyle = 'rgba(30,102,245,.25)';
       ctx.lineWidth = 11; ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.moveTo(ar.x1, ar.y1);
-      if (ar.bend) ctx.quadraticCurveTo(g.cx, g.cy, ar.x2, ar.y2); else ctx.lineTo(ar.x2, ar.y2);
-      ctx.stroke();
+      tracePath(ar); ctx.stroke();
       const m = arrowPoint(ar, 0.5);
-      ctx.fillStyle = css('--draw-accent');
+      ctx.fillStyle = accent;
       for (const [x, y, r] of [[ar.x1, ar.y1, 3.5], [ar.x2, ar.y2, 3.5], [m.x, m.y, 5]]){
-        ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill();
+        ctx.beginPath(); ctx.arc(x, y, px(r) * 1.2, 0, TAU); ctx.fill();
       }
     }
   }
   if (drag && drag.arrowNew){
     const n = drag.arrowNew;
-    drawArrow(ctx, {kind:state.arrowKind, x1:n.x1, y1:n.y1, x2:n.x2, y2:n.y2,
+    drawArrow(ctx, {kind: state.arrowKind, x1: n.x1, y1: n.y1, x2: n.x2, y2: n.y2,
                     bend: state.bend, color: paletteHex(state.arrowColor)}, null);
   }
+  // Auswahlrahmen und Drehgriff
   if (state.tool === 'select' && selCount() && !(drag && drag.area)){
-    const bx = selBox(14);
+    const bx = selBox(px(14));
     if (bx){
-      ctx.strokeStyle = css('--draw-accent'); ctx.lineWidth = 1; ctx.setLineDash([4,4]);
-      ctx.strokeRect(bx.x0 + .5, bx.y0 + .5, bx.x1 - bx.x0, bx.y1 - bx.y0);
+      ctx.strokeStyle = accent; ctx.lineWidth = px(1); ctx.setLineDash([px(4), px(4)]);
+      ctx.strokeRect(bx.x0, bx.y0, bx.x1 - bx.x0, bx.y1 - bx.y0);
       ctx.setLineDash([]);
+      const rh = rotHandle();
+      if (rh){
+        ctx.beginPath(); ctx.moveTo(rh.x, bx.y0); ctx.lineTo(rh.x, rh.y + px(7)); ctx.stroke();
+        ctx.fillStyle = '#fff'; ctx.lineWidth = px(1.6);
+        ctx.beginPath(); ctx.arc(rh.x, rh.y, px(7), 0, TAU); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(rh.x, rh.y, px(3.2), -Math.PI * 0.9, Math.PI * 0.55); ctx.stroke();
+      }
     }
   }
   if (drag && drag.area){
     const ar = drag.area;
     ctx.beginPath();
-    if (ar.shape === 'rect') ctx.rect(Math.min(ar.x0, ar.x1), Math.min(ar.y0, ar.y1), Math.abs(ar.x1-ar.x0), Math.abs(ar.y1-ar.y0));
+    if (ar.shape === 'rect') ctx.rect(Math.min(ar.x0, ar.x1), Math.min(ar.y0, ar.y1), Math.abs(ar.x1 - ar.x0), Math.abs(ar.y1 - ar.y0));
     else if (ar.pts.length > 1){
       ctx.moveTo(ar.pts[0].x, ar.pts[0].y);
       for (const q of ar.pts.slice(1)) ctx.lineTo(q.x, q.y);
       ctx.closePath();
     }
-    ctx.fillStyle = 'rgba(30,102,245,.09)';
-    ctx.fill();
-    ctx.strokeStyle = css('--draw-accent');
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([6,4]);
-    ctx.stroke();
-    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(30,102,245,.09)'; ctx.fill();
+    ctx.strokeStyle = accent; ctx.lineWidth = px(1.5); ctx.setLineDash([px(6), px(4)]);
+    ctx.stroke(); ctx.setLineDash([]);
   }
-  if (drag && drag.from){
-    const A = byId(drag.from);
-    ctx.strokeStyle = css('--draw-accent');
-    ctx.lineWidth = 1.6;
-    ctx.setLineDash([5,4]);
-    ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(drag.x, drag.y); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = css('--draw-accent');
-    ctx.beginPath(); ctx.arc(drag.x, drag.y, 3.2, 0, TAU); ctx.fill();
+  // Vorschau: Kette
+  if (drag && drag.chain && drag.chain.plan){
+    const c = drag.chain, pl = c.plan;
+    ctx.strokeStyle = accent; ctx.fillStyle = accent; ctx.lineWidth = 1.9; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.globalAlpha = 0.6;
+    ctx.beginPath(); ctx.moveTo(c.sx, c.sy);
+    if (pl.toId != null){ const t = byId(pl.toId); ctx.lineTo(t.x, t.y); }
+    else pl.pts.forEach(q => ctx.lineTo(q.x, q.y));
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    const last = pl.toId != null ? byId(pl.toId) : pl.pts[pl.pts.length - 1];
+    for (const q of pl.pts){ ctx.beginPath(); ctx.arc(q.x, q.y, px(2.6), 0, TAU); ctx.fill(); }
+    // Zähler am Zeiger (in Bildschirmgröße)
+    const total = pl.toId != null ? 0 : pl.pts.length + 1;
+    if (total > 2 && last){
+      const t = total + ' Atome';
+      ctx.font = FONT(px(12.5));
+      const tw = ctx.measureText(t).width, hx = last.x + px(14), hy = last.y - px(14);
+      ctx.fillStyle = 'rgba(30,102,245,.92)';
+      ctx.beginPath(); ctx.rect(hx - px(5), hy - px(10), tw + px(10), px(20)); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      ctx.fillText(t, hx, hy);
+    }
+  }
+  // Vorschau: Ring
+  if (state.tool === 'ring' && ringGhost && !drag){
+    const g = ringGhost;
+    ctx.strokeStyle = accent; ctx.lineWidth = 1.9; ctx.globalAlpha = 0.5; ctx.lineJoin = 'round';
+    ctx.beginPath();
+    if (g.anchor != null){ const a = byId(g.anchor); ctx.moveTo(a.x, a.y); ctx.lineTo(g.pts[0].x, g.pts[0].y); }
+    ctx.moveTo(g.pts[0].x, g.pts[0].y);
+    g.pts.forEach(q => ctx.lineTo(q.x, q.y));
+    ctx.closePath(); ctx.stroke();
+    if (g.aromatic){
+      ctx.beginPath(); ctx.arc(g.cx, g.cy, g.R * 0.55, 0, TAU); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
   }
   placeSelBar();
 }
-
 /* =======================================================================
    7. Auswertung: Summenformel, Molmasse, Halbstrukturformel
    ======================================================================= */
@@ -1692,7 +1667,6 @@ function checks(){
   if (comps.length > 1) out.push({type:'info', text:`Die Zeichnung enthält ${comps.length} getrennte Teilchen.`});
   return out;
 }
-
 /* =======================================================================
    8. Oberfläche aktualisieren
    ======================================================================= */
@@ -1708,17 +1682,21 @@ function refresh(){
 
   const box = $('#checks');
   box.innerHTML = '';
-  for (const c of checks()){
+  const cks = checks();
+  for (const c of cks){
     const d = document.createElement('div');
     d.className = 'msg ' + (c.type === 'err' ? 'err' : 'info');
     d.textContent = c.text;
     box.appendChild(d);
   }
-  const errs = checks().filter(c => c.type === 'err').length;
+  const errs = cks.filter(c => c.type === 'err').length;
   const sideClosed = document.querySelector('.layout').classList.contains('side-closed');
   $('#hintWarn').textContent = errs ? (sideClosed ? 'Bindigkeit prüfen (Auswertung öffnen)' : 'Bindigkeit prüfen (siehe rechts)') : '';
+  $('#btnUndo').disabled = !undoStack.length;
+  $('#btnRedo').disabled = !redoStack.length;
 
   if (state.mode === 'halb' || state.mode === 'summe') renderTextMode();
+  scheduleSave();
 }
 
 function renderTextMode(){
@@ -1749,74 +1727,95 @@ function renderTextMode(){
 }
 
 const HINTS = {
-  build : 'Tippen auf leere Fläche: neues Atom. Tippen auf ein Atom: Kette verlängern. Ziehen: Bindung in gewünschte Richtung.',
-  select: 'Klick markiert, Umschalt+Klick ergänzt, Ziehen auf freier Fläche zieht einen Rahmen (Alt: Lasso). Doppelklick: ganzes Teilchen bzw. Text bearbeiten.',
-  element:'Auf ein Atom tippen, um es in das oben gewählte Element zu ändern. Bei markierten Atomen gilt es für die ganze Auswahl.',
-  bond  : 'Auf eine Bindung tippen: Einfach- → Doppel- → Dreifachbindung.',
-  charge: 'Ladung oben wählen, dann auf ein Atom tippen (bei Auswahl: für alle markierten). „ohne“ entfernt die Ladung.',
-  arrow : 'Von der Elektronenquelle zum Ziel ziehen. Ein Tipp wählt einen Pfeil aus, der Mittelpunkt biegt ihn.',
-  text  : 'Auf die Fläche tippen und direkt schreiben, Enter übernimmt. Tipp auf einen Text bearbeitet ihn; leeren und Enter löscht ihn.',
-  erase : 'Tippen oder über Objekte wischen löscht Atome, Bindungen, Pfeile und Texte. Tipp in eine Auswahl löscht die ganze Auswahl.'
+  draw  : 'Tippen: Atom setzen bzw. Kette um ein Atom verlängern · Ziehen: Zickzack-Kette, je weiter, desto länger (Umschalt: andere Seite) · Tipp auf Bindung: Doppel-/Dreifachbindung · über einem Atom Taste O, N, S, Cl … ändert das Element.',
+  ring  : 'Freie Fläche: Ring setzen · Tipp auf eine Bindung: Ring anellieren (gemeinsame Bindung) · Tipp auf ein Atom: Ring anhängen · Tasten 3–7 und B wählen den Ring.',
+  select: 'Klick markiert, Umschalt+Klick ergänzt, Ziehen auf freier Fläche zieht einen Rahmen (Alt: Lasso) · Doppelklick: ganzes Teilchen · runder Griff: drehen · Strg+C / Strg+V / Strg+D.',
+  charge: 'Ladung oben wählen, dann auf ein Atom tippen (bei Auswahl: für alle markierten) · schneller: über einem Atom Taste + oder −.',
+  arrow : 'Von der Elektronenquelle zum Ziel ziehen · ein Tipp wählt einen Pfeil aus, der Mittelpunkt biegt ihn, die Enden lassen sich in der Auswahl verschieben.',
+  text  : 'Auf die Fläche tippen und schreiben, Enter übernimmt · Tipp auf einen Text bearbeitet ihn · H2O → H₂O, ^ stellt hoch, _ tief.',
+  erase : 'Tippen oder über Objekte wischen löscht Atome, Bindungen, Pfeile und Texte · Tipp in eine Auswahl löscht die ganze Auswahl.'
 };
-
 
 /* =======================================================================
    9. Eingabe auf der Zeichenfläche
    ======================================================================= */
-function pos(e){
+function spos(e){
   const r = cv.getBoundingClientRect();
   return {x: e.clientX - r.left, y: e.clientY - r.top};
 }
-const hitScale = () => document.documentElement.classList.contains('view-touch') ? 1.4 : 1;
-function atomAt(p, r = 17 * hitScale()){
+function pos(e){ const s = spos(e); return toWorld(s.x, s.y); }
+const hitScale = () => document.documentElement.classList.contains('view-touch') ? 1.45 : 1;
+/* Trefferradius: konstant in Bildschirmpixeln, aber nie größer als ein Teil der Bindungslänge */
+const hr = (p, cap) => Math.min(p * hitScale() / view.s, cap);
+
+function atomAt(p, r = hr(17, L * 0.45), skipId = null){
   let best = null, bd = r;
   for (const a of atoms){
+    if (a.id === skipId) continue;
     const d = Math.hypot(a.x - p.x, a.y - p.y);
     if (d < bd){ bd = d; best = a; }
   }
   return best;
 }
-function bondAt(p, r = 9 * hitScale()){
+/* Atom an einer berechneten Position (zum Verschmelzen neuer Atome mit vorhandenen) */
+function nearAtom(q, r = L * 0.3, skip = null){
+  let best = null, bd = r;
+  for (const a of atoms){
+    if (skip && skip.has(a.id)) continue;
+    const d = Math.hypot(a.x - q.x, a.y - q.y);
+    if (d < bd){ bd = d; best = a; }
+  }
+  return best;
+}
+function bondAt(p, r = hr(9, L * 0.3)){
+  let best = null, bd = r;
   for (const b of bonds){
     const A = byId(b.a), B = byId(b.b);
-    const dx = B.x-A.x, dy = B.y-A.y;
-    const len2 = dx*dx + dy*dy;
+    const dx = B.x - A.x, dy = B.y - A.y;
+    const len2 = dx * dx + dy * dy;
     if (!len2) continue;
-    let t = ((p.x-A.x)*dx + (p.y-A.y)*dy) / len2;
+    let t = ((p.x - A.x) * dx + (p.y - A.y) * dy) / len2;
     t = Math.max(0, Math.min(1, t));
-    const d = Math.hypot(A.x + dx*t - p.x, A.y + dy*t - p.y);
-    if (d < r) return b;
+    const d = Math.hypot(A.x + dx * t - p.x, A.y + dy * t - p.y);
+    if (d < bd){ bd = d; best = b; }
   }
-  return null;
+  return best;
 }
 function labelBox(lb){
   const m = measureRuns(ctx, parseLabelText(lb.t));
-  return {hw: m.w/2 + 6, hh: m.h/2 + 6};
+  return {hw: m.w / 2 + 6, hh: m.h / 2 + 6};
 }
 function labelAt(p){
-  for (let i = labels.length-1; i >= 0; i--){
+  for (let i = labels.length - 1; i >= 0; i--){
     const lb = labels[i];
     const {hw, hh} = labelBox(lb);
-    if (Math.abs(p.x-lb.x) < hw && Math.abs(p.y-lb.y) < hh) return lb;
+    if (Math.abs(p.x - lb.x) < hw && Math.abs(p.y - lb.y) < hh) return lb;
   }
   return null;
 }
-function arrowAt(p, r = 10 * hitScale()){
-  for (let i = arrows.length-1; i >= 0; i--){
+function arrowAt(p, r = hr(10, 30)){
+  for (let i = arrows.length - 1; i >= 0; i--){
     const ar = arrows[i];
-    for (let t = 0; t <= 1.0001; t += 0.05){
+    for (let t = 0; t <= 1.0001; t += 0.04){
       const q = arrowPoint(ar, t);
-      if (Math.hypot(q.x-p.x, q.y-p.y) < r) return ar;
+      if (Math.hypot(q.x - p.x, q.y - p.y) < r) return ar;
     }
   }
   return null;
 }
-function arrowEndAt(p, r = 12 * hitScale(), only = null){
-  for (let i = arrows.length-1; i >= 0; i--){
+function arrowEndAt(p, r = hr(12, 30), only = null){
+  for (let i = arrows.length - 1; i >= 0; i--){
     const ar = arrows[i];
     if (only && !only.has(ar.id)) continue;
-    if (Math.hypot(ar.x1-p.x, ar.y1-p.y) < r) return {ar, end:1};
-    if (Math.hypot(ar.x2-p.x, ar.y2-p.y) < r) return {ar, end:2};
+    if (Math.hypot(ar.x1 - p.x, ar.y1 - p.y) < r) return {ar, end: 1};
+    if (Math.hypot(ar.x2 - p.x, ar.y2 - p.y) < r) return {ar, end: 2};
+  }
+  return null;
+}
+function arrowMidAt(p, r = hr(14, 30)){
+  for (let i = arrows.length - 1; i >= 0; i--){
+    const m = arrowPoint(arrows[i], 0.5);
+    if (Math.hypot(m.x - p.x, m.y - p.y) < r) return arrows[i];
   }
   return null;
 }
@@ -1824,13 +1823,11 @@ function snapAngle(a){
   const step = Math.PI / 6;                 // 30°
   return Math.round(a / step) * step;
 }
-
-/* ---- Treffer: ein Objekt unter dem Zeiger, gleich welcher Art ---- */
 function hitAt(p){
-  const lb = labelAt(p); if (lb) return {type:'label', id:lb.id};
-  const a = atomAt(p);   if (a)  return {type:'atom',  id:a.id};
-  const ar = arrowAt(p); if (ar) return {type:'arrow', id:ar.id};
-  const b = bondAt(p);   if (b)  return {type:'bond',  id:b.id};
+  const lb = labelAt(p); if (lb) return {type: 'label', id: lb.id};
+  const a = atomAt(p);   if (a)  return {type: 'atom',  id: a.id};
+  const ar = arrowAt(p); if (ar) return {type: 'arrow', id: ar.id};
+  const b = bondAt(p);   if (b)  return {type: 'bond',  id: b.id};
   return null;
 }
 const sameHit = (h, k) => (!h && !k) || (h && k && h.type === k.type && h.id === k.id);
@@ -1859,18 +1856,17 @@ function selectAll(){
   selArrows = new Set(arrows.map(a => a.id));
   selLabels = new Set(labels.map(l => l.id));
 }
-/* Umrandung der Auswahl (für das Greifen innerhalb der Auswahl) */
 function selBox(pad = 16){
   if (!selCount()) return null;
-  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
-  const put = (x,y,hw=0,hh=0) => { x0=Math.min(x0,x-hw); y0=Math.min(y0,y-hh); x1=Math.max(x1,x+hw); y1=Math.max(y1,y+hh); };
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  const put = (x, y, hw = 0, hh = 0) => { x0 = Math.min(x0, x - hw); y0 = Math.min(y0, y - hh); x1 = Math.max(x1, x + hw); y1 = Math.max(y1, y + hh); };
   for (const id of selection){ const a = byId(id); if (a) put(a.x, a.y); }
   for (const ar of arrows) if (selArrows.has(ar.id)){
     put(ar.x1, ar.y1); put(ar.x2, ar.y2); const m = arrowPoint(ar, 0.5); put(m.x, m.y);
   }
   for (const lb of labels) if (selLabels.has(lb.id)){ const b = labelBox(lb); put(lb.x, lb.y, b.hw, b.hh); }
   if (x0 > x1) return null;
-  return {x0:x0-pad, y0:y0-pad, x1:x1+pad, y1:y1+pad};
+  return {x0: x0 - pad, y0: y0 - pad, x1: x1 + pad, y1: y1 + pad};
 }
 function inSelBox(p){
   const b = selBox();
@@ -1881,7 +1877,6 @@ function moveSel(dx, dy){
   for (const ar of arrows) if (selArrows.has(ar.id)){ ar.x1 += dx; ar.y1 += dy; ar.x2 += dx; ar.y2 += dy; }
   for (const lb of labels) if (selLabels.has(lb.id)){ lb.x += dx; lb.y += dy; }
 }
-/* Bereichsauswahl: Rechteck oder Freihand-Lasso */
 function selectArea(area, add){
   if (!add) clearSel();
   let inside;
@@ -1891,7 +1886,7 @@ function selectArea(area, add){
     inside = q => q.x >= x0 && q.x <= x1 && q.y >= y0 && q.y <= y1;
   } else inside = q => inPoly(q, area.pts);
   atoms.forEach(a => { if (inside(a)) selection.add(a.id); });
-  arrows.forEach(ar => { if (inside({x:ar.x1, y:ar.y1}) && inside({x:ar.x2, y:ar.y2})) selArrows.add(ar.id); });
+  arrows.forEach(ar => { if (inside({x: ar.x1, y: ar.y1}) && inside({x: ar.x2, y: ar.y2})) selArrows.add(ar.id); });
   labels.forEach(lb => { if (inside(lb)) selLabels.add(lb.id); });
 }
 function selHint(){
@@ -1901,12 +1896,10 @@ function selHint(){
   if (selection.size) parts.push(selection.size + (selection.size === 1 ? ' Atom' : ' Atome'));
   if (selArrows.size) parts.push(selArrows.size + (selArrows.size === 1 ? ' Pfeil' : ' Pfeile'));
   if (selLabels.size) parts.push(selLabels.size + (selLabels.size === 1 ? ' Text' : ' Texte'));
-  $('#hint').textContent = parts.join(', ') + ' markiert. Ziehen verschiebt, Entf löscht, Esc hebt auf.';
+  $('#hint').textContent = parts.join(', ') + ' markiert. Ziehen verschiebt, Element- und Bindungsknöpfe wirken auf die Auswahl, Entf löscht, Esc hebt auf.';
 }
 
 /* ---- Löschen ---- */
-/* Ein Atom samt der expliziten H-Atome, die nur an ihm hängen – sonst blieben
-   sie als isolierte Atome zurück und verfälschten die Summenformel. */
 function deleteAtomDeep(id){
   const a = byId(id); if (!a) return;
   if (a.el !== 'H'){
@@ -1918,7 +1911,7 @@ function deleteAtomDeep(id){
 function deleteBond(id){
   const b = bondById(id); if (!b) return;
   bonds = bonds.filter(x => x.id !== id);
-  for (const end of [b.a, b.b]){                 // verwaiste H-Atome mit entfernen
+  for (const end of [b.a, b.b]){
     const at = byId(end);
     if (at && at.el === 'H' && bondsOf(end).length === 0) removeAtom(end);
   }
@@ -1947,7 +1940,6 @@ function deleteSelection(){
 }
 
 /* ---- Text direkt auf der Fläche bearbeiten ---- */
-let editLabel = null;          // {id} beim Bearbeiten, {id:null, x, y} beim Neuanlegen
 const editor = document.createElement('input');
 editor.type = 'text';
 editor.id = 'labelEditor';
@@ -1962,8 +1954,10 @@ function openEditor(lb, p){
   const x = lb ? lb.x : p.x, y = lb ? lb.y : p.y;
   editLabel = lb ? {id: lb.id} : {id: null, x, y};
   editor.value = lb ? lb.t : $('#textVal').value.trim();
-  editor.style.left = x + 'px';
-  editor.style.top  = y + 'px';
+  const s = toScreen(x, y);
+  editor.style.left = s.x + 'px';
+  editor.style.top  = s.y + 'px';
+  editor.style.fontSize = Math.max(12, FS * view.s) + 'px';
   const col = lb ? lb.color : paletteHex(state.textColor);
   editor.style.color = col || '#1e1e2e';
   editor.hidden = false;
@@ -1983,7 +1977,7 @@ function commitEdit(){
     else if (lb && val !== lb.t){ pushUndo(); lb.t = val; }
   } else if (val){
     pushUndo();
-    labels.push({id:nid++, x:e.x, y:e.y, t:val, color: paletteHex(state.textColor)});
+    labels.push({id: nid++, x: e.x, y: e.y, t: val, color: paletteHex(state.textColor)});
   }
   $('#hint').textContent = HINTS[state.tool];
   refresh();
@@ -2002,15 +1996,181 @@ editor.addEventListener('keydown', e => {
 });
 editor.addEventListener('blur', () => commitEdit());
 
-/* ---- Zeigerereignisse ---- */
+/* =======================================================================
+   9b. Ketten und Ringe
+   ======================================================================= */
+/* Plant eine Zickzack-Kette vom Startpunkt zum Zeiger.
+   Bis ca. 1,5 Bindungslängen: eine einzelne Bindung in 30°-Schritten.
+   Darüber: Kettenachse in 30°-Schritten, Bindungen im Wechsel ±30° dazu
+   (120°-Bindungswinkel). Länge = Abstand / (L · cos 30°). */
+function chainPlan(c, p, flip){
+  const start = c.startId != null ? byId(c.startId) : null;
+  const dx = p.x - c.sx, dy = p.y - c.sy, dist = Math.hypot(dx, dy);
+  const tgt = atomAt(p, undefined, c.startId);
+  if (tgt && dist < L * 1.75) return {pts: [], toId: tgt.id, n: 1};
+  const step = L * Math.cos(Math.PI / 6);
+  const n = Math.max(1, Math.min(60, Math.round(dist / step)));
+  const ax = snapAngle(Math.atan2(dy, dx));
+  const pts = [];
+  if (n === 1){
+    pts.push({x: c.sx + L * Math.cos(ax), y: c.sy + L * Math.sin(ax)});
+    return {pts, n};
+  }
+  const z = Math.PI / 6;
+  const occ = start ? occupiedAngles(start) : [];
+  let sgn;
+  if (occ.length){
+    const sc = g => Math.min(...occ.map(o => angDiff(ax + g * z, o)));
+    const d = sc(1) - sc(-1);
+    sgn = Math.abs(d) > 1e-6 ? (d > 0 ? 1 : -1) : (Math.sin(ax + z) < Math.sin(ax - z) ? 1 : -1);
+  } else {
+    // erste Bindung bevorzugt nach oben – wie im Schulbuch
+    sgn = Math.sin(ax + z) < Math.sin(ax - z) - 1e-6 ? 1 : -1;
+  }
+  if (flip) sgn = -sgn;
+  let x = c.sx, y = c.sy;
+  for (let k = 0; k < n; k++){
+    const a = ax + sgn * (k % 2 ? -z : z);
+    x += L * Math.cos(a); y += L * Math.sin(a);
+    pts.push({x, y});
+  }
+  return {pts, n};
+}
+function commitChain(c){
+  const pl = c.plan;
+  pushUndo();
+  let prev = c.startId != null ? byId(c.startId) : null;
+  if (!prev) prev = nearAtom({x: c.sx, y: c.sy}, L * 0.2) || addAtom('C', c.sx, c.sy);
+  if (pl.toId != null){
+    const ex = findBond(prev.id, pl.toId);
+    if (ex) ex.order = ex.order % 3 + 1; else addBond(prev.id, pl.toId, state.order);
+    return;
+  }
+  const used = new Set([prev.id]);
+  pl.pts.forEach((q, i) => {
+    const last = i === pl.pts.length - 1;
+    let at = nearAtom(q, L * 0.3, used);
+    if (!at) at = addAtom(last ? state.el : 'C', q.x, q.y);
+    used.add(at.id);
+    if (!findBond(prev.id, at.id)) addBond(prev.id, at.id, pl.n === 1 ? state.order : 1);
+    prev = at;
+  });
+}
+/* Treffer für das Ringwerkzeug */
+function ringHitAt(p){
+  const a = atomAt(p); if (a) return {type: 'atom', id: a.id};
+  const b = bondAt(p); if (b) return {type: 'bond', id: b.id};
+  return null;
+}
+/* Eckpunkte eines regelmäßigen n-Rings */
+function ringPlan(n, hit, p){
+  const R = L / (2 * Math.sin(Math.PI / n)), ap = L / (2 * Math.tan(Math.PI / n));
+  const verts = (cx, cy, a0, dir) => {
+    const out = [];
+    for (let i = 0; i < n; i++){ const a = a0 + dir * i * TAU / n; out.push({x: cx + R * Math.cos(a), y: cy + R * Math.sin(a)}); }
+    return out;
+  };
+  const base = {aromatic: state.aromatic && n === 6, R};
+  if (!hit){
+    return Object.assign(base, {cx: p.x, cy: p.y, pts: verts(p.x, p.y, -Math.PI / 2, 1), anchor: null});
+  }
+  if (hit.type === 'bond'){
+    const b = bondById(hit.id), A = byId(b.a), B = byId(b.b);
+    const mx = (A.x + B.x) / 2, my = (A.y + B.y) / 2;
+    const len = Math.hypot(B.x - A.x, B.y - A.y) || 1;
+    const nx = -(B.y - A.y) / len, ny = (B.x - A.x) / len;
+    const crowd = s => {
+      const cx = mx + s * nx * ap, cy = my + s * ny * ap; let pen = 0;
+      for (const o of atoms){
+        if (o.id === A.id || o.id === B.id) continue;
+        const d = Math.hypot(o.x - cx, o.y - cy);
+        if (d < R * 1.3) pen += R * 1.3 - d;
+      }
+      return pen;
+    };
+    const c1 = crowd(1), c2 = crowd(-1);
+    let s = c1 < c2 - 1e-6 ? 1 : (c2 < c1 - 1e-6 ? -1 : ((p.x - mx) * nx + (p.y - my) * ny >= 0 ? 1 : -1));
+    const cx = mx + s * nx * ap, cy = my + s * ny * ap;
+    const aA = Math.atan2(A.y - cy, A.x - cx), aB = Math.atan2(B.y - cy, B.x - cx);
+    let d = aB - aA; while (d > Math.PI) d -= TAU; while (d < -Math.PI) d += TAU;
+    // Ringgröße wird an die vorhandene Bindungslänge angepasst
+    const k = len / L;
+    const out = verts(cx, cy, aA, d >= 0 ? 1 : -1).map(q => ({x: cx + (q.x - cx) * k, y: cy + (q.y - cy) * k}));
+    out[0] = {x: A.x, y: A.y}; out[1] = {x: B.x, y: B.y};
+    return Object.assign(base, {cx, cy, pts: out, anchor: null, R: R * k});
+  }
+  const a = byId(hit.id);
+  const nb = neighbors(a.id);
+  if (nb.length >= 2){
+    // Ring als Substituent über eine neue Bindung anhängen (z. B. Phenylgruppe)
+    const dir = suggestDir(a);
+    const qx = a.x + L * Math.cos(dir), qy = a.y + L * Math.sin(dir);
+    const cx = qx + R * Math.cos(dir), cy = qy + R * Math.sin(dir);
+    return Object.assign(base, {cx, cy, pts: verts(cx, cy, dir + Math.PI, 1), anchor: a.id});
+  }
+  // Ring schließt das Atom ein (z. B. Kettenende wird Ringatom)
+  const dir = nb.length === 1 ? angleTo(nb[0], a) : suggestDir(a);
+  const cx = a.x + R * Math.cos(dir), cy = a.y + R * Math.sin(dir);
+  const out = verts(cx, cy, dir + Math.PI, 1);
+  out[0] = {x: a.x, y: a.y};
+  return Object.assign(base, {cx, cy, pts: out, anchor: null});
+}
+function commitRing(pl){
+  pushUndo();
+  const ids = pl.pts.map(q => (nearAtom(q, L * 0.3) || addAtom('C', q.x, q.y)).id);
+  if (pl.anchor != null && !findBond(pl.anchor, ids[0])) addBond(pl.anchor, ids[0], 1);
+  const n = ids.length, fresh = new Set();
+  for (let i = 0; i < n; i++){
+    const j = (i + 1) % n;
+    if (!findBond(ids[i], ids[j])) fresh.add(addBond(ids[i], ids[j], 1));
+  }
+  if (pl.aromatic){
+    const hasDouble = id => bondsOf(id).some(b => b.order >= 2);
+    for (let i = 0; i < n; i++){
+      const b = findBond(ids[i], ids[(i + 1) % n]);
+      if (fresh.has(b) && !hasDouble(b.a) && !hasDouble(b.b)) b.order = 2;
+    }
+  }
+}
+
+/* =======================================================================
+   9c. Zeigerereignisse
+   ======================================================================= */
 const HOVER_TYPES = {
-  build:['atom','bond'], element:['atom'], charge:['atom'], bond:['bond'],
-  text:['label'], arrow:['arrow'], select:['atom','bond','arrow','label'],
-  erase:['atom','bond','arrow','label']
+  draw: ['atom', 'bond'], ring: [], charge: ['atom'], text: ['label'], arrow: ['arrow'],
+  select: ['atom', 'bond', 'arrow', 'label'], erase: ['atom', 'bond', 'arrow', 'label']
 };
-let downPt = null, moved = false, swallowUp = false, lastTap = {hit:null, t:0};
+let downPt = null, downScr = null, moved = false, swallowUp = false, lastTap = {hit: null, t: 0};
+let spaceDown = false, pinch = null;
+const ptrs = new Map();
 const firstMove = d => { if (!d.undo){ pushUndo(); d.undo = true; } };
 
+function cursorFor(){
+  if (spaceDown) return 'grab';
+  return state.tool === 'select' ? 'default' : (state.tool === 'text' ? 'text' : 'crosshair');
+}
+function cancelDrag(){
+  if (drag && drag.undo){ const s = undoStack.pop(); if (s) apply(s); }
+  drag = null; downPt = null; moved = false;
+}
+function startPinch(){
+  const [a, b] = [...ptrs.values()];
+  const r = cv.getBoundingClientRect();
+  pinch = {d: Math.hypot(a.x - b.x, a.y - b.y) || 1, mx: (a.x + b.x) / 2 - r.left, my: (a.y + b.y) / 2 - r.top,
+           s: view.s, ox: view.ox, oy: view.oy};
+  if (editLabel) commitEdit();
+  hover = null; render();
+}
+function updatePinch(){
+  const [a, b] = [...ptrs.values()];
+  const r = cv.getBoundingClientRect();
+  const d = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+  const mx = (a.x + b.x) / 2 - r.left, my = (a.y + b.y) / 2 - r.top;
+  const s = Math.max(ZMIN, Math.min(ZMAX, pinch.s * d / pinch.d));
+  const wx = (pinch.mx - pinch.ox) / pinch.s, wy = (pinch.my - pinch.oy) / pinch.s;
+  view.s = s; view.ox = mx - wx * s; view.oy = my - wy * s;
+  render(); syncZoom();
+}
 function eraseAt(p){
   const h = hitAt(p);
   if (!h) return;
@@ -2019,60 +2179,102 @@ function eraseAt(p){
   hover = null;
   render();
 }
+function newArea(p, e){
+  const shape = e.altKey ? (state.selShape === 'rect' ? 'lasso' : 'rect') : state.selShape;
+  return shape === 'rect' ? {shape, x0: p.x, y0: p.y, x1: p.x, y1: p.y} : {shape, pts: [p]};
+}
+/* Wirkt ein Tipp auf ein markiertes Atom, gilt er für die ganze Auswahl */
+const targetsOf = at => (selection.has(at.id) && selection.size > 1) ? [...selection].map(byId).filter(Boolean) : [at];
 
 cv.addEventListener('pointerdown', e => {
-  if (editLabel){ e.preventDefault(); commitEdit(); swallowUp = true; return; }   // Klick daneben schließt nur das Textfeld
+  ptrs.set(e.pointerId, {x: e.clientX, y: e.clientY});
+  if (ptrs.size === 2){ cancelDrag(); startPinch(); e.preventDefault(); return; }
+  if (ptrs.size > 2 || e.button === 2) return;
+  if (editLabel){ e.preventDefault(); commitEdit(); swallowUp = true; return; }
+  e.preventDefault();
+  try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+  const sp = spos(e);
+  if (e.button === 1 || spaceDown){
+    drag = {pan: true, sx: sp.x, sy: sp.y, ox: view.ox, oy: view.oy};
+    cv.style.cursor = 'grabbing';
+    return;
+  }
   if (e.button > 0) return;
-  e.preventDefault();                 // verhindert nachträgliche Maus-Ereignisse (Fokusverlust auf Tablets)
-  cv.setPointerCapture(e.pointerId);
-  const p = pos(e);
-  downPt = p; moved = false;
+  const p = toWorld(sp.x, sp.y);
+  downPt = p; downScr = sp; moved = false;
   const a = atomAt(p);
   const h = hitAt(p);
 
   if (state.tool === 'arrow'){
     const am = arrowMidAt(p);
-    if (am){ selArrow = am.id; drag = {bendArrow:am}; }
-    else drag = {arrowNew:{x1:p.x, y1:p.y, x2:p.x, y2:p.y}};
+    if (am){ selArrow = am.id; drag = {bendArrow: am}; }
+    else drag = {arrowNew: {x1: p.x, y1: p.y, x2: p.x, y2: p.y}};
   }
   else if (state.tool === 'select'){
-    const ae = arrowEndAt(p, 12, selCount() > 1 ? new Set() : null);
-    if (e.shiftKey)                      drag = {toggle:h, area: h ? null : newArea(p, e), add:true};
-    else if (ae && !a)                   drag = {arrowEnd:ae};
+    const rh = rotHandle();
+    const ae = arrowEndAt(p, undefined, selCount() > 1 ? new Set() : null);
+    if (rh && Math.hypot(sp.x - toScreen(rh.x, rh.y).x, sp.y - toScreen(rh.x, rh.y).y) < 13 * hitScale()){
+      const orig = {
+        at: [...selection].map(byId).filter(Boolean).map(o => [o, o.x, o.y]),
+        ar: arrows.filter(o => selArrows.has(o.id)).map(o => [o, o.x1, o.y1, o.x2, o.y2]),
+        lb: labels.filter(o => selLabels.has(o.id)).map(o => [o, o.x, o.y])
+      };
+      drag = {rotate: true, cx: rh.cx, cy: rh.cy, a0: Math.atan2(p.y - rh.cy, p.x - rh.cx), orig};
+    }
+    else if (e.shiftKey)                 drag = {toggle: h, area: h ? null : newArea(p, e), add: true};
+    else if (ae && !a)                   drag = {arrowEnd: ae};
     else if (h){
       if (!isSelected(h)){ clearSel(); setHit(h, true); }
-      drag = {selMove:true, lx:p.x, ly:p.y, hit:h};
+      drag = {selMove: true, lx: p.x, ly: p.y, hit: h};
     }
-    else if (inSelBox(p))                drag = {selMove:true, lx:p.x, ly:p.y, hit:null};
-    else                                 drag = {area:newArea(p, e), add:false};
+    else if (inSelBox(p))                drag = {selMove: true, lx: p.x, ly: p.y, hit: null};
+    else                                 drag = {area: newArea(p, e), add: false};
   }
   else if (state.tool === 'erase'){
     if (h && isSelected(h) && selCount() > 1){ deleteSelection(); swallowUp = true; return; }
-    drag = {erase:true};
+    drag = {erase: true};
     eraseAt(p);
   }
-  else if (state.tool === 'build' && a){ drag = {from:a.id, x:p.x, y:p.y}; }
+  else if (state.tool === 'draw'){
+    if (a) drag = {chain: {startId: a.id, sx: a.x, sy: a.y}};
+    else if (!bondAt(p)) drag = {chain: {startId: null, sx: p.x, sy: p.y}};
+  }
   render();
 });
 
-function newArea(p, e){
-  const shape = e.altKey ? (state.selShape === 'rect' ? 'lasso' : 'rect') : state.selShape;
-  return shape === 'rect' ? {shape, x0:p.x, y0:p.y, x1:p.x, y1:p.y} : {shape, pts:[p]};
-}
-
 cv.addEventListener('pointermove', e => {
-  const p = pos(e);
-  if (downPt && Math.hypot(p.x-downPt.x, p.y-downPt.y) > 5) moved = true;
+  if (ptrs.has(e.pointerId)) ptrs.set(e.pointerId, {x: e.clientX, y: e.clientY});
+  if (pinch){ if (ptrs.size >= 2) updatePinch(); return; }
+  const sp = spos(e);
+  if (drag && drag.pan){
+    view.ox = drag.ox + sp.x - drag.sx; view.oy = drag.oy + sp.y - drag.sy;
+    render(); return;
+  }
+  const p = toWorld(sp.x, sp.y);
+  if (downScr && Math.hypot(sp.x - downScr.x, sp.y - downScr.y) > 5) moved = true;
 
+  if (drag && drag.rotate){
+    if (!moved) return;
+    firstMove(drag);
+    let ang = Math.atan2(p.y - drag.cy, p.x - drag.cx) - drag.a0;
+    if (!e.shiftKey) ang = Math.round(ang / (Math.PI / 12)) * (Math.PI / 12);   // 15°-Schritte
+    const co = Math.cos(ang), si = Math.sin(ang);
+    const rot = (x, y) => [drag.cx + (x - drag.cx) * co - (y - drag.cy) * si, drag.cy + (x - drag.cx) * si + (y - drag.cy) * co];
+    drag.orig.at.forEach(([o, x, y]) => { [o.x, o.y] = rot(x, y); });
+    drag.orig.lb.forEach(([o, x, y]) => { [o.x, o.y] = rot(x, y); });
+    drag.orig.ar.forEach(([o, x1, y1, x2, y2]) => { [o.x1, o.y1] = rot(x1, y1); [o.x2, o.y2] = rot(x2, y2); });
+    let deg = Math.round(ang * 180 / Math.PI); if (deg > 180) deg -= 360; if (deg < -180) deg += 360;
+    $('#hint').textContent = 'Drehung: ' + deg + '° (Umschalt: stufenlos)';
+    render(); return;
+  }
   if (drag && drag.bendArrow){
     if (!moved) return;
     firstMove(drag);
     const ar = drag.bendArrow;
-    const dx = ar.x2-ar.x1, dy = ar.y2-ar.y1, len = Math.hypot(dx, dy) || 1;
-    const nx = -dy/len, ny = dx/len;
-    const mx = (ar.x1+ar.x2)/2, my = (ar.y1+ar.y2)/2;
-    // Die Kurve läuft bei t = 0,5 durch Mitte + n·bend·len/2
-    const b = 2 * ((p.x-mx)*nx + (p.y-my)*ny) / len;
+    const dx = ar.x2 - ar.x1, dy = ar.y2 - ar.y1, len = Math.hypot(dx, dy) || 1;
+    const nx = -dy / len, ny = dx / len;
+    const mx = (ar.x1 + ar.x2) / 2, my = (ar.y1 + ar.y2) / 2;
+    const b = 2 * ((p.x - mx) * nx + (p.y - my) * ny) / len;
     ar.bend = Math.max(-1.2, Math.min(1.2, b));
     state.bend = ar.bend;
     syncArrowUI();
@@ -2088,7 +2290,7 @@ cv.addEventListener('pointermove', e => {
     render(); return;
   }
   if (drag && drag.selMove){
-    if (!moved) return;                 // kleines Zittern ist noch kein Verschieben
+    if (!moved) return;
     firstMove(drag);
     moveSel(p.x - drag.lx, p.y - drag.ly);
     drag.lx = p.x; drag.ly = p.y;
@@ -2099,48 +2301,59 @@ cv.addEventListener('pointermove', e => {
     if (ar.shape === 'rect'){ ar.x1 = p.x; ar.y1 = p.y; }
     else {
       const last = ar.pts[ar.pts.length - 1];
-      if (Math.hypot(p.x - last.x, p.y - last.y) > 3) ar.pts.push(p);
+      if (Math.hypot(p.x - last.x, p.y - last.y) > px(3)) ar.pts.push(p);
     }
     render(); return;
   }
   if (drag && drag.erase){ eraseAt(p); return; }
-  if (drag && drag.from != null){
-    const A = byId(drag.from);
-    const target = atomAt(p);
-    if (target && target.id !== A.id){ drag.x = target.x; drag.y = target.y; }
-    else {
-      const ang = snapAngle(Math.atan2(p.y-A.y, p.x-A.x));
-      drag.x = A.x + L*Math.cos(ang);
-      drag.y = A.y + L*Math.sin(ang);
-    }
-    render();
-    return;
+  if (drag && drag.chain){
+    drag.chain.plan = moved ? chainPlan(drag.chain, p, e.shiftKey) : null;
+    hover = null;
+    render(); return;
   }
   if (drag) return;
   let nh = hitAt(p);
   if (nh && !(HOVER_TYPES[state.tool] || []).includes(nh.type)) nh = null;
+  if (state.tool === 'ring'){
+    ringGhost = ringPlan(state.ring, ringHitAt(p), p);
+    hover = null; render(); return;
+  }
   if (!sameHit(nh, hover)){ hover = nh; render(); }
 });
 
+function endPointer(e){
+  ptrs.delete(e.pointerId);
+  if (pinch){ if (ptrs.size < 2) pinch = null; return true; }
+  return false;
+}
+cv.addEventListener('pointercancel', e => {
+  if (endPointer(e)) return;
+  if (drag && drag.pan){ drag = null; cv.style.cursor = cursorFor(); return; }
+  cancelDrag(); render();
+});
+
 cv.addEventListener('pointerup', e => {
-  const p = pos(e);
+  if (endPointer(e)) return;
   const wasDrag = drag;
   drag = null;
+  if (wasDrag && wasDrag.pan){ cv.style.cursor = cursorFor(); return; }
   if (swallowUp){ swallowUp = false; downPt = null; return; }
-  if (!downPt){ return; }
-  downPt = null;
+  if (!downPt) return;
+  const p = pos(e);
+  downPt = null; downScr = null;
 
+  if (wasDrag && wasDrag.rotate){ if (wasDrag.undo) refresh(); else render(); selHint(); return; }
   if (wasDrag && wasDrag.bendArrow){ if (wasDrag.undo) refresh(); else render(); return; }
   if (wasDrag && wasDrag.arrowNew){
     const n = wasDrag.arrowNew;
-    if (Math.hypot(n.x2-n.x1, n.y2-n.y1) > 16){
+    if (Math.hypot(n.x2 - n.x1, n.y2 - n.y1) > px(16)){
       pushUndo();
-      const ar = {id:nid++, kind:state.arrowKind, x1:n.x1, y1:n.y1, x2:n.x2, y2:n.y2,
+      const ar = {id: nid++, kind: state.arrowKind, x1: n.x1, y1: n.y1, x2: n.x2, y2: n.y2,
                   bend: state.bend, color: paletteHex(state.arrowColor)};
       arrows.push(ar);
       selArrow = ar.id;
       refresh();
-    } else {                                  // kurzer Tipp: Pfeil auswählen
+    } else {
       const ar = arrowAt(p);
       selArrow = ar ? ar.id : null;
       if (ar){
@@ -2153,14 +2366,14 @@ cv.addEventListener('pointerup', e => {
     }
     return;
   }
-  if (wasDrag && wasDrag.arrowEnd){ if (wasDrag.undo) refresh(); return; }
+  if (wasDrag && wasDrag.arrowEnd){ if (wasDrag.undo) refresh(); else render(); return; }
   if (wasDrag && wasDrag.erase){ if (wasDrag.undo) refresh(); else render(); return; }
 
   if (wasDrag && (wasDrag.toggle !== undefined || wasDrag.area)){
     if (wasDrag.area){
       const ar = wasDrag.area;
       const big = ar.shape === 'rect'
-        ? Math.abs(ar.x1-ar.x0) > 4 || Math.abs(ar.y1-ar.y0) > 4
+        ? Math.abs(ar.x1 - ar.x0) > px(4) || Math.abs(ar.y1 - ar.y0) > px(4)
         : ar.pts.length > 2;
       if (big) selectArea(ar, wasDrag.add);
       else if (!wasDrag.add) clearSel();
@@ -2172,66 +2385,56 @@ cv.addEventListener('pointerup', e => {
 
   if (wasDrag && wasDrag.selMove){
     if (wasDrag.undo){ refresh(); selHint(); return; }
-    // Tippen ohne Bewegung: Doppeltipp prüfen
     const h = wasDrag.hit, now = Date.now();
     if (h && sameHit(h, lastTap.hit) && now - lastTap.t < 450){
-      lastTap = {hit:null, t:0};
+      lastTap = {hit: null, t: 0};
       if (h.type === 'label'){ openEditor(labels.find(x => x.id === h.id)); return; }
       if (h.type === 'atom' || h.type === 'bond'){
         const start = h.type === 'atom' ? h.id : bondById(h.id).a;
         clearSel(); selection = componentOf(start);
         render();
-        $('#hint').textContent = selection.size + ' Atome markiert (ganzes Teilchen). Ziehen verschiebt, Entf löscht.';
+        $('#hint').textContent = selection.size + ' Atome markiert (ganzes Teilchen). Ziehen verschiebt, runder Griff dreht, Entf löscht.';
         return;
       }
     }
-    lastTap = {hit:h, t:now};
+    lastTap = {hit: h, t: now};
     render(); selHint(); return;
   }
 
-  if (wasDrag && wasDrag.from != null && moved){
-    pushUndo();
-    const A = byId(wasDrag.from);
-    const target = atomAt(p);
-    if (target && target.id !== A.id){
-      const ex = findBond(A.id, target.id);
-      if (ex) ex.order = ex.order % 3 + 1;
-      else addBond(A.id, target.id, 1);
-    } else {
-      const ang = snapAngle(Math.atan2(p.y-A.y, p.x-A.x));
-      const nx = A.x + L*Math.cos(ang), ny = A.y + L*Math.sin(ang);
-      const near = atomAt({x:nx, y:ny}, 14);
-      if (near && near.id !== A.id) addBond(A.id, near.id, 1);
-      else { const na = addAtom(state.el, nx, ny); addBond(A.id, na.id, 1); }
-    }
+  if (wasDrag && wasDrag.chain && moved && wasDrag.chain.plan){
+    commitChain(wasDrag.chain);
     refresh(); return;
   }
-
-  if (moved) return;
+  if (moved && !(wasDrag && wasDrag.chain)) return;
 
   // --- einfaches Tippen ---
   const a = atomAt(p), b = a ? null : bondAt(p);
-  /* Wirkt ein Tipp auf ein markiertes Atom, gilt er für die ganze Auswahl */
-  const targets = at => (selection.has(at.id) && selection.size > 1)
-    ? [...selection].map(byId).filter(Boolean) : [at];
 
-  if (state.tool === 'build'){
-    pushUndo();
+  if (state.tool === 'draw'){
     if (a){
-      const dir = suggestDir(a);
-      const na = addAtom(state.el, a.x + L*Math.cos(dir), a.y + L*Math.sin(dir));
-      addBond(a.id, na.id, 1);
-    } else if (!b){
+      pushUndo();
+      if (state.el !== 'C' && a.el !== state.el){
+        targetsOf(a).forEach(t => { t.el = state.el; });            // Element tauschen
+      } else {
+        const dir = suggestDir(a);
+        const q = {x: a.x + L * Math.cos(dir), y: a.y + L * Math.sin(dir)};
+        const na = nearAtom(q, L * 0.3, new Set([a.id])) || addAtom(state.el, q.x, q.y);
+        if (!findBond(a.id, na.id)) addBond(a.id, na.id, state.order);
+      }
+    } else if (b){
+      pushUndo();
+      b.order = (state.order === 1 || b.order === state.order) ? b.order % 3 + 1 : state.order;
+    } else {
+      pushUndo();
       addAtom(state.el, p.x, p.y);
     }
-  } else if (state.tool === 'element' && a){
-    pushUndo(); targets(a).forEach(t => { t.el = state.el; });
-  } else if (state.tool === 'bond' && b){
-    pushUndo(); b.order = b.order % 3 + 1;
+  } else if (state.tool === 'ring'){
+    commitRing(ringPlan(state.ring, ringHitAt(p), p));
+    ringGhost = null;
   } else if (state.tool === 'charge' && a){
     pushUndo();
     const ch = state.charge;
-    targets(a).forEach(t => {
+    targetsOf(a).forEach(t => {
       if (ch.d){ t.d = ch.d; t.q = 0; }
       else if (ch.q === 0){ t.q = 0; t.d = null; }
       else { t.q = ch.q; t.d = null; }
@@ -2239,11 +2442,29 @@ cv.addEventListener('pointerup', e => {
   } else if (state.tool === 'text'){
     openEditor(labelAt(p), p);
     return;
+  } else {
+    render(); return;
   }
   refresh();
 });
 
-cv.addEventListener('pointerleave', () => { if (hover && !drag){ hover = null; render(); } });
+cv.addEventListener('pointerleave', () => {
+  if (!drag && (hover || ringGhost)){ hover = null; ringGhost = null; render(); }
+});
+
+/* Mausrad: verschieben; Strg/Pinch auf dem Trackpad: zoomen */
+cv.addEventListener('wheel', e => {
+  e.preventDefault();
+  const sp = spos(e);
+  if (e.ctrlKey || e.metaKey){
+    zoomAt(sp.x, sp.y, Math.exp(-e.deltaY * (e.deltaMode === 1 ? 0.05 : 0.0022)));
+  } else {
+    const k = e.deltaMode === 1 ? 16 : 1;
+    view.ox -= (e.shiftKey && !e.deltaX ? e.deltaY : e.deltaX) * k;
+    view.oy -= (e.shiftKey && !e.deltaX ? 0 : e.deltaY) * k;
+    afterView();
+  }
+}, {passive: false});
 
 /* ---- Schwebende Leiste an der Auswahl ---- */
 const selBar = document.createElement('div');
@@ -2253,8 +2474,10 @@ selBar.innerHTML =
   '<button data-sb="rotL" title="15° gegen den Uhrzeigersinn">↺</button>' +
   '<button data-sb="rotR" title="15° im Uhrzeigersinn">↻</button>' +
   '<button data-sb="mirror" title="waagerecht spiegeln">⇋</button>' +
+  '<button data-sb="mirrorV" title="senkrecht spiegeln">⇵</button>' +
+  '<button data-sb="dup" title="Duplizieren (Strg+D)">Duplizieren</button>' +
   '<button data-sb="del" class="danger" title="Auswahl löschen (Entf)">Löschen</button>' +
-  '<button data-sb="none" title="Auswahl aufheben (Esc)">Aufheben</button>';
+  '<button data-sb="none" title="Auswahl aufheben (Esc)">✕</button>';
 board.appendChild(selBar);
 selBar.addEventListener('pointerdown', e => e.stopPropagation());
 selBar.addEventListener('click', e => {
@@ -2262,21 +2485,24 @@ selBar.addEventListener('click', e => {
   const act = k.dataset.sb;
   if (act === 'del') deleteSelection();
   else if (act === 'none'){ clearSel(); render(); selHint(); }
+  else if (act === 'dup') duplicateSel();
   else if (act === 'mirror') transformSel((x, y) => [-x, y], true);
+  else if (act === 'mirrorV') transformSel((x, y) => [x, -y], true);
   else {
-    const r = (act === 'rotL' ? -15 : 15) * Math.PI/180, co = Math.cos(r), si = Math.sin(r);
-    transformSel((x, y) => [x*co - y*si, x*si + y*co]);
+    const r = (act === 'rotL' ? -15 : 15) * Math.PI / 180, co = Math.cos(r), si = Math.sin(r);
+    transformSel((x, y) => [x * co - y * si, x * si + y * co]);
   }
 });
 function placeSelBar(){
-  const b = (!drag && !editLabel && selCount()) ? selBox(20) : null;
+  const b = (!drag && !editLabel && selCount() && state.tool === 'select') ? selBox(px(20)) : null;
   if (!b){ selBar.hidden = true; return; }
   selBar.hidden = false;
+  const tl = toScreen(b.x0, b.y0), br = toScreen(b.x1, b.y1);
   const bw = selBar.offsetWidth, bh = selBar.offsetHeight;
-  let x = (b.x0 + b.x1)/2 - bw/2;
-  let y = b.y0 - bh - 8;
-  if (y < 6) y = b.y1 + 8;
-  if (y + bh > H - 6) y = Math.max(6, H - bh - 6);
+  let x = (tl.x + br.x) / 2 - bw / 2;
+  let y = br.y + 10;                                   // unter der Auswahl (oben sitzt der Drehgriff)
+  if (y + bh > H - 6) y = tl.y - bh - 46;
+  y = Math.max(6, Math.min(H - bh - 6, y));
   x = Math.max(6, Math.min(W - bw - 6, x));
   selBar.style.left = x + 'px';
   selBar.style.top  = y + 'px';
@@ -2285,27 +2511,23 @@ function placeSelBar(){
 /* =======================================================================
    10. Bedienelemente
    ======================================================================= */
-// Werkzeuge
-document.querySelectorAll('#tools button').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if (editLabel) commitEdit();
-    state.tool = btn.dataset.tool;
-    document.body.dataset.tool = state.tool;
-    if (state.tool !== 'arrow') selArrow = null;
-    hover = null;
-    document.querySelectorAll('#tools button').forEach(b => b.classList.toggle('on', b === btn));
-    if (selCount()) selHint(); else $('#hint').textContent = HINTS[state.tool];
-    cv.style.cursor = state.tool === 'select' ? 'default' : (state.tool === 'text' ? 'text' : 'crosshair');
-    render();
-  });
-});
+function setTool(t){
+  if (editLabel) commitEdit();
+  state.tool = t;
+  document.body.dataset.tool = t;
+  if (t !== 'arrow') selArrow = null;
+  hover = null; ringGhost = null;
+  document.querySelectorAll('#tools button').forEach(b => b.classList.toggle('on', b.dataset.tool === t));
+  if (selCount()) selHint(); else $('#hint').textContent = HINTS[t];
+  cv.style.cursor = cursorFor();
+  render();
+}
+document.querySelectorAll('#tools button').forEach(btn => btn.addEventListener('click', () => setTool(btn.dataset.tool)));
 
-// Form der Bereichsauswahl
 document.querySelectorAll('#selShape button').forEach(b => {
   b.addEventListener('click', () => {
     state.selShape = b.dataset.shape;
     document.querySelectorAll('#selShape button').forEach(x => x.classList.toggle('on', x === b));
-    if (state.tool !== 'select') document.querySelector('#tools [data-tool="select"]').click();
   });
 });
 
@@ -2314,11 +2536,30 @@ const EL_NAMES = {H:'Wasserstoff', C:'Kohlenstoff', N:'Stickstoff', O:'Sauerstof
                   P:'Phosphor', F:'Fluor', Cl:'Chlor', Br:'Brom', I:'Iod'};
 const elName = el => EL_NAMES[el] || (PT[el] ? PT[el].name : el);
 const valText = el => EL[el].v == null ? 'Bindigkeit frei (keine Prüfung)' : 'Bindigkeit ' + EL[el].v;
-const COLVAR = {H:'--el-H',C:'--el-C',N:'--el-N',O:'--el-O',S:'--el-S',P:'--el-P'};
-/* Knopffarben in der Oberfläche: Catppuccin-Mocha-Töne, gut lesbar auf dunklem Grund */
+const COLVAR = {H:'--el-H', C:'--el-C', N:'--el-N', O:'--el-O', S:'--el-S', P:'--el-P'};
 const elVar = el => 'var(--ui' + (isR(el) ? '--el-R' : (COLVAR[el] || (['F','Cl','Br','I'].includes(el) ? '--el-Hal' : '--el-X'))).slice(1) + ')';
 const allElButtons = () => document.querySelectorAll('#elements button, #rests button');
 
+/* Element für neue Atome wählen; bei Auswahl wird sie sofort umgestellt */
+function setElement(el, fromKey){
+  state.el = el;
+  allElButtons().forEach(x => {
+    x.classList.toggle('on', x.dataset.el === el);
+    x.style.color = x.classList.contains('on') ? '' : elVar(x.dataset.el);
+  });
+  if (selection.size && (state.tool === 'select' || state.tool === 'draw')){
+    pushUndo();
+    [...selection].map(byId).filter(Boolean).forEach(a => { a.el = el; });
+    refresh();
+    $('#hint').textContent = selection.size + ' markierte Atome in ' + (isR(el) ? 'Rest ' + el : elName(el)) + ' geändert.';
+    return;
+  }
+  $('#hint').textContent = (isR(el)
+      ? 'Rest ' + el + ' – Platzhalter für eine beliebige Gruppe, einbindig. '
+      : elName(el) + ' (' + el + '), ' + valText(el) + '. ') +
+    (el === 'C' ? 'Tippen auf ein Atom verlängert die Kette.' : 'Tippen auf ein Atom ersetzt es, Ziehen von einem Atom hängt ' + el + ' an.');
+  if (!fromKey && state.tool !== 'draw' && state.tool !== 'select') setTool('draw');
+}
 function makeElButton(el, box){
   const b = document.createElement('button');
   b.className = 'el' + (el === 'C' ? ' on' : '');
@@ -2329,35 +2570,47 @@ function makeElButton(el, box){
     b.title = idx ? 'Rest R' + idx + ' – beliebige Gruppe' : 'Rest R – beliebige Gruppe';
   } else {
     b.textContent = el;
-    b.title = elName(el) + ' – ' + valText(el);
+    const keys = {C:1, H:1, O:1, N:1, S:1, F:1, I:1};
+    b.title = elName(el) + ' – ' + valText(el) + (keys[el] ? ' (Taste ' + el + ')' : '');
   }
   b.style.color = el === 'C' ? '' : elVar(el);
-  b.addEventListener('click', () => {
-    state.el = el;
-    $('#hint').textContent = (isR(el)
-        ? 'Rest ' + el.replace(/^R/, 'R') + ' – Platzhalter für eine beliebige Gruppe, einbindig. '
-        : elName(el) + ' (' + el + '), ' + valText(el) + '. ') + HINTS[state.tool];
-    allElButtons().forEach(x => {
-      x.classList.toggle('on', x === b);
-      x.style.color = x.classList.contains('on') ? '' : elVar(x.dataset.el);
-    });
-  });
+  b.addEventListener('click', () => setElement(el));
   box.appendChild(b);
 }
 EL_ORDER.forEach(el => makeElButton(el, $('#elements')));
 R_ORDER.forEach(el => makeElButton(el, $('#rests')));
 
+// Bindungsart
+function setOrder(o){
+  state.order = o;
+  document.querySelectorAll('#bondOrder button').forEach(b => b.classList.toggle('on', +b.dataset.order === o));
+  const sel = bonds.filter(b => selection.has(b.a) && selection.has(b.b));
+  if (sel.length){ pushUndo(); sel.forEach(b => { b.order = o; }); refresh(); }
+}
+document.querySelectorAll('#bondOrder button').forEach(b => b.addEventListener('click', () => {
+  setOrder(+b.dataset.order);
+  if (state.tool !== 'draw' && state.tool !== 'select') setTool('draw');
+}));
+
+// Ringe
+function setRing(n, arom){
+  state.ring = n; state.aromatic = !!arom;
+  document.querySelectorAll('#ringKinds button').forEach(b =>
+    b.classList.toggle('on', +b.dataset.ring === n && !!b.dataset.arom === !!arom));
+  if (state.tool !== 'ring') setTool('ring');
+  $('#hint').textContent = (arom ? 'Benzolring' : n + '-Ring') + ' gewählt. ' + HINTS.ring;
+}
+document.querySelectorAll('#ringKinds button').forEach(b =>
+  b.addEventListener('click', () => setRing(+b.dataset.ring, b.dataset.arom)));
+
 // Pfeilarten, Farbe und Krümmung
 const selectedArrow = () => (selArrow == null ? null : arrows.find(x => x.id === selArrow));
 function syncArrowUI(){
-  document.querySelectorAll('#arrowKinds button')
-    .forEach(x => x.classList.toggle('on', x.dataset.kind === state.arrowKind));
-  document.querySelectorAll('#arrowColors button')
-    .forEach(x => x.classList.toggle('on', x.dataset.col === state.arrowColor));
+  document.querySelectorAll('#arrowKinds button').forEach(x => x.classList.toggle('on', x.dataset.kind === state.arrowKind));
+  document.querySelectorAll('#arrowColors button').forEach(x => x.classList.toggle('on', x.dataset.col === state.arrowColor));
   $('#bendRange').value = Math.round(state.bend * 100);
   $('#bendVal').textContent = Math.round(state.bend * 100);
 }
-const arrowBox = $('#arrowKinds');
 Object.keys(ARROW_KINDS).forEach(k => {
   const b = document.createElement('button');
   b.textContent = ARROW_KINDS[k].label;
@@ -2367,13 +2620,12 @@ Object.keys(ARROW_KINDS).forEach(k => {
     state.arrowKind = k;
     const ar = selectedArrow();
     if (ar){ pushUndo(); ar.kind = k; refresh(); }
-    else state.bend = ARROW_KINDS[k].def;      // sinnvolle Voreinstellung je Art
+    else state.bend = ARROW_KINDS[k].def;
     syncArrowUI();
-    if (state.tool !== 'arrow') document.querySelector('#tools [data-tool="arrow"]').click();
+    if (state.tool !== 'arrow') setTool('arrow');
   });
-  arrowBox.appendChild(b);
+  $('#arrowKinds').appendChild(b);
 });
-const colBox = $('#arrowColors');
 PALETTE.forEach(p => {
   const b = document.createElement('button');
   b.className = 'sw' + (p.key === 'ink' ? ' on' : '');
@@ -2386,9 +2638,8 @@ PALETTE.forEach(p => {
     if (ar){ pushUndo(); ar.color = p.hex; refresh(); }
     syncArrowUI();
   });
-  colBox.appendChild(b);
+  $('#arrowColors').appendChild(b);
 });
-// Textfarbe (unabhängig von der Pfeilfarbe)
 const txtColBox = $('#textColors');
 PALETTE.forEach(p => {
   const b = document.createElement('button');
@@ -2419,10 +2670,7 @@ $('#bendRange').addEventListener('change', () => { if (selectedArrow()) refresh(
 function setManualH(on){
   state.manualH = on;
   $('#manualNote').hidden = !on;
-  document.querySelectorAll('#hmodes button').forEach(b => {
-    b.disabled = on;
-    b.style.opacity = on ? .45 : 1;
-  });
+  document.querySelectorAll('#hmodes button').forEach(b => { b.disabled = on; b.style.opacity = on ? .45 : 1; });
   $('#btnManualH').classList.toggle('on', on);
 }
 $('#btnManualH').addEventListener('click', () => {
@@ -2432,7 +2680,7 @@ $('#btnManualH').addEventListener('click', () => {
     if (!n) continue;
     const dirs = freeDirs(a, n, [], L * 0.74);
     for (const d of dirs){
-      const h = addAtom('H', a.x + L*0.74*Math.cos(d), a.y + L*0.74*Math.sin(d));
+      const h = addAtom('H', a.x + L * 0.74 * Math.cos(d), a.y + L * 0.74 * Math.sin(d));
       addBond(a.id, h.id, 1);
     }
   }
@@ -2456,13 +2704,18 @@ $('#btnAutoH').addEventListener('click', () => {
 // Ladungsknöpfe
 document.querySelectorAll('#charges button').forEach(b => {
   b.addEventListener('click', () => {
-    state.charge = b.dataset.d ? {q:0, d:b.dataset.d} : {q:+b.dataset.q, d:null};
+    state.charge = b.dataset.d ? {q: 0, d: b.dataset.d} : {q: +b.dataset.q, d: null};
     document.querySelectorAll('#charges button').forEach(x => x.classList.toggle('on', x === b));
-    const t = document.querySelector('#tools [data-tool="charge"]');
-    if (state.tool !== 'charge') t.click();
+    if (selection.size){
+      pushUndo();
+      [...selection].map(byId).filter(Boolean).forEach(t => {
+        if (state.charge.d){ t.d = state.charge.d; t.q = 0; } else { t.q = state.charge.q; t.d = null; }
+      });
+      refresh();
+    }
+    if (state.tool !== 'charge') setTool('charge');
   });
 });
-
 
 // Weiteres Element per Texteingabe
 function addCustomElement(){
@@ -2480,7 +2733,7 @@ function addCustomElement(){
   const known = !!EL[sym] && !EL[sym].custom;
   ensureEl(sym, vOv);
   if (!document.querySelector('#elements [data-el="' + sym + '"]')) makeElButton(sym, $('#elements'));
-  document.querySelector('#elements [data-el="' + sym + '"]').click();
+  setElement(sym);
   inp.value = ''; vInp.value = '';
   closeCustomEl();
   let msg = elName(sym) + ' (' + sym + ') gewählt, ' + valText(sym) + '.';
@@ -2506,7 +2759,7 @@ $('#elCustom').addEventListener('input', e => e.target.classList.remove('bad'));
 
 // Eigene Ladung per Texteingabe: 3+, +3, 3−, -3, +, −, 0
 function parseCharge(t){
-  t = String(t).replace(/\s+/g, '').replace(/[\u2212\u2013]/g, '-');
+  t = String(t).replace(/\s+/g, '').replace(/[−–]/g, '-');
   if (t === '0') return 0;
   const m = t.match(/^([+-])?(\d*)([+-])?$/);
   if (!m || (!m[1] && !m[3]) || (m[1] && m[3])) return null;
@@ -2523,35 +2776,30 @@ function applyCustomCharge(){
     return;
   }
   inp.classList.remove('bad');
-  state.charge = {q, d:null};
-  document.querySelectorAll('#charges button').forEach(x =>
-    x.classList.toggle('on', !x.dataset.d && +x.dataset.q === q));
-  if (state.tool !== 'charge') document.querySelector('#tools [data-tool="charge"]').click();
-  $('#hint').textContent = (q ? 'Ladung ' + chargeText(q) : 'Ladung entfernen') +
-    ' gewählt – auf ein Atom tippen (bei Auswahl: für alle markierten).';
+  state.charge = {q, d: null};
+  document.querySelectorAll('#charges button').forEach(x => x.classList.toggle('on', !x.dataset.d && +x.dataset.q === q));
+  if (state.tool !== 'charge') setTool('charge');
+  $('#hint').textContent = (q ? 'Ladung ' + chargeText(q) : 'Ladung entfernen') + ' gewählt – auf ein Atom tippen (bei Auswahl: für alle markierten).';
 }
 $('#btnQCustom').addEventListener('click', applyCustomCharge);
 $('#qCustom').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); applyCustomCharge(); } });
 $('#qCustom').addEventListener('input', e => e.target.classList.remove('bad'));
 
 // Darstellungsarten
-document.querySelectorAll('#modes button').forEach(btn => {
-  btn.addEventListener('click', () => {
-    state.mode = btn.dataset.mode;
-    document.querySelectorAll('#modes button').forEach(b => b.classList.toggle('on', b === btn));
-    if (state.mode === 'skelett'){ state.showC = false; setH('hetero'); }
-    if (state.mode === 'struktur'){ state.showC = true;  setH('allLine'); }
-    const textMode = (state.mode === 'halb' || state.mode === 'summe');
-    board.hidden = textMode;
-    $('#textout').hidden = !textMode;
-    $('#hint').textContent = textMode
-      ? 'Textansicht – die Zeichnung bleibt erhalten.'
-      : HINTS[state.tool];
-    syncControls();
-    if (!textMode) resize();
-    refresh();
-  });
-});
+function setMode(m){
+  state.mode = m;
+  document.querySelectorAll('#modes button').forEach(b => b.classList.toggle('on', b.dataset.mode === m));
+  if (m === 'skelett'){ state.showC = false; if (!state.manualH) setH('hetero'); }
+  if (m === 'struktur'){ state.showC = true;  if (!state.manualH) setH('allLine'); }
+  const textMode = (m === 'halb' || m === 'summe');
+  board.hidden = textMode;
+  $('#textout').hidden = !textMode;
+  $('#hint').textContent = textMode ? 'Textansicht – die Zeichnung bleibt erhalten.' : HINTS[state.tool];
+  syncControls();
+  if (!textMode) requestAnimationFrame(resize);
+  refresh();
+}
+document.querySelectorAll('#modes button').forEach(btn => btn.addEventListener('click', () => setMode(btn.dataset.mode)));
 
 function setH(mode){
   state.hMode = mode;
@@ -2560,7 +2808,6 @@ function setH(mode){
 document.querySelectorAll('#hmodes button').forEach(btn => {
   btn.addEventListener('click', () => { setH(btn.dataset.h); syncControls(); refresh(); });
 });
-
 function syncControls(){
   const forced = state.hMode === 'allText' || state.hMode === 'allLine';
   const cb = $('#showC');
@@ -2576,11 +2823,7 @@ document.querySelectorAll('#lpMode button').forEach(b => {
   b.addEventListener('click', () => { state.lp = b.dataset.lp; syncControls(); refresh(); });
 });
 $('#showGrid').addEventListener('change', e => { state.showGrid = e.target.checked; refresh(); });
-$('#mono').addEventListener('change', e => {
-  state.mono = e.target.checked;
-  store.set('sfe-mono', state.mono ? '1' : '0');
-  refresh();
-});
+$('#mono').addEventListener('change', e => { state.mono = e.target.checked; store.set('sfe-mono', state.mono ? '1' : '0'); refresh(); });
 $('#whiteBg').addEventListener('change', e => {
   state.white = e.target.checked;
   document.documentElement.classList.toggle('paper-white', state.white);
@@ -2590,33 +2833,35 @@ $('#whiteBg').addEventListener('change', e => {
 // Blattfunktionen
 $('#btnUndo').addEventListener('click', undo);
 $('#btnRedo').addEventListener('click', redo);
-$('#btnClear').addEventListener('click', () => {
+function clearAll(){
+  if (!atoms.length && !arrows.length && !labels.length) return;
   pushUndo(); atoms = []; bonds = []; arrows = []; labels = []; clearSel(); selArrow = null; refresh();
-});
-$('#btnCenter').addEventListener('click', () => { centerView(); refresh(); });
+  $('#hint').textContent = 'Alles gelöscht. Rückgängig mit Strg+Z.';
+}
+$('#btnClear').addEventListener('click', clearAll);
+$('#btnClearAll').addEventListener('click', () => { $('#fileMenu').open = false; clearAll(); });
+$('#btnFit').addEventListener('click', fitView);
+$('#zoomIn').addEventListener('click', () => zoomAt(W / 2, H / 2, 1.25));
+$('#zoomOut').addEventListener('click', () => zoomAt(W / 2, H / 2, 0.8));
+$('#zoomVal').addEventListener('click', () => setZoom(1));
 
 function bbox(){
   if (!atoms.length && !arrows.length && !labels.length) return null;
-  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
-  const put = (x,y) => { x0=Math.min(x0,x); y0=Math.min(y0,y); x1=Math.max(x1,x); y1=Math.max(y1,y); };
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  const put = (x, y) => { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); };
   for (const a of atoms) put(a.x, a.y);
   for (const a of arrows){ put(a.x1, a.y1); put(a.x2, a.y2); }
   for (const l of labels) put(l.x, l.y);
-  return {x0,y0,x1,y1};
+  return {x0, y0, x1, y1};
 }
-function centerView(){
-  const bb = bbox(); if (!bb) return;
-  const dx = W/2 - (bb.x0+bb.x1)/2, dy = H/2 - (bb.y0+bb.y1)/2;
+function shiftAll(dx, dy){
   atoms.forEach(a => { a.x += dx; a.y += dy; });
   arrows.forEach(a => { a.x1 += dx; a.y1 += dy; a.x2 += dx; a.y2 += dy; });
   labels.forEach(l => { l.x += dx; l.y += dy; });
 }
 
-/* --- Begradigen ------------------------------------------------------
-   Die längste Kette wird waagerecht ausgerichtet, Seitenketten zweigen im
-   eingestellten Winkel (90° oder 45°) ab und laufen dann geradlinig weiter. */
+/* --- Ausrichten, Drehen, Spiegeln ------------------------------------ */
 const allNeighbors = id => neighbors(id).map(n => n.id);
-
 function componentOf(start){
   const seen = new Set([start]), q = [start];
   while (q.length){
@@ -2625,14 +2870,14 @@ function componentOf(start){
   }
   return seen;
 }
-/* Dreht bzw. spiegelt die Auswahl (Atome, Pfeile, Texte) – ohne Auswahl die ganze Zeichnung */
+/* Dreht bzw. spiegelt die Auswahl – ohne Auswahl die ganze Zeichnung */
 function transformSel(fn, mirror = false){
   const all = !selCount();
   const at  = all ? atoms.slice() : [...selection].map(byId).filter(Boolean);
   const ars = arrows.filter(a => all || selArrows.has(a.id));
   const lbs = labels.filter(l => all || selLabels.has(l.id));
   const pts = [...at, ...lbs];
-  ars.forEach(a => pts.push({x:a.x1, y:a.y1}, {x:a.x2, y:a.y2}));
+  ars.forEach(a => pts.push({x: a.x1, y: a.y1}, {x: a.x2, y: a.y2}));
   if (!pts.length) return;
   pushUndo();
   let cx = 0, cy = 0;
@@ -2644,18 +2889,10 @@ function transformSel(fn, mirror = false){
   ars.forEach(a => {
     [a.x1, a.y1] = tf(a.x1, a.y1);
     [a.x2, a.y2] = tf(a.x2, a.y2);
-    if (mirror) a.bend = -(a.bend || 0);   // Spiegelung kehrt die Krümmungsrichtung um
+    if (mirror) a.bend = -(a.bend || 0);
   });
   refresh();
 }
-document.querySelectorAll('#transform [data-rot]').forEach(b => {
-  b.addEventListener('click', () => {
-    const r = +b.dataset.rot * Math.PI/180, co = Math.cos(r), si = Math.sin(r);
-    transformSel((x, y) => [x*co - y*si, x*si + y*co]);
-  });
-});
-$('#btnMirror').addEventListener('click', () => transformSel((x, y) => [-x, y], true));
-
 function componentsAll(){
   const seen = new Set(), comps = [];
   for (const a of atoms){
@@ -2678,93 +2915,80 @@ function treeDepth(id, parent){
   }
   return best;
 }
-
+/* Die längste Kette wird ausgerichtet, Seitenketten zweigen im gewählten
+   Winkel ab. Wirkt auf die markierten Teilchen (ohne Auswahl: auf alle);
+   jedes Teilchen bleibt an seinem Platz. */
 function straighten(){
   if (!atoms.length) return;
   pushUndo();
   const zz = state.align === 'zz';
   const offs = state.align === '45' ? [45, 90, 135] : (zz ? [60, 120, 90] : [90, 45, 135]);
-  const TURN = Math.PI/3;                 // Knick im Zickzack: 120°-Bindungswinkel
-  const pts = [];
-  const isFree = (x, y) => !pts.some(p => Math.hypot(p.x-x, p.y-y) < L*0.72);
+  const TURN = Math.PI / 3;
+  let pts = [];
+  const isFree = (x, y) => !pts.some(p => Math.hypot(p.x - x, p.y - y) < L * 0.72);
   const put = (id, x, y) => { const a = byId(id); a.x = x; a.y = y; pts.push({x, y}); };
-  /* Abzweigwinkel relativ zur Laufrichtung, abwechselnd nach oben/unten */
   function cands(dir, flip){
     const list = [];
     for (const o of offs){
-      const r = o * Math.PI/180;
+      const r = o * Math.PI / 180;
       list.push(dir + (flip ? -r : r), dir - (flip ? -r : r));
     }
     return list;
   }
-  /* setzt alle Nachbarn von id (außer parent) und deren Teilbäume */
   function spread(id, parent, dir, flip, turn){
     const p = byId(id);
-    const kids = allNeighbors(id).filter(n => n !== parent)
-                   .sort((a, b) => treeDepth(b, id) - treeDepth(a, id));
+    const kids = allNeighbors(id).filter(n => n !== parent).sort((a, b) => treeDepth(b, id) - treeDepth(a, id));
     const list = cands(dir, flip);
     let ci = 0;
     kids.forEach((kid, idx) => {
       let ang = null, x = 0, y = 0;
-      // längster Ast läuft geradeaus weiter (bzw. im Zickzack knickend)
       const cont = zz ? dir + turn * TURN : dir;
       if (idx === 0){
-        const tx = p.x + L*Math.cos(cont), ty = p.y + L*Math.sin(cont);
+        const tx = p.x + L * Math.cos(cont), ty = p.y + L * Math.sin(cont);
         if (isFree(tx, ty)){ ang = cont; x = tx; y = ty; }
       }
       while (ang === null && ci < list.length){
         const c = list[ci++];
-        const tx = p.x + L*Math.cos(c), ty = p.y + L*Math.sin(c);
+        const tx = p.x + L * Math.cos(c), ty = p.y + L * Math.sin(c);
         if (isFree(tx, ty)){ ang = c; x = tx; y = ty; }
       }
-      if (ang === null){                              // Notfall: irgendwohin, Hauptsache sichtbar
-        ang = (dir || 0) + (idx + 1) * Math.PI/2;
-        x = p.x + L*Math.cos(ang); y = p.y + L*Math.sin(ang);
-      }
+      if (ang === null){ ang = (dir || 0) + (idx + 1) * Math.PI / 2; x = p.x + L * Math.cos(ang); y = p.y + L * Math.sin(ang); }
       put(kid, x, y);
       spread(kid, id, ang, flip, -turn);
     });
   }
-  /* Richtung, die vom Kettenknick nach außen zeigt (für Zickzack-Abzweige) */
   function outward(id, chainNbrs){
     let sx = 0, sy = 0;
     const p = byId(id);
-    for (const n of chainNbrs){
-      const ang = angleTo(p, byId(n));
-      sx += Math.cos(ang); sy += Math.sin(ang);
-    }
-    if (Math.hypot(sx, sy) < 1e-6) return -Math.PI/2;
+    for (const n of chainNbrs){ const ang = angleTo(p, byId(n)); sx += Math.cos(ang); sy += Math.sin(ang); }
+    if (Math.hypot(sx, sy) < 1e-6) return -Math.PI / 2;
     return Math.atan2(-sy, -sx);
   }
 
-  let ringSkipped = false, row = 0;
-  for (const comp of componentsAll()){
+  let ringSkipped = false, done = 0;
+  const comps = componentsAll().filter(c => !selection.size || c.some(id => selection.has(id)));
+  for (const comp of comps){
     const set = new Set(comp);
     let edges = 0;
     for (const b of bonds) if (set.has(b.a) && set.has(b.b)) edges++;
-    if (edges !== comp.length - 1){                   // enthält einen Ring
-      ringSkipped = true;
-      comp.forEach(id => pts.push({x: byId(id).x, y: byId(id).y}));
-      continue;
-    }
+    if (edges !== comp.length - 1){ ringSkipped = true; continue; }
+    let ox = 0, oy = 0;
+    comp.forEach(id => { ox += byId(id).x; oy += byId(id).y; });
+    ox /= comp.length; oy /= comp.length;
+    pts = [];
     const heavy = comp.filter(id => byId(id).el !== 'H');
     let path;
     if (heavy.length >= 2) path = longestPath(heavy);
     else if (heavy.length === 1) path = [heavy[0]];
     else path = comp.slice(0, 2);
-
-    const y0 = row * L * 3;
     if (zz){
-      const dx = L * Math.cos(Math.PI/6), dy = L * Math.sin(Math.PI/6);
-      path.forEach((id, i) => put(id, i*dx, y0 + (i % 2 === 1 ? -dy : 0)));
-    } else {
-      path.forEach((id, i) => put(id, i*L, y0));
-    }
+      const dx = L * Math.cos(Math.PI / 6), dy = L * Math.sin(Math.PI / 6);
+      path.forEach((id, i) => put(id, i * dx, (i % 2 === 1 ? -dy : 0)));
+    } else path.forEach((id, i) => put(id, i * L, 0));
     const inPath = new Set(path);
     path.forEach((id, i) => {
       const p = byId(id);
-      const kids = allNeighbors(id).filter(n => !inPath.has(n))
-                     .sort((a, b) => treeDepth(b, id) - treeDepth(a, id));
+      const kids = allNeighbors(id).filter(n => !inPath.has(n)).sort((a, b) => treeDepth(b, id) - treeDepth(a, id));
       const chainNbrs = allNeighbors(id).filter(n => inPath.has(n));
       const base = zz ? outward(id, chainNbrs) : 0;
       const flip = i % 2 === 1;
@@ -2774,22 +2998,25 @@ function straighten(){
         let ang = null, x = 0, y = 0;
         while (ang === null && ci < list.length){
           const c = list[ci++];
-          const tx = p.x + L*Math.cos(c), ty = p.y + L*Math.sin(c);
+          const tx = p.x + L * Math.cos(c), ty = p.y + L * Math.sin(c);
           if (isFree(tx, ty)){ ang = c; x = tx; y = ty; }
         }
-        if (ang === null){ ang = -Math.PI/2; x = p.x; y = p.y - L; }
+        if (ang === null){ ang = -Math.PI / 2; x = p.x; y = p.y - L; }
         put(kid, x, y);
         spread(kid, id, ang, flip, i % 2 === 0 ? 1 : -1);
       });
     });
-    row++;
+    let nx = 0, ny = 0;
+    comp.forEach(id => { nx += byId(id).x; ny += byId(id).y; });
+    nx /= comp.length; ny /= comp.length;
+    comp.forEach(id => { const a = byId(id); a.x += ox - nx; a.y += oy - ny; });
+    done++;
   }
-  centerView();
   refresh();
   let msg = HINTS[state.tool];
   if (ringSkipped) msg = 'Ringe bleiben unverändert – ausgerichtet werden nur offene Ketten.';
-  else if (!zz && !effShowC())
-    msg = 'Gerade Ketten sind ohne C-Symbole nicht ablesbar: C-Symbole einblenden oder „Zickzack“ wählen.';
+  else if (!zz && !effShowC()) msg = 'Gerade Ketten sind ohne C-Symbole nicht ablesbar: C-Symbole einblenden oder „Zickzack“ wählen.';
+  else if (done) msg = done === 1 ? 'Kette ausgerichtet.' : done + ' Teilchen ausgerichtet.';
   $('#hint').textContent = msg;
 }
 $('#btnStraight').addEventListener('click', straighten);
@@ -2800,56 +3027,143 @@ document.querySelectorAll('#alignMode button').forEach(b => {
   });
 });
 
-/* --- Export ---------------------------------------------------------- */
-function download(blob, name){
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = name;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1500);
+/* --- Zwischenablage (auch zwischen Formel und Mechanismus) ------------ */
+let clip = null;
+function copySel(){
+  if (!selCount()) return false;
+  const at = atoms.filter(a => selection.has(a.id)).map(a => Object.assign({}, a));
+  const ids = new Set(at.map(a => a.id));
+  clip = {
+    at, ws: state.ws, n: 0,
+    bd: bonds.filter(b => ids.has(b.a) && ids.has(b.b)).map(b => Object.assign({}, b)),
+    ar: arrows.filter(a => selArrows.has(a.id)).map(a => Object.assign({}, a)),
+    lb: labels.filter(l => selLabels.has(l.id)).map(l => Object.assign({}, l))
+  };
+  return true;
 }
-function flash(btn, text){
-  const old = btn.textContent;
-  btn.textContent = text;
-  setTimeout(() => btn.textContent = old, 1800);
+function pasteClip(target){
+  if (!clip) return;
+  pushUndo();
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  const put = (x, y) => { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); };
+  clip.at.forEach(a => put(a.x, a.y)); clip.lb.forEach(l => put(l.x, l.y));
+  clip.ar.forEach(a => { put(a.x1, a.y1); put(a.x2, a.y2); });
+  if (x0 > x1) return;
+  let dx, dy;
+  if (target){ dx = target.x - (x0 + x1) / 2; dy = target.y - (y0 + y1) / 2; }
+  else if (clip.ws === state.ws){ clip.n++; dx = dy = L * 0.7 * clip.n; }
+  else { const c = viewCenter(); dx = c.x - (x0 + x1) / 2; dy = c.y - (y0 + y1) / 2; }
+  const map = new Map();
+  clearSel(); selArrow = null;
+  clip.at.forEach(a => { const n = Object.assign({}, a, {id: nid++, x: a.x + dx, y: a.y + dy}); map.set(a.id, n.id); atoms.push(n); selection.add(n.id); });
+  clip.bd.forEach(b => bonds.push({id: nid++, a: map.get(b.a), b: map.get(b.b), order: b.order}));
+  clip.ar.forEach(a => { const n = Object.assign({}, a, {id: nid++, x1: a.x1 + dx, y1: a.y1 + dy, x2: a.x2 + dx, y2: a.y2 + dy}); arrows.push(n); selArrows.add(n.id); });
+  clip.lb.forEach(l => { const n = Object.assign({}, l, {id: nid++, x: l.x + dx, y: l.y + dy}); labels.push(n); selLabels.add(n.id); });
+  if (state.tool !== 'select') setTool('select');
+  refresh(); selHint();
 }
-function sceneBounds(){
-  const b = {x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9};
-  drawScene(new SvgCtx(), {bounds: b, export: true});
-  if (b.x0 > b.x1){ const bb = bbox(); return bb ? {x0:bb.x0, y0:bb.y0, x1:bb.x1, y1:bb.y1} : null; }
-  return b;
+function duplicateSel(){ if (copySel()) pasteClip(null); }
+
+/* =======================================================================
+   10b. Arbeitsbereiche: Formel und Mechanismus (getrennte Dokumente)
+   ======================================================================= */
+const docs = {formel: null, mech: null};
+const emptyDoc = () => ({atoms: [], bonds: [], arrows: [], labels: [], nid: 1, undo: [], redo: [], view: null, manualH: false, orient: 'land'});
+function packDoc(){
+  return {atoms, bonds, arrows, labels, nid, undo: undoStack, redo: redoStack,
+          view: {s: view.s, ox: view.ox, oy: view.oy, W, H}, manualH: state.manualH, orient};
 }
-function renderToCanvas(scale){
-  const bb = sceneBounds(), m = 22;
-  const w = (bb.x1-bb.x0) + 2*m, h = (bb.y1-bb.y0) + 2*m;
-  const off = document.createElement('canvas');
-  off.width = Math.round(w*scale); off.height = Math.round(h*scale);
-  const c = off.getContext('2d');
-  c.setTransform(scale,0,0,scale,0,0);
-  c.fillStyle = '#FFFFFF'; c.fillRect(0,0,w,h);
-  c.translate(m - bb.x0, m - bb.y0);
-  drawScene(c, {export: true});
-  return off;
+function unpackDoc(d){
+  atoms = d.atoms; bonds = d.bonds; arrows = d.arrows; labels = d.labels; nid = d.nid;
+  undoStack = d.undo || []; redoStack = d.redo || [];
+  orient = d.orient || 'land';
+  setManualH(!!d.manualH);
+  syncOrient();
+  if (d.view){
+    // Mitte der Ansicht beibehalten, auch wenn sich die Fenstergröße geändert hat
+    view.s = d.view.s;
+    view.ox = d.view.ox + (W - (d.view.W || W)) / 2;
+    view.oy = d.view.oy + (H - (d.view.H || H)) / 2;
+    return true;
+  }
+  return false;
 }
-$('#btnPng').addEventListener('click', () => {
-  if (!bbox()) return;
-  renderToCanvas(3).toBlob(b => download(b, 'strukturformel.png'));
-});
-$('#btnCopyImg').addEventListener('click', () => {
-  const btn = $('#btnCopyImg');
-  if (!bbox()) return;
-  renderToCanvas(3).toBlob(async blob => {
-    try {
-      await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
-      flash(btn, 'Bild kopiert');
-    } catch {
-      flash(btn, 'Nicht möglich – bitte PNG speichern');
-    }
+function syncWsUI(){
+  document.documentElement.dataset.ws = state.ws;
+  document.querySelectorAll('#workspace button').forEach(b => b.classList.toggle('on', b.dataset.ws === state.ws));
+}
+function setWorkspace(ws, opts = {}){
+  if (ws === state.ws) return;
+  if (editLabel) commitEdit();
+  docs[state.ws] = packDoc();
+  clearSel(); selArrow = null; hover = null; ringGhost = null;
+  state.ws = ws;
+  syncWsUI();
+  const hadView = unpackDoc(docs[ws] || emptyDoc());
+  requestAnimationFrame(() => {
+    resize();
+    if (!hadView || opts.fit) fitView(); else { render(); syncZoom(); }
+    refresh();
+    $('#hint').textContent = ws === 'mech'
+      ? 'Mechanismus: A4-Blatt. Strukturen mit Strg+C / Strg+V aus der Formel übernehmen, Pfeile mit P.'
+      : 'Formel: eine Struktur groß in der Mitte. „Einpassen“ (Strg+0) zentriert sie wieder.';
+    if (opts.then) opts.then();
   });
+}
+document.querySelectorAll('#workspace button').forEach(b => b.addEventListener('click', () => setWorkspace(b.dataset.ws)));
+
+function syncOrient(){
+  document.querySelectorAll('#pageOrient button').forEach(b => b.classList.toggle('on', b.dataset.or === orient));
+}
+document.querySelectorAll('#pageOrient button').forEach(b => b.addEventListener('click', () => {
+  if (orient === b.dataset.or) return;
+  orient = b.dataset.or; syncOrient(); fitView(); refresh();
+}));
+
+// Formel → Mechanismus-Blatt und zurück
+$('#btnToMech').addEventListener('click', () => {
+  $('#fileMenu').open = false;
+  if (!atoms.length && !arrows.length && !labels.length) return;
+  const keep = [selection, selArrows, selLabels].map(s => new Set(s));
+  if (!selCount()) selectAll();
+  copySel();
+  [selection, selArrows, selLabels] = keep;
+  setWorkspace('mech', {then: () => { pasteClip(viewCenter()); $('#hint').textContent = 'Formel auf das Blatt kopiert und markiert – zum Platzieren ziehen.'; }});
+});
+$('#btnToFormel').addEventListener('click', () => {
+  $('#fileMenu').open = false;
+  if (!copySel()){ $('#hint').textContent = 'Zuerst eine Struktur markieren (Auswahl, Doppelklick).'; return; }
+  setWorkspace('formel', {then: () => {
+    pushUndo(); atoms = []; bonds = []; arrows = []; labels = [];
+    pasteClip({x: 0, y: 0}); clearSel(); fitView(); refresh(); setTool('draw');
+  }});
 });
 
-/* Minimaler Zeichenkontext, der statt auf die Leinwand nach SVG schreibt.
-   So erzeugt dieselbe Zeichenroutine eine verlustfrei skalierbare Datei. */
+/* Automatisches Speichern im Browser (beide Arbeitsbereiche) */
+let saveT = 0;
+function scheduleSave(){ clearTimeout(saveT); saveT = setTimeout(saveDocs, 500); }
+function saveDocs(){
+  docs[state.ws] = packDoc();
+  for (const k of ['formel', 'mech']){
+    const d = docs[k]; if (!d) continue;
+    store.set('sfe-doc-' + k, JSON.stringify({atoms: d.atoms, bonds: d.bonds, arrows: d.arrows, labels: d.labels,
+                                              nid: d.nid, orient: d.orient, manualH: d.manualH}));
+  }
+  store.set('sfe-ws', state.ws);
+}
+function loadSaved(k){
+  try {
+    const t = store.get('sfe-doc-' + k); if (!t) return null;
+    const d = JSON.parse(t);
+    if (!Array.isArray(d.atoms) || !Array.isArray(d.bonds)) return null;
+    d.atoms = d.atoms.filter(a => EL[a.el] || ensureEl(a.el));
+    const ok = new Set(d.atoms.map(a => a.id));
+    d.bonds = d.bonds.filter(b => ok.has(b.a) && ok.has(b.b));
+    return Object.assign(emptyDoc(), d, {undo: [], redo: [], view: null});
+  } catch (e){ return null; }
+}
+
+/* Minimaler Zeichenkontext für SVG */
 function SvgCtx(){
   this.parts = []; this.tx = 0; this.ty = 0;
   this.fillStyle = '#000'; this.strokeStyle = '#000'; this.lineWidth = 1;
@@ -2897,20 +3211,103 @@ SvgCtx.prototype = {
       '" fill="'+this.fillStyle+'">'+esc+'</text>');
   }
 };
+
+/* --- Export ----------------------------------------------------------
+   kind 'tight': Zeichnung zugeschnitten · kind 'page': ganzes A4-Blatt  */
+function download(blob, name){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+function flash(btn, text){
+  const old = btn.textContent;
+  btn.textContent = text;
+  setTimeout(() => btn.textContent = old, 1800);
+}
+function sceneBounds(){
+  const b = {x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9};
+  drawScene(new SvgCtx(), {bounds: b, export: true});
+  if (b.x0 > b.x1){ const bb = bbox(); return bb ? {x0: bb.x0, y0: bb.y0, x1: bb.x1, y1: bb.y1} : null; }
+  return b;
+}
+function exportBox(kind){
+  if (kind === 'page') return pageRect();
+  const bb = sceneBounds(); if (!bb) return null;
+  const m = 22;
+  return {x0: bb.x0 - m, y0: bb.y0 - m, x1: bb.x1 + m, y1: bb.y1 + m};
+}
+function renderToCanvas(kind, scale){
+  const b = exportBox(kind);
+  const w = b.x1 - b.x0, h = b.y1 - b.y0;
+  const off = document.createElement('canvas');
+  off.width = Math.round(w * scale); off.height = Math.round(h * scale);
+  const c = off.getContext('2d');
+  c.setTransform(scale, 0, 0, scale, 0, 0);
+  c.fillStyle = '#FFFFFF'; c.fillRect(0, 0, w, h);
+  c.translate(-b.x0, -b.y0);
+  drawScene(c, {export: true});
+  return off;
+}
+function buildSvg(kind){
+  const b = exportBox(kind);
+  const w = b.x1 - b.x0, h = b.y1 - b.y0;
+  const s = new SvgCtx();
+  s.translate(-b.x0, -b.y0);
+  drawScene(s, {export: true});
+  const dims = kind === 'page'
+    ? 'width="' + (w / MM).toFixed(1) + 'mm" height="' + (h / MM).toFixed(1) + 'mm"'
+    : 'width="' + Math.round(w) + '" height="' + Math.round(h) + '"';
+  return '<?xml version="1.0" encoding="UTF-8"?>\n' +
+    '<svg xmlns="http://www.w3.org/2000/svg" ' + dims + ' viewBox="0 0 ' + w.toFixed(2) + ' ' + h.toFixed(2) + '">' +
+    '<rect width="100%" height="100%" fill="#ffffff"/>' + s.parts.join('') + '</svg>';
+}
+const fname = ext => (isMech() ? 'mechanismus' : 'strukturformel') + '.' + ext;
+const DPI300 = 300 / 25.4 / MM;           // Weltmaß → Pixel bei 300 dpi
+const closeMenus = () => document.querySelectorAll('details.menu').forEach(m => m.open = false);
+
+$('#btnPng').addEventListener('click', () => {
+  if (!bbox()) return;
+  renderToCanvas('tight', isMech() ? DPI300 : 3).toBlob(b => download(b, fname('png')));
+  closeMenus();
+});
 $('#btnSvg').addEventListener('click', () => {
   if (!bbox()) return;
-  const bb = sceneBounds(), m = 22;
-  const w = Math.round((bb.x1-bb.x0) + 2*m), h = Math.round((bb.y1-bb.y0) + 2*m);
-  const s = new SvgCtx();
-  s.translate(m - bb.x0, m - bb.y0);
-  drawScene(s, {export: true});
-  const svg = '<?xml version="1.0" encoding="UTF-8"?>\n' +
-    '<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'">' +
-    '<rect width="100%" height="100%" fill="#ffffff"/>' + s.parts.join('') + '</svg>';
-  download(new Blob([svg], {type:'image/svg+xml'}), 'strukturformel.svg');
+  download(new Blob([buildSvg('tight')], {type: 'image/svg+xml'}), fname('svg'));
+  closeMenus();
+});
+$('#btnPagePng').addEventListener('click', () => {
+  renderToCanvas('page', DPI300).toBlob(b => download(b, 'mechanismus-a4.png'));
+  closeMenus();
+});
+$('#btnPageSvg').addEventListener('click', () => {
+  download(new Blob([buildSvg('page')], {type: 'image/svg+xml'}), 'mechanismus-a4.svg');
+  closeMenus();
+});
+$('#btnPrint').addEventListener('click', () => {
+  closeMenus();
+  const land = orient === 'land';
+  $('#printStyle').textContent = '@page{size:A4 ' + (land ? 'landscape' : 'portrait') + ';margin:0}' +
+    '@media print{#printArea img{width:' + (land ? 297 : 210) + 'mm;height:' + (land ? 210 : 297) + 'mm}}';
+  const img = $('#printImg');
+  img.onload = () => { img.onload = null; setTimeout(() => window.print(), 60); };
+  img.src = renderToCanvas('page', 220 / 25.4 / MM).toDataURL('image/png');
+});
+$('#btnCopyImg').addEventListener('click', () => {
+  const btn = $('#btnCopyImg');
+  if (!bbox()) return;
+  renderToCanvas('tight', 3).toBlob(async blob => {
+    try {
+      await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+      flash(btn, 'Bild kopiert');
+    } catch (e){
+      flash(btn, 'Nicht möglich – bitte PNG speichern');
+    }
+  });
 });
 
-/* --- Molekül-Code ---------------------------------------------------- */
+/* --- Molekül-Code --- */
 function qCode(a){
   if (a.d) return a.d === '+' ? 'd+' : 'd-';
   const q = qOf(a);
@@ -2926,7 +3323,7 @@ function applyQCode(atom, code){
 }
 function encodeMol(){
   if (!atoms.length && !arrows.length && !labels.length) return '';
-  const bb = sceneBounds() || {x0:0, y0:0};
+  const bb = isMech() ? {x0:0, y0:0} : (sceneBounds() || {x0:0, y0:0});
   const idx = new Map(atoms.map((a, i) => [a.id, i]));
   const rx = v => Math.round(v - bb.x0), ry = v => Math.round(v - bb.y0);
   const A = atoms.map(a => {
@@ -2989,7 +3386,7 @@ $('#btnCodeSet').addEventListener('click', () => {
     pushUndo();
     atoms = d.na; bonds = d.nb; arrows = d.np; labels = d.nt; nid = d.nid;
     clearSel(); selArrow = null;
-    centerView(); refresh();
+    if (isMech()) refresh(); else { fitView(); refresh(); }
     flash(btn, 'Geladen');
   } catch (err){
     flash(btn, 'Code ungültig');
@@ -3013,200 +3410,251 @@ $('#btnCopy').addEventListener('click', async () => {
   setTimeout(() => btn.textContent = 'Formel kopieren', 1600);
 });
 
-// Tastatur
+/* --- Tastatur ---------------------------------------------------------
+   Werkzeuge: Z Zeichnen · R Ring · A Auswahl · L Ladung · P Pfeil · T Text · X Radierer
+   Über einem Atom: C H O N S F I ändern das Element, + / − die Ladung
+   Über einer Bindung: 1 2 3 setzen die Bindungsart (sonst: Vorgabe für neue)
+   Ringwerkzeug: 3–7 Ringgröße, B Benzol                                       */
 window.addEventListener('keydown', e => {
-  if (['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)) return;
+  if (['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)) return;
   const k = e.key.toLowerCase();
+  if (e.key === ' '){
+    e.preventDefault();
+    if (!spaceDown){ spaceDown = true; cv.style.cursor = cursorFor(); }
+    return;
+  }
   if (e.key === 'Escape'){
+    closeMenus();
     if (selCount() || selArrow != null){ clearSel(); selArrow = null; render(); $('#hint').textContent = HINTS[state.tool]; }
     return;
   }
   if (e.key === 'Delete' || e.key === 'Backspace'){
     e.preventDefault();
     if (deleteSelection()) return;
-    if (state.tool === 'arrow' && selArrow != null){ pushUndo(); deleteHit({type:'arrow', id:selArrow}); refresh(); return; }
+    if (state.tool === 'arrow' && selArrow != null){ pushUndo(); deleteHit({type: 'arrow', id: selArrow}); refresh(); return; }
     if (hover){ pushUndo(); deleteHit(hover); hover = null; refresh(); }
     return;
   }
-  if ((e.ctrlKey || e.metaKey) && k === 'z'){
-    e.preventDefault();
-    if (e.shiftKey) redo(); else undo();
-    return;
+  const mod = e.ctrlKey || e.metaKey;
+  if (mod && k === 'z'){ e.preventDefault(); if (e.shiftKey) redo(); else undo(); return; }
+  if (mod && k === 'y'){ e.preventDefault(); redo(); return; }
+  if (mod && k === 'a'){ e.preventDefault(); if (state.tool !== 'select') setTool('select'); selectAll(); render(); selHint(); return; }
+  if (mod && k === 'c'){ if (copySel()){ e.preventDefault(); $('#hint').textContent = 'Kopiert – mit Strg+V einfügen (auch im anderen Arbeitsbereich).'; } return; }
+  if (mod && k === 'x'){ if (copySel()){ e.preventDefault(); deleteSelection(); } return; }
+  if (mod && k === 'v'){ if (clip){ e.preventDefault(); pasteClip(null); } return; }
+  if (mod && k === 'd'){ e.preventDefault(); duplicateSel(); return; }
+  if (mod && (k === '0')){ e.preventDefault(); fitView(); return; }
+  if (mod || e.altKey) return;
+
+  // Ladung über einem Atom
+  if ((e.key === '+' || e.key === '-') && hover && hover.type === 'atom'){
+    const a = byId(hover.id); if (!a) return;
+    pushUndo();
+    a.d = null;
+    a.q = Math.max(-8, Math.min(8, qOf(a) + (e.key === '+' ? 1 : -1)));
+    refresh(); return;
   }
-  if ((e.ctrlKey || e.metaKey) && k === 'y'){ e.preventDefault(); redo(); return; }
-  if ((e.ctrlKey || e.metaKey) && k === 'a'){
-    e.preventDefault();
-    if (state.tool !== 'select') document.querySelector('#tools [data-tool="select"]').click();
-    selectAll(); render(); selHint();
-    return;
+  if (e.key === '+'){ zoomAt(W / 2, H / 2, 1.25); return; }
+  if (e.key === '-'){ zoomAt(W / 2, H / 2, 0.8); return; }
+
+  // Ziffern: Ringgröße bzw. Bindungsart
+  if (/^[1-7]$/.test(e.key)){
+    const n = +e.key;
+    if (state.tool === 'ring' && n >= 3){ setRing(n, false); return; }
+    if (n <= 3){
+      if (hover && hover.type === 'bond'){
+        const b = bondById(hover.id);
+        if (b){ pushUndo(); b.order = n; refresh(); }
+        return;
+      }
+      setOrder(n); return;
+    }
+    if (n >= 4){ setRing(n, false); return; }
   }
-  if (e.ctrlKey || e.metaKey || e.altKey) return;
-  const toolKeys = {b:'build', a:'select', m:'select', e:'element', v:'bond', l:'charge', p:'arrow', t:'text', x:'erase'};
-  if (toolKeys[k]){ document.querySelector(`#tools [data-tool="${toolKeys[k]}"]`).click(); return; }
-  const elKeys = {c:'C', o:'O', n:'N', h:'H', s:'S', f:'F', r:'R'};
+  if (k === 'b'){ setRing(6, true); return; }
+
+  // Elemente: über einem Atom sofort ändern, sonst als Vorgabe wählen
+  const elKeys = {c: 'C', h: 'H', o: 'O', n: 'N', s: 'S', f: 'F', i: 'I'};
   if (elKeys[k]){
-    const b = document.querySelector(`[data-el="${elKeys[k]}"]`);
-    if (b) b.click();
+    const el = elKeys[k];
+    if (hover && hover.type === 'atom'){
+      const a = byId(hover.id);
+      if (a && a.el !== el){ pushUndo(); targetsOf(a).forEach(t => { t.el = el; }); refresh(); }
+      return;
+    }
+    setElement(el, true);
+    return;
   }
+  const toolKeys = {z: 'draw', r: 'ring', a: 'select', v: 'select', l: 'charge', p: 'arrow', t: 'text', x: 'erase', e: 'erase'};
+  if (toolKeys[k]){ setTool(toolKeys[k]); return; }
 });
+window.addEventListener('keyup', e => {
+  if (e.key === ' '){ spaceDown = false; cv.style.cursor = cursorFor(); }
+});
+window.addEventListener('blur', () => { spaceDown = false; });
 
 /* =======================================================================
    11. Vorlagen
    ======================================================================= */
-function seed(el){ return addAtom(el, W/2, H/2); }
+let tplO = {x: 0, y: 0};
+function seed(el){ return addAtom(el, tplO.x, tplO.y); }
 function grow(from, el, deg, order = 1){
-  const a = deg * Math.PI/180;
-  const na = addAtom(el, from.x + L*Math.cos(a), from.y + L*Math.sin(a));
+  const a = deg * Math.PI / 180;
+  const na = addAtom(el, from.x + L * Math.cos(a), from.y + L * Math.sin(a));
   addBond(from.id, na.id, order);
   return na;
 }
 function makeRing(n, aromatic, cx, cy){
-  const r = L / (2*Math.sin(Math.PI/n));
+  const r = L / (2 * Math.sin(Math.PI / n));
   const list = [];
   for (let i = 0; i < n; i++){
-    const ang = -Math.PI/2 + i*TAU/n;
-    list.push(addAtom('C', cx + r*Math.cos(ang), cy + r*Math.sin(ang)));
+    const ang = -Math.PI / 2 + i * TAU / n;
+    list.push(addAtom('C', cx + r * Math.cos(ang), cy + r * Math.sin(ang)));
   }
   for (let i = 0; i < n; i++){
     const ord = aromatic && i % 2 === 0 ? 2 : 1;
-    addBond(list[i].id, list[(i+1)%n].id, ord);
+    addBond(list[i].id, list[(i + 1) % n].id, ord);
   }
   return list;
 }
-function insertRing(n, aromatic){
-  pushUndo();
-  const bb = bbox();
-  const cx = bb ? bb.x1 + L*2.2 : W/2;
-  const cy = bb ? (bb.y0+bb.y1)/2 : H/2;
-  makeRing(n, aromatic, Math.min(cx, W - 90), cy);
-  refresh();
-}
-document.querySelectorAll('[data-ring]').forEach(b =>
-  b.addEventListener('click', () => insertRing(+b.dataset.ring, false)));
-$('#btnBenzol').addEventListener('click', () => insertRing(6, true));
-
 const TEMPLATES = {
   methan: () => { seed('C'); },
-  ethan: () => { const a = seed('C'); grow(a,'C',-30); },
-  propan: () => { const a = seed('C'); const b = grow(a,'C',-30); grow(b,'C',30); },
-  ethanol: () => { const a = seed('C'); const b = grow(a,'C',-30); grow(b,'O',30); },
-  ethanal: () => { const a = seed('C'); const b = grow(a,'C',-30); grow(b,'O',-90,2); },
-  essigsaeure: () => { const a = seed('C'); const b = grow(a,'C',-30); grow(b,'O',-90,2); grow(b,'O',30); },
-  aceton: () => { const a = seed('C'); const b = grow(a,'C',-30); grow(b,'C',30); grow(b,'O',-90,2); },
-  ethen: () => { const a = seed('C'); grow(a,'C',-30,2); },
-  ethin: () => { const a = seed('C'); grow(a,'C',0,3); },
-  isobutan: () => { const a = seed('C'); const b = grow(a,'C',-30); grow(b,'C',30); grow(b,'C',-90); },
+  ethan: () => { const a = seed('C'); grow(a, 'C', -30); },
+  propan: () => { const a = seed('C'); const b = grow(a, 'C', -30); grow(b, 'C', 30); },
+  hexan: () => { let a = seed('C'); for (let i = 0; i < 5; i++) a = grow(a, 'C', i % 2 ? 30 : -30); },
+  ethanol: () => { const a = seed('C'); const b = grow(a, 'C', -30); grow(b, 'O', 30); },
+  ethanal: () => { const a = seed('C'); const b = grow(a, 'C', -30); grow(b, 'O', -90, 2); },
+  essigsaeure: () => { const a = seed('C'); const b = grow(a, 'C', -30); grow(b, 'O', -90, 2); grow(b, 'O', 30); },
+  aceton: () => { const a = seed('C'); const b = grow(a, 'C', -30); grow(b, 'C', 30); grow(b, 'O', -90, 2); },
+  ethen: () => { const a = seed('C'); grow(a, 'C', -30, 2); },
+  ethin: () => { const a = seed('C'); grow(a, 'C', 0, 3); },
+  isobutan: () => { const a = seed('C'); const b = grow(a, 'C', -30); grow(b, 'C', 30); grow(b, 'C', -90); },
   glycerin: () => {
-    const a = seed('C'); const b = grow(a,'C',-30); const c = grow(b,'C',30);
-    grow(a,'O',150); grow(b,'O',-90); grow(c,'O',-30);
+    const a = seed('C'); const b = grow(a, 'C', -30); const c = grow(b, 'C', 30);
+    grow(a, 'O', 150); grow(b, 'O', -90); grow(c, 'O', -30);
   },
   alanin: () => {
-    const a = seed('C'); const b = grow(a,'C',-30); const c = grow(b,'C',30);
-    grow(b,'N',-90); grow(c,'O',-30,2); grow(c,'O',90);
+    const a = seed('C'); const b = grow(a, 'C', -30); const c = grow(b, 'C', 30);
+    grow(b, 'N', -90); grow(c, 'O', -30, 2); grow(c, 'O', 90);
   },
-  cyclohexan: () => makeRing(6, false, W/2, H/2),
-  benzol: () => makeRing(6, true, W/2, H/2),
+  cyclohexan: () => makeRing(6, false, tplO.x, tplO.y),
+  benzol: () => makeRing(6, true, tplO.x, tplO.y),
   wasser: () => { seed('O'); },
   ammoniak: () => { seed('N'); },
-  co2: () => { const c = seed('C'); grow(c,'O',180,2); grow(c,'O',0,2); }
+  co2: () => { const c = seed('C'); grow(c, 'O', 180, 2); grow(c, 'O', 0, 2); }
 };
 $('#templates').addEventListener('change', e => {
   const key = e.target.value;
+  e.target.value = '';
   if (!key) return;
   pushUndo();
-  atoms = []; bonds = []; arrows = []; labels = []; clearSel(); selArrow = null;
-  TEMPLATES[key]();
-  centerView();
-  refresh();
-  e.target.value = '';
+  if (isMech()){
+    // Mechanismus: Vorlage in der Mitte des sichtbaren Bereichs ergänzen und markieren
+    tplO = viewCenter();
+    const before = new Set(atoms.map(a => a.id));
+    TEMPLATES[key]();
+    clearSel(); selArrow = null;
+    const fresh = atoms.filter(a => !before.has(a.id));
+    let cx = 0, cy = 0; fresh.forEach(a => { cx += a.x; cy += a.y; });
+    if (fresh.length){ cx /= fresh.length; cy /= fresh.length; fresh.forEach(a => { a.x += tplO.x - cx; a.y += tplO.y - cy; selection.add(a.id); }); }
+    setTool('select');
+    refresh(); selHint();
+  } else {
+    atoms = []; bonds = []; arrows = []; labels = []; clearSel(); selArrow = null;
+    tplO = {x: 0, y: 0};
+    TEMPLATES[key]();
+    fitView();
+    refresh();
+  }
+  e.target.blur();
 });
 
 /* =======================================================================
    12. Start
    ======================================================================= */
+let sized = false;
 function resize(){
   const r = board.getBoundingClientRect();
   if (!r.width || !r.height) return;
+  const c = sized ? toWorld(W / 2, H / 2) : null;
   dpr = Math.min(window.devicePixelRatio || 1, 2.5);
   W = r.width; H = r.height;
-  cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr);
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
   cv.style.width = W + 'px'; cv.style.height = H + 'px';
-  ctx.setTransform(dpr,0,0,dpr,0,0);
+  if (c){ view.ox = W / 2 - c.x * view.s; view.oy = H / 2 - c.y * view.s; }
+  sized = true;
   render();
 }
 new ResizeObserver(() => resize()).observe(board);
 window.addEventListener('resize', resize);
 
-document.fonts && document.fonts.ready.then(() => refresh());
-
-$('#hint').textContent = HINTS.build;
-
-/* =======================================================================
-   Ansicht (Kompakt/Touch), Auswertungsleiste, Exportmenü
-   ======================================================================= */
-const store = {
-  get(k){ try { return localStorage.getItem(k); } catch (e) { return null; } },
-  set(k, v){ try { localStorage.setItem(k, v); } catch (e) {} }
-};
-const ctxBox = $('#ctx'), ctxHome = ctxBox.parentNode;
 function setView(v){
-  if (!['classic', 'compact', 'touch'].includes(v)) v = 'compact';
+  if (!['compact', 'touch'].includes(v)) v = 'compact';
   const root = document.documentElement;
-  root.classList.toggle('view-touch',   v === 'touch');
+  root.classList.toggle('view-touch', v === 'touch');
   root.classList.toggle('view-compact', v === 'compact');
-  root.classList.toggle('view-classic', v === 'classic');
-  /* Klassisch: alle Optionen dauerhaft in der linken Leiste */
-  if (v === 'classic') $('#classicSlot').appendChild(ctxBox);
-  else if (ctxBox.parentNode !== ctxHome) ctxHome.insertBefore(ctxBox, $('#board'));
   document.querySelectorAll('#viewMode button').forEach(b => b.classList.toggle('on', b.dataset.view === v));
   store.set('sfe-view', v);
   requestAnimationFrame(() => { resize(); render(); });
 }
-document.querySelectorAll('#viewMode button').forEach(b =>
-  b.addEventListener('click', () => setView(b.dataset.view)));
-const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-setView(store.get('sfe-view') || 'compact');
+document.querySelectorAll('#viewMode button').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+{
+  const saved = store.get('sfe-view');
+  const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+  setView(saved === 'touch' || saved === 'compact' ? saved : (coarse ? 'touch' : 'compact'));
+}
 
 function setSide(open){
   document.querySelector('.layout').classList.toggle('side-closed', !open);
   $('#btnPanel').classList.toggle('on', open);
   store.set('sfe-side', open ? '1' : '0');
+  requestAnimationFrame(resize);
   refresh();
 }
-$('#btnPanel').addEventListener('click', () =>
-  setSide(document.querySelector('.layout').classList.contains('side-closed')));
+$('#btnPanel').addEventListener('click', () => setSide(document.querySelector('.layout').classList.contains('side-closed')));
 $('#hintWarn').addEventListener('click', () => setSide(true));
-{
-  const s = store.get('sfe-side');
-  setSide(s == null ? (window.innerWidth > 1100 || document.documentElement.classList.contains('view-classic')) : s === '1');
-}
-
 
 /* Catppuccin-Variante wählen: wirkt sofort und wird gemerkt */
 const FLAVORS = ['latte', 'frappe', 'macchiato', 'mocha'];
 function setFlavor(f){
   if (!FLAVORS.includes(f)) f = 'mocha';
   document.documentElement.dataset.flavor = f;
-  $('#flavor').value = f;
+  document.querySelectorAll('#flavor button').forEach(b => b.classList.toggle('on', b.dataset.flavor === f));
   store.set('sfe-flavor', f);
-  refresh();
+  render();
 }
-$('#flavor').addEventListener('change', e => setFlavor(e.target.value));
-setFlavor(store.get('sfe-flavor') || 'mocha');
+document.querySelectorAll('#flavor button').forEach(b => b.addEventListener('click', () => setFlavor(b.dataset.flavor)));
+
+document.addEventListener('pointerdown', e => {
+  document.querySelectorAll('details.menu').forEach(m => { if (m.open && !m.contains(e.target)) m.open = false; });
+});
+
+// Gespeicherten Stand laden
 state.mono = store.get('sfe-mono') === '1';
 $('#mono').checked = state.mono;
-refresh();
-
-const exportMenu = $('#exportMenu');
-document.addEventListener('pointerdown', e => {
-  if (exportMenu.open && !exportMenu.contains(e.target)) exportMenu.open = false;
-});
+docs.formel = loadSaved('formel');
+docs.mech = loadSaved('mech');
+state.ws = store.get('sfe-ws') === 'mech' ? 'mech' : 'formel';
+syncWsUI();
+setFlavor(store.get('sfe-flavor') || 'mocha');
 syncControls();
 syncArrowUI();
 resize();
-TEMPLATES.ethanol();
-centerView();
+{
+  const d = docs[state.ws] || emptyDoc();
+  unpackDoc(d);
+  if (state.ws === 'formel' && !docs.formel){ tplO = {x: 0, y: 0}; TEMPLATES.ethanol(); }
+}
+{
+  const s = store.get('sfe-side');
+  document.querySelector('.layout').classList.toggle('side-closed', !(s == null ? window.innerWidth > 1100 : s === '1'));
+  $('#btnPanel').classList.toggle('on', !document.querySelector('.layout').classList.contains('side-closed'));
+}
+setTool('draw');
+resize();
+fitView();
 refresh();
+document.fonts && document.fonts.ready.then(() => { if (!isMech()) fitView(); refresh(); });
 </script>
 </body>
 </html>
