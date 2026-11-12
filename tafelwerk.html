@@ -173,11 +173,11 @@ button { cursor: pointer; }
 .zufall-name.dreht { color: var(--muted); }
 
 /* Würfel */
-.wuerfel { flex: 1; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4cqmin; padding: 5cqmin; }
-.w6 { width: min(36cqh, 26cqw); aspect-ratio: 1; background: #fff; border: 2px solid var(--ink); border-radius: 18%; display: grid;
-  grid-template: repeat(3, 1fr) / repeat(3, 1fr); padding: 12%; transition: transform .35s; }
-.w6 i { width: 70%; aspect-ratio: 1; border-radius: 50%; background: var(--ink); place-self: center; visibility: hidden; }
-.w6.rollt { transform: rotate(200deg) scale(.85); }
+.wuerfel { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 8px; min-width: 0; cursor: pointer; }
+.wuerfel .reihe { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.w6 { flex: none; transition: transform .3s; }
+.w6 svg { width: 100%; height: 100%; display: block; }
+.w6.rollt { transform: rotate(18deg) scale(.88); }
 
 /* Lautstärke */
 .laut { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3cqh; padding: 5cqmin; }
@@ -571,7 +571,7 @@ const E = (cx, cy, rx, ry, fill, o) => (fill ? fuellung(geschl(ellPts(cx + 1.2, 
 const Blob = (pts, fill, o) => (fill ? fuellung(geschl(pts.map(([x, y]) => [x + 1.3 + jit(.7), y + 1.2 + jit(.7)])), fill) : "") + Cv([...pts, pts[0], pts[1]], o);
 const Dot = (x, y, r = 1.7, col = "currentColor") => fuellung(geschl(ellPts(x, y, r, r, 6, r * .18, false)), col);
 const Arc = (cx, cy, r, a0, a1, o) => { const n = Math.max(3, Math.ceil(Math.abs(a1 - a0) * r / 4)); return Cv(Array.from({ length: n + 1 }, (_, i) => { const a = a0 + (a1 - a0) * i / n; return [cx + Math.cos(a) * r, cy + Math.sin(a) * r]; }), o); };
-const Txt = (x, y, s, size = 12, col = "currentColor") => `<text x="${x}" y="${y}" font-size="${size}" font-family='${FONT}' font-weight="700" fill="${col}" stroke="none" transform="rotate(${fx(jit(3))} ${x} ${y})">${s}</text>`;
+const Txt = (x, y, s, size = 12, col = "currentColor", anker = "start") => `<text x="${x}" y="${y}" text-anchor="${anker}" font-size="${size}" font-family='${FONT}' font-weight="700" fill="${col}" stroke="none" transform="rotate(${fx(jit(3))} ${x} ${y})">${s}</text>`;
 const Hatch = (x1, y1, x2, y2, n = 4, len = 3.4) => Array.from({ length: n }, (_, i) => { const t = n > 1 ? i / (n - 1) : 0, px = x1 + (x2 - x1) * t, py = y1 + (y2 - y1) * t; return Ln([[px, py], [px + len, py - len]], { w: SK.sw * .5 }); }).join("");
 const Rays = (cx, cy, r1, r2, n, a0 = 0) => Array.from({ length: n }, (_, i) => { const a = a0 + i / n * Math.PI * 2; return Ln([[cx + Math.cos(a) * r1, cy + Math.sin(a) * r1], [cx + Math.cos(a) * r2, cy + Math.sin(a) * r2]]); }).join("");
 const Rot = (deg, cx, cy, inner) => `<g transform="rotate(${deg} ${cx} ${cy})">${inner}</g>`;
@@ -781,6 +781,8 @@ function aufraeumen(id, nurInhalt) {
   const r = LAUF.get(id); if (!r) return;
   if (r.stream) { r.stream.getTracks().forEach(t => t.stop()); r.stream = null; }
   if (r.raf) cancelAnimationFrame(r.raf);
+  if (r.ro) { r.ro.disconnect(); r.ro = null; }
+  if (r.rollZeit) { clearInterval(r.rollZeit); r.rollZeit = null; r.rollt = false; }
   if (r.blob) { URL.revokeObjectURL(r.blob); r.blob = null; }
   if (r.audio) { try { r.audio.close(); } catch (e) {} r.audio = null; }
   if (!nurInhalt) LAUF.delete(id);
@@ -956,7 +958,7 @@ typ("symbol", {
   name: "Arbeitssymbol", icon: "symbol", groesse: [260, 260], rund: true, daten: { symbol: "ruhe", text: "" },
   einst: [{ k: "symbol", t: "symbole", l: "Symbol" }, { k: "text", t: "text", l: "Eigene Beschriftung (leer = Standard)" }],
   zeichne(w, el) {
-    el.append(h("div", { class: "symbol", title: "Doppelklick: nächstes Symbol" }, arbeitSvg(w.data.symbol), h("div", { class: "wtitel" }, w.data.text || ARBEIT[w.data.symbol][0])));
+    el.append(h("div", { class: "symbol", title: "Antippen: Einstellungen · Doppelklick: nächstes Symbol" }, arbeitSvg(w.data.symbol), h("div", { class: "wtitel" }, w.data.text || ARBEIT[w.data.symbol][0])));
     el.ondblclick = () => { const k = Object.keys(ARBEIT); w.data.symbol = k[(k.indexOf(w.data.symbol) + 1) % k.length]; w.data.text = ""; neuZeichnen(w); speichern(); };
   },
 });
@@ -1092,22 +1094,51 @@ typ("video", {
   },
 });
 
-// Würfel
+// Würfel (W4 bis W100 oder eigene Seitenzahl; mehrere Würfel passen sich der Widgetgröße an)
 const AUGEN = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
+function wuerfelSvg(S, v, i) {
+  const z = y => Txt(23, y, v, String(v).length > 2 ? 13 : String(v).length > 1 ? 17 : 20, "currentColor", "middle");
+  const vieleck = (n, r, w0) => Array.from({ length: n }, (_, k) => { const a = w0 + k / n * Math.PI * 2; return [23 + Math.cos(a) * r, 24 + Math.sin(a) * r]; });
+  const fn = () => S === 6 ? R(5, 5, 36, 36, "W") + (AUGEN[v] || []).map(k => Dot(13 + (k % 3) * 10, 13 + Math.floor(k / 3) * 10, 3.3)).join("")
+    : S === 4 ? Pg([[23, 4], [43, 40], [3, 40]], "Y") + z(35)
+    : S === 8 ? Pg([[23, 3], [42, 23], [23, 43], [4, 23]], "B") + z(29)
+    : S === 10 ? Pg([[23, 3], [42, 17], [36, 43], [10, 43], [4, 17]], "G") + z(31)
+    : S === 12 ? Pg(vieleck(5, 20, -Math.PI / 2), "P") + z(30)
+    : S === 20 ? Pg(vieleck(6, 20, 0), "O") + Ln([[23, 8], [10, 31], [36, 31], [23, 8]], { w: 1.2 }) + z(30)
+    : E(23, 23, 19, 19, "T") + z(29);
+  return skSvg(fn, "0 0 46 46", 2.2, `w${S}-${v}-${i}`);
+}
 typ("wuerfel", {
-  name: "Würfel", icon: "wuerfel", groesse: [360, 240], daten: { anzahl: 2, werte: [3, 5] },
-  einst: [{ k: "anzahl", t: "zahl", l: "Anzahl Würfel", min: 1, max: 6 }],
-  zeichne(w, el) {
-    const d = w.data; d.werte = Array.from({ length: d.anzahl }, (_, i) => d.werte[i] || 1);
-    const box = h("div", { class: "wuerfel nodrag", title: "Antippen zum Würfeln", role: "button", tabindex: "0", "aria-label": "Würfeln" });
-    const wuerfelEl = d.werte.map(v => { const k = h("div", { class: "w6" }); for (let i = 0; i < 9; i++) k.append(h("i", { style: { visibility: AUGEN[v].includes(i) ? "visible" : "hidden" } })); return k; });
-    box.append(...wuerfelEl);
-    const summe = h("div", { class: "leise tab", style: { width: "100%", textAlign: "center", fontSize: "clamp(11px,5cqh,20px)" } }, d.anzahl > 1 ? `Summe ${d.werte.reduce((a, b) => a + b, 0)}` : "");
-    box.append(summe);
-    const wuerfeln = () => { wuerfelEl.forEach(k => k.classList.add("rollt")); ton(300, .05, 3, .08);
-      setTimeout(() => { d.werte = d.werte.map(() => 1 + Math.floor(Math.random() * 6)); neuZeichnen(w); speichern(); }, 350); };
+  name: "Würfel", icon: "wuerfel", groesse: [360, 240], daten: { anzahl: 2, seiten: "6", eigen: 13, werte: [3, 5] },
+  einst: [{ k: "anzahl", t: "zahl", l: "Anzahl Würfel (1–12)", min: 1, max: 12 },
+    { k: "seiten", t: "auswahl", l: "Würfelart", o: [["4", "W4"], ["6", "W6 (Standardwürfel)"], ["8", "W8"], ["10", "W10"], ["12", "W12"], ["20", "W20"], ["100", "W100"], ["0", "Eigene Seitenzahl …"]] },
+    { k: "eigen", t: "zahl", l: "Eigene Seitenzahl (2–1000), gilt bei „Eigene Seitenzahl …“", min: 2, max: 1000 }],
+  zeichne(w, el, r) {
+    const d = w.data;
+    if (d.seiten === undefined) d.seiten = "6"; if (d.eigen === undefined) d.eigen = 13;
+    const S = Number(d.seiten) > 0 ? Number(d.seiten) : klemme(Math.round(d.eigen) || 6, 2, 1000);
+    d.werte = Array.from({ length: d.anzahl }, (_, i) => klemme(Math.round(d.werte[i]) || 1, 1, S));
+    const reihe = h("div", { class: "reihe" }), summe = h("div", { class: "leise tab", style: { fontSize: "clamp(11px,4cqh,20px)", minHeight: "1.3em" } }, d.anzahl > 1 ? `Summe ${d.werte.reduce((a, b) => a + b, 0)}` : "");
+    const box = h("div", { class: "wuerfel nodrag", title: `Antippen zum Würfeln (W${S})`, role: "button", tabindex: "0", "aria-label": `Würfeln, W${S}` }, reihe, summe);
+    const eck = d.werte.map((v, i) => h("div", { class: "w6" }, wuerfelSvg(S, v, i))); reihe.append(...eck);
+    const anordnen = () => {   // beste Spaltenzahl so wählen, dass die Würfel möglichst groß und vollständig sichtbar sind
+      const n = eck.length, gap = 8, B = Math.max(40, el.clientWidth - 16), Hh = Math.max(40, el.clientHeight - 16 - (d.anzahl > 1 ? 30 : 0));
+      let best = { g: 0, sp: 1 };
+      for (let sp = 1; sp <= n; sp++) { const zl = Math.ceil(n / sp), g = Math.floor(Math.min((B - gap * (sp - 1)) / sp, (Hh - gap * (zl - 1)) / zl)); if (g > best.g) best = { g, sp }; }
+      const g = Math.max(24, Math.min(best.g, 220));
+      eck.forEach(k => { k.style.width = k.style.height = g + "px"; });
+      reihe.style.width = best.sp * g + (best.sp - 1) * gap + 2 + "px";
+    };
+    const wuerfeln = () => {
+      if (r.rollt) return; r.rollt = true; eck.forEach(k => k.classList.add("rollt")); ton(300, .05, 3, .08); let n = 0;
+      r.rollZeit = setInterval(() => {
+        eck.forEach((k, i) => k.replaceChildren(wuerfelSvg(S, 1 + Math.floor(Math.random() * S), i)));
+        if (++n >= 6) { clearInterval(r.rollZeit); r.rollZeit = null; r.rollt = false; d.werte = d.werte.map(() => 1 + Math.floor(Math.random() * S)); neuZeichnen(w); speichern(); }
+      }, 70);
+    };
     box.onclick = wuerfeln; box.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); wuerfeln(); } };
-    el.append(box);
+    el.append(box); anordnen();
+    if (r.ro) r.ro.disconnect(); r.ro = new ResizeObserver(anordnen); r.ro.observe(el);
   },
 });
 
@@ -1339,6 +1370,10 @@ typ("punkte", {
   },
 });
 
+// Antippen öffnet die Einstellungen (nur auf freien Flächen, nicht auf Knöpfen); „sofort“ öffnet sie direkt nach dem Einfügen aus der Leiste
+for (const k of ["symbol", "sticker", "uhr", "kalender", "countdown", "plan", "qr", "bild", "zufall", "gruppen", "umfrage", "laut", "ampel", "punkte", "vtimer", "webcam", "timer"]) T[k].tipp = true;
+for (const k of ["symbol", "sticker", "zufall", "gruppen", "umfrage", "plan", "countdown", "qr", "link", "einbetten", "punkte", "wuerfel"]) T[k].sofort = true;
+let AUTO_EINST = true;
 const ALLE_TYPEN = ["hintergrund", "umfrage", "zufall", "laut", "bild", "text", "symbol", "ampel", "plan", "timer", "uhr",
   "gruppen", "video", "wuerfel", "webcam", "vtimer", "kalender", "countdown", "stoppuhr", "pdf", "zeichnen", "einbetten", "qr", "link", "sticker", "punkte"];
 const eintragName = k => (AKTIONEN[k] || T[k]).name;
@@ -1418,7 +1453,8 @@ function ziehenEinrichten(el, w) {
       lage(el, w); werkzeugPos();
     };
     const fertig = () => { el.removeEventListener("pointermove", bewegen); el.removeEventListener("pointerup", fertig); el.removeEventListener("pointercancel", fertig);
-      if (bewegt) { speichern(); const r = LAUF.get(w.id); if (griff && r && r.groesse) r.groesse(); } };
+      if (bewegt) { speichern(); const r = LAUF.get(w.id); if (griff && r && r.groesse) r.groesse(); }
+      else if (!griff && AUTO_EINST && T[w.typ].tipp && !e.target.closest(".ziehgriff")) einstellungen(w); };
     el.addEventListener("pointermove", bewegen); el.addEventListener("pointerup", fertig); el.addEventListener("pointercancel", fertig);
   });
 }
@@ -1573,7 +1609,7 @@ function leisteZeigen() {
 function dockKnopf(k, imPanel) {
   return h("button", { class: "dock-item" + (LEISTE.includes(k) ? " in-leiste" : ""), title: eintragName(k), onclick: () => {
     if (imPanel && $("#mehr").classList.contains("bearbeiten")) { LEISTE = LEISTE.includes(k) ? LEISTE.filter(x => x !== k) : [...LEISTE, k]; DB.setzeEinst("leiste", LEISTE); leisteZeigen(); mehrZeigen(true); return; }
-    if (AKTIONEN[k]) AKTIONEN[k].tun(); else widgetHinzufuegen(k);
+    if (AKTIONEN[k]) AKTIONEN[k].tun(); else { const nw = widgetHinzufuegen(k); if (AUTO_EINST && T[k].sofort) einstellungen(nw); }
     if (imPanel) mehrZeigen(false);
   } }, wIcon(eintragIcon(k)), h("span", {}, eintragName(k)));
 }
@@ -1751,6 +1787,7 @@ $("#btn-menue").onclick = e => {
     ZUSTAND.tafel.seiten.length > 1 ? h("button", { onclick: () => { m.hidden = true; seiteLoeschenFragen(); } }, ic("muell"), "Diese Seite löschen") : null,
     h("button", { onclick: () => { m.hidden = true; seiteLeeren(); } }, ic("neu"), "Alle Widgets dieser Seite entfernen"),
     h("hr"),
+    h("button", { onclick: () => { m.hidden = true; AUTO_EINST = !AUTO_EINST; DB.setzeEinst("auto", AUTO_EINST); toast(AUTO_EINST ? "Einstellungen öffnen sich beim Antippen und Einfügen." : "Einstellungen öffnen sich nur noch über das Zahnrad."); } }, ic("zahnrad"), "Einstellungen automatisch öffnen: " + (AUTO_EINST ? "an" : "aus")),
     h("button", { onclick: () => { m.hidden = true; tastenhilfe(); } }, ic("zahnrad"), "Tastenkürzel"));
 };
 function seiteLoeschenFragen() {
@@ -1847,6 +1884,7 @@ function beispielTafel() {
   await DB.oeffnen();
   const leiste = await DB.holeEinst("leiste"); if (Array.isArray(leiste)) LEISTE = leiste.filter(k => ALLE_TYPEN.includes(k));
   leisteZeigen();
+  if ((await DB.holeEinst("auto")) === false) AUTO_EINST = false;
   const dp = await DB.holeEinst("dock"); if (dp && Number.isFinite(dp.fx) && Number.isFinite(dp.fy)) { dockPos = { fx: klemme(dp.fx, 0, 1), fy: klemme(dp.fy, 0, 1) }; dockLage(); }
   ZUSTAND.tafeln = (await DB.alle()).sort((a, b) => b.geaendert - a.geaendert);
   const zuletzt = await DB.holeEinst("zuletzt");
