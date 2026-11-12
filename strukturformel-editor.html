@@ -209,7 +209,24 @@ html.view-touch .side button{padding:10px 11px}
 @media (max-width:1100px){
   .side{position:absolute;right:0;top:0;bottom:0;z-index:15;box-shadow:-10px 0 28px rgba(17,17,27,.5)}
 }
-@media (max-width:1500px){ .lbl{display:none} html[data-ws="mech"] header h1{display:none} }
+@media (max-width:1500px){ .lbl{display:none} }
+@media (max-width:1250px){ header h1{display:none} #workspace button small{display:none} }
+.float{position:absolute;bottom:10px;z-index:2;border-radius:var(--radius);box-shadow:0 2px 10px rgba(17,17,27,.28)}
+.float button{font-size:12.5px;padding:5px 9px;background:var(--ink)}
+.float button.on{background:var(--accent)}
+.fl-left{left:10px} .fl-right{right:10px}
+html.view-touch .float button{padding:9px 13px;font-size:14px}
+dialog{background:var(--ink);color:var(--text-on-ink);border:1px solid var(--ink-3);border-radius:10px;
+  width:min(860px,94vw);max-height:90vh;padding:18px 20px;box-shadow:0 12px 40px rgba(17,17,27,.6)}
+dialog::backdrop{background:rgba(17,17,27,.55)}
+dialog h2{margin:0 0 12px;font-size:16px}
+dialog h3{margin:14px 0 6px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--ink-3);padding-bottom:4px}
+.help-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:0 28px}
+.help-grid dl{margin:0;display:grid;grid-template-columns:max-content 1fr;gap:5px 12px;font-size:13px;line-height:1.4}
+.help-grid dt{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--accent);white-space:nowrap}
+.help-grid dd{margin:0}
+dialog .close{float:right;margin:-4px -4px 0 12px}
 @media (max-width:700px){ header h1{display:none} }
 
 /* ---- Druck: nur das Blatt ---- */
@@ -233,24 +250,14 @@ html.view-touch .side button{padding:10px 11px}
   </div>
   <nav class="seg" id="modes" aria-label="Darstellung">
     <button class="on" data-mode="skelett" title="Skelettformel (Zeichnung)">Skelett</button>
-    <button data-mode="struktur" title="Strukturformel mit allen Atomen (Zeichnung)">Strukturformel</button>
+    <button data-mode="struktur" title="Strukturformel mit allen Atomen (Zeichnung)">Struktur<span class="lbl">formel</span></button>
     <button data-mode="halb" title="Halbstrukturformel (Text)">Halbstruktur</button>
     <button data-mode="summe" title="Summenformel (Text)">Summe</button>
   </nav>
   <div class="hdr-actions">
-    <div class="seg mech-only" id="pageOrient" title="Ausrichtung des A4-Blattes">
-      <button data-or="land" class="on" title="A4 Querformat">Quer</button>
-      <button data-or="port" title="A4 Hochformat">Hoch</button>
-    </div>
     <div class="seg">
       <button id="btnUndo" title="Rückgängig (Strg+Z)">↶ <span class="lbl">Rückgängig</span></button>
       <button id="btnRedo" title="Wiederholen (Strg+Y)">↷</button>
-    </div>
-    <div class="seg" title="Zoom: Strg+Mausrad oder zwei Finger. Verschieben: Mausrad, Leertaste+Ziehen oder mittlere Maustaste.">
-      <button id="zoomOut" title="Verkleinern">−</button>
-      <button id="zoomVal" title="Auf 100 % setzen">160 %</button>
-      <button id="zoomIn" title="Vergrößern">+</button>
-      <button id="btnFit" title="Einpassen (Strg+0): Formel bzw. Blatt in die Mitte">Einpassen</button>
     </div>
     <select id="templates" title="Beispielmolekül laden (Mechanismus: wird auf dem Blatt ergänzt)">
       <option value="">Beispiel …</option>
@@ -313,6 +320,7 @@ html.view-touch .side button{padding:10px 11px}
         </div>
       </div>
     </details>
+    <button id="btnHelp" title="Kurzhilfe: Bedienung und Tastenkürzel (Taste ?)">?</button>
     <button id="btnPanel" title="Auswertung und Anzeigeoptionen ein- oder ausblenden">Auswertung</button>
   </div>
 </header>
@@ -390,7 +398,8 @@ html.view-touch .side button{padding:10px 11px}
           <button class="el" data-q="-2" title="zweifach negativ">2−</button>
           <button class="el" data-d="+" title="Partialladung positiv">δ+</button>
           <button class="el" data-d="-" title="Partialladung negativ">δ−</button>
-          <button class="el" data-q="0" title="Ladung entfernen">ohne</button>
+          <button class="el" data-rad="1" title="Radikal: ungepaartes Elektron (über Atom: Taste .)">•</button>
+          <button class="el" data-q="0" title="Ladung, Partialladung und Radikalpunkt entfernen">ohne</button>
         </div>
       </div>
       <div class="cg" data-for="charge">
@@ -414,7 +423,18 @@ html.view-touch .side button{padding:10px 11px}
       </div>
     </div>
 
-    <div class="board" id="board"><canvas id="cv"></canvas></div>
+    <div class="board" id="board"><canvas id="cv" aria-label="Zeichenfläche"></canvas>
+      <div class="float fl-left seg mech-only" id="pageOrient" title="Ausrichtung des A4-Blattes">
+        <button data-or="land" class="on">A4 quer</button>
+        <button data-or="port">A4 hoch</button>
+      </div>
+      <div class="float fl-right seg" title="Zoom: Strg+Mausrad oder zwei Finger. Verschieben: Mausrad, Leertaste+Ziehen oder mittlere Maustaste.">
+        <button id="zoomOut" title="Verkleinern (−)">−</button>
+        <button id="zoomVal" title="Auf 100 % setzen">160 %</button>
+        <button id="zoomIn" title="Vergrößern (+)">+</button>
+        <button id="btnFit" title="Einpassen (Strg+0): Formel bzw. Blatt in die Mitte">Einpassen</button>
+      </div>
+    </div>
 
     <div class="textout" id="textout" hidden>
       <div class="eyebrow" id="toEyebrow">Halbstrukturformel</div>
@@ -430,7 +450,7 @@ html.view-touch .side button{padding:10px 11px}
   <aside class="side" id="side">
     <div class="group">
       <h2>Auswertung</h2>
-      <div class="readout"><div class="k">Summenformel</div><div class="v" id="outSum">—</div></div>
+      <div class="readout"><div class="k" id="kSum">Summenformel</div><div class="v" id="outSum">—</div></div>
       <div class="readout"><div class="k">Molare Masse</div><div class="v" id="outMass">—</div></div>
       <div class="readout"><div class="k">Halbstrukturformel</div><div class="v small" id="outCond">—</div></div>
       <div id="checks"></div>
@@ -471,6 +491,63 @@ html.view-touch .side button{padding:10px 11px}
     </div>
   </aside>
 </div>
+
+<dialog id="help">
+  <button class="close" id="helpClose" title="Schließen (Esc)">✕</button>
+  <h2>Kurzhilfe</h2>
+  <div class="help-grid">
+    <div>
+      <h3>Zeichnen (Z)</h3>
+      <dl>
+        <dt>Tippen, freie Fläche</dt><dd>Atom setzen</dd>
+        <dt>Tippen auf Atom</dt><dd>Kette um ein Atom verlängern; ist ein anderes Element als C gewählt, wird das Atom ersetzt</dd>
+        <dt>Ziehen</dt><dd>Zickzack-Kette, je weiter, desto länger; Umschalt kippt sie auf die andere Seite</dd>
+        <dt>Ziehen Atom → Atom</dt><dd>Bindung bzw. Ringschluss</dd>
+        <dt>Tippen auf Bindung</dt><dd>Einfach → Doppel → Dreifach</dd>
+      </dl>
+      <h3>Zeiger über einem Objekt</h3>
+      <dl>
+        <dt>C H O N S F I</dt><dd>Element des Atoms ändern</dd>
+        <dt>+ &nbsp;−</dt><dd>Ladung erhöhen bzw. vermindern</dd>
+        <dt>.</dt><dd>Radikalpunkt setzen bzw. entfernen</dd>
+        <dt>1 2 3</dt><dd>Bindungsart setzen</dd>
+        <dt>Entf</dt><dd>Objekt löschen</dd>
+      </dl>
+      <h3>Ring (R)</h3>
+      <dl>
+        <dt>3 … 7, B</dt><dd>Ringgröße wählen, B = Benzol</dd>
+        <dt>Freie Fläche</dt><dd>Ring setzen</dd>
+        <dt>Bindung</dt><dd>Ring anellieren (gemeinsame Bindung)</dd>
+        <dt>Atom</dt><dd>Ring anhängen</dd>
+      </dl>
+    </div>
+    <div>
+      <h3>Auswahl (A)</h3>
+      <dl>
+        <dt>Klick / Umschalt+Klick</dt><dd>markieren / Auswahl ergänzen</dd>
+        <dt>Ziehen, freie Fläche</dt><dd>Rahmen aufziehen (Alt: Lasso)</dd>
+        <dt>Doppelklick</dt><dd>ganzes Teilchen markieren; Text bearbeiten</dd>
+        <dt>Runder Griff</dt><dd>drehen in 15°-Schritten (Umschalt: stufenlos)</dd>
+        <dt>Strg+C / V / X / D</dt><dd>kopieren, einfügen, ausschneiden, duplizieren – auch zwischen Formel und Mechanismus</dd>
+        <dt>Strg+A, Esc</dt><dd>alles markieren, Auswahl aufheben</dd>
+      </dl>
+      <h3>Weitere Werkzeuge</h3>
+      <dl>
+        <dt>L</dt><dd>Ladung, Partialladung, Radikal</dd>
+        <dt>P</dt><dd>Pfeil: ziehen; Elektronenpfeile rasten an Atomen und Bindungen ein (Alt: frei). Der mittlere Griff biegt den Pfeil.</dd>
+        <dt>T</dt><dd>Text; H2O wird zu H₂O, ^ stellt hoch, _ tief</dd>
+        <dt>X</dt><dd>Radierer: tippen oder wischen</dd>
+      </dl>
+      <h3>Ansicht</h3>
+      <dl>
+        <dt>Strg+Mausrad</dt><dd>zoomen (Touch: zwei Finger)</dd>
+        <dt>Mausrad, Leertaste+Ziehen</dt><dd>Ansicht verschieben</dd>
+        <dt>Strg+0</dt><dd>einpassen</dd>
+        <dt>Strg+Z / Strg+Y</dt><dd>rückgängig / wiederholen</dd>
+      </dl>
+    </div>
+  </div>
+</dialog>
 
 <div id="printArea"><img id="printImg" alt=""></div>
 
@@ -598,6 +675,7 @@ function removeAtom(id){
 
 /* Ladungen: q = formale Ladung (…, -1, 0, +1, …), d = Partialladung ('+'/'-') */
 const qOf = a => a.q || 0;
+const HYPER = {S:[4,6], P:[5], Cl:[3,5,7], Br:[3,5,7], I:[3,5,7]};
 /* Bindigkeit unter Berücksichtigung der Ladung.
    Für N, O, S, P, Halogene gilt Bindigkeit + Ladung (NH₄⁺: 4, O⁻: 1);
    Kohlenstoff verliert in beiden Richtungen eine Bindung (Carbenium und
@@ -610,6 +688,13 @@ function valenceOf(a){
   if (a.el === 'H' || e.ve === 4) v = e.v - Math.abs(q);   // H⁺/H⁻, Carbenium/Carbanion
   else if (e.ve >= 5) v = e.v + q;                          // NH₄⁺: 4, O⁻: 1
   else v = e.v - q;                                         // Na⁺: 0, Mg²⁺: 0, BH₄⁻: 4
+  if (a.r) v -= 1;                                          // Radikal: ein Elektron bleibt ungepaart
+  /* Elemente ab der 3. Periode mit erweiterter Bindigkeit (Schreibweise mit
+     Doppelbindungen): H₂SO₄ (S: 6), SO₂ (S: 4), H₃PO₄ (P: 5), HClO₄ (Cl: 7) */
+  if (!q && !a.r && HYPER[a.el]){
+    const s = bondSum(a.id);
+    if (s > v && HYPER[a.el].includes(s)) v = s;
+  }
   return Math.max(0, v);
 }
 
@@ -632,7 +717,7 @@ function totalH(a){ return implicitH(a) + explicitH(a); }
 function lonePairs(a){
   if (isR(a.el)) return 0;
   const used = bondSum(a.id) + implicitH(a);
-  return Math.max(0, Math.floor((EL[a.el].ve - qOf(a) - used) / 2));
+  return Math.max(0, Math.floor((EL[a.el].ve - qOf(a) - used - (a.r ? 1 : 0)) / 2));
 }
 
 /* =======================================================================
@@ -821,6 +906,7 @@ function labelRuns(a){
     if (hCount > 1) hs.push({t:String(hCount), sub:true});
   }
   if (!hs.length) return sym.concat(qRun);
+  if (nb === 0 && q >= 0 && H_FIRST.includes(a.el)) return hs.concat(sym).concat(qRun);
 
   // Terminale Gruppe nach links spiegeln: H₃C– statt –CH₃
   if (nb === 1){
@@ -863,8 +949,14 @@ const ctx = cv.getContext('2d');
 const board = document.getElementById('board');
 let W = 800, H = 500, dpr = 1;
 
+const cssCache = new Map();          // wird bei Themenwechsel geleert
 function css(name){
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  let v = cssCache.get(name);
+  if (v === undefined){
+    v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    cssCache.set(name, v);
+  }
+  return v;
 }
 /* Schwarzweiß-Darstellung: alle Symbole in der Gerüstfarbe */
 const paint = v => css(state.mono ? '--el-C' : v);
@@ -1071,9 +1163,25 @@ function drawScene(c, opt){
         c.lineTo(x1 - dx*sh + nx*o, y1 - dy*sh + ny*o);
         c.stroke();
       } else {
-        const o = 3.1;
-        c.beginPath(); c.moveTo(x0+nx*o,y0+ny*o); c.lineTo(x1+nx*o,y1+ny*o); c.stroke();
-        c.beginPath(); c.moveTo(x0-nx*o,y0-ny*o); c.lineTo(x1-nx*o,y1-ny*o); c.stroke();
+        const sA = neighbors(A.id).filter(n => n.id !== B.id);
+        const sB = neighbors(B.id).filter(n => n.id !== A.id);
+        if (!ha && !hb && sA.length + sB.length > 0){
+          // Gerüstecken ohne Symbol: Hauptlinie bleibt in der Kette, die zweite
+          // Linie liegt verkürzt auf der Seite der Substituenten
+          let side = 0;
+          for (const n of sA.concat(sB)) side += (n.x - (A.x+B.x)/2)*nx + (n.y - (A.y+B.y)/2)*ny;
+          const o = 5.2 * (side < -1e-6 ? -1 : 1);
+          const s0 = sA.length ? 0.14 : 0.03, s1 = sB.length ? 0.14 : 0.03;
+          c.beginPath(); c.moveTo(x0,y0); c.lineTo(x1,y1); c.stroke();
+          c.beginPath();
+          c.moveTo(x0 + dx*s0 + nx*o, y0 + dy*s0 + ny*o);
+          c.lineTo(x1 - dx*s1 + nx*o, y1 - dy*s1 + ny*o);
+          c.stroke();
+        } else {
+          const o = 3.1;
+          c.beginPath(); c.moveTo(x0+nx*o,y0+ny*o); c.lineTo(x1+nx*o,y1+ny*o); c.stroke();
+          c.beginPath(); c.moveTo(x0-nx*o,y0-ny*o); c.lineTo(x1-nx*o,y1-ny*o); c.stroke();
+        }
       }
     } else {
       const o = 5.0;
@@ -1151,6 +1259,21 @@ function drawScene(c, opt){
     const runs = [{t:'\u03B4'}, {t: a.d === '+' ? '+' : '\u2212', sup:true}];
     ext(px, py, 12, 10);
     drawRuns(c, px, py, runs, paint(a.d === '+' ? '--el-O' : '--draw-accent'), FS * 0.86);
+  }
+
+  /* --- Radikale: ungepaartes Elektron als Punkt --- */
+  for (const a of atoms){
+    if (!a.r) continue;
+    const extra = (state.hMode === 'allLine'
+        ? hAtoms.filter(h => h.parent.id === a.id).map(h => angleTo(a, h)) : [])
+      .concat(lpDirs.get(a.id) || []);
+    const d = freeDirs(a, 1, extra, L * 0.5)[0];
+    const halo = halos.get(a.id);
+    const r = (halo ? Math.max(halo.hw, halo.hh) : 3) + 6;
+    const qx = a.x + r*Math.cos(d), qy = a.y + r*Math.sin(d);
+    ext(qx, qy, 4);
+    c.fillStyle = css('--el-C');
+    c.beginPath(); c.arc(qx, qy, 2.4, 0, TAU); c.fill();
   }
 
   /* --- Beschriftungen --- */
@@ -1421,6 +1544,9 @@ function render(){
     ctx.globalAlpha = 1;
   }
   placeSelBar();
+  // Auswertung folgt der Auswahl
+  const k = selection.size ? [...selection].join() : '';
+  if (k !== lastSelKey){ lastSelKey = k; updateReadout(); }
 }
 /* =======================================================================
    7. Auswertung: Summenformel, Molmasse, Halbstrukturformel
@@ -1432,7 +1558,7 @@ const uniSub = n => String(n).split('').map(d => SUBS[d]).join('');
 
 const SUPS = {'1':'¹','2':'²','3':'³','4':'⁴','+':'⁺','-':'⁻','\u2212':'⁻'};
 const uniSup = s => String(s).split('').map(d => SUPS[d] || d).join('');
-const totalCharge = () => atoms.reduce((s, a) => s + qOf(a), 0);
+const totalCharge = (list = atoms) => list.reduce((s, a) => s + qOf(a), 0);
 function chargeMarkup(q, mode){
   if (!q) return '';
   return mode === 'html' ? '<sup>' + chargeText(q) + '</sup>' : uniSup(chargeText(q));
@@ -1445,17 +1571,17 @@ function rLabel(el, count, mode){
   return 'R' + sup + cnt;
 }
 
-function counts(){
+function counts(list = atoms){
   const c = {};
-  for (const a of atoms){
+  for (const a of list){
     c[a.el] = (c[a.el] || 0) + 1;
     const ih = implicitH(a);
     if (ih) c.H = (c.H || 0) + ih;
   }
   return c;
 }
-function sumFormula(){
-  const c = counts();
+function sumFormula(list = atoms){
+  const c = counts(list);
   const keys = Object.keys(c);
   if (!keys.length) return {html:'—', text:'—'};
   const rKeys = keys.filter(isR).sort();
@@ -1465,8 +1591,14 @@ function sumFormula(){
   else if (c.H && plain.length === 2){
     // ohne Kohlenstoff: H₂O, H₂S, HCl – aber NH₃, PH₃ und als Anion OH⁻
     const x = plain.find(k => k !== 'H');
-    const anionO = x === 'O' && totalCharge() < 0;
+    const anionO = x === 'O' && totalCharge(list) < 0;
     if (H_FIRST.includes(x) && !anionO) order.push('H', x); else order.push(x, 'H');
+  }
+  else if (!c.C && c.H && c.O && plain.length >= 3){
+    // Oxosäuren: H zuerst, O zuletzt (HNO₃, H₂SO₄, H₃PO₄); Hydroxide: Metall, dann OH (NaOH)
+    const others = plain.filter(k => k !== 'H' && k !== 'O').sort((x, y) => seqKey(x) - seqKey(y));
+    const metal = others.some(k => PT[k] && (PT[k].g <= 12 || ['Al','Ga','In','Tl','Sn','Pb','Bi'].includes(k)));
+    if (metal) order.push(...others, 'O', 'H'); else order.push('H', ...others, 'O');
   }
   const rest = plain.filter(k => !order.includes(k));
   if (c.C) rest.sort();                                   // Hill-System: C, H, dann alphabetisch
@@ -1481,12 +1613,13 @@ function sumFormula(){
     html += rLabel(k, c[k], 'html');
     text += rLabel(k, c[k], 'text');
   }
-  const q = totalCharge();
+  if (list.some(a => a.r)){ html += '•'; text += '•'; }
+  const q = totalCharge(list);
   if (q){ html += chargeMarkup(q, 'html'); text += chargeMarkup(q, 'text'); }
   return {html, text};
 }
-function molarMass(){
-  const c = counts();
+function molarMass(list = atoms){
+  const c = counts(list);
   let m = 0, hasR = false;
   for (const k in c){
     if (isR(k)){ hasR = true; continue; }
@@ -1494,9 +1627,9 @@ function molarMass(){
   }
   return {m, hasR};
 }
-function massText(){
-  if (!atoms.length) return '—';
-  const {m, hasR} = molarMass();
+function massText(list = atoms){
+  if (!list.length) return '—';
+  const {m, hasR} = molarMass(list);
   return m.toFixed(2) + ' g/mol' + (hasR ? ' (ohne Reste)' : '');
 }
 
@@ -1570,7 +1703,7 @@ const BONDSYM = {1:'–', 2:'=', 3:'≡'};
 const EN_FIRST = ['O','N','S','F','Cl','Br','I'];   // H₂O, NH₃, HCl … statt OH₂
 function groupStr(id, mode, reverse){
   const a = byId(id);
-  const qm = chargeMarkup(qOf(a), mode);
+  const qm = (a.r ? '•' : '') + chargeMarkup(qOf(a), mode);
   if (isR(a.el)) return rLabel(a.el, 1, mode) + qm;
   const h = totalH(a);
   if (!h) return a.el + qm;
@@ -1594,8 +1727,9 @@ function branchStr(id, parent, allowed, mode, visited){
   }
   return s;
 }
-function condensed(mode){
-  const comps = componentsHeavy();
+function condensed(mode, only = null){
+  let comps = componentsHeavy();
+  if (only) comps = comps.filter(c => c.some(id => only.has(id)));
   const onlyH = atoms.length && !heavyAtoms().length;
   if (onlyH){
     const n = atoms.length;
@@ -1652,6 +1786,7 @@ function checks(){
   const tq = totalCharge();
   if (tq) out.push({type:'info', text:'Gesamtladung des Teilchens: ' + (tq > 0 ? '+' : '\u2212') + Math.abs(tq) + '.'});
   if (atoms.some(a => a.d)) out.push({type:'info', text:'δ-Zeichen kennzeichnen Partialladungen und verändern weder Formel noch Bindigkeit.'});
+  if (atoms.some(a => a.r)) out.push({type:'info', text:'Der Punkt kennzeichnet ein ungepaartes Elektron (Radikal); die Bindigkeit ist um eins vermindert.'});
   if (hasR) out.push({type:'info', text:'Reste (R) sind Platzhalter: Sie liefern keine H-Atome und gehen nicht in die molare Masse ein.'});
   const open = atoms.filter(a => a.el === 'C' && implicitH(a) > 0).length;
   if (state.manualH){
@@ -1672,14 +1807,47 @@ function checks(){
    ======================================================================= */
 const $ = s => document.querySelector(s);
 
+/* Auswertung je Teilchen (zusammenhängende Struktur). Sind Atome markiert,
+   bezieht sie sich nur auf die markierten Teilchen. Gleiche Teilchen werden
+   mit Koeffizient zusammengefasst: 2 H₂O. */
+function evalParts(){
+  const all = componentsAll().map(c => c.map(byId));
+  const picked = selection.size ? all.filter(c => c.some(a => selection.has(a.id))) : [];
+  const comps = picked.length ? picked : all;
+  const groups = new Map();
+  for (const c of comps){
+    const f = sumFormula(c);
+    const g = groups.get(f.html) || {n: 0, html: f.html, text: f.text, mass: massText(c)};
+    g.n++; groups.set(f.html, g);
+  }
+  const gs = [...groups.values()];
+  const co = g => (g.n > 1 ? g.n + ' ' : '');
+  return {
+    n: comps.length, sel: picked.length > 0,
+    only: picked.length ? new Set(picked.flat().map(a => a.id)) : null,
+    sumHtml: gs.length ? gs.map(g => co(g) + g.html).join(' + ') : '—',
+    sumText: gs.length ? gs.map(g => co(g) + g.text).join(' + ') : '—',
+    massHtml: !gs.length ? '—' : gs.length === 1 ? gs[0].mass : gs.map(g => g.html + ': ' + g.mass).join('<br>'),
+    multi: gs.length > 1
+  };
+}
+let lastSelKey = '';
+function updateReadout(){
+  const ev = evalParts();
+  const tag = ev.sel ? ' (Auswahl)' : (ev.n > 1 ? ' (' + ev.n + ' Teilchen)' : '');
+  $('#kSum').textContent = 'Summenformel' + tag;
+  $('#outSum').innerHTML = ev.sumHtml;
+  $('#outSum').classList.toggle('small', ev.sumHtml.length > 60);
+  $('#outMass').innerHTML = ev.massHtml;
+  $('#outMass').classList.toggle('small', ev.multi);
+  const cd = condensed('html', ev.only);
+  $('#outCond').innerHTML = atoms.length ? (cd.ok ? cd.text : 'für Ringe nicht möglich') : '—';
+  if (state.mode === 'halb' || state.mode === 'summe') renderTextMode();
+}
+
 function refresh(){
   render();
-  const sf = sumFormula();
-  $('#outSum').innerHTML = sf.html;
-  $('#outMass').textContent = massText();
-  const cd = condensed('html');
-  $('#outCond').innerHTML = atoms.length ? (cd.ok ? cd.text : 'für Ringe nicht möglich') : '—';
-
+  updateReadout();
   const box = $('#checks');
   box.innerHTML = '';
   const cks = checks();
@@ -1691,11 +1859,18 @@ function refresh(){
   }
   const errs = cks.filter(c => c.type === 'err').length;
   const sideClosed = document.querySelector('.layout').classList.contains('side-closed');
-  $('#hintWarn').textContent = errs ? (sideClosed ? 'Bindigkeit prüfen (Auswertung öffnen)' : 'Bindigkeit prüfen (siehe rechts)') : '';
+  const w = $('#hintWarn');
+  w.dataset.act = '';
+  w.textContent = errs ? (sideClosed ? 'Bindigkeit prüfen (Auswertung öffnen)' : 'Bindigkeit prüfen (siehe rechts)') : '';
+  if (!errs && isMech()){
+    const bb = sceneBounds(), P = pageRect();
+    if (bb && (bb.x0 < P.x0 || bb.y0 < P.y0 || bb.x1 > P.x1 || bb.y1 > P.y1)){
+      w.textContent = 'Teile der Zeichnung liegen außerhalb des Blattes';
+      w.dataset.act = 'fit';
+    }
+  }
   $('#btnUndo').disabled = !undoStack.length;
   $('#btnRedo').disabled = !redoStack.length;
-
-  if (state.mode === 'halb' || state.mode === 'summe') renderTextMode();
   scheduleSave();
 }
 
@@ -1709,11 +1884,12 @@ function renderTextMode(){
   }
   if (state.mode === 'summe'){
     eyebrow.textContent = 'Summenformel';
-    form.innerHTML = sumFormula().html;
-    note.textContent = 'Molare Masse: ' + massText();
+    const ev = evalParts();
+    form.innerHTML = ev.sumHtml.split(' + ').map(p => '<span class="frag">' + p + '</span>').join('');
+    note.innerHTML = 'Molare Masse' + (ev.multi ? '<br>' : ': ') + ev.massHtml;
   } else {
     eyebrow.textContent = 'Halbstrukturformel';
-    const cd = condensed('html');
+    const cd = condensed('html', evalParts().only);
     if (cd.ok){
       form.innerHTML = cd.text.split('  +  ').map(p => '<span class="frag">'+p+'</span>').join('');
       note.textContent = cd.ring
@@ -1727,13 +1903,13 @@ function renderTextMode(){
 }
 
 const HINTS = {
-  draw  : 'Tippen: Atom setzen bzw. Kette um ein Atom verlängern · Ziehen: Zickzack-Kette, je weiter, desto länger (Umschalt: andere Seite) · Tipp auf Bindung: Doppel-/Dreifachbindung · über einem Atom Taste O, N, S, Cl … ändert das Element.',
-  ring  : 'Freie Fläche: Ring setzen · Tipp auf eine Bindung: Ring anellieren (gemeinsame Bindung) · Tipp auf ein Atom: Ring anhängen · Tasten 3–7 und B wählen den Ring.',
-  select: 'Klick markiert, Umschalt+Klick ergänzt, Ziehen auf freier Fläche zieht einen Rahmen (Alt: Lasso) · Doppelklick: ganzes Teilchen · runder Griff: drehen · Strg+C / Strg+V / Strg+D.',
-  charge: 'Ladung oben wählen, dann auf ein Atom tippen (bei Auswahl: für alle markierten) · schneller: über einem Atom Taste + oder −.',
-  arrow : 'Von der Elektronenquelle zum Ziel ziehen · ein Tipp wählt einen Pfeil aus, der Mittelpunkt biegt ihn, die Enden lassen sich in der Auswahl verschieben.',
-  text  : 'Auf die Fläche tippen und schreiben, Enter übernimmt · Tipp auf einen Text bearbeitet ihn · H2O → H₂O, ^ stellt hoch, _ tief.',
-  erase : 'Tippen oder über Objekte wischen löscht Atome, Bindungen, Pfeile und Texte · Tipp in eine Auswahl löscht die ganze Auswahl.'
+  draw  : 'Tippen: Atom setzen oder Kette verlängern · Ziehen: Kette beliebiger Länge · Tipp auf Bindung: Doppel-/Dreifachbindung · mehr unter „?“',
+  ring  : 'Freie Fläche: Ring setzen · Bindung: anellieren · Atom: anhängen · Tasten 3–7, B = Benzol',
+  select: 'Klick markiert · Ziehen: Rahmen (Alt: Lasso) · Doppelklick: ganzes Teilchen · runder Griff dreht · Strg+C/V/D',
+  charge: 'Ladung oder Radikalpunkt wählen, dann auf ein Atom tippen · schneller: über dem Atom + , − oder . drücken',
+  arrow : 'Von der Elektronenquelle zum Ziel ziehen · Elektronenpfeile rasten an Atomen und Bindungen ein (Alt: frei)',
+  text  : 'Tippen und schreiben, Enter übernimmt · H2O → H₂O, ^ stellt hoch, _ tief',
+  erase : 'Tippen oder wischen löscht · Tipp in eine Auswahl löscht die ganze Auswahl'
 };
 
 /* =======================================================================
@@ -2141,7 +2317,8 @@ const HOVER_TYPES = {
   select: ['atom', 'bond', 'arrow', 'label'], erase: ['atom', 'bond', 'arrow', 'label']
 };
 let downPt = null, downScr = null, moved = false, swallowUp = false, lastTap = {hit: null, t: 0};
-let spaceDown = false, pinch = null;
+let spaceDown = false, pinch = null, activeId = null, penDown = false, penAt = 0;
+const ignored = new Set();
 const ptrs = new Map();
 const firstMove = d => { if (!d.undo){ pushUndo(); d.undo = true; } };
 
@@ -2171,6 +2348,25 @@ function updatePinch(){
   view.s = s; view.ox = mx - wx * s; view.oy = my - wy * s;
   render(); syncZoom();
 }
+/* Elektronenpfeile rasten ein: an einem Atom knapp neben dem Symbol (zur
+   Gegenseite hin), an einer Bindung in deren Mitte. Alt schaltet das ab. */
+function snapArrowPt(p, other){
+  const a = atomAt(p);
+  if (a){
+    const ang = Math.atan2(other.y - a.y, other.x - a.x);
+    const r = labelRuns(a) ? 14 : 6;
+    return {x: a.x + r * Math.cos(ang), y: a.y + r * Math.sin(ang)};
+  }
+  const b = bondAt(p);
+  if (b){ const A = byId(b.a), B = byId(b.b); return {x: (A.x + B.x) / 2, y: (A.y + B.y) / 2}; }
+  return p;
+}
+function applyCharge(t, ch){
+  if (ch.r){ t.r = 1; t.d = null; }
+  else if (ch.d){ t.d = ch.d; t.q = 0; }
+  else if (ch.q === 0){ t.q = 0; t.d = null; t.r = 0; }
+  else { t.q = ch.q; t.d = null; }
+}
 function eraseAt(p){
   const h = hitAt(p);
   if (!h) return;
@@ -2186,10 +2382,20 @@ function newArea(p, e){
 /* Wirkt ein Tipp auf ein markiertes Atom, gilt er für die ganze Auswahl */
 const targetsOf = at => (selection.has(at.id) && selection.size > 1) ? [...selection].map(byId).filter(Boolean) : [at];
 
+cv.addEventListener('contextmenu', e => e.preventDefault());
 cv.addEventListener('pointerdown', e => {
-  ptrs.set(e.pointerId, {x: e.clientX, y: e.clientY});
-  if (ptrs.size === 2){ cancelDrag(); startPinch(); e.preventDefault(); return; }
-  if (ptrs.size > 2 || e.button === 2) return;
+  if (e.pointerType === 'pen'){
+    // Stift hat Vorrang: aufliegende Finger/Handballen werden ignoriert
+    penAt = Date.now(); penDown = true;
+    if (ptrs.size){ ptrs.forEach((v, id) => ignored.add(id)); ptrs.clear(); pinch = null; cancelDrag(); }
+  } else if (e.pointerType === 'touch'){
+    if (penDown || Date.now() - penAt < 400){ ignored.add(e.pointerId); return; }
+    ptrs.set(e.pointerId, {x: e.clientX, y: e.clientY});
+    if (ptrs.size === 2){ cancelDrag(); startPinch(); e.preventDefault(); return; }
+    if (ptrs.size > 2) return;
+  }
+  if (e.button === 2) return;
+  activeId = e.pointerId;
   if (editLabel){ e.preventDefault(); commitEdit(); swallowUp = true; return; }
   e.preventDefault();
   try { cv.setPointerCapture(e.pointerId); } catch (err) {}
@@ -2208,7 +2414,7 @@ cv.addEventListener('pointerdown', e => {
   if (state.tool === 'arrow'){
     const am = arrowMidAt(p);
     if (am){ selArrow = am.id; drag = {bendArrow: am}; }
-    else drag = {arrowNew: {x1: p.x, y1: p.y, x2: p.x, y2: p.y}};
+    else drag = {arrowNew: {x1: p.x, y1: p.y, x2: p.x, y2: p.y, rx1: p.x, ry1: p.y}};
   }
   else if (state.tool === 'select'){
     const rh = rotHandle();
@@ -2243,8 +2449,11 @@ cv.addEventListener('pointerdown', e => {
 });
 
 cv.addEventListener('pointermove', e => {
+  if (ignored.has(e.pointerId)) return;
+  if (e.pointerType === 'pen') penAt = Date.now();
   if (ptrs.has(e.pointerId)) ptrs.set(e.pointerId, {x: e.clientX, y: e.clientY});
   if (pinch){ if (ptrs.size >= 2) updatePinch(); return; }
+  if (drag && e.pointerId !== activeId) return;
   const sp = spos(e);
   if (drag && drag.pan){
     view.ox = drag.ox + sp.x - drag.sx; view.oy = drag.oy + sp.y - drag.sy;
@@ -2281,12 +2490,22 @@ cv.addEventListener('pointermove', e => {
     render();
     return;
   }
-  if (drag && drag.arrowNew){ drag.arrowNew.x2 = p.x; drag.arrowNew.y2 = p.y; render(); return; }
+  if (drag && drag.arrowNew){
+    const n = drag.arrowNew;
+    n.x1 = n.rx1; n.y1 = n.ry1; n.x2 = p.x; n.y2 = p.y;
+    if (isElectronArrow(state.arrowKind) && !e.altKey){
+      const s2 = snapArrowPt(p, {x: n.rx1, y: n.ry1}); n.x2 = s2.x; n.y2 = s2.y;
+      const s1 = snapArrowPt({x: n.rx1, y: n.ry1}, s2); n.x1 = s1.x; n.y1 = s1.y;
+    }
+    render(); return;
+  }
   if (drag && drag.arrowEnd){
     if (!moved) return;
     firstMove(drag);
     const {ar, end} = drag.arrowEnd;
-    if (end === 1){ ar.x1 = p.x; ar.y1 = p.y; } else { ar.x2 = p.x; ar.y2 = p.y; }
+    const q = (isElectronArrow(ar.kind) && !e.altKey)
+      ? snapArrowPt(p, end === 1 ? {x: ar.x2, y: ar.y2} : {x: ar.x1, y: ar.y1}) : p;
+    if (end === 1){ ar.x1 = q.x; ar.y1 = q.y; } else { ar.x2 = q.x; ar.y2 = q.y; }
     render(); return;
   }
   if (drag && drag.selMove){
@@ -2322,9 +2541,11 @@ cv.addEventListener('pointermove', e => {
 });
 
 function endPointer(e){
+  if (ignored.delete(e.pointerId)) return true;
+  if (e.pointerType === 'pen'){ penDown = false; penAt = Date.now(); }
   ptrs.delete(e.pointerId);
   if (pinch){ if (ptrs.size < 2) pinch = null; return true; }
-  return false;
+  return e.pointerId !== activeId;
 }
 cv.addEventListener('pointercancel', e => {
   if (endPointer(e)) return;
@@ -2433,12 +2654,7 @@ cv.addEventListener('pointerup', e => {
     ringGhost = null;
   } else if (state.tool === 'charge' && a){
     pushUndo();
-    const ch = state.charge;
-    targetsOf(a).forEach(t => {
-      if (ch.d){ t.d = ch.d; t.q = 0; }
-      else if (ch.q === 0){ t.q = 0; t.d = null; }
-      else { t.q = ch.q; t.d = null; }
-    });
+    targetsOf(a).forEach(t => applyCharge(t, state.charge));
   } else if (state.tool === 'text'){
     openEditor(labelAt(p), p);
     return;
@@ -2513,6 +2729,8 @@ function placeSelBar(){
    ======================================================================= */
 function setTool(t){
   if (editLabel) commitEdit();
+  // Zeichenwerkzeuge arbeiten ohne Auswahl – sonst würde ein Elementknopf unbemerkt Markiertes ändern
+  if (t !== state.tool && ['draw', 'ring', 'arrow', 'text'].includes(t)) clearSel();
   state.tool = t;
   document.body.dataset.tool = t;
   if (t !== 'arrow') selArrow = null;
@@ -2704,13 +2922,11 @@ $('#btnAutoH').addEventListener('click', () => {
 // Ladungsknöpfe
 document.querySelectorAll('#charges button').forEach(b => {
   b.addEventListener('click', () => {
-    state.charge = b.dataset.d ? {q: 0, d: b.dataset.d} : {q: +b.dataset.q, d: null};
+    state.charge = b.dataset.rad ? {q: 0, d: null, r: 1} : (b.dataset.d ? {q: 0, d: b.dataset.d} : {q: +b.dataset.q, d: null});
     document.querySelectorAll('#charges button').forEach(x => x.classList.toggle('on', x === b));
     if (selection.size){
       pushUndo();
-      [...selection].map(byId).filter(Boolean).forEach(t => {
-        if (state.charge.d){ t.d = state.charge.d; t.q = 0; } else { t.q = state.charge.q; t.d = null; }
-      });
+      [...selection].map(byId).filter(Boolean).forEach(t => applyCharge(t, state.charge));
       refresh();
     }
     if (state.tool !== 'charge') setTool('charge');
@@ -2827,6 +3043,7 @@ $('#mono').addEventListener('change', e => { state.mono = e.target.checked; stor
 $('#whiteBg').addEventListener('change', e => {
   state.white = e.target.checked;
   document.documentElement.classList.toggle('paper-white', state.white);
+  cssCache.clear();
   refresh();
 });
 
@@ -3135,7 +3352,8 @@ $('#btnToFormel').addEventListener('click', () => {
   if (!copySel()){ $('#hint').textContent = 'Zuerst eine Struktur markieren (Auswahl, Doppelklick).'; return; }
   setWorkspace('formel', {then: () => {
     pushUndo(); atoms = []; bonds = []; arrows = []; labels = [];
-    pasteClip({x: 0, y: 0}); clearSel(); fitView(); refresh(); setTool('draw');
+    pasteClip({x: 0, y: 0}); undoStack.pop();      // ein einziger Rückgängig-Schritt
+    clearSel(); fitView(); refresh(); setTool('draw');
   }});
 });
 
@@ -3150,6 +3368,25 @@ function saveDocs(){
                                               nid: d.nid, orient: d.orient, manualH: d.manualH}));
   }
   store.set('sfe-ws', state.ws);
+  store.set('sfe-prefs', JSON.stringify({
+    mode: state.mode === 'struktur' ? 'struktur' : 'skelett', hMode: state.hMode, showC: state.showC,
+    lp: state.lp, grid: state.showGrid, white: state.white, align: state.align, selShape: state.selShape}));
+}
+function loadPrefs(){
+  let p; try { p = JSON.parse(store.get('sfe-prefs') || 'null'); } catch (e){ p = null; }
+  if (!p) return;
+  if (['none', 'dots', 'line'].includes(p.lp)) state.lp = p.lp;
+  state.showGrid = !!p.grid;
+  state.white = p.white !== false;
+  document.documentElement.classList.toggle('paper-white', state.white);
+  if (p.mode === 'struktur'){ state.mode = 'struktur'; state.showC = true; }
+  document.querySelectorAll('#modes button').forEach(b => b.classList.toggle('on', b.dataset.mode === state.mode));
+  if (['none', 'hetero', 'allText', 'allLine'].includes(p.hMode)) setH(p.hMode);
+  if (typeof p.showC === 'boolean') state.showC = p.showC;
+  if (['zz', '90', '45'].includes(p.align)) state.align = p.align;
+  if (['rect', 'lasso'].includes(p.selShape)) state.selShape = p.selShape;
+  document.querySelectorAll('#alignMode button').forEach(b => b.classList.toggle('on', b.dataset.align === state.align));
+  document.querySelectorAll('#selShape button').forEach(b => b.classList.toggle('on', b.dataset.shape === state.selShape));
 }
 function loadSaved(k){
   try {
@@ -3269,7 +3506,7 @@ const closeMenus = () => document.querySelectorAll('details.menu').forEach(m => 
 
 $('#btnPng').addEventListener('click', () => {
   if (!bbox()) return;
-  renderToCanvas('tight', isMech() ? DPI300 : 3).toBlob(b => download(b, fname('png')));
+  renderToCanvas('tight', 3).toBlob(b => download(b, fname('png')));
   closeMenus();
 });
 $('#btnSvg').addEventListener('click', () => {
@@ -3309,12 +3546,14 @@ $('#btnCopyImg').addEventListener('click', () => {
 
 /* --- Molekül-Code --- */
 function qCode(a){
-  if (a.d) return a.d === '+' ? 'd+' : 'd-';
+  const rad = a.r ? '.' : '';
+  if (a.d) return (a.d === '+' ? 'd+' : 'd-') + rad;
   const q = qOf(a);
-  return q ? (Math.abs(q) > 1 ? Math.abs(q) : '') + (q > 0 ? '+' : '-') : '';
+  return (q ? (Math.abs(q) > 1 ? Math.abs(q) : '') + (q > 0 ? '+' : '-') : '') + rad;
 }
 function applyQCode(atom, code){
   if (!code) return;
+  if (code.endsWith('.')){ atom.r = 1; code = code.slice(0, -1); if (!code) return; }
   if (code === 'd+'){ atom.d = '+'; return; }
   if (code === 'd-'){ atom.d = '-'; return; }
   const m = code.match(/^(\d*)([+-])$/);
@@ -3395,7 +3634,8 @@ $('#btnCodeSet').addEventListener('click', () => {
 
 // Formel kopieren
 $('#btnCopy').addEventListener('click', async () => {
-  const txt = state.mode === 'summe' ? sumFormula().text : condensed('text').text;
+  const ev0 = evalParts();
+  const txt = state.mode === 'summe' ? ev0.sumText : condensed('text', ev0.only).text;
   const btn = $('#btnCopy');
   try {
     await navigator.clipboard.writeText(txt);
@@ -3417,7 +3657,14 @@ $('#btnCopy').addEventListener('click', async () => {
    Ringwerkzeug: 3–7 Ringgröße, B Benzol                                       */
 window.addEventListener('keydown', e => {
   if (['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)) return;
+  if ($('#help').open) return;
   const k = e.key.toLowerCase();
+  if (e.key === '?' || e.key === 'F1'){ e.preventDefault(); $('#help').showModal(); return; }
+  if (state.mode === 'halb' || state.mode === 'summe'){
+    // Textansicht: die Zeichnung ist nicht sichtbar, also nur Rückgängig/Wiederholen
+    if ((e.ctrlKey || e.metaKey) && (k === 'z' || k === 'y')){ e.preventDefault(); if (k === 'y' || e.shiftKey) redo(); else undo(); }
+    return;
+  }
   if (e.key === ' '){
     e.preventDefault();
     if (!spaceDown){ spaceDown = true; cv.style.cursor = cursorFor(); }
@@ -3452,6 +3699,11 @@ window.addEventListener('keydown', e => {
     pushUndo();
     a.d = null;
     a.q = Math.max(-8, Math.min(8, qOf(a) + (e.key === '+' ? 1 : -1)));
+    refresh(); return;
+  }
+  if (e.key === '.' && hover && hover.type === 'atom'){
+    const a = byId(hover.id); if (!a) return;
+    pushUndo(); a.r = a.r ? 0 : 1; a.d = null;
     refresh(); return;
   }
   if (e.key === '+'){ zoomAt(W / 2, H / 2, 1.25); return; }
@@ -3612,7 +3864,7 @@ function setSide(open){
   refresh();
 }
 $('#btnPanel').addEventListener('click', () => setSide(document.querySelector('.layout').classList.contains('side-closed')));
-$('#hintWarn').addEventListener('click', () => setSide(true));
+$('#hintWarn').addEventListener('click', () => { if ($('#hintWarn').dataset.act === 'fit') fitView(); else setSide(true); });
 
 /* Catppuccin-Variante wählen: wirkt sofort und wird gemerkt */
 const FLAVORS = ['latte', 'frappe', 'macchiato', 'mocha'];
@@ -3621,10 +3873,14 @@ function setFlavor(f){
   document.documentElement.dataset.flavor = f;
   document.querySelectorAll('#flavor button').forEach(b => b.classList.toggle('on', b.dataset.flavor === f));
   store.set('sfe-flavor', f);
+  cssCache.clear();
   render();
 }
 document.querySelectorAll('#flavor button').forEach(b => b.addEventListener('click', () => setFlavor(b.dataset.flavor)));
 
+$('#btnHelp').addEventListener('click', () => $('#help').showModal());
+$('#helpClose').addEventListener('click', () => $('#help').close());
+$('#help').addEventListener('click', e => { if (e.target === $('#help')) $('#help').close(); });
 document.addEventListener('pointerdown', e => {
   document.querySelectorAll('details.menu').forEach(m => { if (m.open && !m.contains(e.target)) m.open = false; });
 });
@@ -3637,6 +3893,7 @@ docs.mech = loadSaved('mech');
 state.ws = store.get('sfe-ws') === 'mech' ? 'mech' : 'formel';
 syncWsUI();
 setFlavor(store.get('sfe-flavor') || 'mocha');
+loadPrefs();
 syncControls();
 syncArrowUI();
 resize();
