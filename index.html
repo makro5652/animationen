@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Interaktive Animationen – Chemie, Biologie &amp; Informatik</title>
-<meta name="description" content="Sammlung browserbasierter Modelle, Simulationen und Werkzeuge für den Chemie-, Biologie- und Informatikunterricht.">
+<meta name="description" content="Sammlung browserbasierter Modelle, Simulationen und Werkzeuge für den Chemie-, Biologie- und Informatikunterricht – inklusive digitaler Tafel (Tafelwerk) für den Unterrichtsalltag.">
 <script>
   /* Farbschema vor dem ersten Rendern setzen (verhindert kurzes Aufblitzen) */
   (function () {
@@ -202,6 +202,7 @@
   }
   .card[data-fach="Biologie"] { --c: var(--bio); }
   .card[data-fach="Informatik"] { --c: var(--inf); }
+  .card[data-fach="Allgemein"] { --c: var(--tool); }
   .gruppe[data-farbe="tool"] .card { --c: var(--tool); }
   .card:hover { transform: translateY(-2px); border-color: var(--line2); background: var(--panel2); }
   .tag {
@@ -256,6 +257,7 @@
   }
   .pill[data-fach="Biologie"] { --c: var(--bio); }
   .pill[data-fach="Informatik"] { --c: var(--inf); }
+  .pill[data-fach="Allgemein"] { --c: var(--tool); }
 
   footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--dim); font-size: 12.5px; }
 
@@ -303,7 +305,8 @@
       Diese Sammlung bündelt browserbasierte Modelle, Simulationen und Werkzeuge für den Chemie-, Biologie- und
       Informatikunterricht. Sie veranschaulichen Vorgänge auf Teilchen-, Zell- und Systemebene, die sich der direkten
       Beobachtung entziehen, und lassen sich ohne Installation im Browser nutzen &ndash; per Beamer im Plenum oder in
-      Einzel- und Partnerarbeit.
+      Einzel- und Partnerarbeit. Ergänzt wird das Angebot durch fächerübergreifende Werkzeuge für den Unterrichtsalltag,
+      etwa eine digitale Tafel mit Timer, Zufallsauswahl und Gruppenbildung.
     </p>
     <details class="hinweis">
       <summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Hinweise zur Nutzung</summary>
@@ -328,6 +331,7 @@
       <button type="button" data-filter-fach="Chemie" aria-pressed="false">Chemie</button>
       <button type="button" data-filter-fach="Biologie" aria-pressed="false">Biologie</button>
       <button type="button" data-filter-fach="Informatik" aria-pressed="false">Informatik</button>
+      <button type="button" data-filter-fach="Allgemein" aria-pressed="false">Allgemein</button>
     </div>
 
     <label>
@@ -356,7 +360,7 @@
     PFLEGEHINWEIS
     Jeder Eintrag ist ein <a class="card"> mit:
       href        = Dateiname der Animation (relativ, unverändert lassen)
-      data-fach   = Chemie | Biologie | Informatik
+      data-fach   = Chemie | Biologie | Informatik | Allgemein (fächerübergreifende Werkzeuge)
       data-typ    = Modell | Simulation | Werkzeug | Übung
       data-jg     = Jahrgangsstufe, z. B. "9" oder "10-12"
     Etikett, Jahrgangszeile und Tabellenansicht werden daraus automatisch erzeugt.
@@ -380,6 +384,16 @@
           <a class="card" href="strukturformel-editor.html" data-fach="Chemie" data-typ="Werkzeug" data-jg="10-12">
             <h3>Strukturformel-Editor</h3>
             <p>Erstellen und Zeichnen von Strukturformeln organischer Moleküle.</p>
+          </a>
+        </div>
+      </details>
+
+      <details class="thema" id="t-unterrichtsorganisation" data-label="Unterrichtsorganisation" open>
+        <summary><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Unterrichtsorganisation<span class="count"></span></summary>
+        <div class="grid">
+          <a class="card" href="tafelwerk.html" data-fach="Allgemein" data-typ="Werkzeug" data-jg="5-13">
+            <h3>Tafelwerk – digitale Tafel</h3>
+            <p>Frei anordenbare Unterrichtswidgets (Timer, Uhr, Zufallsauswahl, Gruppenbildung, Umfrage, Ampel, Arbeitssymbole, Lautstärkeanzeige u. a.) auf mehreren Tafelseiten; mit Stift, Bildern, PDFs und Hintergründen. Tafelbilder werden im Browser gespeichert und lassen sich als Datei exportieren.</p>
           </a>
         </div>
       </details>

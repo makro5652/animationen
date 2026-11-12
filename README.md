@@ -59,6 +59,12 @@ git clone https://github.com/makro5652/animationen.git
 | Regulation des Blutzuckerspiegels | [`Animation_Blutzuckerregulation.html`](Animation_Blutzuckerregulation.html) |
 | Das Immunsystem | [`immunsystem-klasse9.html`](immunsystem-klasse9.html) |
 
+### Werkzeuge für den Unterrichtsalltag (fächerübergreifend)
+
+| Thema | Datei |
+|---|---|
+| Tafelwerk – digitale Tafel mit Widgets, Seiten und exportierbaren Tafelbildern | [`tafelwerk.html`](tafelwerk.html) |
+
 ### Informatik
 
 | Thema | Datei |
