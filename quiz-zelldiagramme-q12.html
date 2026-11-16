@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz: Zelldiagramme und galvanische Elemente (Jgst. 12)</title>
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('idx-theme-v2');
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
+<style>
+  :root {
+    --ink:#EFF1F5; --panel:#E6E9EF; --panel2:#DCE0E8; --line:#CCD0DA; --line2:#ACB0BE;
+    --txt:#4C4F69; --dim:#6C6F85; --accent:#8839EF; --chem:#179299;
+    --ok:#40A02B; --bad:#D20F39; --glow:#E5E6F8;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color-scheme:light;
+  }
+  :root[data-theme="dark"] {
+    --ink:#303446; --panel:#414559; --panel2:#51576D; --line:#51576D; --line2:#626880;
+    --txt:#C6D0F5; --dim:#A5ADCE; --accent:#CA9EE6; --chem:#81C8BE;
+    --ok:#A6D189; --bad:#E78284; --glow:#3A3D57; color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 700px at 20% -10%,var(--glow) 0%,transparent 60%),var(--ink);
+    color:var(--txt);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+  .wrap{max-width:860px;margin:0 auto;padding:28px 16px 70px}
+  .back{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);text-decoration:none}
+  .back:hover{color:var(--txt)}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin:18px 0 8px}
+  h1{font-size:clamp(24px,4vw,34px);margin:0 0 10px;letter-spacing:-.02em;line-height:1.15}
+  h1 span{color:var(--accent)}
+  .sub{color:var(--dim);margin:0 0 16px;max-width:70ch}
+  .bar{position:sticky;top:0;z-index:10;padding:10px 0;background:color-mix(in srgb,var(--ink) 90%,transparent);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .barrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .prog{flex:1 1 180px;height:8px;border-radius:99px;background:var(--panel2);overflow:hidden}
+  .prog>i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+  .stat{font-family:var(--mono);font-size:12px;color:var(--dim);white-space:nowrap}
+  .btn{background:var(--panel);color:var(--dim);border:1px solid var(--line);border-radius:8px;font:500 13px var(--sans);
+    padding:8px 12px;cursor:pointer}
+  .btn:hover{color:var(--txt);background:var(--panel2)}
+  .btn[aria-expanded="true"]{color:var(--txt);box-shadow:inset 0 -2px 0 var(--accent)}
+  #tabelle{margin-top:10px;border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:12px 14px;max-height:60vh;overflow:auto}
+  #tabelle[hidden]{display:none}
+  table{border-collapse:collapse;width:100%;font-size:14px}
+  th,td{padding:5px 10px;border-bottom:1px solid var(--line);text-align:left}
+  th{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+  td.v{text-align:right;font-family:var(--mono);white-space:nowrap}
+  .note{font-size:12.5px;color:var(--dim);margin:8px 0 0}
+  h2{font-size:18px;margin:34px 0 4px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-top:14px;position:relative}
+  .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--line2);border-radius:12px 0 0 12px}
+  .card.ok::before{background:var(--ok)} .card.no::before{background:var(--bad)}
+  .qn{font-family:var(--mono);font-size:12px;color:var(--dim);letter-spacing:.1em}
+  .qt{font-weight:650;margin:2px 0 6px}
+  .zd{text-align:center;font-size:17px;padding:8px;margin:6px 0 8px;border-radius:8px;background:var(--panel2);overflow-x:auto;white-space:nowrap}
+  .opts{display:grid;gap:8px;margin-top:8px}
+  .opt{display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;background:var(--ink);color:var(--txt);
+    border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;cursor:pointer}
+  .opt:hover:not(:disabled){border-color:var(--accent)}
+  .opt b{font-family:var(--mono);color:var(--dim);flex:none}
+  .opt:disabled{cursor:default}
+  .opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 16%,var(--ink))}
+  .opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--ink))}
+  .fb{margin-top:10px;font-size:14.5px;padding:10px 12px;border-radius:10px;background:var(--panel2)}
+  .fb strong.ok{color:var(--ok)} .fb strong.no{color:var(--bad)}
+  #result{margin-top:30px;border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:18px}
+  #result[hidden]{display:none}
+  #result h3{margin:0 0 6px}
+  sup,sub{line-height:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">&larr; Übersicht</a>
+  <p class="eyebrow">Chemie · Jahrgangsstufe 12 · Übung</p>
+  <h1>Zelldiagramme und <span>galvanische Elemente</span></h1>
+  <p class="sub">27 Multiple-Choice-Fragen zu Zelldiagrammen, Standardpotentialen, Elektrolyse, elektrochemischer Doppelschicht und Konzentrationsabhängigkeit. Wähle je Frage genau eine Antwort; die Rückmeldung mit Begründung erscheint sofort. Die Tabelle der Standardpotentiale lässt sich jederzeit einblenden.</p>
+
+  <div class="bar">
+    <div class="barrow">
+      <button class="btn" id="tbtn" aria-expanded="false" aria-controls="tabelle">Tabelle der Standardpotentiale</button>
+      <div class="prog" aria-hidden="true"><i id="pbar"></i></div>
+      <span class="stat" id="stat" aria-live="polite"></span>
+      <button class="btn" id="reset">Zurücksetzen</button>
+    </div>
+    <div id="tabelle" hidden>
+      <table>
+        <thead><tr><th>Redoxpaar</th><th style="text-align:right">E° in V</th><th>Redoxpaar</th><th style="text-align:right">E° in V</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <p class="note">Standardbedingungen: 25 °C, c = 1 mol/L, p = 1 bar; Bezug: Standardwasserstoffelektrode (E° = 0 V). Auszug; Werte können in Tafelwerken geringfügig abweichen.</p>
+    </div>
+  </div>
+
+  <main id="quiz"></main>
+  <section id="result" hidden aria-live="polite"></section>
+</div>
+<script>
+const DATA = [{"s":"Teil A – Zelldiagramme und Redoxgleichungen"},{"n":1,"q":"Welche Zuordnung der Teilreaktionen ist richtig?","zd":"","q2":"","o":["Beide Teilreaktionen sind Oxidationen, da sich jeweils die Ladung des Teilchens ändert.","Fe^{3+} + e^{−} → Fe^{2+} ist eine Reduktion; Zn → Zn^{2+} + 2 e^{−} ist eine Oxidation.","Fe^{3+} + e^{−} → Fe^{2+} ist eine Oxidation; Zn → Zn^{2+} + 2 e^{−} ist eine Reduktion."],"a":1,"e":"Aufnahme von Elektronen = Reduktion (Fe^{3+} → Fe^{2+}); Abgabe von Elektronen = Oxidation (Zn → Zn^{2+})."},{"n":2,"q":"Gegeben ist das Zelldiagramm","zd":"Zn | Zn^{2+} (0,1 mol/L) ‖ Cu^{2+} (0,1 mol/L) | Cu","q2":"Welche Halbzelle ist die Anode (Ort der Oxidation)?","o":["Die Cu^{2+} | Cu-Halbzelle.","Beide Halbzellen sind gleichzeitig Anode.","Die Zn | Zn^{2+}-Halbzelle."],"a":2,"e":"Zink ist das unedlere Metall und wird oxidiert (Zn → Zn^{2+} + 2 e^{−}); im Zelldiagramm steht die Anode links."},{"n":3,"q":"Was kennzeichnet der doppelte senkrechte Strich ‖ in einem Zelldiagramm?","zd":"","q2":"","o":["Die Phasengrenze zwischen Metall und Lösung.","Die Salzbrücke bzw. das Diaphragma, das die beiden Halbzellen elektrolytisch verbindet.","Den Elektronenleiter zwischen den Elektroden."],"a":1,"e":"Der einfache Strich | steht für eine Phasengrenze (fest/flüssig); ‖ steht für die Trennung der Halbzellen durch eine ionenleitende Verbindung."},{"n":4,"q":"Gegeben ist das Zelldiagramm","zd":"Cu | Cu^{2+} (1 mol/L) ‖ Ag^{+} (1 mol/L) | Ag","q2":"Welche Gleichung beschreibt die Gesamtreaktion der Zelle?","o":["Cu + 2 Ag^{+} → Cu^{2+} + 2 Ag","Cu^{2+} + 2 Ag → Cu + 2 Ag^{+}","Cu + Ag^{+} → Cu^{2+} + Ag"],"a":0,"e":"Links wird oxidiert (Cu → Cu^{2+} + 2 e^{−}), rechts reduziert (Ag^{+} + e^{−} → Ag). Die Elektronenzahl muss ausgeglichen werden (×2). Die Gleichung Cu + Ag^{+} → Cu^{2+} + Ag ist nicht ladungsbilanziert."},{"n":5,"q":"In welche Richtung verläuft im äußeren Stromkreis des Daniell-Elements (Zn | Zn^{2+} ‖ Cu^{2+} | Cu) der Elektronenfluss?","zd":"","q2":"","o":["Von der Kupferelektrode zur Zinkelektrode.","Es fließen keine Elektronen, da die Salzbrücke den Stromkreis schließt.","Von der Zinkelektrode zur Kupferelektrode."],"a":2,"e":"Zink wird oxidiert, die frei werdenden Elektronen fließen über den Leiter zur Kupferelektrode (Ort der Reduktion). Die Salzbrücke leitet nur Ionen, keine Elektronen."},{"n":6,"q":"Welche Funktion hat die Salzbrücke in einer galvanischen Zelle?","zd":"","q2":"","o":["Sie schließt den Stromkreis durch gerichtete Bewegung von Ionen und gleicht Ladungsüberschüsse in den Halbzellen aus.","Sie transportiert die Elektronen von der Anode zur Kathode.","Sie liefert die Metallionen für die Reduktion an der Kathode nach."],"a":0,"e":"In der Anodenhalbzelle entstehen Kationen (Ladungsüberschuss +), in der Kathodenhalbzelle werden Kationen verbraucht. Die gerichtete Ionenbewegung in der Salzbrücke gleicht dies aus."},{"n":7,"q":"Eine galvanische Zelle besteht aus einer Mg | Mg^{2+}- und einer Fe | Fe^{2+}-Halbzelle (jeweils 1 mol/L). Welches Zelldiagramm ist korrekt notiert?","zd":"","q2":"","o":["Fe | Fe^{2+} (1 mol/L) ‖ Mg^{2+} (1 mol/L) | Mg","Mg | Mg^{2+} (1 mol/L) ‖ Fe^{2+} (1 mol/L) | Fe","Mg | Mg^{2+} (1 mol/L) | Fe^{2+} (1 mol/L) | Fe"],"a":1,"e":"Magnesium ist das unedlere Metall (E° = −2,36 V) und bildet die Anode (links). Das Diagramm mit Fe links vertauscht Anode und Kathode; das Diagramm ohne ‖ trennt die Halbzellen nicht."},{"s":"Teil B – Standardpotentiale und Zellspannung"},{"n":8,"q":"Warum wird der Standardwasserstoffelektrode das Potential E° = 0 V zugeordnet?","zd":"","q2":"","o":["Weil an der Platinelektrode keinerlei Reaktion stattfindet.","Weil Wasserstoff das unedelste aller Elemente ist.","Weil sich nur Potentialdifferenzen (Spannungen) messen lassen; deshalb wird ein Bezugspunkt per Definition festgelegt."],"a":2,"e":"Einzelpotentiale sind nicht absolut messbar. Alle Standardpotentiale beziehen sich auf die per Definition auf 0 V gesetzte Standardwasserstoffelektrode."},{"n":9,"q":"Wie wird die Standard-Zellspannung ΔE° einer galvanischen Zelle berechnet?","zd":"","q2":"","o":["ΔE° = E°(Kathode) − E°(Anode)","ΔE° = E°(Anode) − E°(Kathode)","ΔE° = E°(Anode) + E°(Kathode)"],"a":0,"e":"Die Zellspannung ist die Differenz der Potentiale: positiveres Potential (Kathode) minus negativeres Potential (Anode)."},{"n":10,"q":"Berechne die Standard-Zellspannung der Zelle","zd":"Zn | Zn^{2+} (1 mol/L) ‖ Cu^{2+} (1 mol/L) | Cu","q2":"(Tabelle der Standardpotentiale verwenden.)","o":["−1,10 V","+0,42 V","+1,10 V"],"a":2,"e":"ΔE° = E°(Cu^{2+}/Cu) − E°(Zn^{2+}/Zn) = +0,34 V − (−0,76 V) = +1,10 V. Der Wert +0,42 V entsteht durch fälschliches Subtrahieren der Beträge (0,76 V − 0,34 V)."},{"n":11,"q":"Welche Aussage über Standardpotentiale ist richtig?","zd":"","q2":"","o":["Je negativer E°, desto stärker oxidierend wirkt die oxidierte Form des Redoxpaares.","Je positiver E°, desto stärker oxidierend wirkt die oxidierte Form des Redoxpaares.","E° gibt nur an, wie viele Elektronen übertragen werden."],"a":1,"e":"Ein positives E° bedeutet, dass die oxidierte Form Elektronen leicht aufnimmt, also ein starkes Oxidationsmittel ist."},{"n":12,"q":"Welches der folgenden Teilchen ist laut Tabelle das stärkste Oxidationsmittel?","zd":"","q2":"","o":["Ag^{+}","Cu^{2+}","Cl_{2}"],"a":2,"e":"Das Redoxpaar Cl_{2}/Cl^{−} hat mit +1,36 V das positivste Potential der drei (Ag^{+}: +0,80 V; Cu^{2+}: +0,34 V)."},{"n":13,"q":"Eine Zelle wird aus den Halbzellen Al | Al^{3+} und Cu | Cu^{2+} aufgebaut (jeweils 1 mol/L). Welche Standard-Zellspannung ergibt sich?","zd":"","q2":"","o":["+1,32 V","+2,00 V","−2,00 V"],"a":1,"e":"ΔE° = +0,34 V − (−1,66 V) = +2,00 V. Der Wert +1,32 V entsteht durch Subtrahieren der Beträge (1,66 V − 0,34 V); −2,00 V durch Vertauschen von Anode und Kathode."},{"n":14,"q":"Welche Kombination aus zwei Halbzellen (jeweils 1 mol/L) liefert die größte Standard-Zellspannung?","zd":"","q2":"","o":["Zn | Zn^{2+} und Cu | Cu^{2+}","Mg | Mg^{2+} und Ag | Ag^{+}","Cu | Cu^{2+} und Ag | Ag^{+}"],"a":1,"e":"Mg/Ag: 0,80 − (−2,36) = 3,16 V; Zn/Cu: 1,10 V; Cu/Ag: 0,46 V. Je größer der Abstand der Standardpotentiale, desto größer die Zellspannung."},{"n":15,"q":"Was bedeutet eine positive Standard-Zellspannung (ΔE° > 0) für die formulierte Zellreaktion?","zd":"","q2":"","o":["Die Reaktion läuft ohne Energiezufuhr von außen spontan ab und kann elektrische Energie liefern.","Die Reaktion läuft nur ab, wenn von außen eine Spannung angelegt wird.","Über den Ablauf der Reaktion lässt sich keine Aussage treffen."],"a":0,"e":"ΔE° > 0 entspricht ΔG° < 0 (ΔG° = −z·F·ΔE°): Die Reaktion ist unter Standardbedingungen exergonisch und läuft spontan ab."},{"n":16,"q":"Ein Kupferblech wird in eine Zinksulfatlösung (c = 1 mol/L) getaucht. Was ist zu beobachten?","zd":"","q2":"","o":["Auf dem Kupferblech scheidet sich metallisches Zink ab.","Das Kupferblech löst sich unter Bildung von Cu^{2+}-Ionen auf.","Es findet keine Reaktion statt, da ΔE° für Cu + Zn^{2+} → Cu^{2+} + Zn negativ ist (−1,10 V)."],"a":2,"e":"Für die Reaktion Cu + Zn^{2+} → Cu^{2+} + Zn gilt ΔE° = −0,76 V − 0,34 V = −1,10 V < 0; sie läuft nicht spontan ab."},{"s":"Teil C – Galvanische Zelle und Elektrolyse"},{"n":17,"q":"Welche Aussage zum Vergleich von galvanischer Zelle und Elektrolysezelle ist richtig?","zd":"","q2":"","o":["In beiden Zelltypen findet an der Anode eine Reduktion statt.","In der galvanischen Zelle läuft eine spontane Redoxreaktion ab, die Strom liefert; in der Elektrolyse wird durch eine äußere Spannungsquelle eine nicht spontane Reaktion erzwungen.","In der Elektrolysezelle ist die Kathode der Ort der Oxidation."],"a":1,"e":"Definitionsgemäß ist die Anode immer der Ort der Oxidation, die Kathode der Ort der Reduktion – in beiden Zelltypen. Der Unterschied liegt in der Energierichtung."},{"n":18,"q":"In welche Richtung verläuft der Elektronenfluss im äußeren Stromkreis einer Elektrolysezelle?","zd":"","q2":"","o":["Von der Anode über die Spannungsquelle zur Kathode.","Von der Kathode über die Spannungsquelle zur Anode.","Die Richtung wechselt ständig."],"a":0,"e":"An der Anode werden Elektronen abgegeben (Oxidation); die Spannungsquelle befördert sie zur Kathode, wo sie bei der Reduktion aufgenommen werden."},{"n":19,"q":"Eine Kupfer(II)-chlorid-Lösung wird mit inerten Graphitelektroden elektrolysiert. Welche Reaktion läuft an der Anode ab?","zd":"","q2":"","o":["Cu^{2+} + 2 e^{−} → Cu","Cl_{2} + 2 e^{−} → 2 Cl^{−}","2 Cl^{−} → Cl_{2} + 2 e^{−}"],"a":2,"e":"An der Anode findet die Oxidation statt: Chlorid-Ionen werden zu Chlor oxidiert. Cu^{2+} wird an der Kathode zu Cu reduziert."},{"n":20,"q":"Welche Mindestspannung muss für die Elektrolyse einer CuCl_{2}-Lösung (c = 1 mol/L) theoretisch angelegt werden (Standardbedingungen, ohne Überspannung)?","zd":"","q2":"","o":["1,70 V","1,02 V","0,34 V"],"a":1,"e":"Zersetzungsspannung = E°(Cl_{2}/Cl^{−}) − E°(Cu^{2+}/Cu) = 1,36 V − 0,34 V = 1,02 V. In der Praxis liegt der Wert wegen Überspannungen und Widerständen höher."},{"n":21,"q":"Welche Reaktion läuft an der Anode bei der Elektrolyse von verdünnter Schwefelsäure (Graphitelektroden) ab?","zd":"","q2":"","o":["2 H_{2}O → O_{2} + 4 H^{+} + 4 e^{−}","2 H^{+} + 2 e^{−} → H_{2}","O_{2} + 4 H^{+} + 4 e^{−} → 2 H_{2}O"],"a":0,"e":"An der Anode wird oxidiert: Wasser wird zu Sauerstoff oxidiert. Die Reduktion von H^{+} zu H_{2} läuft an der Kathode ab; die Reaktion O_{2} + 4 H^{+} + 4 e^{−} → 2 H_{2}O ist die umgekehrte Reaktion (Reduktion)."},{"s":"Teil D – Elektrochemische Doppelschicht und Konzentrationsabhängigkeit"},{"n":22,"q":"Ein Zinkblech taucht in eine Zn^{2+}-haltige Lösung. Welche Ladungsverteilung bildet sich an der Phasengrenze aus (elektrochemische Doppelschicht)?","zd":"","q2":"","o":["Das Metall lädt sich positiv, die angrenzende Lösung negativ auf.","Das Metall lädt sich negativ, die angrenzende Lösung positiv auf.","Metall und Lösung bleiben elektrisch neutral."],"a":1,"e":"Zn-Atome gehen als Zn^{2+} in Lösung, die Elektronen verbleiben im Metall: Das Metall wird negativ, die Lösung an der Grenzfläche positiv."},{"n":23,"q":"Warum kommt der Übergang von Zn^{2+}-Ionen aus dem Blech in die Lösung nach kurzer Zeit scheinbar zum Stillstand?","zd":"","q2":"","o":["Weil das gesamte Zink des Blechs aufgebraucht ist.","Weil die Lösung an Zn^{2+} gesättigt ist.","Weil die entstehende Ladungstrennung den weiteren Übertritt hemmt und sich ein dynamisches Gleichgewicht Zn ⇌ Zn^{2+} + 2 e^{−} einstellt."],"a":2,"e":"Die elektrostatische Anziehung zwischen negativem Metall und positiver Lösungsschicht wirkt dem weiteren Ionenübertritt entgegen; Hin- und Rückreaktion laufen gleich schnell ab."},{"n":24,"q":"Das Potential der Cu^{2+}/Cu-Halbzelle (+0,34 V) ist positiver als das der Zn^{2+}/Zn-Halbzelle (−0,76 V). Welche Erklärung trifft zu?","zd":"","q2":"","o":["Zink hat die größere Tendenz, Ionen zu bilden; das Zinkblech lädt sich daher stärker negativ auf als das Kupferblech.","Kupfer hat die größere Tendenz, Ionen zu bilden; das Kupferblech lädt sich daher stärker negativ auf.","Die Potentiale hängen nur von der Größe der Metallbleche ab."],"a":0,"e":"Je unedler das Metall, desto weiter liegt das Gleichgewicht Me ⇌ Me^{n+} + n e^{−} auf der Seite der Ionen und desto negativer ist das Metall aufgeladen."},{"n":25,"q":"In einer Cu | Cu^{2+}-Halbzelle wird die Konzentration der Cu^{2+}-Ionen erhöht. Wie verändert sich das Potential dieser Halbzelle (Reduktionspotential)?","zd":"","q2":"","o":["Es sinkt (wird negativer).","Es bleibt unverändert.","Es steigt (wird positiver)."],"a":2,"e":"Mehr Cu^{2+} verschiebt das Gleichgewicht Cu^{2+} + 2 e^{−} ⇌ Cu nach rechts. Weniger Elektronen verbleiben im Blech, es lädt sich weniger negativ auf: Das Potential steigt."},{"n":26,"q":"Gegeben ist das Zelldiagramm","zd":"Zn | Zn^{2+} (0,01 mol/L) ‖ Cu^{2+} (1 mol/L) | Cu","q2":"Wie verhält sich die Zellspannung im Vergleich zur Standard-Zellspannung von 1,10 V?","o":["Sie ist größer als 1,10 V.","Sie ist kleiner als 1,10 V.","Sie ist gleich 1,10 V."],"a":0,"e":"Bei kleinerer Zn^{2+}-Konzentration liegt das Gleichgewicht Zn ⇌ Zn^{2+} + 2 e^{−} weiter rechts, das Zinkpotential wird negativer, die Potentialdifferenz zur Kupferhalbzelle größer (qualitativ; mit der Nernst-Gleichung ca. 1,16 V)."},{"n":27,"q":"Warum sinkt die Spannung eines Daniell-Elements im Betrieb allmählich ab?","zd":"","q2":"","o":["Weil die Zn-Elektrode dicker wird und der Widerstand steigt.","Weil c(Zn^{2+}) zunimmt und c(Cu^{2+}) abnimmt; die Potentiale beider Halbzellen nähern sich an, bis im Gleichgewicht ΔE = 0 gilt.","Die Spannung sinkt nicht, sondern bleibt bis zum völligen Verbrauch von Zink konstant bei 1,10 V."],"a":1,"e":"Mit fortschreitendem Umsatz verändern sich die Konzentrationen so, dass sich beide Halbzellenpotentiale einander angleichen; im Gleichgewichtszustand ist die Zelle „leer“."}];
+const POT = [["Li^{+} / Li","−3,04"],["Mg^{2+} / Mg","−2,36"],["Al^{3+} / Al","−1,66"],["Zn^{2+} / Zn","−0,76"],["Fe^{2+} / Fe","−0,44"],["Pb^{2+} / Pb","−0,13"],["2 H^{+} / H_{2}","0,00"],["Cu^{2+} / Cu","+0,34"],["I_{2} / 2 I^{−}","+0,54"],["Fe^{3+} / Fe^{2+}","+0,77"],["Ag^{+} / Ag","+0,80"],["Br_{2} / 2 Br^{−}","+1,07"],["O_{2} / 2 H_{2}O (pH 0)","+1,23"],["Cl_{2} / 2 Cl^{−}","+1,36"]];
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const fm = s => esc(s).replace(/\^\{([^}]*)\}/g,'<sup>$1</sup>').replace(/_\{([^}]*)\}/g,'<sub>$1</sub>');
+const Q = DATA.filter(d => d.n);
+const state = {};              // n -> gewählter Index
+const quiz = document.getElementById('quiz');
+
+function render() {
+  quiz.innerHTML = '';
+  DATA.forEach(d => {
+    if (d.s) { const h = document.createElement('h2'); h.textContent = d.s; quiz.appendChild(h); return; }
+    const c = document.createElement('article'); c.className = 'card'; c.id = 'q' + d.n;
+    let h = '<div class="qn">FRAGE ' + d.n + ' VON ' + Q.length + '</div><div class="qt">' + fm(d.q) + '</div>';
+    if (d.zd) h += '<div class="zd">' + fm(d.zd) + '</div>';
+    if (d.q2) h += '<div class="qt">' + fm(d.q2) + '</div>';
+    h += '<div class="opts">' + d.o.map((o,i) => '<button class="opt" data-n="'+d.n+'" data-i="'+i+'"><b>' + 'abc'[i] + ')</b><span>' + fm(o) + '</span></button>').join('') + '</div><div class="fb" hidden></div>';
+    c.innerHTML = h; quiz.appendChild(c);
+  });
+  quiz.querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => answer(+b.dataset.n, +b.dataset.i)));
+  update();
+}
+function answer(n, i) {
+  if (n in state) return;
+  state[n] = i;
+  const d = Q.find(x => x.n === n), c = document.getElementById('q' + n);
+  const ok = i === d.a;
+  c.classList.add(ok ? 'ok' : 'no');
+  c.querySelectorAll('.opt').forEach((b, k) => { b.disabled = true; if (k === d.a) b.classList.add('right'); else if (k === i) b.classList.add('wrong'); });
+  const fb = c.querySelector('.fb'); fb.hidden = false;
+  fb.innerHTML = '<strong class="' + (ok ? 'ok' : 'no') + '">' + (ok ? 'Richtig.' : 'Falsch.') + '</strong> ' + (ok ? '' : 'Richtig ist ' + 'abc'[d.a] + '). ') + fm(d.e);
+  update();
+}
+function update() {
+  const done = Object.keys(state).length, right = Q.filter(d => state[d.n] === d.a).length;
+  document.getElementById('pbar').style.width = (100 * done / Q.length) + '%';
+  document.getElementById('stat').textContent = done + ' / ' + Q.length + ' beantwortet · ' + right + ' richtig';
+  const r = document.getElementById('result');
+  if (done === Q.length) {
+    const wrongs = Q.filter(d => state[d.n] !== d.a).map(d => d.n);
+    r.hidden = false;
+    r.innerHTML = '<h3>Ergebnis: ' + right + ' von ' + Q.length + ' richtig (' + Math.round(100 * right / Q.length) + ' %)</h3>' +
+      (wrongs.length ? '<p>Noch einmal ansehen: Frage ' + wrongs.join(', ') + '.</p>' : '<p>Alle Fragen richtig beantwortet.</p>');
+  } else r.hidden = true;
+}
+document.getElementById('reset').addEventListener('click', () => { for (const k in state) delete state[k]; render(); window.scrollTo({top:0,behavior:'smooth'}); });
+const tb = document.getElementById('tbtn'), tab = document.getElementById('tabelle');
+tb.addEventListener('click', () => { const open = tab.hidden; tab.hidden = !open; tb.setAttribute('aria-expanded', open); });
+const body = document.getElementById('tbody');
+for (let i = 0; i < 7; i++) {
+  const a = POT[i], b = POT[i + 7];
+  body.insertAdjacentHTML('beforeend', '<tr><td>' + fm(a[0]) + '</td><td class="v">' + a[1] + '</td><td>' + fm(b[0]) + '</td><td class="v">' + b[1] + '</td></tr>');
+}
+render();
+</script>
+</body>
+</html>
