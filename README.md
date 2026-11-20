@@ -26,6 +26,7 @@ git clone https://github.com/makro5652/animationen.git
 | Teilchen- und Gitter-Simulation | [`Teilchenmodell_Anziehung.html`](Teilchenmodell_Anziehung.html) |
 | Schalenmodell | [`schalenmodell.html`](schalenmodell.html) |
 | Bindungslabor | [`Bindungslabor.html`](Bindungslabor.html) |
+| Ionen-Puzzle: Verhältnisformeln von Salzen (Atom- und Molekül-Ionen) | [`ionen-puzzle.html`](ionen-puzzle.html) |
 | Mystery: Das Rätsel der H₂-Flasche (Elektronenpaarbindung) | [`mystery-h2.html`](mystery-h2.html) |
 | EPA-Modell | [`EPA-Modell.html`](EPA-Modell.html) |
 | Dipol-Labor | [`dipollabor.html`](dipollabor.html) |

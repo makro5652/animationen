@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ionen-Puzzle – Verhältnisformeln von Salzen</title>
+<meta name="description" content="Salze aus Atom-Ionen und Molekül-Ionen als Puzzle zusammensetzen: Ladungsausgleich, Verhältnisformel und Name – mit Übungsmodus.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Patrick+Hand&display=swap">
+<style>
+  :root {
+    --paper: #fbf7ee;
+    --dots: #ddd5c3;
+    --ink: #2b2b2b;
+    --pencil: #6b665c;
+    --red: #c8423b;
+    --green: #2e8b57;
+    --blue: #2f6db3;
+    --marker: #ffe36e;
+    --note: #fff4a3;
+    --hand: 'Patrick Hand', 'Comic Neue', 'Segoe Print', 'Chalkboard SE', cursive;
+    --title: 'Caveat', 'Segoe Print', 'Chalkboard SE', cursive;
+    --sketch: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background-color: var(--paper);
+    background-image: radial-gradient(var(--dots) 1.1px, transparent 1.3px);
+    background-size: 22px 22px;
+    color: var(--ink);
+    font-family: var(--hand);
+    font-size: 17px;
+    line-height: 1.35;
+  }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+  /* ---------- Kopf ---------- */
+  header.top { padding: 10px 18px 0; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 6px 22px; }
+  .titel h1 { font-family: var(--title); font-size: 44px; line-height: .95; margin: 0; font-weight: 700; }
+  .titel h1 .mark { background: linear-gradient(transparent 55%, var(--marker) 55%, var(--marker) 88%, transparent 88%); padding: 0 4px; }
+  .titel p { margin: 2px 0 0; color: var(--pencil); font-size: 16px; }
+  .titel a.zurueck { color: var(--pencil); font-size: 15px; text-decoration: none; border-bottom: 1.5px dashed var(--pencil); }
+  .leiste { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; margin-left: auto; padding-bottom: 4px; }
+  .btn {
+    font-family: var(--hand); font-size: 17px; color: var(--ink); background: #fff;
+    border: 2px solid var(--ink); border-radius: var(--sketch);
+    padding: 3px 13px; cursor: pointer; box-shadow: 2px 2px 0 var(--ink);
+    transition: transform .08s;
+  }
+  .btn:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
+  .btn:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--ink); }
+  .btn.on { background: var(--marker); }
+  .btn:focus-visible { outline: 2px dashed var(--blue); outline-offset: 3px; }
+  .seg { display: inline-flex; gap: 4px; }
+  .chk { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; font-size: 16px; }
+  .chk input { width: 17px; height: 17px; accent-color: var(--ink); }
+
+  /* ---------- Hauptbereich ---------- */
+  .app {
+    display: grid; grid-template-columns: 190px 1fr 190px; gap: 10px;
+    padding: 8px 12px 0; height: calc(100vh - 118px); min-height: 540px;
+    user-select: none; -webkit-user-select: none;
+  }
+  .pal { overflow-y: auto; overflow-x: hidden; padding: 2px 2px 10px; scrollbar-width: thin; }
+  .pal h2 { font-family: var(--title); font-size: 30px; margin: 0 0 2px; text-align: center; line-height: 1; }
+  .pal h2 small { display: block; font-family: var(--hand); font-size: 14px; color: var(--pencil); font-weight: normal; }
+  .grp h3 {
+    font-family: var(--hand); font-weight: normal; font-size: 15px; margin: 8px 0 4px; text-align: center;
+    color: var(--pencil); border-bottom: 1.5px dashed var(--dots);
+  }
+  .pal-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 2px; }
+  .pal-item {
+    width: 86px; display: flex; flex-direction: column; align-items: center;
+    cursor: grab; touch-action: pan-y; border-radius: 10px; padding: 2px 0 4px;
+  }
+  .pal-item:hover { background: rgba(255, 227, 110, .35); }
+  .pal-item:focus-visible { outline: 2px dashed var(--blue); }
+  .pal-item .mini { position: relative; }
+  .pal-item .mini > .stueck { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  .pal-name { font-size: 12.5px; line-height: 1.05; text-align: center; color: var(--pencil); hyphens: auto; overflow-wrap: anywhere; padding: 0 2px; }
+  body.ohne-namen .pal-name { display: none; }
+  .pal-item.aus { display: none; }
+
+  .ws {
+    position: relative; overflow: hidden;
+    border: 2.5px solid var(--ink);
+    border-radius: 22px 9px 26px 12px / 12px 26px 9px 22px;
+    background: rgba(255, 255, 255, .6);
+    box-shadow: 4px 5px 0 rgba(43, 43, 43, .12);
+    touch-action: none;
+  }
+  .leer {
+    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: var(--pencil); text-align: center; pointer-events: none; padding: 20px;
+  }
+  .nur-klein { display: none; }
+  .leer .gross { font-family: var(--title); font-size: 34px; color: var(--ink); }
+  .leer svg { max-width: 92%; }
+
+  .cluster { position: absolute; }
+  .cluster > svg { display: block; overflow: visible; }
+  .cluster.ziel > svg { filter: drop-shadow(0 0 7px #f2b705); }
+  .cluster.abgelehnt > svg { filter: drop-shadow(0 0 7px #e0524b); }
+  .lbl {
+    position: absolute; display: flex; align-items: center; justify-content: center;
+    font-size: 23px; line-height: 1; cursor: grab; touch-action: none; white-space: nowrap;
+  }
+  .lbl.lang { font-size: 18.5px; }
+  .lbl sub, .cap sub, .info sub, .aufgabe sub, .merk sub { font-size: .68em; vertical-align: -.28em; line-height: 0; }
+  .lbl sup, .cap sup, .info sup, .aufgabe sup, .merk sup { font-size: .68em; vertical-align: .55em; line-height: 0; }
+  .griff {
+    position: absolute; width: 30px; height: 30px; left: -8px; top: -8px; cursor: move; touch-action: none;
+    background: #fff; border: 2px solid var(--ink); border-radius: 50% 45% 52% 48%; display: flex; align-items: center; justify-content: center;
+    box-shadow: 1.5px 1.5px 0 var(--ink); z-index: 2;
+  }
+  .cap {
+    position: absolute; left: 50%; transform: translateX(-50%); width: max-content; max-width: 290px;
+    text-align: center; font-size: 16px; line-height: 1.2; pointer-events: none;
+  }
+  .cap .formel { font-size: 30px; font-family: var(--hand); padding: 0 6px; background: linear-gradient(transparent 58%, var(--marker) 58%, var(--marker) 90%, transparent 90%); }
+  .cap .ok { color: var(--green); }
+  .cap .nok { color: var(--red); }
+  .cap .klein { color: var(--pencil); font-size: 14.5px; }
+
+  body.zieht, body.zieht * { user-select: none; -webkit-user-select: none; cursor: grabbing !important; }
+  .ghost { position: fixed; pointer-events: none; z-index: 60; transform: rotate(-3deg); opacity: .93; }
+  .ghost > svg { overflow: visible; display: block; }
+
+  .muell {
+    position: absolute; right: 10px; bottom: 8px; width: 78px; text-align: center; font-size: 13px; color: var(--pencil);
+    transition: transform .12s; pointer-events: none;
+  }
+  .muell.heiss { transform: scale(1.18) rotate(-4deg); color: var(--red); }
+
+  .info {
+    position: absolute; left: 12px; bottom: 12px; max-width: min(360px, calc(100% - 110px)); z-index: 8;
+    background: #fff; border: 2px solid var(--ink); border-radius: 14px 6px 16px 8px / 8px 16px 6px 14px;
+    box-shadow: 4px 4px 0 rgba(43, 43, 43, .16); padding: 8px 34px 10px 14px; display: none; font-size: 16px;
+  }
+  .info.offen { display: block; }
+  .info h4 { margin: 0 0 3px; font-family: var(--title); font-size: 27px; line-height: 1; font-weight: 700; }
+  .info p { margin: 3px 0; }
+  .info .gl { font-size: 18px; }
+  .x { position: absolute; right: 6px; top: 4px; background: none; border: none; font-family: var(--hand); font-size: 22px; cursor: pointer; color: var(--ink); line-height: 1; }
+
+  .aufgabe {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%) rotate(-.8deg); z-index: 7;
+    background: var(--note); border: 1.5px solid #d8c75a; box-shadow: 3px 4px 0 rgba(43, 43, 43, .14);
+    padding: 8px 14px 9px; min-width: 280px; max-width: calc(100% - 24px); display: none; text-align: center;
+  }
+  .aufgabe.offen { display: block; }
+  .aufgabe::before {
+    content: ""; position: absolute; top: -9px; left: 50%; width: 70px; height: 18px; transform: translateX(-50%) rotate(2deg);
+    background: rgba(200, 200, 190, .55);
+  }
+  .aufgabe .frage { font-size: 21px; }
+  .aufgabe .frage b { font-size: 25px; }
+  .aufgabe .knoepfe { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 6px; }
+  .aufgabe .btn { font-size: 15.5px; padding: 2px 10px; }
+  .aufgabe .rueck { margin-top: 6px; min-height: 1.2em; font-size: 16.5px; }
+  .aufgabe .rueck.richtig { color: var(--green); }
+  .aufgabe .rueck.falsch { color: var(--red); }
+  .aufgabe .stand { font-size: 13.5px; color: var(--pencil); margin-top: 2px; }
+  .aufgabe select { font-family: var(--hand); font-size: 15px; border: 1.5px solid var(--ink); border-radius: 6px; background: #fff; padding: 1px 4px; }
+  .aufgabe .opts { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; font-size: 14.5px; margin-bottom: 4px; color: var(--pencil); }
+
+  /* ---------- Merkkasten ---------- */
+  .unten { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; padding: 18px 14px 8px; max-width: 1400px; margin: 0 auto; }
+  .merk {
+    background: #fff; border: 2px solid var(--ink); border-radius: 18px 7px 20px 9px / 9px 20px 7px 18px;
+    padding: 10px 16px 12px; box-shadow: 4px 4px 0 rgba(43, 43, 43, .12); position: relative;
+  }
+  .merk h3 { font-family: var(--title); font-size: 30px; margin: 0 0 4px; line-height: 1; }
+  .merk h3 span { background: linear-gradient(transparent 55%, var(--marker) 55%, var(--marker) 90%, transparent 90%); padding: 0 3px; }
+  .merk ol, .merk ul { margin: 4px 0; padding-left: 22px; }
+  .merk li { margin: 3px 0; }
+  .merk dl { margin: 4px 0; }
+  .merk dt { font-weight: bold; }
+  .merk dd { margin: 0 0 6px 14px; color: #444; }
+  .legende { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+  .legende figure { margin: 0; display: flex; align-items: center; gap: 6px; }
+  footer { text-align: center; color: var(--pencil); font-size: 14px; padding: 6px 12px 18px; }
+  footer a { color: var(--pencil); }
+
+  /* ---------- schmale Bildschirme ---------- */
+  @media (max-width: 860px) {
+    .titel h1 { font-size: 36px; }
+    .nur-gross { display: none; } .nur-klein { display: inline; }
+    .leer svg { display: none; }
+    .leiste { margin-left: 0; }
+    .app { grid-template-columns: 1fr; grid-template-rows: auto 62vh auto; height: auto; min-height: 0; }
+    .pal { overflow-x: auto; overflow-y: hidden; padding-bottom: 4px; }
+    .pal h2 { text-align: left; font-size: 24px; }
+    .pal h2 small { display: inline; margin-left: 6px; }
+    .pal-inner { display: flex; gap: 6px; width: max-content; }
+    .grp { display: flex; align-items: flex-start; gap: 4px; }
+    .grp h3 { writing-mode: vertical-rl; transform: rotate(180deg); border: none; border-left: 1.5px dashed var(--dots); margin: 0; padding: 0 2px; font-size: 13px; }
+    .pal-grid { flex-wrap: nowrap; align-items: flex-start; }
+    .pal-item { touch-action: pan-x; width: 80px; }
+    .info { max-width: calc(100% - 24px); bottom: 70px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- globale SVG-Definitionen: Bleistift-Wackeln und Schraffur -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="rough2" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="11" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#2b2b2b" stroke-width="1.4" opacity=".42"/>
+    </pattern>
+  </defs>
+</svg>
+
+<header class="top">
+  <div class="titel">
+    <h1><span class="mark">Ionen-Puzzle</span></h1>
+    <p>Salze aus Atom-Ionen und Molekül-Ionen zusammensetzen &middot; <a class="zurueck" href="index.html">zur Übersicht</a></p>
+  </div>
+  <div class="leiste">
+    <div class="seg" role="group" aria-label="Ionen filtern">
+      <button type="button" class="btn on" data-filter="alle">alle Ionen</button>
+      <button type="button" class="btn" data-filter="atom">Atom-Ionen</button>
+      <button type="button" class="btn" data-filter="mol">Molekül-Ionen</button>
+    </div>
+    <label class="chk"><input type="checkbox" id="chkNamen" checked> Namen</label>
+    <label class="chk"><input type="checkbox" id="chkErgebnis" checked> Formel &amp; Name zeigen</label>
+    <button type="button" class="btn" id="btnUebung">Übungsmodus</button>
+    <button type="button" class="btn" id="btnLeeren">Leeren</button>
+    <button type="button" class="btn" id="btnVoll" title="Vollbild">Vollbild</button>
+  </div>
+</header>
+
+<div class="app">
+  <aside class="pal" id="palK" aria-label="Kationen">
+    <h2>Kationen <small>positiv geladen</small></h2>
+    <div class="pal-inner"></div>
+  </aside>
+
+  <main class="ws" id="ws" aria-label="Arbeitsfläche">
+    <div class="leer" id="leer">
+      <div class="gross">Ziehe Ionen hierher!</div>
+      <div><span class="nur-gross">Kationen von links, Anionen von rechts.</span><span class="nur-klein">Kationen von oben, Anionen von unten.</span> Die Teile passen nur zusammen,<br>wenn sich die Ladungen ausgleichen.</div>
+      <svg width="420" height="70" viewBox="0 0 420 70" aria-hidden="true">
+        <path d="M10 40 C 60 10, 110 60, 160 34" fill="none" stroke="#6b665c" stroke-width="2.2" stroke-linecap="round" filter="url(#rough)"/>
+        <path d="M150 26 L162 34 L149 42" fill="none" stroke="#6b665c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M410 40 C 360 10, 310 60, 260 34" fill="none" stroke="#6b665c" stroke-width="2.2" stroke-linecap="round" filter="url(#rough)"/>
+        <path d="M270 26 L258 34 L271 42" fill="none" stroke="#6b665c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <div class="aufgabe" id="aufgabe" aria-live="polite">
+      <div class="opts">
+        <label>Ionen:
+          <select id="selStufe">
+            <option value="1">nur Atom-Ionen</option>
+            <option value="2" selected>auch Molekül-Ionen</option>
+          </select>
+        </label>
+        <label>Vorgabe:
+          <select id="selForm">
+            <option value="name">Name</option>
+            <option value="formel">Formel</option>
+            <option value="mix" selected>gemischt</option>
+          </select>
+        </label>
+      </div>
+      <div class="frage" id="frage"></div>
+      <div class="knoepfe">
+        <button type="button" class="btn" id="btnPruefen">Prüfen</button>
+        <button type="button" class="btn" id="btnLoesung">Lösung zeigen</button>
+        <button type="button" class="btn" id="btnNeu">Nächste Aufgabe</button>
+      </div>
+      <div class="rueck" id="rueck"></div>
+      <div class="stand" id="stand"></div>
+    </div>
+
+    <div class="info" id="info" role="dialog" aria-live="polite">
+      <button type="button" class="x" id="infoX" aria-label="Schließen">&times;</button>
+      <div id="infoInhalt"></div>
+    </div>
+
+    <div class="muell" id="muell" aria-hidden="true">
+      <svg width="52" height="58" viewBox="0 0 52 58">
+        <g fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" filter="url(#rough)">
+          <path d="M8 14 H44"/><path d="M19 14 V8 H33 V14"/>
+          <path d="M11 14 L14 52 H38 L41 14"/>
+          <path d="M20 22 L21 45 M26 22 V45 M32 22 L31 45"/>
+        </g>
+      </svg>
+      <div>zum Löschen hierher ziehen</div>
+    </div>
+  </main>
+
+  <aside class="pal" id="palA" aria-label="Anionen">
+    <h2>Anionen <small>negativ geladen</small></h2>
+    <div class="pal-inner"></div>
+  </aside>
+</div>
+
+<section class="unten">
+  <div class="merk">
+    <h3><span>So funktioniert das Puzzle</span></h3>
+    <div class="legende" id="legende"></div>
+    <ul>
+      <li>Jede <b>Kerbe</b> am Kation steht für <b>eine positive Ladung</b>.</li>
+      <li>Jede <b>Noppe</b> am Anion steht für <b>eine negative Ladung</b>.</li>
+      <li>Ein <b>schraffierter Rand</b> zeigt ein <b>Molekül-Ion</b>: Es besteht aus mehreren Atomen.</li>
+      <li>Ein Salz ist <b>elektrisch neutral</b>, wenn alle Kerben gefüllt sind und keine Noppe übrig bleibt.</li>
+      <li>Ein Ion antippen: Informationen erscheinen. Ein Teil aus der Verbindung ziehen: Es wird wieder abgelöst. Mit dem runden Griff verschiebst du die ganze Verbindung.</li>
+    </ul>
+  </div>
+  <div class="merk">
+    <h3><span>Verhältnisformel aufstellen</span></h3>
+    <ol>
+      <li>Ionen mit Ladung notieren: Al<sup>3+</sup> und SO<sub>4</sub><sup>2−</sup></li>
+      <li>Die Summe aller Ladungen muss null sein. Das kleinste gemeinsame Vielfache (kgV) von 3 und 2 ist 6.</li>
+      <li>Anzahl berechnen: 6 : 3 = <b>2</b> Al<sup>3+</sup> und 6 : 2 = <b>3</b> SO<sub>4</sub><sup>2−</sup></li>
+      <li>Ein Molekül-Ion kommt in <b>Klammern</b>, wenn es mehr als einmal vorkommt: Al<sub>2</sub>(SO<sub>4</sub>)<sub>3</sub></li>
+      <li>In der Verhältnisformel stehen keine Ladungen. Das Zahlenverhältnis wird so weit wie möglich gekürzt.</li>
+      <li>Römische Zahlen im Namen geben die Ladung des Metall-Ions an: Eisen(III)-chlorid enthält Fe<sup>3+</sup>.</li>
+    </ol>
+  </div>
+  <div class="merk">
+    <h3><span>Wortspeicher</span></h3>
+    <dl>
+      <dt>das Ion, die Ionen</dt><dd>geladenes Teilchen; es hat mehr oder weniger Elektronen als Protonen</dd>
+      <dt>das Kation, die Kationen</dt><dd>positiv geladenes Ion, z. B. Na<sup>+</sup></dd>
+      <dt>das Anion, die Anionen</dt><dd>negativ geladenes Ion, z. B. Cl<sup>−</sup></dd>
+      <dt>das Molekül-Ion, die Molekül-Ionen</dt><dd>geladenes Teilchen aus mehreren Atomen, z. B. NO<sub>3</sub><sup>−</sup></dd>
+      <dt>die Verhältnisformel, die Verhältnisformeln</dt><dd>Formel eines Salzes; sie zeigt das Zahlenverhältnis der Ionen</dd>
+      <dt>der Index, die Indizes</dt><dd>kleine tiefgestellte Zahl in einer Formel; sie gibt eine Anzahl an</dd>
+      <dt>die Ladung, die Ladungen</dt><dd>elektrische Eigenschaft eines Teilchens: positiv oder negativ</dd>
+    </dl>
+  </div>
+</section>
+
+<footer>
+  Idee angelehnt an das Ion Model von javalab.org &middot; eigene Umsetzung für den Chemieunterricht &middot; CC BY-ND 4.0
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ================= Daten ================= */
+  var U = 46;   // Höhe pro Elementarladung (px)
+  var W = 96;   // Breite eines Puzzleteils
+  var R = 10;   // Radius Kerbe/Noppe
+  var P = 14;   // Rand im Cluster-SVG
+
+  var KAT = [
+    { id: 'Li',  f: 'Li',  q: 1, n: 'Lithium',    ng: 'He', c: '#f6a5a0' },
+    { id: 'Na',  f: 'Na',  q: 1, n: 'Natrium',    ng: 'Ne', c: '#ffd166' },
+    { id: 'K',   f: 'K',   q: 1, n: 'Kalium',     ng: 'Ar', c: '#f5a9d6' },
+    { id: 'Ag',  f: 'Ag',  q: 1, n: 'Silber',     nb: 1,    c: '#d9dde2' },
+    { id: 'Cu1', f: 'Cu',  q: 1, n: 'Kupfer(I)',  nb: 1,    c: '#f2b880' },
+    { id: 'NH4', f: 'NH4', q: 1, n: 'Ammonium',   mol: 1,   c: '#b9e38f' },
+    { id: 'Mg',  f: 'Mg',  q: 2, n: 'Magnesium',  ng: 'Ne', c: '#c9b8f0' },
+    { id: 'Ca',  f: 'Ca',  q: 2, n: 'Calcium',    ng: 'Ar', c: '#ffb27a' },
+    { id: 'Ba',  f: 'Ba',  q: 2, n: 'Barium',     ng: 'Xe', c: '#e3e384' },
+    { id: 'Zn',  f: 'Zn',  q: 2, n: 'Zink',       nb: 1,    c: '#bccadb' },
+    { id: 'Cu2', f: 'Cu',  q: 2, n: 'Kupfer(II)', nb: 1,    c: '#7fd1e8' },
+    { id: 'Fe2', f: 'Fe',  q: 2, n: 'Eisen(II)',  nb: 1,    c: '#a6cfa9' },
+    { id: 'Pb2', f: 'Pb',  q: 2, n: 'Blei(II)',             c: '#adadbd' },
+    { id: 'Fe3', f: 'Fe',  q: 3, n: 'Eisen(III)', nb: 1,    c: '#ec9a7c' },
+    { id: 'Al',  f: 'Al',  q: 3, n: 'Aluminium',  ng: 'Ne', c: '#d3dde2' }
+  ];
+
+  var AN = [
+    { id: 'F',      f: 'F',      q: 1, s: 'fluorid',            ng: 'Ne', c: '#cdf2c2' },
+    { id: 'Cl',     f: 'Cl',     q: 1, s: 'chlorid',            ng: 'Ar', c: '#9ed68c' },
+    { id: 'Br',     f: 'Br',     q: 1, s: 'bromid',             ng: 'Kr', c: '#e3a47d' },
+    { id: 'I',      f: 'I',      q: 1, s: 'iodid',              ng: 'Xe', c: '#b8a2de' },
+    { id: 'O',      f: 'O',      q: 2, s: 'oxid',               ng: 'Ne', c: '#76aee0' },
+    { id: 'S',      f: 'S',      q: 2, s: 'sulfid',             ng: 'Ar', c: '#f6e061' },
+    { id: 'N',      f: 'N',      q: 3, s: 'nitrid',             ng: 'Ne', c: '#abc3ea' },
+    { id: 'OH',     f: 'OH',     q: 1, s: 'hydroxid',           mol: 1, c: '#91d5f5' },
+    { id: 'NO3',    f: 'NO3',    q: 1, s: 'nitrat',             mol: 1, c: '#f6bb73' },
+    { id: 'NO2',    f: 'NO2',    q: 1, s: 'nitrit',             mol: 1, c: '#f8d8a3' },
+    { id: 'HCO3',   f: 'HCO3',   q: 1, s: 'hydrogencarbonat',   mol: 1, c: '#b6ecf2' },
+    { id: 'HSO4',   f: 'HSO4',   q: 1, s: 'hydrogensulfat',     mol: 1, c: '#d9edb3' },
+    { id: 'H2PO4',  f: 'H2PO4',  q: 1, s: 'dihydrogenphosphat', mol: 1, c: '#d3f5cb' },
+    { id: 'CH3COO', f: 'CH3COO', q: 1, s: 'acetat',             mol: 1, c: '#f3c6fb' },
+    { id: 'MnO4',   f: 'MnO4',   q: 1, s: 'permanganat',        mol: 1, c: '#e69edb' },
+    { id: 'CO3',    f: 'CO3',    q: 2, s: 'carbonat',           mol: 1, c: '#86d6fa' },
+    { id: 'SO4',    f: 'SO4',    q: 2, s: 'sulfat',             mol: 1, c: '#b1d784' },
+    { id: 'SO3',    f: 'SO3',    q: 2, s: 'sulfit',             mol: 1, c: '#dfe979' },
+    { id: 'HPO4',   f: 'HPO4',   q: 2, s: 'hydrogenphosphat',   mol: 1, c: '#a8d8aa' },
+    { id: 'CrO4',   f: 'CrO4',   q: 2, s: 'chromat',            mol: 1, c: '#ffe286' },
+    { id: 'Cr2O7',  f: 'Cr2O7',  q: 2, s: 'dichromat',          mol: 1, c: '#ffb952' },
+    { id: 'PO4',    f: 'PO4',    q: 3, s: 'phosphat',           mol: 1, c: '#9fcf68' }
+  ];
+
+  var ELEM = { H: 'Wasserstoff', C: 'Kohlenstoff', N: 'Stickstoff', O: 'Sauerstoff', S: 'Schwefel',
+               P: 'Phosphor', Mn: 'Mangan', Cr: 'Chrom' };
+
+  var KM = {}, AM = {};
+  KAT.forEach(function (i) { KM[i.id] = i; });
+  AN.forEach(function (i) { AM[i.id] = i; });
+
+  /* bekannte Salze für den Übungsmodus [Kation, Anion] */
+  var AUFGABEN = [
+    ['Na','Cl'], ['K','Br'], ['Li','F'], ['Ca','Cl'], ['Ba','Cl'], ['Mg','O'], ['Al','O'], ['Na','O'],
+    ['Ca','F'], ['Fe3','Cl'], ['Fe2','S'], ['Cu2','O'], ['Cu1','O'], ['Ag','Cl'], ['Fe3','O'], ['Cu2','Cl'],
+    ['Pb2','I'], ['Zn','S'], ['Mg','N'], ['Li','N'], ['Al','Cl'], ['K','I'], ['Ag','Br'], ['Ca','O'],
+    ['Ba','SO4'], ['Ca','CO3'], ['Na','HCO3'], ['Na','CO3'], ['K','NO3'], ['Ag','NO3'], ['NH4','Cl'],
+    ['NH4','SO4'], ['Ca','OH'], ['Na','OH'], ['Al','OH'], ['Fe3','OH'], ['Ca','PO4'], ['Cu2','SO4'],
+    ['Al','SO4'], ['K','MnO4'], ['Na','CH3COO'], ['K','Cr2O7'], ['Pb2','NO3'], ['Zn','SO4'],
+    ['Na','H2PO4'], ['Na','HPO4'], ['Mg','OH'], ['Na','SO3'], ['Na','NO2'], ['Fe2','SO4'], ['Li','CO3'],
+    ['K','PO4'], ['Ca','HCO3'], ['NH4','NO3'], ['NH4','PO4'], ['K','CrO4'], ['K','HSO4'], ['Mg','SO4'],
+    ['Ca','NO3'], ['Cu2','NO3'], ['Fe3','SO4'], ['Ba','OH']
+  ];
+
+  /* ================= Hilfsfunktionen ================= */
+  function fmt(f) { return f.replace(/(\d+)/g, '<sub>$1</sub>'); }
+  function ladung(q, sgn) { return (q > 1 ? q : '') + (sgn > 0 ? '+' : '−'); }
+  function ionHTML(ion, art) { return fmt(ion.f) + '<sup>' + ladung(ion.q, art === 'k' ? 1 : -1) + '</sup>'; }
+  function gross(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function ionName(ion, art) { return art === 'k' ? ion.n + '-Ion' : gross(ion.s) + '-Ion'; }
+  function ggT(a, b) { while (b) { var t = b; b = a % b; a = t; } return a; }
+  function kgV(a, b) { return a * b / ggT(a, b); }
+  function vz(x) { return x > 0 ? '+' + x : (x < 0 ? '−' + (-x) : '0'); }
+  function salzName(k, a) { return /\)$/.test(k.n) ? k.n + '-' + a.s : k.n + a.s; }
+  function teil(ion, n) {
+    if (n === 1) return fmt(ion.f);
+    return ion.mol ? '(' + fmt(ion.f) + ')<sub>' + n + '</sub>' : fmt(ion.f) + '<sub>' + n + '</sub>';
+  }
+  function salzFormel(k, a, nk, na) {
+    var g = ggT(nk, na);
+    return teil(k, nk / g) + teil(a, na / g);
+  }
+  function zusammensetzung(f) {
+    var re = /([A-Z][a-z]?)(\d*)/g, m, z = {}, ord = [];
+    while ((m = re.exec(f))) {
+      if (!(m[1] in z)) { z[m[1]] = 0; ord.push(m[1]); }
+      z[m[1]] += m[2] ? parseInt(m[2], 10) : 1;
+    }
+    return ord.map(function (e) { return z[e] + ' ' + (ELEM[e] || e) + '-Atom' + (z[e] > 1 ? 'e' : ''); });
+  }
+
+  /* ================= Puzzleteile zeichnen ================= */
+  function pfadK(x, y, n) {            // Kation: Kerben rechts
+    var d = 'M' + x + ' ' + y + ' H' + (x + W);
+    for (var i = 0; i < n; i++) {
+      var cy = y + i * U + U / 2;
+      d += ' V' + (cy - R) + ' A' + R + ' ' + R + ' 0 0 0 ' + (x + W) + ' ' + (cy + R);
+    }
+    return d + ' V' + (y + n * U) + ' H' + x + ' Z';
+  }
+  function pfadA(x, y, n) {            // Anion: Noppen links
+    var d = 'M' + x + ' ' + y + ' H' + (x + W) + ' V' + (y + n * U) + ' H' + x;
+    for (var i = n - 1; i >= 0; i--) {
+      var cy = y + i * U + U / 2;
+      d += ' V' + (cy + R) + ' A' + R + ' ' + R + ' 0 0 1 ' + x + ' ' + (cy - R);
+    }
+    return d + ' Z';
+  }
+  function teilSVG(art, ion, x, y) {
+    var d = art === 'k' ? pfadK(x, y, ion.q) : pfadA(x, y, ion.q);
+    var h = ion.q * U;
+    var s = '<path d="' + d + '" transform="translate(3.5 4)" fill="#2b2b2b" opacity=".15"/>';
+    s += '<path d="' + d + '" transform="translate(-1.6 1.4)" fill="' + ion.c + '"/>';
+    if (ion.mol) {
+      var bx = art === 'k' ? x : x + W - 14;
+      s += '<rect x="' + bx + '" y="' + y + '" width="14" height="' + h + '" fill="url(#hatch)"/>';
+      var lx = art === 'k' ? x + 14 : x + W - 14;
+      s += '<path d="M' + lx + ' ' + (y + 3) + ' V' + (y + h - 3) + '" stroke="#2b2b2b" stroke-width="1.3" opacity=".6" filter="url(#rough2)"/>';
+    }
+    s += '<path d="' + d + '" fill="none" stroke="#2b2b2b" stroke-width="2.4" stroke-linejoin="round" filter="url(#rough)"/>';
+    s += '<path d="' + d + '" fill="none" stroke="#2b2b2b" stroke-width="1" opacity=".38" transform="translate(1.3 -1)" filter="url(#rough2)"/>';
+    return s;
+  }
+  function geisterSVG(art, x, y, n) {   // gestrichelte Lücke: hier fehlt noch etwas
+    var d = art === 'k' ? pfadK(x, y, n) : pfadA(x, y, n);
+    var s = '<path d="' + d + '" fill="rgba(255,255,255,.45)" stroke="#8a8478" stroke-width="2" stroke-dasharray="7 6" stroke-linejoin="round" filter="url(#rough2)"/>';
+    s += '<text x="' + (x + W / 2) + '" y="' + (y + n * U / 2 + 10) + '" text-anchor="middle" font-family="Caveat, cursive" font-size="32" font-weight="700" fill="#8a8478">?</text>';
+    return s;
+  }
+  function labelHTML(ion, art, x, y, extraAttr) {
+    var lang = ion.f.length >= 5 ? ' lang' : '';
+    var lx = art === 'k' ? x + (ion.mol ? 14 : 0) : x;
+    var w = W - (ion.mol ? 14 : 0) - (art === 'k' ? R : 0);
+    if (art === 'a') lx = x + R;
+    if (art === 'a') w = W - R - (ion.mol ? 14 : 0);
+    return '<div class="lbl' + lang + '" style="left:' + lx + 'px;top:' + y + 'px;width:' + w + 'px;height:' + (ion.q * U) + 'px" ' +
+      (extraAttr || '') + '><span>' + ionHTML(ion, art) + '</span></div>';
+  }
+  /* Einzelnes Teil als HTML (Palette, Geist beim Ziehen) */
+  function einzelteil(art, ion) {
+    var w = 2 * P + W, h = 2 * P + ion.q * U;
+    var x0 = art === 'k' ? P : P;
+    return '<svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">' + teilSVG(art, ion, x0, P) + '</svg>' +
+      labelHTML(ion, art, x0, P, '');
+  }
+
+  /* ================= Zustand ================= */
+  var ws = document.getElementById('ws');
+  var leer = document.getElementById('leer');
+  var muell = document.getElementById('muell');
+  var cl = [];            // Verbindungen: {id,x,y,k,nk,a,na}
+  var nid = 1;
+  var opt = { filter: 'alle', ergebnis: true };
+  var aufgabe = null, uebung = false, geloest = 0, gestellt = 0, ergebnisVorUebung = true;
+
+  /* ================= Palette ================= */
+  function baueGruppe(liste, art, titel) {
+    var sec = document.createElement('section');
+    sec.className = 'grp';
+    sec.innerHTML = '<h3>' + titel + '</h3><div class="pal-grid"></div>';
+    var grid = sec.querySelector('.pal-grid');
+    var S = 0.62;
+    liste.forEach(function (ion) {
+      var it = document.createElement('div');
+      it.className = 'pal-item';
+      it.tabIndex = 0;
+      it.dataset.art = art;
+      it.dataset.id = ion.id;
+      it.dataset.mol = ion.mol ? '1' : '0';
+      it.setAttribute('role', 'button');
+      it.setAttribute('aria-label', ionName(ion, art) + ' – auf die Arbeitsfläche ziehen');
+      var w = (2 * P + W) * S, h = (2 * P + ion.q * U) * S;
+      it.innerHTML = '<div class="mini" style="width:' + w + 'px;height:' + h + 'px">' +
+        '<div class="stueck" style="transform:scale(' + S + ')">' + einzelteil(art, ion) + '</div></div>' +
+        '<div class="pal-name">' + ionName(ion, art) + '</div>';
+      grid.appendChild(it);
+    });
+    return sec;
+  }
+  function bauePalette() {
+    var k = document.querySelector('#palK .pal-inner');
+    k.appendChild(baueGruppe(KAT.filter(function (i) { return !i.mol; }), 'k', 'Atom-Ionen'));
+    k.appendChild(baueGruppe(KAT.filter(function (i) { return i.mol; }), 'k', 'Molekül-Ionen'));
+    var a = document.querySelector('#palA .pal-inner');
+    a.appendChild(baueGruppe(AN.filter(function (i) { return !i.mol; }), 'a', 'Atom-Ionen'));
+    a.appendChild(baueGruppe(AN.filter(function (i) { return i.mol; }), 'a', 'Molekül-Ionen'));
+  }
+  function filterAnwenden() {
+    document.querySelectorAll('.grp').forEach(function (g) {
+      var istMol = g.querySelector('h3').textContent.indexOf('Molekül') === 0;
+      g.style.display = (opt.filter === 'alle' || (opt.filter === 'mol') === istMol) ? '' : 'none';
+    });
+  }
+
+  /* ================= Verbindungen auswerten & zeichnen ================= */
+  function analyse(c) {
+    var k = c.k ? KM[c.k] : null, a = c.a ? AM[c.a] : null;
+    var pos = k ? k.q * c.nk : 0, neg = a ? a.q * c.na : 0;
+    var r = { c: c, k: k, a: a, pos: pos, neg: neg, beide: !!(k && a), neutral: !!(k && a) && pos === neg };
+    if (r.neutral) { r.formel = salzFormel(k, a, c.nk, c.na); r.name = salzName(k, a); }
+    return r;
+  }
+  function groesse(c) {
+    var r = analyse(c);
+    var H = Math.max(r.pos, r.neg, 1);
+    return { w: 2 * P + 2 * W, h: 2 * P + H * U, H: H, r: r };
+  }
+  function beschriftung(r) {
+    var c = r.c, t = '';
+    if (!r.beide) {
+      var q = r.pos - r.neg;
+      t += '<div class="nok">Gesamtladung: ' + vz(q) + '</div>';
+      t += '<div class="klein">' + (q > 0 ? 'Es fehlen Anionen.' : 'Es fehlen Kationen.') + '</div>';
+      return t;
+    }
+    var rechnung = c.nk + '·(+' + r.k.q + ') + ' + c.na + '·(−' + r.a.q + ') = ' + vz(r.pos - r.neg);
+    if (r.neutral) {
+      if (opt.ergebnis) {
+        t += '<div><span class="formel">' + r.formel + '</span></div>';
+        t += '<div>' + r.name + '</div>';
+      } else {
+        t += '<div class="ok" style="font-size:20px">neutral ✓</div>';
+      }
+      var g = ggT(c.nk, c.na);
+      t += '<div class="klein">' + rechnung + '</div>';
+      t += '<div class="klein">Verhältnis ' + ionHTML(r.k, 'k') + ' : ' + ionHTML(r.a, 'a') + ' = ' + (c.nk / g) + ' : ' + (c.na / g) +
+        (g > 1 ? ' (gekürzt aus ' + c.nk + ' : ' + c.na + ')' : '') + '</div>';
+    } else {
+      t += '<div class="nok">nicht neutral</div>';
+      t += '<div class="klein">' + rechnung + '</div>';
+      t += '<div class="klein">' + (r.pos > r.neg ? 'Es fehlen negative Ladungen.' : 'Es fehlen positive Ladungen.') + '</div>';
+    }
+    return t;
+  }
+  var GRIFF = '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><g fill="none" stroke="#2b2b2b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M9 1.5V16.5M1.5 9H16.5"/><path d="M6.5 4L9 1.5 11.5 4M6.5 14L9 16.5 11.5 14M4 6.5L1.5 9 4 11.5M14 6.5L16.5 9 14 11.5"/></g></svg>';
+
+  function zeichne() {
+    ws.querySelectorAll('.cluster').forEach(function (e) { e.remove(); });
+    leer.style.display = cl.length ? 'none' : '';
+    cl.forEach(function (c) {
+      var g = groesse(c), r = g.r;
+      var el = document.createElement('div');
+      el.className = 'cluster';
+      el.dataset.cid = c.id;
+      el.style.left = c.x + 'px';
+      el.style.top = c.y + 'px';
+      el.style.width = g.w + 'px';
+      var svg = '<svg width="' + g.w + '" height="' + g.h + '" viewBox="0 0 ' + g.w + ' ' + g.h + '">';
+      var html = '';
+      if (r.pos > r.neg) svg += geisterSVG('a', P + W, P + r.neg * U, r.pos - r.neg);
+      if (r.neg > r.pos) svg += geisterSVG('k', P, P + r.pos * U, r.neg - r.pos);
+      var i, y;
+      if (r.k) for (i = 0; i < c.nk; i++) {
+        y = P + i * r.k.q * U;
+        svg += teilSVG('k', r.k, P, y);
+        html += labelHTML(r.k, 'k', P, y, 'data-art="k" data-cid="' + c.id + '"');
+      }
+      if (r.a) for (i = 0; i < c.na; i++) {
+        y = P + i * r.a.q * U;
+        svg += teilSVG('a', r.a, P + W, y);
+        html += labelHTML(r.a, 'a', P + W, y, 'data-art="a" data-cid="' + c.id + '"');
+      }
+      if (r.neutral) {
+        svg += '<path d="M' + (g.w - 26) + ' ' + (P - 2) + ' l7 8 l14 -18" fill="none" stroke="#2e8b57" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" filter="url(#rough)"/>';
+      }
+      svg += '</svg>';
+      el.innerHTML = svg + html +
+        '<div class="griff" data-cid="' + c.id + '" title="Verbindung verschieben">' + GRIFF + '</div>' +
+        '<div class="cap" style="top:' + (g.h - P + 6) + 'px">' + beschriftung(r) + '</div>';
+      ws.appendChild(el);
+    });
+  }
+
+  /* ================= Info-Kärtchen ================= */
+  var info = document.getElementById('info'), infoInhalt = document.getElementById('infoInhalt');
+  function zeigeInfo(art, ion) {
+    var t = '<h4>' + ionHTML(ion, art) + ' &nbsp;' + ionName(ion, art) + '</h4>';
+    t += '<p>' + (art === 'k' ? 'Kation' : 'Anion') + ' · Ladung: ' + ladung(ion.q, art === 'k' ? 1 : -1) +
+      ' · ' + (ion.mol ? 'Molekül-Ion' : 'Atom-Ion') + '</p>';
+    if (ion.mol) {
+      t += '<p>Aufbau: ' + zusammensetzung(ion.f).join(', ') + '. Die Atome sind durch Elektronenpaarbindungen verbunden; ' +
+        'das ganze Teilchen trägt die Ladung ' + ladung(ion.q, art === 'k' ? 1 : -1) + '.</p>';
+    } else {
+      var e = ion.q > 1 ? ion.q + ' e<sup>−</sup>' : 'e<sup>−</sup>';
+      t += '<p class="gl">' + (art === 'k'
+        ? fmt(ion.f) + ' → ' + ionHTML(ion, art) + ' + ' + e
+        : fmt(ion.f) + ' + ' + e + ' → ' + ionHTML(ion, art)) + '</p>';
+      if (ion.ng) t += '<p>Das Ion hat dieselbe Elektronenkonfiguration wie ein ' + ion.ng + '-Atom (Edelgaskonfiguration).</p>';
+      else if (ion.nb) t += '<p>Nebengruppenelement: Das Ion hat keine Edelgaskonfiguration.' +
+        (/\(/.test(ion.n) ? ' Die römische Zahl im Namen gibt die Ladung an.' : '') + '</p>';
+      else t += '<p>Das Ion hat keine Edelgaskonfiguration. Die römische Zahl im Namen gibt die Ladung an.</p>';
+    }
+    if (ion.id === 'CH3COO') t += '<p>Hinweis: Acetate werden oft auch so geschrieben: CH<sub>3</sub>COONa.</p>';
+    infoInhalt.innerHTML = t;
+    info.classList.add('offen');
+  }
+  document.getElementById('infoX').addEventListener('click', function () { info.classList.remove('offen'); });
+
+  /* ================= Ziehen & Ablegen ================= */
+  var warte = null, zug = null;
+
+  function wsRect() { return ws.getBoundingClientRect(); }
+  function ueberMuell(x, y) {
+    var r = muell.getBoundingClientRect();
+    return x > r.left - 14 && x < r.right + 14 && y > r.top - 14 && y < r.bottom + 14;
+  }
+  function inWs(x, y) { var r = wsRect(); return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; }
+
+  function findeZiel(art, ion, px, py) {   // px,py = linke obere Ecke des Teils (Arbeitsflächen-Koordinaten)
+    var best = null, bestA = 0, w = W, h = ion.q * U;
+    cl.forEach(function (c) {
+      var g = groesse(c), m = 26;
+      var x1 = Math.max(px, c.x - m), y1 = Math.max(py, c.y - m);
+      var x2 = Math.min(px + w, c.x + g.w + m), y2 = Math.min(py + h, c.y + g.h + m);
+      var A = (x2 - x1) * (y2 - y1);
+      if (x2 > x1 && y2 > y1 && A > bestA) { bestA = A; best = c; }
+    });
+    if (!best) return null;
+    var ok = art === 'k' ? (!best.k || best.k === ion.id) : (!best.a || best.a === ion.id);
+    return { c: best, ok: ok };
+  }
+  function markiere(z) {
+    ws.querySelectorAll('.cluster').forEach(function (e) { e.classList.remove('ziel', 'abgelehnt'); });
+    if (!z) return;
+    var e = ws.querySelector('.cluster[data-cid="' + z.c.id + '"]');
+    if (e) e.classList.add(z.ok ? 'ziel' : 'abgelehnt');
+  }
+  function begrenze(c) {
+    var r = wsRect(), g = groesse(c);
+    c.x = Math.max(-P + 4, Math.min(c.x, r.width - g.w));
+    c.y = Math.max(-P + 4, Math.min(c.y, r.height - g.h - 40));
+  }
+
+  function zugStarten(e) {
+    var i = warte.info;
+    if (i.typ === 'griff') {
+      var c = cl.find(function (k) { return k.id === i.cid; });
+      if (!c) return;
+      zug = { typ: 'cluster', c: c, dx: warte.sx - c.x, dy: warte.sy - c.y };
+      document.body.classList.add('zieht');
+      return;
+    }
+    var ion = i.art === 'k' ? KM[i.id] : AM[i.id];
+    if (i.typ === 'teil') {           // aus Verbindung herauslösen
+      var cc = cl.find(function (k) { return k.id === i.cid; });
+      if (cc) {
+        if (i.art === 'k') { cc.nk--; if (!cc.nk) cc.k = null; }
+        else { cc.na--; if (!cc.na) cc.a = null; }
+        if (!cc.k && !cc.a) cl = cl.filter(function (k) { return k !== cc; });
+        zeichne();
+      }
+    }
+    var g = document.createElement('div');
+    g.className = 'ghost';
+    g.innerHTML = einzelteil(i.art, ion);
+    g.style.width = (2 * P + W) + 'px';
+    document.body.appendChild(g);
+    zug = { typ: 'ion', art: i.art, ion: ion, el: g };
+    document.body.classList.add('zieht');
+    info.classList.remove('offen');
+  }
+  function zugBewegen(e) {
+    if (zug.typ === 'cluster') {
+      var r = wsRect();
+      zug.c.x = e.clientX - r.left - zug.dx;
+      zug.c.y = e.clientY - r.top - zug.dy;
+      var el = ws.querySelector('.cluster[data-cid="' + zug.c.id + '"]');
+      if (el) { el.style.left = zug.c.x + 'px'; el.style.top = zug.c.y + 'px'; }
+      muell.classList.toggle('heiss', ueberMuell(e.clientX, e.clientY));
+      return;
+    }
+    var h = zug.ion.q * U;
+    zug.el.style.left = (e.clientX - P - W / 2) + 'px';
+    zug.el.style.top = (e.clientY - P - h / 2) + 'px';
+    var heiss = ueberMuell(e.clientX, e.clientY);
+    muell.classList.toggle('heiss', heiss);
+    if (inWs(e.clientX, e.clientY) && !heiss) {
+      var rr = wsRect();
+      markiere(findeZiel(zug.art, zug.ion, e.clientX - rr.left - W / 2, e.clientY - rr.top - h / 2));
+    } else markiere(null);
+  }
+  function zugBeenden(e) {
+    var x = e.clientX, y = e.clientY;
+    document.body.classList.remove('zieht');
+    muell.classList.remove('heiss');
+    markiere(null);
+    if (zug.typ === 'cluster') {
+      if (ueberMuell(x, y) || !inWs(x, y)) cl = cl.filter(function (k) { return k !== zug.c; });
+      else begrenze(zug.c);
+      zug = null; zeichne(); return;
+    }
+    zug.el.remove();
+    if (inWs(x, y) && !ueberMuell(x, y)) {
+      var r = wsRect(), h = zug.ion.q * U;
+      var px = x - r.left - W / 2, py = y - r.top - h / 2;
+      var z = findeZiel(zug.art, zug.ion, px, py);
+      if (z && z.ok) {
+        if (zug.art === 'k') { z.c.k = zug.ion.id; z.c.nk++; } else { z.c.a = zug.ion.id; z.c.na++; }
+        begrenze(z.c);
+      } else {
+        var c = { id: nid++, k: null, nk: 0, a: null, na: 0, y: py - P };
+        if (zug.art === 'k') { c.k = zug.ion.id; c.nk = 1; c.x = px - P; }
+        else { c.a = zug.ion.id; c.na = 1; c.x = px - P - W; }
+        if (z && !z.ok) {            // Nicht passend: daneben ablegen
+          var gz = groesse(z.c);
+          c.x = z.c.x + gz.w + 20; c.y = z.c.y;
+          hinweis('In einer Verbindung gibt es hier nur eine Kationen-Sorte und eine Anionen-Sorte.');
+        }
+        cl.push(c);
+        begrenze(c);
+      }
+    }
+    zug = null;
+    zeichne();
+  }
+
+  document.addEventListener('pointerdown', function (e) {
+    if (e.button !== undefined && e.button > 0) return;
+    var t = e.target;
+    var pal = t.closest && t.closest('.pal-item');
+    var lbl = t.closest && t.closest('.lbl[data-cid]');
+    var gr = t.closest && t.closest('.griff');
+    var info0 = null;
+    if (pal) info0 = { typ: 'pal', art: pal.dataset.art, id: pal.dataset.id };
+    else if (lbl) {
+      var c = cl.find(function (k) { return k.id === +lbl.dataset.cid; });
+      if (!c) return;
+      info0 = { typ: 'teil', art: lbl.dataset.art, id: lbl.dataset.art === 'k' ? c.k : c.a, cid: c.id };
+      e.preventDefault();
+    } else if (gr) { info0 = { typ: 'griff', cid: +gr.dataset.cid }; e.preventDefault(); }
+    if (!info0) return;
+    if (e.pointerType === 'mouse') e.preventDefault();   // keine Textauswahl beim Ziehen mit der Maus
+    var r = wsRect();
+    warte = { sx: e.clientX - (info0.typ === 'griff' ? r.left : 0), sy: e.clientY - (info0.typ === 'griff' ? r.top : 0),
+              cx: e.clientX, cy: e.clientY, info: info0 };
+  });
+  document.addEventListener('pointermove', function (e) {
+    if (warte && !zug) {
+      if (Math.hypot(e.clientX - warte.cx, e.clientY - warte.cy) < 6) return;
+      zugStarten(e);
+    }
+    if (zug) { e.preventDefault(); zugBewegen(e); }
+  }, { passive: false });
+  document.addEventListener('pointerup', function (e) {
+    if (zug) zugBeenden(e);
+    else if (warte && warte.info.typ !== 'griff') {
+      var i = warte.info;
+      zeigeInfo(i.art, i.art === 'k' ? KM[i.id] : AM[i.id]);
+    }
+    warte = null;
+  });
+  document.addEventListener('pointercancel', function () {
+    if (zug) {
+      if (zug.el) zug.el.remove();
+      document.body.classList.remove('zieht');
+      markiere(null); muell.classList.remove('heiss');
+      zug = null; zeichne();
+    }
+    warte = null;
+  });
+
+  /* Tastatur: Enter auf einem Palettenteil legt es auf die Arbeitsfläche */
+  document.addEventListener('keydown', function (e) {
+    var it = document.activeElement;
+    if (!it || !it.classList || !it.classList.contains('pal-item')) return;
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    var art = it.dataset.art, ion = art === 'k' ? KM[it.dataset.id] : AM[it.dataset.id];
+    var r = wsRect();
+    var c = { id: nid++, k: null, nk: 0, a: null, na: 0, x: r.width / 2 - W - P, y: 70 + (cl.length % 4) * 30 };
+    if (art === 'k') { c.k = ion.id; c.nk = 1; } else { c.a = ion.id; c.na = 1; }
+    cl.push(c); begrenze(c); zeichne(); zeigeInfo(art, ion);
+  });
+
+  var hinweisTimer = null;
+  function hinweis(txt) {
+    infoInhalt.innerHTML = '<h4>Hinweis</h4><p>' + txt + '</p>';
+    info.classList.add('offen');
+    clearTimeout(hinweisTimer);
+    hinweisTimer = setTimeout(function () { info.classList.remove('offen'); }, 4500);
+  }
+
+  /* ================= Übungsmodus ================= */
+  var elAufgabe = document.getElementById('aufgabe'), elFrage = document.getElementById('frage'),
+      elRueck = document.getElementById('rueck'), elStand = document.getElementById('stand');
+  var selStufe = document.getElementById('selStufe'), selForm = document.getElementById('selForm');
+  var chkErg = document.getElementById('chkErgebnis');
+
+  function neueAufgabe() {
+    var pool = AUFGABEN.filter(function (p) {
+      return selStufe.value === '2' || (!KM[p[0]].mol && !AM[p[1]].mol);
+    });
+    var p;
+    do { p = pool[Math.floor(Math.random() * pool.length)]; }
+    while (pool.length > 1 && aufgabe && p[0] === aufgabe.k && p[1] === aufgabe.a);
+    var form = selForm.value === 'mix' ? (Math.random() < 0.5 ? 'name' : 'formel') : selForm.value;
+    var k = KM[p[0]], a = AM[p[1]], l = kgV(k.q, a.q);
+    aufgabe = { k: p[0], a: p[1], form: form, nk: l / k.q, na: l / a.q, fertig: false };
+    elFrage.innerHTML = 'Baue: <b>' + (form === 'name' ? salzName(k, a) : salzFormel(k, a, l / k.q, l / a.q)) + '</b>';
+    elRueck.textContent = ''; elRueck.className = 'rueck';
+    gestellt++;
+    stand();
+  }
+  function stand() { elStand.textContent = 'gelöst: ' + geloest + ' von ' + gestellt; }
+  function pruefen() {
+    if (!aufgabe) return;
+    var k = KM[aufgabe.k], a = AM[aufgabe.a];
+    var liste = cl.map(analyse).filter(function (r) { return r.beide; });
+    var treffer = liste.find(function (r) { return r.c.k === aufgabe.k && r.c.a === aufgabe.a && r.neutral; });
+    var t = '', ok = false;
+    if (treffer) {
+      ok = true;
+      t = 'Richtig! ' + salzFormel(k, a, aufgabe.nk, aufgabe.na) + ' ist ' + salzName(k, a) + '.';
+      var g = ggT(treffer.c.nk, treffer.c.na);
+      if (g > 1) t += ' Das Verhältnis ' + treffer.c.nk + ' : ' + treffer.c.na + ' lässt sich kürzen – ' + (treffer.c.nk / g) + ' : ' + (treffer.c.na / g) + ' genügt.';
+      if (!aufgabe.fertig) { geloest++; aufgabe.fertig = true; }
+    } else {
+      var fast = liste.find(function (r) { return r.c.k === aufgabe.k && r.c.a === aufgabe.a; });
+      var neutral = liste.find(function (r) { return r.neutral; });
+      if (fast) t = 'Falsch: Die Ionen stimmen, aber die Ladungen sind nicht ausgeglichen (Gesamtladung ' + vz(fast.pos - fast.neg) + ').';
+      else if (neutral) {
+        t = 'Falsch: Du hast ' + neutral.name + ' (' + neutral.formel + ') gebaut.';
+        if (neutral.k.f === k.f && neutral.k.id !== k.id) t += ' Achte auf die Ladung des Metall-Ions: Die römische Zahl im Namen gibt sie an.';
+        else if (neutral.k.id !== k.id && neutral.a.id !== a.id) t += ' Kation und Anion stimmen nicht.';
+        else if (neutral.k.id !== k.id) t += ' Das Kation stimmt nicht.';
+        else t += ' Das Anion stimmt nicht.';
+      } else t = 'Falsch: Auf der Arbeitsfläche ist noch keine vollständige, neutrale Verbindung.';
+    }
+    elRueck.innerHTML = t;
+    elRueck.className = 'rueck ' + (ok ? 'richtig' : 'falsch');
+    stand();
+  }
+  function loesungZeigen() {
+    if (!aufgabe) return;
+    var r = wsRect();
+    var c = { id: nid++, k: aufgabe.k, nk: aufgabe.nk, a: aufgabe.a, na: aufgabe.na, x: r.width / 2 - W - P, y: 130 };
+    cl.push(c); begrenze(c);
+    aufgabe.fertig = true;
+    var k = KM[aufgabe.k], a = AM[aufgabe.a];
+    elRueck.innerHTML = 'Lösung: ' + salzFormel(k, a, aufgabe.nk, aufgabe.na) + ' – ' + salzName(k, a) +
+      ' (' + aufgabe.nk + ' ' + ionHTML(k, 'k') + ' und ' + aufgabe.na + ' ' + ionHTML(a, 'a') + ')';
+    elRueck.className = 'rueck';
+    opt.ergebnis = true; chkErg.checked = true;
+    zeichne();
+  }
+  document.getElementById('btnUebung').addEventListener('click', function () {
+    uebung = !uebung;
+    this.classList.toggle('on', uebung);
+    elAufgabe.classList.toggle('offen', uebung);
+    if (uebung) {
+      ergebnisVorUebung = opt.ergebnis;
+      opt.ergebnis = false; chkErg.checked = false;
+      cl = []; geloest = 0; gestellt = 0; aufgabe = null;
+      neueAufgabe();
+    } else {
+      opt.ergebnis = ergebnisVorUebung; chkErg.checked = ergebnisVorUebung;
+    }
+    zeichne();
+  });
+  document.getElementById('btnPruefen').addEventListener('click', pruefen);
+  document.getElementById('btnLoesung').addEventListener('click', loesungZeigen);
+  document.getElementById('btnNeu').addEventListener('click', function () {
+    cl = []; zeichne();
+    if (!uebung) return;
+    opt.ergebnis = false; chkErg.checked = false;
+    neueAufgabe(); zeichne();
+  });
+  function einstellungGeaendert() {
+    if (!uebung) return;
+    if (aufgabe && !aufgabe.fertig) gestellt--;   // unbearbeitete Aufgabe nicht mitzählen
+    cl = []; neueAufgabe(); zeichne();
+  }
+  selStufe.addEventListener('change', einstellungGeaendert);
+  selForm.addEventListener('change', einstellungGeaendert);
+
+  /* ================= Bedienleiste ================= */
+  document.querySelectorAll('[data-filter]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      opt.filter = b.dataset.filter;
+      document.querySelectorAll('[data-filter]').forEach(function (x) { x.classList.toggle('on', x === b); });
+      filterAnwenden();
+    });
+  });
+  document.getElementById('chkNamen').addEventListener('change', function () {
+    document.body.classList.toggle('ohne-namen', !this.checked);
+  });
+  chkErg.addEventListener('change', function () { opt.ergebnis = this.checked; zeichne(); });
+  document.getElementById('btnLeeren').addEventListener('click', function () { cl = []; zeichne(); info.classList.remove('offen'); });
+  document.getElementById('btnVoll').addEventListener('click', function () {
+    var d = document;
+    if (d.fullscreenElement || d.webkitFullscreenElement) (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+    else { var el = d.documentElement; (el.requestFullscreen || el.webkitRequestFullscreen || function () {}).call(el); }
+  });
+  window.addEventListener('resize', function () { cl.forEach(begrenze); zeichne(); });
+
+  /* Legende im Merkkasten */
+  (function () {
+    var na = KM.Na, so4 = AM.SO4;
+    var f1 = '<figure><div style="position:relative;width:' + ((2 * P + W) * .7) + 'px;height:' + ((2 * P + U) * .7) + 'px"><div style="position:absolute;left:0;top:0;transform:scale(.7);transform-origin:0 0">' + einzelteil('k', na) + '</div></div><figcaption>Atom-Ion<br>1 Kerbe = 1+</figcaption></figure>';
+    var f2 = '<figure><div style="position:relative;width:' + ((2 * P + W) * .7) + 'px;height:' + ((2 * P + 2 * U) * .7) + 'px"><div style="position:absolute;left:0;top:0;transform:scale(.7);transform-origin:0 0">' + einzelteil('a', so4) + '</div></div><figcaption>Molekül-Ion<br>2 Noppen = 2−</figcaption></figure>';
+    document.getElementById('legende').innerHTML = f1 + f2;
+  })();
+
+  bauePalette();
+  filterAnwenden();
+  zeichne();
+})();
+</script>
+</body>
+</html>
