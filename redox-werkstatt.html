@@ -116,6 +116,14 @@ input.co{width:3.2em;font:700 22px Caveat,cursive;text-align:center;border:2px s
 .waage .beam{transition:transform .5s ease;transform-origin:110px 60px}
 .opt{display:inline-flex;align-items:center;gap:10px;margin:0 0 18px;cursor:pointer}.opt input{width:22px;height:22px;accent-color:var(--vio)}
 .tr .seg button.on{background:var(--hl);font-weight:700}
+.hgrid{display:grid;grid-template-columns:auto auto auto;justify-content:start;align-items:center;gap:12px 16px;margin:12px 0}.hrow{display:contents}
+.hrow .eq{padding:2px 0;white-space:nowrap;overflow-x:auto}.eq .stp{vertical-align:middle;margin:0 2px}.eq .stp output{min-width:40px}
+.fac{display:flex;align-items:center;gap:8px;border-left:3px solid var(--ink);padding-left:14px;min-height:54px;font:700 28px Caveat,cursive;white-space:nowrap}
+.fac .stp output{min-width:40px}
+.ref{border:2px dashed var(--vio);border-radius:14px;padding:6px 14px;margin:8px 0 12px}
+details.hint{border:2px solid var(--hl);border-radius:12px;padding:8px 14px;margin:10px 0;background:color-mix(in srgb,var(--hl) 12%,transparent)}
+details.hint summary{cursor:pointer;font-weight:700;min-height:32px}details.hint li{margin:.4em 0}
+@media(max-width:600px){.hgrid{grid-template-columns:minmax(0,1fr);gap:6px}.fac{justify-self:start;min-height:46px}.hrow .tag{grid-column:1/-1;justify-self:start;margin-top:8px}}
 .xbox{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:6px 0 4px}.xc{display:inline-flex;align-items:center;gap:6px;border:2px dashed var(--mut);border-radius:12px;padding:4px 8px;font-size:20px}.xc button{min-height:36px;padding:2px 10px;font-size:15px;box-shadow:none}
 button.rm{min-height:28px;min-width:28px;padding:0 6px;margin-left:4px;font-size:16px;line-height:1;box-shadow:none;border-width:1.5px;vertical-align:middle}
 .drawer{position:fixed;inset:0 0 0 auto;width:min(440px,100%);z-index:20;overflow:auto;border-radius:0;box-shadow:-6px 0 0 var(--ink)}
@@ -332,8 +340,8 @@ function solve(t){const ho=half(...t.ox,t.mil),hr=half(...t.red,t.mil);
  return{ho,hr,eo,er,fo,fr,g,eq:e}}
 const nota=e=>S.h3o?swapH(e,'H3O'):e;
 const HELP=['e^-','H3O^+','H^+','OH^-','H2O'];
-function side(X,ord,oz){const k=Object.keys(X).sort((a,b)=>{const ia=ord.indexOf(a),ib=ord.indexOf(b);return(ia<0?20+HELP.indexOf(a):ia)-(ib<0?20+HELP.indexOf(b):ib)});
- return k.map(f=>`<span class="term">${X[f]!==1?`<b class="co">${X[f]}</b>&#8239;`:''}${fmt(f,oz?OZ[f]:null)}</span>`).join(' + ')}
+function side(X,ord,oz,only){const k=Object.keys(X).sort((a,b)=>{const ia=ord.indexOf(a),ib=ord.indexOf(b);return(ia<0?20+HELP.indexOf(a):ia)-(ib<0?20+HELP.indexOf(b):ib)});
+ return k.map(f=>`<span class="term">${X[f]!==1?`<b class="co">${X[f]}</b>&#8239;`:''}${fmt(f,oz?OZ[f]:null,only)}</span>`).join(' + ')}
 const eqH=(e,ord=[],oz)=>`<div class="eq">${side(e.L,ord,oz)}<span class="ar">⟶</span>${side(e.R,ord,oz)}</div>`;
 function balTable(e){const els=uniq([...Object.keys(e.L),...Object.keys(e.R)].flatMap(f=>Object.keys(parse(f).c)));
  const r=els.map(el=>{const l=cnt(e.L,el),rr=cnt(e.R,el);return`<tr><td>${el}</td><td>${l}</td><td>${rr}</td><td class="${l===rr?'okc':'noc'}">${l===rr?'ausgeglichen':'falsch'}</td></tr>`}).join('');
@@ -553,8 +561,39 @@ function slots(t){const x=sd=>W.extra.filter(e=>e.s===sd).map(e=>e.f);return{L:u
 const isX=(sd,f)=>W.extra.some(e=>e.s===sd&&e.f===f);
 const CAND=()=>[S.h3o?'H3O^+':'H^+','OH^-','H2O'];
 function solD(){return W.t.mil==='sauer'?{ho:nota(W.sol.ho),hr:nota(W.sol.hr),eq:nota(W.sol.eq)}:W.sol}
+const elB=x=>{const a=parse(x[0]).c[x[2]],b=parse(x[1]).c[x[2]],l=lcm(a,b);return E([[l/a,x[0]]],[[l/b,x[1]]])};
+const scale=(e,k)=>{const r={L:{},R:{}};for(const s_ of['L','R'])for(const f in e[s_])r[s_][f]=e[s_][f]*k;return r};
+function hrow(kind,edit){const t=W.t,ox=kind==='ox',x=ox?t.ox:t.red,e=elB(x),o=ordT(t),ek=ox?'w3eo':'w3er',fk=ox?'w3fo':'w3fr';
+ const nE=edit?stp(ek,V[ek]?V[ek].v:1,1,1,16,String):`<b class="co">${ox?W.sol.eo:W.sol.er}</b>`,eT=`<span class="term">${nE}&#8239;${fmt('e^-')}</span>`;
+ const fac=edit?stp(fk,V[fk]?V[fk].v:1,1,1,16,String):`<b class="co">${ox?W.sol.fo:W.sol.fr}</b>`,sh=W.step>=1?1:0,L=side(e.L,o,sh,x[2]),R=side(e.R,o,sh,x[2]);
+ return`<div class="hrow"><span class="tag ${ox?'t-ox':'t-re'}">${ox?'Oxidation':'Reduktion'}</span><div class="eq">${ox?`${L}<span class="ar">⟶</span>${R} + ${eT}`:`${L} + ${eT}<span class="ar">⟶</span>${R}`}</div><div class="fac" aria-label="Faktor"><span>·</span>${fac}</div></div>`}
+function sumParts(){const t=W.t,so=scale(elB(t.ox),W.sol.fo),sr=scale(elB(t.red),W.sol.fr);add(so.R,'e^-',W.sol.eo*W.sol.fo);add(sr.L,'e^-',W.sol.er*W.sol.fr);return[so,sr]}
+function sumEq(){const sum={L:{},R:{}};for(const h of sumParts())for(const s_ of['L','R'])for(const f in h[s_])add(sum[s_],f,h[s_][f]);return cancel(sum)}
+function sumStep3(){const o=ordT(W.t),[so,sr]=sumParts(),n=W.sol.eo*W.sol.fo;
+ return`<div class="fb ok"><b class="v">Richtig.</b> Nach der Multiplikation werden in beiden Teilgleichungen ${n} Elektronen übertragen:</div>${eqH(so,o)}${eqH(sr,o)}<p class="note">Addiert – die ${n} Elektronen stehen auf beiden Seiten und fallen heraus:</p>${eqH(sumEq(),o)}`}
+function mHint(t){if(t.mil==='neutral')return`<ol><li><b>Übertragen:</b> Koeffizienten aus Schritt 3 eintragen. Die Elektronen erscheinen in der Gesamtgleichung nicht mehr.</li><li><b>Kontrolle:</b> Prüfe Ladungs- und Atombilanz. Bei dieser Reaktion sind keine weiteren Teilchen nötig.</li></ol>`;
+ const sa=t.mil==='sauer',ion=sa?(S.h3o?'Oxonium-Ionen (H₃O⁺)':'Protonen (H⁺)'):'Hydroxid-Ionen (OH⁻)';
+ return`<ol><li><b>Übertragen:</b> Koeffizienten aus Schritt 3 eintragen. Die Elektronen erscheinen in der Gesamtgleichung nicht mehr.</li>
+ <li><b>Ladungsausgleich:</b> Im ${sa?'sauren':'alkalischen'} Milieu stehen ${ion} in großer Zahl zur Verfügung. Ergänze so viele davon auf der Seite mit der <b>${sa?'niedrigeren (negativeren)':'höheren (positiveren)'}</b> Ladung, bis die Ladungswaage im Gleichgewicht ist.</li>
+ <li><b>Der Trick – Sauerstoff zählen:</b> Sind die Ladungen ausgeglichen, zähle die O-Atome auf beiden Seiten${sa&&S.h3o?' (auch die in H₃O⁺)':sa?'':' (auch die in OH⁻)'}. Ergänze auf der Seite mit weniger O-Atomen so viele H₂O-Moleküle, wie dort O-Atome fehlen. ${sa?'Im Sauren entsteht so Wasser, meist auf der Gegenseite der '+(S.h3o?'Oxonium-Ionen':'Protonen')+'.':'Im Alkalischen steht Wasser meist auf der Gegenseite der Hydroxid-Ionen: Wo OH⁻ verbraucht wird, entsteht Wasser – und umgekehrt.'}</li>
+ <li><b>Kontrolle:</b> Stimmen Ladung und O-Atome, sind die H-Atome automatisch ausgeglichen. Ist das nicht so, liegt der Fehler im Ladungsausgleich.</li>
+ <li><b>Kürzen:</b> Steht H₂O oder ${sa?(S.h3o?'H₃O⁺':'H⁺'):'OH⁻'} auf beiden Seiten, wird gekürzt.</li></ol>`}
+function nextTip(){const t=W.t,{e}=readCo(),sol=solD().eq,HX=['H2O','H3O^+','H^+','OH^-'];
+ const mains=[...reac(t).filter(f=>!HX.includes(f)).map(f=>['L',f]),...prod(t).filter(f=>!HX.includes(f)).map(f=>['R',f])];
+ const v=([s_,f])=>e[s_][f]||0,w=([s_,f])=>sol[s_][f]||0;
+ if(!(mains.every(m=>v(m)>0)&&mains.every(m=>v(m)*w(mains[0])===w(m)*v(mains[0]))))return`Übertrage zuerst die Koeffizienten aus Schritt 3 (Faktor × Koeffizient in der Teilgleichung) für ${mains.map(m=>fmt(m[1])).join(', ')}.`;
+ const ql=chg(e.L),qr=chg(e.R);
+ if(ql!==qr){if(t.mil==='neutral')return'Die Ladungen stimmen nicht überein – prüfe die übertragenen Koeffizienten.';
+  const low=ql<qr?'links':'rechts',high=ql<qr?'rechts':'links';
+  return`Ladung links ${sgn(ql)}, rechts ${sgn(qr)}. ${t.mil==='sauer'?`Gleiche im sauren Milieu mit ${S.h3o?'H₃O⁺':'H⁺'} aus – auf der Seite mit der niedrigeren Ladung, also <b>${low}</b>.`:`Gleiche im alkalischen Milieu mit OH⁻ aus – auf der Seite mit der höheren Ladung, also <b>${high}</b>.`}`}
+ const oL=cnt(e.L,'O'),oR=cnt(e.R,'O');
+ if(oL!==oR)return`Die Ladung ist ausgeglichen. Jetzt der Trick: Zähle die Sauerstoffatome – links ${oL}, rechts ${oR}. Ergänze auf der Seite mit weniger O-Atomen entsprechend viele H₂O-Moleküle.`;
+ const hL=cnt(e.L,'H'),hR=cnt(e.R,'H');
+ if(hL!==hR)return`Ladung und Sauerstoff stimmen, die H-Atome aber nicht (links ${hL}, rechts ${hR}). Prüfe den Ladungsausgleich.`;
+ const both=Object.keys(e.L).filter(f=>e.R[f]);if(both.length)return`${both.map(f=>fmt(f)).join(', ')} steht auf beiden Seiten – kürze, bis es nur noch auf einer Seite steht.`;
+ const g=[...Object.values(e.L),...Object.values(e.R)].reduce(gcd);if(g>1)return`Alles ist ausgeglichen, aber alle Koeffizienten sind durch ${g} teilbar. Kürze sie.`;
+ return'Ladung und alle Atome sind ausgeglichen. Klicke auf „Prüfen“.'}
 function renderTask(){const t=W.t,s=W.step,o=ordT(t),sl=slots(t),sd=solD(),ck=i=>s>i?' <span class="ck">✓</span>':'';
- const elB=(x)=>{const a=parse(x[0]).c[x[2]],b=parse(x[1]).c[x[2]],l=lcm(a,b);return E([[l/a,x[0]]],[[l/b,x[1]]])};
  $('#w-task').innerHTML=`<div class="sk">
  <div class="stepnav" style="margin:0 0 10px"><button id="w-back">Zur Aufgabenübersicht</button><label class="opt" style="margin:0"><input type="checkbox" class="omrm-t" ${S.omrm?'checked':''}> Oxidations-/Reduktionsmittel zuordnen</label><span>${MILT[t.mil]} <span class="stars">${'★'.repeat(t.st)}${'☆'.repeat(3-t.st)}</span></span></div>
  <h2>${t.t}</h2><p>${t.c}</p>${eqH(schema(t),o)}
@@ -565,15 +604,15 @@ function renderTask(){const t=W.t,s=W.step,o=ordT(t),sl=slots(t),sd=solD(),ck=i=
   ${W.trs.map((x,i)=>`<div class="tr">${fmt(x.f,s>0?OZ[x.f]:null,x.k==='ox'?t.ox[2]:t.red[2])}<span class="ar">⟶</span>${fmt(x.to,s>0?OZ[x.to]:null,x.k==='ox'?t.ox[2]:t.red[2])}<span class="seg"><button data-tr="${i}" data-v="ox" class="${W.cls[i]==='ox'?'on-ox':''}">Oxidation</button><button data-tr="${i}" data-v="re" class="${W.cls[i]==='re'?'on-re':''}">Reduktion</button></span></div>`).join('')}
   ${S.omrm?`<p style="margin-top:12px"><b>Welche Rolle spielt das Edukt?</b></p>${reac(t).map(f=>`<div class="tr">${fmt(f)}<span class="seg">${[['om','Oxidationsmittel'],['rm','Reduktionsmittel'],['both','beides']].map(([v,l])=>`<button data-role="${f}" data-v="${v}" class="${W.role[f]===v?'on':''}">${l}</button>`).join('')}</span></div>`).join('')}`:''}
   <div id="w2fb">${s>1?`<p>Oxidationsmittel: ${fmt(t.red[0])} &nbsp;·&nbsp; Reduktionsmittel: ${fmt(t.ox[0])}${t.red[0]===t.ox[0]?' (Disproportionierung: dasselbe Teilchen wird oxidiert und reduziert)':''}</p>`:''}</div>${s===1?'<button class="pri" data-a="c2">Prüfen</button>':''}</div>
- <div class="wstep ${s<2?'locked':''}"><h3>Schritt 3: Elektronenbilanz${ck(2)}</h3><p>Wie viele Elektronen werden in der jeweiligen Teilgleichung (Element bereits ausgeglichen) übertragen? Mit welchem Faktor muss jede Teilgleichung multipliziert werden, damit die Elektronenzahlen gleich sind?</p>
-  <div class="rows"><div class="row"><span><span class="tag t-ox">Ox.</span> ${eqH(elB(t.ox),o).replace('class="eq"','class="eq" style="display:inline-block"')}</span><span>e⁻: ${stp('w3eo',V.w3eo?V.w3eo.v:1,1,1,16,String)} &nbsp;Faktor: ${stp('w3fo',V.w3fo?V.w3fo.v:1,1,1,16,String)}</span></div>
-  <div class="row"><span><span class="tag t-re">Red.</span> ${eqH(elB(t.red),o).replace('class="eq"','class="eq" style="display:inline-block"')}</span><span>e⁻: ${stp('w3er',V.w3er?V.w3er.v:1,1,1,16,String)} &nbsp;Faktor: ${stp('w3fr',V.w3fr?V.w3fr.v:1,1,1,16,String)}</span></div></div>
-  <div id="w3fb"></div>${s===2?'<button class="pri" data-a="c3">Prüfen</button>':''}</div>
- <div class="wstep ${s<3?'locked':''}"><h3>Schritt 4: Gesamtgleichung${ck(3)}</h3><p>Trage alle Koeffizienten ein – auch die 1. Leere Felder zählen als 0. Prüfe mit der Bilanz unten, ob Ladung und Atome ausgeglichen sind. Fehlen Teilchen, ergänze sie selbst: Überlege, welche Teilchen im vorliegenden Milieu in großer Zahl zur Verfügung stehen.</p>
+ <div class="wstep ${s<2?'locked':''}"><h3>Schritt 3: Teilgleichungen und Elektronenbilanz${ck(2)}</h3><p>Ergänze in jeder Teilgleichung die Zahl der übertragenen Elektronen (Änderung der OZ × Anzahl der betroffenen Atome). Hinter dem Strich steht der Faktor, mit dem die Teilgleichung multipliziert wird, damit abgegebene und aufgenommene Elektronen gleich sind (kgV).</p>
+  <div class="hgrid">${hrow('ox',s<=2)}${hrow('re',s<=2)}</div>
+  <div id="w3fb">${s>2?sumStep3():''}</div>${s===2?'<button class="pri" data-a="c3">Prüfen</button>':''}</div>
+ <div class="wstep ${s<3?'locked':''}"><h3>Schritt 4: Gesamtgleichung${ck(3)}</h3>${s>=3?`<div class="ref"><p class="note">Übertrag aus Schritt 3 – Ladung und Sauerstoff sind hier noch nicht ausgeglichen:</p>${eqH(sumEq(),o)}</div>`:''}<p>Trage alle Koeffizienten ein – auch die 1. Leere Felder zählen als 0. Prüfe mit der Bilanz unten, ob Ladung und Atome ausgeglichen sind. Fehlen Teilchen, ergänze sie selbst: Überlege, welche Teilchen im vorliegenden Milieu in großer Zahl zur Verfügung stehen.</p>
+  <details class="hint"><summary>Hinweis: So gleichst du die Gesamtgleichung aus</summary>${mHint(t)}</details>
   <div class="tpl">${['L','R'].map(sd2=>sl[sd2].map(f=>`<span class="term"><input class="co" type="number" inputmode="numeric" min="0" max="40" data-s="${sd2}" data-f="${f}" aria-label="Koeffizient">&#8239;${fmt(f)}${isX(sd2,f)?`<button class="rm" data-a="rm" data-s="${sd2}" data-f="${f}" aria-label="entfernen" title="entfernen">×</button>`:''}</span>`).join(' + ')).join('<span class="ar">⟶</span>')}</div>
   <div class="xbox"><span class="note">Teilchen ergänzen:</span>${CAND().map(f=>`<span class="xc">${fmt(f)}<button data-a="addx" data-s="L" data-f="${f}">links</button><button data-a="addx" data-s="R" data-f="${f}">rechts</button></span>`).join('')}</div>
   <div class="bal"><div id="w4tab"></div><svg class="waage" viewBox="0 0 220 150" aria-label="Ladungswaage"><path d="M110 60 L110 135 M80 138 h60" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><g class="beam" id="beam"><path d="M25 60 h170" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M25 60 l-15 35 h30 z M195 60 l-15 35 h30 z" fill="none" stroke="currentColor" stroke-width="3"/><text id="ql" x="25" y="115" text-anchor="middle" font-size="18" font-weight="700" fill="currentColor">0</text><text id="qr" x="195" y="115" text-anchor="middle" font-size="18" font-weight="700" fill="currentColor">0</text></g><text x="110" y="20" text-anchor="middle" font-size="15" fill="currentColor">Ladungsbilanz</text></svg></div>
-  <div id="w4fb"></div>${s===3?'<button class="pri" data-a="c4">Prüfen</button>':''}</div>
+  <div id="w4tip"></div><div id="w4fb"></div>${s===3?'<span class="stepnav" style="justify-content:flex-start"><button data-a="tip">Was ist mein nächster Schritt?</button><button class="pri" data-a="c4">Prüfen</button></span>':''}</div>
  <div class="wstep"><div class="stepnav"><button data-a="help" ${s<2?'disabled':''}>Teilgleichungen zeigen (−5 Punkte)</button><button data-a="sol">Lösung zeigen</button></div><div id="wsol"></div></div></div>`;
  updBal()}
 function readCo(){const e={L:{},R:{}};let bad=false;document.querySelectorAll('#w-task input.co').forEach(i=>{const v=i.value.trim()===''?0:+i.value;if(!Number.isInteger(v)||v<0)bad=true;else add(e[i.dataset.s],i.dataset.f,v)});return{e,bad}}
@@ -615,6 +654,7 @@ $('#w-task').addEventListener('click',ev=>{const b=ev.target.closest('button');i
   else if(atomsOk&&qOk)m=' Atome und Ladung sind zwar ausgeglichen, aber die Elektronenbilanz stimmt nicht: Abgegebene und aufgenommene Elektronen müssen gleich sein. Prüfe die Verhältnisse mit deinen Faktoren aus Schritt 3.';
   else m=` ${!atomsOk?'Die Atombilanz ist nicht ausgeglichen ('+els.filter(el=>cnt(e.L,el)!==cnt(e.R,el)).join(', ')+'). ':''}${!qOk?'Die Ladungsbilanz ist nicht ausgeglichen.':''}`;
   $('#w4fb').innerHTML=fb(false,m)}
+ if(a==='tip'){$('#w4tip').innerHTML=`<div class="fb"><b>Nächster Schritt:</b> ${nextTip()}</div>`;return}
  if(a==='help'){if(!W.help){W.help=true;pts(-5)}const sd=solD(),o=ordT(t);$('#wsol').innerHTML=`<p><span class="tag t-ox">Oxidation</span></p>${eqH(sd.ho,o)}<p><span class="tag t-re">Reduktion</span></p>${eqH(sd.hr,o)}`}
  if(a==='sol'){W.help=true;$('#wsol').innerHTML=solHTML()}});
 let saved={};const keep=()=>{saved={};document.querySelectorAll('#w-task input.co').forEach(i=>saved[i.dataset.s+i.dataset.f]=i.value)},restore=()=>{document.querySelectorAll('#w-task input.co').forEach(i=>{if(saved[i.dataset.s+i.dataset.f]!==undefined)i.value=saved[i.dataset.s+i.dataset.f]});updBal()};
