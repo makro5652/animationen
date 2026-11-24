@@ -286,7 +286,7 @@ const OZ={'O2':{O:0},'Fe':{Fe:0},'Cl2':{Cl:0},'S8':{S:0},'Na':{Na:0},'P4':{P:0},
 'K2MnO4':{K:1,Mn:6,O:-2},'H3PO4':{H:1,P:5,O:-2},'NaClO':{Na:1,Cl:1,O:-2},'KClO3':{K:1,Cl:5,O:-2},'CrO4^2-':{Cr:6,O:-2},'K2Cr2O7':{K:1,Cr:6,O:-2},
 'Cr2O7^2-':{Cr:6,O:-2},'Na2S2O3':{Na:1,S:2,O:-2},'S2O3^2-':{S:2,O:-2},'S4O6^2-':{S:2.5,O:-2},'N2H4':{N:-2,H:1},'NH2OH':{N:-1,H:1,O:-2},'LiAlH4':{Li:1,Al:3,H:-1},
 'HClO4':{H:1,Cl:7,O:-2},'N2O':{N:1,O:-2},'Cu2O':{Cu:1,O:-2},'[Al(OH)4]^-':{Al:3,O:-2,H:1},'C2O4^2-':{C:3,O:-2},'SO3^2-':{S:4,O:-2},'NO':{N:2,O:-2},
-'IO3^-':{I:5,O:-2},'Cr(OH)3':{Cr:3,O:-2,H:1},'H^+':{H:1},'H3O^+':{H:1,O:-2},'OH^-':{O:-2,H:1},'PbO2':{Pb:4,O:-2},'SnCl2':{Sn:2,Cl:-1}};
+'IO3^-':{I:5,O:-2},'Cr(OH)3':{Cr:3,O:-2,H:1},'H^+':{H:1},'H3O^+':{H:1,O:-2},'OH^-':{O:-2,H:1},'PbO2':{Pb:4,O:-2},'Zn':{Zn:0},'Zn^2+':{Zn:2},'Mg':{Mg:0},'Mg^2+':{Mg:2},'Br2':{Br:0},'Br^-':{Br:-1},'Sn^2+':{Sn:2},'Sn^4+':{Sn:4},'SnCl2':{Sn:2,Cl:-1}};
 const PC={};
 function parse(f){if(PC[f])return PC[f];if(f==='e^-')return PC[f]={c:{},q:-1};
  const [b,ch]=f.split('^');let i=0;
@@ -509,6 +509,14 @@ $('#ex-prev').addEventListener('click',()=>{exI--;renderEx()});$('#ex-next').add
 /* ---------- Station: Werkstatt ---------- */
 const TASKS=[
 {id:'ag',t:'Silberbaum',c:'Ein Kupferdraht in Silbernitrat-Lösung überzieht sich mit Silberkristallen; die Lösung färbt sich blau.',st:1,mil:'neutral',ox:['Cu','Cu^2+','Cu'],red:['Ag^+','Ag','Ag']},
+{id:'zn',t:'Zink in Kupfersulfat',c:'Ein Zinkblech in Kupfer(II)-sulfat-Lösung überzieht sich mit Kupfer; die blaue Farbe der Lösung wird schwächer.',st:1,mil:'neutral',ox:['Zn','Zn^2+','Zn'],red:['Cu^2+','Cu','Cu']},
+{id:'fe',t:'Eisennagel verkupfert',c:'Ein Eisennagel wird in Kupfer(II)-sulfat-Lösung getaucht; es bilden sich Eisen(II)-Ionen.',st:1,mil:'neutral',ox:['Fe','Fe^2+','Fe'],red:['Cu^2+','Cu','Cu']},
+{id:'mgag',t:'Magnesium und Silberionen',c:'Magnesiumband wird in Silbernitrat-Lösung gegeben; es scheidet sich Silber ab.',st:1,mil:'neutral',ox:['Mg','Mg^2+','Mg'],red:['Ag^+','Ag','Ag']},
+{id:'alcu',t:'Aluminium und Kupferionen',c:'Aluminiumfolie reduziert Kupfer(II)-Ionen zu Kupfer (z. B. in chloridhaltiger Kupfersalz-Lösung).',st:1,mil:'neutral',ox:['Al','Al^3+','Al'],red:['Cu^2+','Cu','Cu']},
+{id:'clbr',t:'Chlor verdrängt Brom',c:'Chlorwasser wird zu Kaliumbromid-Lösung gegeben; die Lösung färbt sich gelbbraun.',st:1,mil:'neutral',ox:['Br^-','Br2','Br'],red:['Cl2','Cl^-','Cl']},
+{id:'bri',t:'Brom verdrängt Iod',c:'Bromwasser wird zu Kaliumiodid-Lösung gegeben; es bildet sich Iod.',st:1,mil:'neutral',ox:['I^-','I2','I'],red:['Br2','Br^-','Br']},
+{id:'fei',t:'Eisen(III) und Iodid',c:'Eisen(III)-chlorid-Lösung wird mit Kaliumiodid-Lösung versetzt; die Lösung färbt sich braun.',st:1,mil:'neutral',ox:['I^-','I2','I'],red:['Fe^3+','Fe^2+','Fe']},
+{id:'sn',t:'Zinn(II) reduziert Eisen(III)',c:'Zinn(II)-Ionen reduzieren Eisen(III)-Ionen zu Eisen(II)-Ionen (Vorreduktion bei der Eisenbestimmung).',st:1,mil:'neutral',ox:['Sn^2+','Sn^4+','Sn'],red:['Fe^3+','Fe^2+','Fe']},
 {id:'cl',t:'Chlor aus Salzsäure',c:'Laborherstellung von Chlor: Kaliumpermanganat wird mit konzentrierter Salzsäure versetzt.',st:2,mil:'sauer',ox:['Cl^-','Cl2','Cl'],red:['MnO4^-','Mn^2+','Mn'],km:1},
 {id:'so3s',t:'Sulfit im Sauren',c:'Schwefelsaure Permanganat-Lösung wird durch Natriumsulfit-Lösung entfärbt.',st:2,mil:'sauer',ox:['SO3^2-','SO4^2-','S'],red:['MnO4^-','Mn^2+','Mn'],km:1},
 {id:'h2o2',t:'Peroxid-Bestimmung',c:'Permanganometrische Titration von Wasserstoffperoxid in schwefelsaurer Lösung; es entsteht ein Gas.',st:3,mil:'sauer',ox:['H2O2','O2','O'],red:['MnO4^-','Mn^2+','Mn'],km:1},
@@ -529,9 +537,9 @@ const reac=t=>uniq([t.red[0],t.ox[0]]),prod=t=>uniq([t.red[1],t.ox[1]]),ordT=t=>
 const schema=t=>E(reac(t).map(f=>[1,f]),prod(t).map(f=>[1,f]));
 const helpers=m=>m==='sauer'?[S.h3o?'H3O^+':'H^+','H2O']:m==='alkalisch'?['OH^-','H2O']:[];
 let wf='alle',W=null;
-function renderList(){const F={alle:'Alle',sauer:'sauer',alkalisch:'alkalisch',km:'mit Permanganat / Braunstein',offen:'noch offen'};
+function renderList(){const F={alle:'Alle',leicht:'einfach (★)',sauer:'sauer',alkalisch:'alkalisch',km:'mit Permanganat / Braunstein',offen:'noch offen'};
  $('#w-filter').innerHTML=Object.entries(F).map(([k,v])=>`<button class="${k===wf?'on':''}" data-f="${k}">${v}</button>`).join('');
- const L=TASKS.filter(t=>wf==='alle'||t.mil===wf||(wf==='km'&&t.km)||(wf==='offen'&&!S.solved.includes(t.id)));
+ const L=TASKS.filter(t=>wf==='alle'||t.mil===wf||(wf==='leicht'&&t.st===1)||(wf==='km'&&t.km)||(wf==='offen'&&!S.solved.includes(t.id)));
  $('#w-cards').innerHTML=L.map(t=>`<button class="sk card" data-id="${t.id}"><span style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span class="stars" aria-label="Schwierigkeit ${t.st}">${'★'.repeat(t.st)}${'☆'.repeat(3-t.st)}</span>${S.solved.includes(t.id)?'<span class="done-mark">gelöst</span>':''}</span>
   <span class="hand" style="font-size:28px">${t.t}</span>${eqH(schema(t),ordT(t))}<span>${MILT[t.mil]} ${t.km?'<span class="tag t-k">Mangan</span>':''}</span></button>`).join('')||'<p>Alle Aufgaben dieser Auswahl sind gelöst.</p>'}
 $('#w-filter').addEventListener('click',ev=>{const b=ev.target.closest('button');if(b){wf=b.dataset.f;renderList()}});
