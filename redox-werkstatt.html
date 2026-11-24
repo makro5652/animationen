@@ -13,14 +13,19 @@
    PICTURE: Becherglas mit violetter Permanganat-Lösung, Elektronenpfeil und Balkenwaage für die Ladungsbilanz.
    COLOUR and TYPE: Permanganat-Violett dominant, Textmarker-Gelb als Akzent, Orange = Oxidation, Blau = Reduktion; Caveat + Atkinson Hyperlegible.
    LAYOUT: Kopfband mit Bild, vier Stationen als Reiter, darunter jeweils Arbeitskarten mit harter Skizzen-Kontur. */
-:root{color-scheme:light dark;
+:root{color-scheme:light;
+--bg:#ffffff;--card:#ffffff;--ink:#1f2136;--mut:#575a72;
+--grid:#e4e1d4;--vio:#6b21a8;--vio2:#efe3fa;--hl:#ffe45c;
+--ox:#c2410c;--re:#1d4ed8;--ok:#157a52;--bad:#c0322b;--okb:#e3f5ec;--badb:#fde7e5}
+@supports (color:light-dark(#000,#fff)){:root{color-scheme:light dark;
 --bg:light-dark(#ffffff,#181a22);--card:light-dark(#ffffff,#22252f);--ink:light-dark(#1f2136,#ecebe4);--mut:light-dark(#575a72,#a9abbb);
 --grid:light-dark(#e4e1d4,#2a2d39);--vio:light-dark(#6b21a8,#c79bf2);--vio2:light-dark(#efe3fa,#3a2a4d);--hl:light-dark(#ffe45c,#7a6612);
---ox:light-dark(#c2410c,#fb9a5b);--re:light-dark(#1d4ed8,#86a8ff);--ok:light-dark(#157a52,#5fd3a0);--bad:light-dark(#c0322b,#ff8a80);--okb:light-dark(#e3f5ec,#173a2c);--badb:light-dark(#fde7e5,#45201e)}
+--ox:light-dark(#c2410c,#fb9a5b);--re:light-dark(#1d4ed8,#86a8ff);--ok:light-dark(#157a52,#5fd3a0);--bad:light-dark(#c0322b,#ff8a80);--okb:light-dark(#e3f5ec,#173a2c);--badb:light-dark(#fde7e5,#45201e)}}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
-body.paper{--bg:light-dark(#fbfaf5,#181a22);background:var(--bg) radial-gradient(var(--grid) 1.2px,transparent 1.3px) 0 0/22px 22px}
-body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 "Atkinson Hyperlegible",system-ui,sans-serif;overflow-x:clip}
+body.paper{--bg:#fbfaf5;background:var(--bg) radial-gradient(var(--grid) 1.2px,transparent 1.3px) 0 0/22px 22px}
+@supports (color:light-dark(#000,#fff)){body.paper{--bg:light-dark(#fbfaf5,#181a22)}}
+body{margin:0;-webkit-text-size-adjust:100%;background:var(--bg);color:var(--ink);font:17px/1.55 "Atkinson Hyperlegible",system-ui,sans-serif;overflow-x:clip}
 .band{padding:clamp(22px,3.5vw,48px) max(4vw,16px)}
 .wrap{max-width:1240px;margin:0 auto}
 h1,h2,h3,.hand{font-family:Caveat,"Comic Sans MS",cursive;font-weight:700;line-height:1.05;text-wrap:balance;margin:0}
@@ -33,14 +38,15 @@ p{margin:.4em 0 .8em;max-width:70ch}
 .hero{width:100%;height:auto;max-height:300px}
 .hero .ln{fill:none;stroke:var(--ink);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 .hero text{font-family:Caveat,cursive;font-weight:700;fill:var(--ink)}
-nav.bar{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);border-bottom:2px solid var(--ink)}
+nav.bar{position:-webkit-sticky;position:sticky;top:0;z-index:5;background:var(--bg);background:color-mix(in srgb,var(--bg) 92%,transparent);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border-bottom:2px solid var(--ink)}
 nav .wrap{display:flex;gap:10px;align-items:center;padding:10px max(4vw,16px);flex-wrap:wrap}
 .tabs{display:flex;gap:8px;overflow-x:auto;flex:1 1 420px;padding:4px 2px 8px}
 .tabs a{flex:none;text-decoration:none;color:var(--ink);font:700 24px Caveat,cursive;padding:6px 16px;border:2px solid var(--ink);border-radius:14px 5px 12px 6px;background:var(--card);min-height:44px;display:flex;align-items:center}
 .tabs a[aria-current=page]{background:var(--vio);color:#fff;border-color:var(--vio);box-shadow:3px 3px 0 var(--ink)}
 .tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 button,.btn{font:inherit;font-size:16px;cursor:pointer;color:var(--ink);background:var(--card);border:2px solid var(--ink);border-radius:12px 5px 11px 6px;padding:8px 14px;min-height:44px;box-shadow:2px 2px 0 var(--ink);transition:transform .08s}
-button:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
+@media(hover:hover){button:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}}
+button,input,a,summary,label{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 button:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink)}
 button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--hl);outline-offset:2px}
 button.pri{background:var(--vio);color:#fff;border-color:var(--ink)}
@@ -68,7 +74,7 @@ rt.p{color:var(--ox)}rt.n{color:var(--re)}rt.z{color:var(--mut)}
 .dots span{width:34px;height:34px;border-radius:50%;border:2px solid var(--ink);display:grid;place-items:center;font:700 18px Caveat,cursive}
 .dots span.done{background:var(--ok);color:#fff;border-color:var(--ok)}.dots span.cur{background:var(--hl)}
 .stp{display:inline-flex;align-items:center;border:2px solid var(--ink);border-radius:12px;overflow:hidden;background:var(--card)}
-.stp button{border:0;border-radius:0;box-shadow:none;min-height:42px;min-width:42px;padding:0;font-size:22px;font-weight:700}
+.stp button{border:0;border-radius:0;box-shadow:none;min-height:44px;min-width:44px;padding:0;font-size:22px;font-weight:700}
 .stp output{min-width:64px;text-align:center;font:700 26px Caveat,cursive}
 .stp.ok{border-color:var(--ok);background:var(--okb)}.stp.no{border-color:var(--bad);background:var(--badb)}
 .big{font-size:clamp(46px,8vw,72px);text-align:center;margin:8px 0 6px;line-height:1.8}
@@ -109,7 +115,8 @@ td.okc{color:var(--ok);font-weight:700}td.noc{color:var(--bad);font-weight:700}
 .tr{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:6px 0}
 .tr .f{font-size:22px}
 .tr .seg button.on-ox{background:var(--ox);color:#fff}.tr .seg button.on-re{background:var(--re);color:#fff}
-input.co{width:3.2em;font:700 22px Caveat,cursive;text-align:center;border:2px solid var(--ink);border-radius:9px;padding:2px;background:var(--bg);color:var(--vio);min-height:40px}
+input.co::-webkit-inner-spin-button,input.co::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input.co{-moz-appearance:textfield;appearance:textfield;width:3.2em;font:700 22px Caveat,cursive;text-align:center;border:2px solid var(--ink);border-radius:9px;padding:2px;background:var(--bg);color:var(--vio);min-height:40px}
 .tpl{font-size:22px;line-height:2.6;padding:4px}
 .bal{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:18px;align-items:center;margin-top:10px}
 .waage{width:100%;height:auto}
@@ -121,7 +128,7 @@ input.co{width:3.2em;font:700 22px Caveat,cursive;text-align:center;border:2px s
 .fac{display:flex;align-items:center;gap:8px;border-left:3px solid var(--ink);padding-left:14px;min-height:54px;font:700 28px Caveat,cursive;white-space:nowrap}
 .fac .stp output{min-width:40px}
 .ref{border:2px dashed var(--vio);border-radius:14px;padding:6px 14px;margin:8px 0 12px}
-details.hint{border:2px solid var(--hl);border-radius:12px;padding:8px 14px;margin:10px 0;background:color-mix(in srgb,var(--hl) 12%,transparent)}
+details.hint{border:2px solid var(--hl);border-radius:12px;padding:8px 14px;margin:10px 0;background:var(--card);background:color-mix(in srgb,var(--hl) 12%,transparent)}
 details.hint summary{cursor:pointer;font-weight:700;min-height:32px}details.hint li{margin:.4em 0}
 @media(max-width:600px){.hgrid{grid-template-columns:minmax(0,1fr);gap:6px}.fac{justify-self:start;min-height:46px}.hrow .tag{grid-column:1/-1;justify-self:start;margin-top:8px}}
 .xbox{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:6px 0 4px}.xc{display:inline-flex;align-items:center;gap:6px;border:2px dashed var(--mut);border-radius:12px;padding:4px 8px;font-size:20px}.xc button{min-height:36px;padding:2px 10px;font-size:15px;box-shadow:none}
@@ -135,7 +142,11 @@ button.rm{min-height:28px;min-width:28px;padding:0 6px;margin-left:4px;font-size
 .lew text.oz{font:700 22px Caveat,cursive;fill:var(--ox)}
 .hidden{display:none!important}
 footer{color:var(--mut);font-size:14px}
-@media(max-width:860px){.grid2,.top{grid-template-columns:minmax(0,1fr)}.bal{grid-template-columns:minmax(0,1fr)}.waage{max-width:240px;margin:auto}}
+@media(max-width:1100px){.tabs a{font-size:21px;padding:4px 12px}nav .wrap{gap:6px 10px;padding-block:6px}.tabs{padding-bottom:4px}}
+@media(max-width:860px){.grid2{grid-template-columns:minmax(0,1fr)}.bal{grid-template-columns:minmax(0,1fr)}.waage{max-width:240px;margin:auto}}
+.top{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)}
+@media(max-width:900px){header.band{padding-block:18px}.hero{max-height:210px}.top p{font-size:16px}}
+@media(max-width:640px){.top{grid-template-columns:minmax(0,1fr)}.hero{max-height:170px}}
 @media(max-width:600px){.ladder{grid-template-columns:repeat(3,minmax(0,1fr))}.ex{font-size:26px}.hero{max-height:200px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -151,13 +162,13 @@ footer{color:var(--mut);font-size:14px}
   <path class="ln" d="M40 70 q-4 0 -4 -6 M44 66 L46 230 q2 18 22 18 L156 247 q20 0 21 -18 L178 66"/>
   <path d="M50 130 q30 -8 60 0 t64 0 L172 228 q-1 14 -18 15 L70 244 q-18 0 -19 -14 Z" fill="#6b21a8" opacity=".88"/>
   <circle cx="90" cy="190" r="5" fill="#fff" opacity=".6"/><circle cx="130" cy="165" r="4" fill="#fff" opacity=".5"/><circle cx="110" cy="215" r="3" fill="#fff" opacity=".5"/>
-  <text x="62" y="112" font-size="30">MnO₄⁻</text>
+  <text x="62" y="112" font-size="30">MnO<tspan font-size="20" dy="7">4</tspan><tspan font-size="22" dy="-19">−</tspan></text>
   <path class="ln" d="M190 120 q55 -60 100 -4" /><path class="ln" d="M278 104 l14 12 l-18 6"/>
-  <text x="205" y="62" font-size="30" fill="#c2410c" style="fill:#c2410c">+ 5 e⁻</text>
+  <text x="205" y="62" font-size="30" fill="#c2410c" style="fill:#c2410c">+ 5 e<tspan font-size="20" dy="-12">−</tspan></text>
   <text x="192" y="160" font-size="23">+VII → +II</text>
   <path class="ln" d="M300 70 q-4 0 -4 -6 M304 66 L306 230 q2 18 22 18 L410 247 q20 0 21 -18 L432 66"/>
   <path d="M310 150 q30 -8 60 0 t56 0 L426 228 q-1 14 -18 15 L330 244 q-18 0 -19 -14 Z" fill="#f3dfe8" opacity=".9"/>
-  <text x="338" y="132" font-size="30">Mn²⁺</text>
+  <text x="338" y="132" font-size="30">Mn<tspan font-size="19" dy="-12">2+</tspan></text>
   <text x="318" y="205" font-size="20" style="fill:#7b6a75">fast farblos</text>
  </svg>
 </div></header>
