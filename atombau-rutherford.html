@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atombau: Vom Kugelwolkenmodell zum Kern-Hülle-Modell</title>
+<style>
+:root{--bg:#0b0d12;--panel:#151821;--panel2:#1b1f2b;--line:#272c3a;--line2:#353b4d;--text:#e9ebf1;--dim:#9ca3b4;--accent:#60a5fa;--pos:#f87171;--posbg:rgba(248,113,113,.14);--neg:#60a5fa;--ok:#4ade80;--bad:#f87171;--warn:#fbbf24;--gold:#e5b94a;--screen:#6ee7a8;--cloud:rgba(248,113,113,.20);--shell:rgba(96,165,250,.13);--lead:#6b7280;--leadd:#3f4652}
+body[data-theme=light]{--bg:#f4f5f8;--panel:#ffffff;--panel2:#f0f2f6;--line:#dde1e8;--line2:#c6ccd7;--text:#15171c;--dim:#596171;--accent:#2563eb;--pos:#dc2626;--posbg:rgba(220,38,38,.09);--neg:#2563eb;--ok:#15803d;--bad:#dc2626;--warn:#b45309;--gold:#b8860b;--screen:#15a34a;--cloud:rgba(220,38,38,.12);--shell:rgba(37,99,235,.09);--lead:#6b7280;--leadd:#9ca3af}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.5}
+button,select,input{font:inherit;color:inherit}
+.wrap{max-width:1440px;margin:0 auto;padding:0 20px}
+header.top{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:flex-end;padding:18px 0 12px}
+.sub{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+h1{font-size:1.45rem;margin:2px 0 0;font-weight:700}
+.ctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line2);border-radius:10px;overflow:hidden}
+.seg button{background:transparent;border:0;padding:7px 14px;cursor:pointer;color:var(--dim)}
+.seg button.on{background:var(--accent);color:#fff}
+.btn{display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:7px 13px;cursor:pointer;text-decoration:none;color:var(--text);font-size:.92rem}
+.btn:hover{border-color:var(--accent)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.sm{padding:4px 10px;font-size:.84rem}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+nav.tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:16px}
+nav.tabs button{background:transparent;border:0;border-bottom:3px solid transparent;padding:9px 14px;cursor:pointer;color:var(--dim);font-weight:600}
+nav.tabs button .n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--panel2);border:1px solid var(--line2);font-size:.78rem;margin-right:6px}
+nav.tabs button.on{color:var(--text);border-bottom-color:var(--accent)}
+nav.tabs button.on .n{background:var(--accent);border-color:var(--accent);color:#fff}
+section.tab{display:none;padding-bottom:40px}
+section.tab.on{display:block}
+.cols{display:grid;grid-template-columns:350px 1fr;gap:16px;align-items:start}
+@media(max-width:980px){.cols{grid-template-columns:1fr}}
+.stage{display:flex;flex-direction:column;gap:16px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.task{position:sticky;top:10px}
+@media(max-width:980px){.task{position:static}}
+.card h2{margin:4px 0 8px;font-size:1.15rem}
+.card h3{margin:0 0 8px;font-size:1rem}
+.tag{display:inline-block;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:6px;padding:1px 7px}
+.lead{color:var(--dim);margin:6px 0 10px}
+ol.steps{margin:6px 0 10px;padding-left:20px}
+ol.steps li{margin:4px 0}
+.hint{background:var(--panel2);border-left:3px solid var(--warn);padding:8px 10px;border-radius:6px;font-size:.9rem;margin:8px 0}
+.note{font-size:.84rem;color:var(--dim);margin-top:8px}
+details.box{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:8px 0}
+details.box summary{cursor:pointer;font-weight:600}
+details.ws dl{margin:6px 0 0;font-size:.86rem}
+details.ws dt{font-weight:700;margin-top:6px}
+details.ws dd{margin:0;color:var(--dim)}
+body[data-niveau=G] .only-R{display:none!important}
+body[data-niveau=R] .only-G{display:none!important}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.fb{min-height:1.4em;margin-top:8px;font-size:.92rem}
+.fb.ok{color:var(--ok)}
+.fb.bad{color:var(--bad)}
+.fig{position:relative;width:100%;max-width:820px;margin:0 auto;user-select:none}
+#fig1{max-width:640px}
+#svg3{max-width:700px;margin:0 auto}
+.fig svg{display:block;width:100%;height:auto}
+.drop{position:absolute;transform:translateY(-50%);min-height:30px;border:2px dashed var(--line2);background:var(--panel);border-radius:8px;padding:3px 6px 3px 26px;font-size:.8rem;line-height:1.2;text-align:left;cursor:pointer;color:var(--text)}
+.drop .num{position:absolute;left:5px;top:50%;transform:translateY(-50%);width:16px;height:16px;border-radius:50%;background:var(--panel2);border:1px solid var(--line2);font-size:.68rem;display:grid;place-items:center;color:var(--dim)}
+.drop.filled{border-style:solid;border-color:var(--accent)}
+.drop.ok{border-color:var(--ok);border-style:solid}
+.drop.bad{border-color:var(--bad);border-style:solid}
+.drop.hot{box-shadow:0 0 0 3px rgba(96,165,250,.35)}
+.pool{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;min-height:34px}
+.chip{background:var(--panel2);border:1px solid var(--line2);border-radius:999px;padding:4px 12px;cursor:pointer;font-size:.86rem}
+.chip.sel{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip.used{display:none}
+/* PSE */
+.pse{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;max-width:620px}
+.pse .cell{border:1px solid var(--line2);background:var(--panel2);border-radius:6px;padding:3px 4px;cursor:pointer;text-align:center;min-height:56px;position:relative}
+.pse .cell:hover{border-color:var(--accent)}
+.pse .cell.cur{outline:2px solid var(--accent)}
+.pse .z{position:absolute;left:4px;top:2px;font-size:.7rem;color:var(--dim)}
+.pse .sym{font-weight:700;font-size:1.15rem;margin-top:10px}
+.pse .nm{font-size:.6rem;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pse .empty{border:0;background:transparent;cursor:default}
+.pse .gh{font-size:.68rem;color:var(--dim);text-align:center;align-self:end}
+.pselegend{display:flex;gap:12px;align-items:center;font-size:.8rem;color:var(--dim);margin-top:8px;flex-wrap:wrap}
+.elchips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px}
+.elchip{border:1px solid var(--line2);background:var(--panel2);border-radius:8px;padding:4px 10px;cursor:pointer}
+.elchip.cur{border-color:var(--accent);box-shadow:0 0 0 2px rgba(96,165,250,.3)}
+.elchip .ck{color:var(--ok);font-weight:700;margin-left:4px}
+.inp{width:80px;padding:6px 8px;border-radius:8px;border:1px solid var(--line2);background:var(--panel2)}
+label.f{display:flex;flex-direction:column;font-size:.82rem;color:var(--dim);gap:2px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:1100px){.two{grid-template-columns:1fr}}
+canvas{display:block;width:100%;max-width:880px;margin:0 auto;height:auto;border-radius:10px;background:var(--panel2);touch-action:manipulation}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.stat{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:6px 8px}
+.stat .k{font-size:.72rem;color:var(--dim)}
+.stat .v{font-size:1.1rem;font-weight:700;font-variant-numeric:tabular-nums}
+.stat .p{font-size:.76rem;color:var(--dim);font-variant-numeric:tabular-nums}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}}
+.sw{display:inline-flex;align-items:center;gap:6px;font-size:.86rem;cursor:pointer}
+.sw input{accent-color:var(--accent)}
+table.t{border-collapse:collapse;width:100%;font-size:.9rem}
+table.t th,table.t td{border:1px solid var(--line2);padding:6px 8px;text-align:left;vertical-align:top}
+table.t th{background:var(--panel2)}
+table.t select{width:100%;padding:4px 6px;border-radius:6px;border:1px solid var(--line2);background:var(--panel2)}
+table.t select.ok{border-color:var(--ok)}
+table.t select.bad{border-color:var(--bad)}
+.mc label{display:flex;gap:8px;align-items:flex-start;padding:6px 8px;border:1px solid var(--line);border-radius:8px;margin:6px 0;cursor:pointer;background:var(--panel2)}
+.mc label.ok{border-color:var(--ok)}
+.mc label.bad{border-color:var(--bad)}
+.merk{border:2px solid var(--accent);border-radius:12px;padding:10px 14px;background:var(--panel2);margin-top:10px}
+.merk b.h{display:block;color:var(--accent);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase}
+.locked{opacity:.35;pointer-events:none;filter:grayscale(1)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.82rem;color:var(--dim);margin-top:8px;align-items:center}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:middle;margin-right:4px}
+.gap{display:inline-block;min-width:120px}
+.lt{line-height:2.2}
+.lt select{padding:3px 6px;border-radius:6px;border:1px solid var(--line2);background:var(--panel2)}
+.lt select.ok{border-color:var(--ok)}.lt select.bad{border-color:var(--bad)}
+.bank{font-size:.85rem;color:var(--dim);border:1px dashed var(--line2);border-radius:8px;padding:6px 10px;margin:6px 0}
+dialog{border:1px solid var(--line2);border-radius:14px;background:var(--panel);color:var(--text);max-width:760px;width:calc(100% - 30px);padding:0}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+dialog .dh{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+dialog .db{padding:12px 16px 16px;max-height:75vh;overflow:auto}
+.sol{display:none;margin-top:8px;border-left:3px solid var(--ok);padding:6px 10px;background:var(--panel2);border-radius:6px}
+.sol.on{display:block}
+.acc{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0;background:var(--panel)}
+.acc h4{margin:0 0 4px}
+.kv{color:var(--dim);font-size:.86rem}
+.range{display:flex;align-items:center;gap:8px;font-size:.84rem;color:var(--dim)}
+.range input{accent-color:var(--accent)}
+footer{color:var(--dim);font-size:.78rem;padding:20px 0 30px;border-top:1px solid var(--line);margin-top:20px}
+</style>
+</head>
+<body data-niveau="G" data-theme="dark">
+<div class="wrap">
+<header class="top">
+  <div>
+    <div class="sub">Chemie · Atombau · Sekundarstufe I</div>
+    <h1>Vom Kugelwolkenmodell zum Kern-Hülle-Modell</h1>
+  </div>
+  <div class="ctrl">
+    <div class="seg" role="radiogroup" aria-label="Niveau">
+      <button data-niv="R">Realschule</button><button data-niv="G" class="on">Gymnasium</button>
+    </div>
+    <a id="abLink" class="btn pri" href="arbeitsblaetter/AB_Atombau_Rutherford_Gymnasium.pdf" download>Arbeitsblatt (PDF)</a>
+    <button id="themeBtn" class="btn">Hell / Dunkel</button>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button data-tab="1" class="on"><span class="n">1</span>Kugelwolkenmodell</button>
+  <button data-tab="2"><span class="n">2</span>Streuversuch</button>
+  <button data-tab="3"><span class="n">3</span>Deutung: Kern und Hülle</button>
+  <button data-tab="4"><span class="n">4</span>Größe und Ladung</button>
+  <button data-tab="5"><span class="n">5</span>Sicherung</button>
+</nav>
+
+<!-- ======================= TAB 1 ======================= -->
+<section class="tab on" id="tab1">
+ <div class="cols">
+  <aside class="card task">
+    <span class="tag">Arbeitsblatt · Aufgabe 1</span>
+    <h2>Das Kugelwolkenmodell</h2>
+    <p class="lead only-G">Im Kugelwolkenmodell wird das Atom als kugelförmige Wolke beschrieben. Die positive Ladung ist gleichmäßig über die gesamte Kugel verteilt; die negativ geladenen Elektronen befinden sich in dieser Wolke. Auch die Masse ist gleichmäßig verteilt.</p>
+    <p class="lead only-R">Im Kugelwolkenmodell stellt man sich ein Atom wie eine Wolke in Kugelform vor. Die positive Ladung ist überall in der Kugel gleich verteilt. In der Wolke befinden sich die Elektronen. Sie sind negativ geladen.</p>
+    <ol class="steps">
+      <li>Wähle ein Element aus der Aufgabe aus.</li>
+      <li>Suche das Element im Periodensystem.</li>
+      <li>Trage die Anzahl der Protonen und der Elektronen ein. Überprüfe.</li>
+      <li>Beschrifte das Modell.</li>
+      <li>Übertrage deine Ergebnisse auf das Arbeitsblatt (Aufgabe 1 a und b).</li>
+    </ol>
+    <div class="hint only-R"><b>Tipp:</b> Die Ordnungszahl steht im Periodensystem oben links im Kästchen. Sie gibt die Anzahl der Protonen an. Ein Atom hat genauso viele Elektronen wie Protonen.</div>
+    <details class="box only-G"><summary>Hilfe</summary><p>Die Ordnungszahl eines Elements gibt die Anzahl der Protonen im Atom an. Atome sind nach außen elektrisch neutral.</p></details>
+    <p class="note">Neutronen werden in dieser Einheit noch nicht betrachtet.</p>
+    <details class="box ws"><summary>Wortspeicher</summary><dl>
+      <dt>das Atom, die Atome</dt><dd>kleinstes Teilchen eines Elements</dd>
+      <dt>das Elektron, die Elektronen</dt><dd>sehr leichtes, negativ geladenes Teilchen im Atom</dd>
+      <dt>das Element, die Elemente</dt><dd>Reinstoff, der nur aus einer Atomsorte besteht</dd>
+      <dt>die Ladung, die Ladungen</dt><dd>elektrische Eigenschaft eines Teilchens: positiv (+) oder negativ (−)</dd>
+      <dt>neutral</dt><dd>nach außen ungeladen: gleich viele positive und negative Ladungen</dd>
+      <dt>die Ordnungszahl, die Ordnungszahlen</dt><dd>Nummer eines Elements im Periodensystem; gibt die Anzahl der Protonen an</dd>
+      <dt>das Proton, die Protonen</dt><dd>positiv geladenes Teilchen im Atom</dd>
+    </dl></details>
+  </aside>
+  <div class="stage">
+    <div class="card">
+      <h3>Protonen und Elektronen ermitteln</h3>
+      <div class="elchips" id="elchips"></div>
+      <div class="row" style="align-items:flex-end">
+        <div style="min-width:200px"><div class="kv">Ausgewähltes Element</div><div id="elName" style="font-size:1.2rem;font-weight:700">–</div></div>
+        <label class="f">Anzahl Protonen<input class="inp" id="inP" type="number" min="0" max="120" inputmode="numeric"></label>
+        <label class="f">Anzahl Elektronen<input class="inp" id="inE" type="number" min="0" max="120" inputmode="numeric"></label>
+        <button class="btn pri" id="chk1">Überprüfen</button>
+      </div>
+      <div class="fb" id="fb1"></div>
+    </div>
+    <div class="card">
+      <h3>Periodensystem (Ausschnitt)</h3>
+      <div class="pse" id="pse"></div>
+      <div class="pselegend"><span>Kästchen: <b>Ordnungszahl</b> oben links, darunter <b>Elementsymbol</b> und Name.</span><button class="btn sm" id="auBtn">Gold (Au) – steht im Periodensystem weiter unten</button></div>
+    </div>
+    <div class="card">
+      <h3>Modell beschriften</h3>
+      <p class="kv">Tippe zuerst einen Begriff an und dann das passende Feld im Bild.</p>
+      <div class="fig" id="fig1"><svg id="svg1" viewBox="0 0 600 400" aria-label="Kugelwolkenmodell"></svg></div>
+      <div class="pool" id="pool1"></div>
+      <div class="row" style="margin-top:8px"><button class="btn pri" id="chkL1">Beschriftung überprüfen</button><button class="btn" id="rstL1">Zurücksetzen</button></div>
+      <div class="fb" id="fbL1"></div>
+    </div>
+  </div>
+ </div>
+</section>
+
+<!-- ======================= TAB 2 ======================= -->
+<section class="tab" id="tab2">
+ <div class="cols">
+  <aside class="card task">
+    <span class="tag">Arbeitsblatt · Aufgabe 2</span>
+    <h2>Der Streuversuch nach Rutherford</h2>
+    <p class="lead only-G">1909 untersuchten Hans Geiger und Ernest Marsden im Labor von Ernest Rutherford, wie Alpha-Teilchen eine sehr dünne Goldfolie durchdringen. Die Auftreffpunkte der Alpha-Teilchen wurden auf einem Leuchtschirm sichtbar: An jeder Auftreffstelle leuchtet der Schirm kurz auf.</p>
+    <p class="lead only-R">Rutherford und seine Mitarbeiter haben Alpha-Teilchen auf eine sehr dünne Goldfolie geschossen. Hinter und neben der Folie stand ein Leuchtschirm. Dort, wo ein Alpha-Teilchen auftrifft, leuchtet der Schirm kurz auf.</p>
+    <ol class="steps">
+      <li>Lies die Infobox „Radioaktive Strahlung“.</li>
+      <li>Beschrifte den Versuchsaufbau (1–5). Übertrage die Begriffe auf das Arbeitsblatt (2 a).</li>
+      <li>Starte den Versuch. Beobachte, <b>wo</b> und <b>wie oft</b> der Leuchtschirm aufleuchtet.</li>
+      <li>Notiere deine Beobachtungen (2 c).</li>
+    </ol>
+    <div class="row"><button class="btn" data-open="dlgRad">Infobox: Radioaktive Strahlung</button><button class="btn" data-open="dlgGold">Infobox: Goldfolie und Leuchtschirm</button></div>
+    <div class="hint only-R"><b>Tipp:</b> Lass viele Alpha-Teilchen fliegen (Regler nach rechts oder „1000 Teilchen auf einmal“). Achte dann besonders auf die Seiten und auf den Bereich links neben der Goldfolie.</div>
+    <details class="box ws"><summary>Wortspeicher</summary><dl>
+      <dt>ablenken (lenkt ab, abgelenkt)</dt><dd>die Richtung einer Bewegung verändern</dd>
+      <dt>das Alpha-Teilchen, die Alpha-Teilchen</dt><dd>zweifach positiv geladenes Teilchen der radioaktiven Strahlung</dd>
+      <dt>die Blende, die Blenden</dt><dd>schmale Öffnung; lässt nur einen dünnen Strahl durch</dd>
+      <dt>die Goldfolie, die Goldfolien</dt><dd>sehr dünn ausgewalztes Gold</dd>
+      <dt>der Leuchtschirm, die Leuchtschirme</dt><dd>Schirm, der an der Stelle kurz aufleuchtet, an der ein Teilchen auftrifft</dd>
+      <dt>das Präparat, die Präparate</dt><dd>hier: Probe eines radioaktiven Stoffes</dd>
+      <dt>die Strahlung, die Strahlungen</dt><dd>sehr schnelle Teilchen oder Energie, die von einer Quelle ausgehen</dd>
+    </dl></details>
+  </aside>
+  <div class="stage">
+    <div class="card">
+      <h3>a) Versuchsaufbau beschriften</h3>
+      <p class="kv">Tippe zuerst einen Begriff an und dann das passende Feld im Bild.</p>
+      <div class="fig" id="fig2"><svg id="svg2" viewBox="0 0 800 440" aria-label="Versuchsaufbau Streuversuch"></svg></div>
+      <div class="pool" id="pool2"></div>
+      <div class="row" style="margin-top:8px"><button class="btn pri" id="chkL2">Beschriftung überprüfen</button><button class="btn" id="rstL2">Zurücksetzen</button></div>
+      <div class="fb" id="fbL2"></div>
+    </div>
+    <div class="card">
+      <h3>b) Versuch durchführen – Beobachtung am Leuchtschirm</h3>
+      <canvas id="cv2" aria-label="Simulation Streuversuch"></canvas>
+      <div class="row" style="margin-top:10px">
+        <button class="btn pri" id="run2">Start</button>
+        <button class="btn" id="burst2">1000 Teilchen auf einmal</button>
+        <button class="btn" id="clr2">Schirm löschen</button>
+        <label class="range">langsam<input type="range" id="rate2" min="0" max="100" value="25">schnell</label>
+        <label class="sw"><input type="checkbox" id="trail2">Flugbahnen anzeigen</label>
+        <label class="sw only-G"><input type="checkbox" id="real2">realistische Häufigkeit</label>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="k">Alpha-Teilchen gesamt</div><div class="v" id="s2n">0</div></div>
+        <div class="stat"><div class="k">geradeaus / kaum abgelenkt</div><div class="v" id="s2a">0</div><div class="p" id="s2ap"></div></div>
+        <div class="stat"><div class="k">seitlich abgelenkt</div><div class="v" id="s2b">0</div><div class="p" id="s2bp"></div></div>
+        <div class="stat"><div class="k">zurückgeworfen</div><div class="v" id="s2c">0</div><div class="p" id="s2cp"></div></div>
+      </div>
+      <p class="note" id="note2"></p>
+    </div>
+    <div class="card">
+      <h3>c) Beobachtungen festhalten</h3>
+      <table class="t" id="obsT">
+        <tr><th>Wo trifft das Alpha-Teilchen auf den Leuchtschirm?</th><th style="width:38%">Wie viele Alpha-Teilchen?</th></tr>
+      </table>
+      <div class="row" style="margin-top:8px"><button class="btn pri" id="chkObs">Überprüfen</button></div>
+      <div class="fb" id="fbObs"></div>
+    </div>
+  </div>
+ </div>
+</section>
+
+<!-- ======================= TAB 3 ======================= -->
+<section class="tab" id="tab3">
+ <div class="cols">
+  <aside class="card task">
+    <span class="tag">Arbeitsblatt · Aufgabe 3</span>
+    <h2>Deutung: Kern und Hülle</h2>
+    <p class="lead only-G">Ein Modell muss die Beobachtungen eines Experiments erklären können. Prüfe, ob das Kugelwolkenmodell die Beobachtungen beim Streuversuch erklärt, und leite daraus ein verbessertes Atommodell ab.</p>
+    <p class="lead only-R">Ein Modell muss zu den Beobachtungen passen. Du prüfst jetzt: Passt das Kugelwolkenmodell zum Streuversuch? Danach entwickelst du ein neues Atommodell.</p>
+    <ol class="steps">
+      <li>Überlege: Was müsste man nach dem Kugelwolkenmodell beobachten? (3 a)</li>
+      <li>Ordne jeder Beobachtung die passende Schlussfolgerung zu. (3 b)</li>
+      <li>Zeichne das neue Atommodell auf dem Arbeitsblatt ab und beschrifte es. (3 c)</li>
+    </ol>
+    <details class="box ws"><summary>Wortspeicher</summary><dl>
+      <dt>der Atomkern, die Atomkerne</dt><dd>sehr kleiner, positiv geladener Bereich im Zentrum des Atoms; enthält fast die gesamte Masse</dd>
+      <dt>die Atomhülle, die Atomhüllen</dt><dd>Raum um den Atomkern, in dem sich die Elektronen befinden</dd>
+      <dt>die Beobachtung, die Beobachtungen</dt><dd>das, was man im Versuch sieht</dd>
+      <dt>die Erwartung, die Erwartungen</dt><dd>das, was man vor dem Versuch vermutet</dd>
+      <dt>die Masse, die Massen</dt><dd>Eigenschaft eines Körpers; wird in Gramm oder Kilogramm angegeben</dd>
+      <dt>das Modell, die Modelle</dt><dd>vereinfachte Darstellung der Wirklichkeit</dd>
+      <dt>die Schlussfolgerung, die Schlussfolgerungen</dt><dd>Erkenntnis, die man aus einer Beobachtung ableitet</dd>
+    </dl></details>
+  </aside>
+  <div class="stage">
+    <div class="card">
+      <h3>a) Erwartung nach dem Kugelwolkenmodell</h3>
+      <p>Was hätte man nach dem Kugelwolkenmodell beim Streuversuch beobachten müssen?</p>
+      <div class="mc" id="mc3"></div>
+      <div class="row"><button class="btn pri" id="chkMc3">Überprüfen</button></div>
+      <div class="fb" id="fbMc3"></div>
+    </div>
+    <div class="card">
+      <h3>b) Beobachtung und Schlussfolgerung</h3>
+      <p class="kv">Wähle zu jeder Beobachtung den Buchstaben der passenden Schlussfolgerung.</p>
+      <ul id="concl" style="margin:6px 0 10px;padding-left:18px"></ul>
+      <table class="t" id="zuT"><tr><th>Beobachtung</th><th style="width:130px">Schlussfolgerung</th></tr></table>
+      <div class="row" style="margin-top:8px"><button class="btn pri" id="chkZu">Überprüfen</button></div>
+      <div class="fb" id="fbZu"></div>
+    </div>
+    <div class="card" id="kh">
+      <h3>c) Das Kern-Hülle-Modell – abzeichnen</h3>
+      <p id="khLock" class="hint">Das Modell wird freigeschaltet, sobald du Aufgabe b richtig gelöst hast. <button class="btn sm" id="unlock3">Lehrkraft: freischalten</button></p>
+      <div id="khBody" class="locked">
+        <div class="row" style="margin-bottom:8px">
+          <span class="kv">Atom:</span>
+          <div class="seg" id="khEl"><button data-z="2">Helium</button><button data-z="3">Lithium</button><button data-z="6" class="on">Kohlenstoff</button></div>
+          <label class="sw"><input type="checkbox" id="khLab" checked>Beschriftung anzeigen</label>
+        </div>
+        <svg id="svg3" viewBox="0 0 640 400" style="width:100%;height:auto;display:block" aria-label="Kern-Hülle-Modell"></svg>
+        <div class="hint"><b>Arbeitsauftrag:</b> Zeichne das Kern-Hülle-Modell des Kohlenstoffatoms in den Kasten auf dem Arbeitsblatt (3 c) ab. Beschrifte: <i>Atomkern, Atomhülle, Proton, Elektron</i>. <span class="only-G">Blende danach die Beschriftung aus und kontrolliere deine Zeichnung.</span></div>
+        <div class="merk"><b class="h">Merke</b>
+          <span class="only-G">Ein Atom besteht aus einem <b>Atomkern</b> und einer <b>Atomhülle</b>. Der Atomkern ist im Vergleich zum Atom extrem klein, enthält die positiv geladenen <b>Protonen</b> und damit fast die gesamte Masse des Atoms. In der Atomhülle befinden sich die negativ geladenen <b>Elektronen</b>; sie hat fast keine Masse und besteht größtenteils aus leerem Raum. (Kern-Hülle-Modell, Rutherford 1911)</span>
+          <span class="only-R">Ein Atom besteht aus einem <b>Atomkern</b> und einer <b>Atomhülle</b>. Im sehr kleinen Atomkern sind die positiv geladenen <b>Protonen</b>. Dort ist fast die ganze Masse des Atoms. In der Atomhülle sind die negativ geladenen <b>Elektronen</b>. Die Atomhülle ist größtenteils leerer Raum.</span>
+        </div>
+        <p class="note">Darstellung nicht maßstabsgetreu: Der Atomkern ist hier stark vergrößert gezeichnet (siehe Reiter 4). Neutronen werden später ergänzt.</p>
+      </div>
+    </div>
+  </div>
+ </div>
+</section>
+
+<!-- ======================= TAB 4 ======================= -->
+<section class="tab" id="tab4">
+ <div class="cols">
+  <aside class="card task">
+    <span class="tag">Arbeitsblatt · Aufgabe 4</span>
+    <h2>Größe und Ladung</h2>
+    <p class="lead">Warum durchdringen fast alle Alpha-Teilchen die Goldfolie – und warum werden einige wenige trotzdem stark abgelenkt? Dafür brauchst du zwei Dinge: die Regeln für elektrische Ladungen und die wahren Größenverhältnisse im Atom.</p>
+    <ol class="steps">
+      <li>Probiere die Ladungsregeln aus und ergänze die Sätze (4 a).</li>
+      <li>Vergrößere das Goldatom mit dem Regler, bis du den Atomkern siehst (4 b).</li>
+      <li>Beobachte den Streuversuch im Modell. Vergleiche beide Atommodelle (4 c).</li>
+    </ol>
+    <details class="box ws"><summary>Wortspeicher</summary><dl>
+      <dt>abstoßen (stößt ab, abgestoßen)</dt><dd>voneinander wegdrücken</dd>
+      <dt>anziehen (zieht an, angezogen)</dt><dd>zueinander hinziehen</dd>
+      <dt>der Durchmesser, die Durchmesser</dt><dd>Strecke quer durch die Mitte eines Kreises oder einer Kugel</dd>
+      <dt>gleichnamig</dt><dd>gleiche Ladung: + und + oder − und −</dd>
+      <dt>der Maßstab, die Maßstäbe</dt><dd>Verhältnis zwischen der Größe im Bild und der wirklichen Größe</dd>
+      <dt>ungleichnamig</dt><dd>verschiedene Ladung: + und −</dd>
+    </dl></details>
+  </aside>
+  <div class="stage">
+    <div class="card">
+      <h3>a) Ladungen: Anziehung und Abstoßung</h3>
+      <canvas id="cvQ" aria-label="Ladungen"></canvas>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="qL">linke Kugel: +</button>
+        <button class="btn" id="qR">rechte Kugel: +</button>
+        <button class="btn pri" id="qGo">Loslassen</button>
+        <button class="btn" id="qBack">Zurück</button>
+      </div>
+      <div class="fb" id="fbQ"></div>
+      <div class="lt" id="ltQ" style="margin-top:6px"></div>
+      <div class="bank only-R" id="bankQ"></div>
+      <div class="row"><button class="btn pri" id="chkQ">Überprüfen</button></div>
+      <div class="fb" id="fbQ2"></div>
+    </div>
+    <div class="card">
+      <h3>b) Wie groß ist der Atomkern im Vergleich zum Atom?</h3>
+      <canvas id="cvZ" aria-label="Größenvergleich Goldatom"></canvas>
+      <div class="row" style="margin-top:10px">
+        <label class="range" style="flex:1;min-width:260px">Atom ganz<input type="range" id="zoom" min="0" max="1000" value="0" style="flex:1">Atomkern ganz</label>
+      </div>
+      <div class="two" style="margin-top:10px">
+        <div>
+          <div class="kv">Vergleich: Wäre der Atomkern so groß wie …</div>
+          <select id="anaSel" class="inp" style="width:100%;margin-top:4px">
+            <option value="0">ein Stecknadelkopf (1 mm)</option>
+            <option value="1" selected>eine Murmel (1 cm)</option>
+            <option value="2">ein Fußball (22 cm)</option>
+          </select>
+          <p id="anaTxt" style="margin:8px 0 0"></p>
+        </div>
+        <div class="kv" id="sizeFacts"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>c) Der Streuversuch im Modell</h3>
+      <div class="row" style="margin-bottom:8px">
+        <div class="seg" id="msMode"><button data-m="cloud">Kugelwolkenmodell</button><button data-m="kern" class="on">Kern-Hülle-Modell</button></div>
+        <label class="sw"><input type="checkbox" id="msTrue">Atomkern maßstabsgetreuer</label>
+      </div>
+      <canvas id="cvM" aria-label="Streuversuch im Modell"></canvas>
+      <div class="row" style="margin-top:10px">
+        <button class="btn pri" id="msRun">Pause</button>
+        <button class="btn" id="msAim">Alpha-Teilchen genau auf einen Atomkern richten</button>
+        <button class="btn" id="msClr">Zurücksetzen</button>
+        <label class="range">wenige<input type="range" id="msRate" min="1" max="30" value="5">viele</label>
+      </div>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--pos)"></span>Alpha-Teilchen (zweifach positiv, 2+)</span>
+        <span class="lgK"><span class="dot" style="background:var(--pos);width:7px;height:7px"></span>Atomkern (positiv)</span>
+        <span><span class="dot" style="background:var(--neg);width:6px;height:6px"></span>Elektron (negativ)</span>
+        <span class="kv">Tipp: Klicke in das Bild, um ein Alpha-Teilchen an dieser Höhe zu starten.</span>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="k">Alpha-Teilchen gesamt</div><div class="v" id="m_n">0</div></div>
+        <div class="stat"><div class="k">geradeaus / kaum abgelenkt</div><div class="v" id="m_a">0</div><div class="p" id="m_ap"></div></div>
+        <div class="stat"><div class="k">seitlich abgelenkt</div><div class="v" id="m_b">0</div><div class="p" id="m_bp"></div></div>
+        <div class="stat"><div class="k">zurückgeworfen</div><div class="v" id="m_c">0</div><div class="p" id="m_cp"></div></div>
+      </div>
+      <p class="note" id="msNote"></p>
+      <p class="note only-G">Die Elektronen der Atomhülle verändern die Flugbahn der Alpha-Teilchen kaum: Ein Alpha-Teilchen hat etwa die 7300-fache Masse eines Elektrons. In der Simulation wird ihr Einfluss deshalb vernachlässigt.</p>
+    </div>
+  </div>
+ </div>
+</section>
+
+<!-- ======================= TAB 5 ======================= -->
+<section class="tab" id="tab5">
+ <div class="cols">
+  <aside class="card task">
+    <span class="tag">Sicherung</span>
+    <h2>Arbeitsblatt gemeinsam besprechen</h2>
+    <p class="lead">Geht das Arbeitsblatt Aufgabe für Aufgabe durch. Vergleicht eure Ergebnisse mit dem Erwartungshorizont und korrigiert eure Notizen mit einer anderen Farbe.</p>
+    <div class="row"><a class="btn pri" id="abLink2" href="arbeitsblaetter/AB_Atombau_Rutherford_Gymnasium.pdf" download>Arbeitsblatt (PDF)</a><button class="btn" id="solAll">Alle Lösungen ein/aus</button></div>
+    <p class="note">Hinweis für die Lehrkraft: Der Erwartungshorizont passt sich dem gewählten Niveau (oben rechts) an.</p>
+  </aside>
+  <div class="stage" id="solList"></div>
+ </div>
+</section>
+
+<footer>Simulation zum Atombau (Kugelwolkenmodell, Streuversuch nach Rutherford, Kern-Hülle-Modell). Darstellungen sind Modelle und nicht maßstabsgetreu, sofern nicht anders angegeben.</footer>
+</div>
+
+<dialog id="dlgRad">
+  <div class="dh"><b>Infobox: Radioaktive Strahlung</b><button class="btn sm" data-close>Schließen</button></div>
+  <div class="db">
+    <p class="only-G">Die Atome mancher Elemente, zum Beispiel Radium oder Uran, sind nicht stabil. Beim Zerfall dieser Atome entsteht energiereiche Strahlung: <b>radioaktive Strahlung</b>. Man unterscheidet drei Strahlungsarten.</p>
+    <p class="only-R">Manche Stoffe, zum Beispiel Radium oder Uran, sind <b>radioaktiv</b>. Von ihnen geht unsichtbare, energiereiche Strahlung aus. Es gibt drei Arten von radioaktiver Strahlung.</p>
+    <table class="t">
+      <tr><th>Strahlung</th><th>Was ist das?</th><th>Ladung</th><th>Wird abgeschirmt durch</th></tr>
+      <tr><td><b>Alpha-Strahlung</b> (α)</td><td>sehr schnelle, im Vergleich zu Elektronen schwere Teilchen<span class="only-G"> (später lernst du: Heliumatomkerne)</span></td><td><b style="color:var(--pos)">zweifach positiv (2+)</b></td><td>ein Blatt Papier oder wenige Zentimeter Luft</td></tr>
+      <tr><td><b>Beta-Strahlung</b> (β)</td><td>sehr schnelle Elektronen</td><td>negativ (−)</td><td>wenige Millimeter Aluminium</td></tr>
+      <tr><td><b>Gamma-Strahlung</b> (γ)</td><td>energiereiche Strahlung ohne Teilchenmasse, ähnlich wie Röntgenstrahlung</td><td>ungeladen</td><td>dicke Schichten aus Blei oder Beton (nur abgeschwächt)</td></tr>
+    </table>
+    <p><b>Gefahr:</b> Radioaktive Strahlung kann Zellen im Körper schädigen. Schutz bieten: großer <b>Abstand</b>, <b>Abschirmung</b> und eine kurze <b>Aufenthaltsdauer</b> in der Nähe der Strahlenquelle.</p>
+    <p><b>Im Streuversuch:</b> Das radioaktive Präparat liegt in einem <b>Bleiblock</b>. Das Blei schirmt die Strahlung ab. Nur durch eine schmale Öffnung (<b>Blende</b>) tritt ein dünner Strahl aus Alpha-Teilchen aus. <span class="only-G">Weil Alpha-Teilchen schon nach wenigen Zentimetern Luft abgebremst werden, wurde der Versuch in einem luftleer gepumpten Gefäß (Vakuum) durchgeführt.</span></p>
+    <p class="note">In der Simulation sind Alpha-Teilchen als rote Punkte dargestellt. Rot steht in dieser Simulation immer für positive Ladung.</p>
+  </div>
+</dialog>
+<dialog id="dlgGold">
+  <div class="dh"><b>Infobox: Goldfolie und Leuchtschirm</b><button class="btn sm" data-close>Schließen</button></div>
+  <div class="db">
+    <p><b>Goldfolie:</b> Gold lässt sich sehr dünn auswalzen. Die Folie im Versuch war weniger als einen tausendstel Millimeter dick. Trotzdem liegen darin noch über tausend Schichten von Goldatomen hintereinander.</p>
+    <p><b>Leuchtschirm:</b> Der Schirm ist mit Zinksulfid beschichtet. Trifft ein Alpha-Teilchen auf, leuchtet die Stelle für einen kurzen Moment auf. <span class="only-G">Geiger und Marsden zählten diese Lichtblitze in einem abgedunkelten Raum mit einem Mikroskop – oft stundenlang. Der Schirm konnte um die Goldfolie herum bewegt werden, sodass alle Richtungen untersucht werden konnten.</span></p>
+  </div>
+</dialog>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let NIV='G';
+let COL={};
+function readCols(){const cs=getComputedStyle(document.body);['bg','panel','panel2','line','line2','text','dim','accent','pos','neg','ok','bad','warn','gold','screen','cloud','shell','lead','leadd'].forEach(k=>COL[k]=cs.getPropertyValue('--'+k).trim());}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function fitCanvas(cv,W,H){const d=Math.min(window.devicePixelRatio||1,2);cv.width=W*d;cv.height=H*d;const c=cv.getContext('2d');c.setTransform(d,0,0,d,0,0);cv._W=W;cv._H=H;return c}
+function cvPos(cv,e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*cv._W,y:(e.clientY-r.top)/r.height*cv._H}}
+function pct(a,n){return n?(100*a/n).toLocaleString('de-DE',{maximumFractionDigits:a/n<0.01?2:1})+' %':''}
+function fb(el,ok,txt){el.className='fb '+(ok===null?'':(ok?'ok':'bad'));el.innerHTML=txt}
+
+/* ---------- Labeler ---------- */
+function makeLabeler(o){
+  const drops=o.targets.map((t,i)=>{const b=document.createElement('button');b.className='drop';b.style.left=t.x+'%';b.style.top=t.y+'%';b.style.width=(t.w||24)+'%';b.dataset.accept=t.id;b.innerHTML='<span class="num">'+(i+1)+'</span><span class="val">&nbsp;</span>';o.fig.appendChild(b);return b});
+  let sel=null;
+  function chipFor(id){return o.pool.querySelector('.chip[data-id="'+id+'"]')}
+  function clearMarks(){drops.forEach(d=>d.classList.remove('ok','bad'));o.fb.textContent=''}
+  function build(){
+    sel=null;o.pool.innerHTML='';
+    drops.forEach(d=>{d.dataset.val='';d.querySelector('.val').innerHTML='&nbsp;';d.classList.remove('filled','ok','bad','hot')});
+    const items=o.items.concat(NIV==='G'?(o.extraG||[]):[]);
+    shuffle(items).forEach(it=>{const c=document.createElement('button');c.className='chip';c.dataset.id=it.id;c.textContent=it.t;c.onclick=()=>{if(sel===c){c.classList.remove('sel');sel=null;drops.forEach(d=>d.classList.remove('hot'));return}
+      if(sel)sel.classList.remove('sel');sel=c;c.classList.add('sel');drops.forEach(d=>d.classList.add('hot'))};o.pool.appendChild(c)});
+    o.fb.textContent='';
+  }
+  drops.forEach(d=>d.onclick=()=>{
+    clearMarks();
+    if(sel){
+      if(d.dataset.val){const old=chipFor(d.dataset.val);if(old)old.classList.remove('used')}
+      d.dataset.val=sel.dataset.id;d.querySelector('.val').textContent=sel.textContent;d.classList.add('filled');
+      sel.classList.add('used');sel.classList.remove('sel');sel=null;drops.forEach(x=>x.classList.remove('hot'));
+    }else if(d.dataset.val){const old=chipFor(d.dataset.val);if(old)old.classList.remove('used');d.dataset.val='';d.querySelector('.val').innerHTML='&nbsp;';d.classList.remove('filled')}
+  });
+  o.check.onclick=()=>{let ok=0,empty=0;drops.forEach(d=>{d.classList.remove('ok','bad');if(!d.dataset.val){empty++;return}if(d.dataset.val===d.dataset.accept){ok++;d.classList.add('ok')}else d.classList.add('bad')});
+    const n=drops.length;
+    if(ok===n)fb(o.fb,true,'Alles richtig beschriftet. Übertrage die Begriffe auf das Arbeitsblatt.');
+    else fb(o.fb,false,ok+' von '+n+' richtig.'+(n-ok-empty>0?' Rot markierte Felder: <b>falsch</b>.':'')+(empty?' '+empty+' Feld(er) noch leer.':''));};
+  o.reset.onclick=build;
+  return {build};
+}
+
+/* ---------- Niveau / Theme / Tabs ---------- */
+const labelers=[];
+function setNiv(n){NIV=n;document.body.dataset.niveau=n;$$('.seg[role=radiogroup] button').forEach(b=>b.classList.toggle('on',b.dataset.niv===n));
+  const f='arbeitsblaetter/AB_Atombau_Rutherford_'+(n==='G'?'Gymnasium':'Realschule')+'.pdf';$('#abLink').href=f;$('#abLink2').href=f;
+  $$('details.ws').forEach(d=>d.open=(n==='R'));
+  labelers.forEach(l=>l.build());buildObs();buildMc3();buildZu();buildLtQ();buildSol();updateModelNote();store.set('atombau-niv',n)}
+$$('.seg[role=radiogroup] button').forEach(b=>b.onclick=()=>setNiv(b.dataset.niv));
+$('#themeBtn').onclick=()=>{const t=document.body.dataset.theme==='dark'?'light':'dark';document.body.dataset.theme=t;store.set('atombau-theme',t);readCols();drawModel1();drawSetup();drawKH();redrawAll()};
+let TAB=1;
+$$('nav.tabs button').forEach(b=>b.onclick=()=>{TAB=+b.dataset.tab;$$('nav.tabs button').forEach(x=>x.classList.toggle('on',x===b));$$('section.tab').forEach(s=>s.classList.toggle('on',s.id==='tab'+TAB));redrawAll();window.scrollTo({top:0,behavior:'smooth'})});
+$$('[data-open]').forEach(b=>b.onclick=()=>$('#'+b.dataset.open).showModal());
+$$('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
+$$('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d)d.close()}));
+
+/* ======================= TAB 1 ======================= */
+const ELS=[[1,'H','Wasserstoff',1,1],[2,'He','Helium',1,8],[3,'Li','Lithium',2,1],[4,'Be','Beryllium',2,2],[5,'B','Bor',2,3],[6,'C','Kohlenstoff',2,4],[7,'N','Stickstoff',2,5],[8,'O','Sauerstoff',2,6],[9,'F','Fluor',2,7],[10,'Ne','Neon',2,8],[11,'Na','Natrium',3,1],[12,'Mg','Magnesium',3,2],[13,'Al','Aluminium',3,3],[14,'Si','Silicium',3,4],[15,'P','Phosphor',3,5],[16,'S','Schwefel',3,6],[17,'Cl','Chlor',3,7],[18,'Ar','Argon',3,8],[19,'K','Kalium',4,1],[20,'Ca','Calcium',4,2],[79,'Au','Gold',6,11]].map(a=>({z:a[0],s:a[1],n:a[2],p:a[3],g:a[4]}));
+const EL=s=>ELS.find(e=>e.s===s);
+const TASKEL=['He','C','Na','Au'];
+let curEl='He';const solved1={};
+function buildPSE(){const p=$('#pse');p.innerHTML='';
+  ['I','II','III','IV','V','VI','VII','VIII'].forEach(g=>{const d=document.createElement('div');d.className='gh';d.textContent=g;p.appendChild(d)});
+  for(let per=1;per<=4;per++)for(let g=1;g<=8;g++){const e=ELS.find(x=>x.p===per&&x.g===g);const d=document.createElement(e?'button':'div');
+    if(e){d.className='cell';d.dataset.s=e.s;d.innerHTML='<span class="z">'+e.z+'</span><div class="sym">'+e.s+'</div><div class="nm">'+e.n+'</div>';d.title=e.n;d.onclick=()=>selectEl(e.s)}else d.className='cell empty';p.appendChild(d)}
+}
+$('#auBtn').onclick=()=>{selectEl('Au');};
+function buildElChips(){const c=$('#elchips');c.innerHTML='<span class="kv" style="align-self:center">Aufgabe:</span>';TASKEL.forEach(s=>{const e=EL(s);const b=document.createElement('button');b.className='elchip'+(s===curEl?' cur':'');b.innerHTML=e.n+(solved1[s]?'<span class="ck">✓</span>':'');b.onclick=()=>selectEl(s);c.appendChild(b)})}
+function selectEl(s){curEl=s;const e=EL(s);
+  $('#elName').innerHTML=e.n+(s==='Au'?' <span class="kv">(Au, Ordnungszahl 79 – steht in der 6. Periode)</span>':'');
+  if(s==='Au')fb($('#fb1'),null,'Gold steht nicht im Ausschnitt des Periodensystems. Seine Ordnungszahl ist 79.');else $('#fb1').textContent='';
+  $('#inP').value=solved1[s]?e.z:'';$('#inE').value=solved1[s]?e.z:'';
+  $$('#pse .cell').forEach(c=>c.classList.toggle('cur',c.dataset.s===s));buildElChips();drawModel1()}
+$('#chk1').onclick=()=>{const e=EL(curEl);const p=parseInt($('#inP').value,10),n=parseInt($('#inE').value,10);
+  if(isNaN(p)||isNaN(n)){fb($('#fb1'),false,'Trage beide Zahlen ein.');return}
+  let msg=[];const okP=p===e.z,okE=n===e.z;
+  if(okP&&okE){solved1[curEl]=true;fb($('#fb1'),true,'Richtig: '+e.n+' hat '+e.z+' Protonen und '+e.z+' Elektronen. Positive und negative Ladungen gleichen sich aus – das Atom ist nach außen elektrisch neutral.');buildElChips();drawModel1();return}
+  if(!okP)msg.push('Anzahl der Protonen: <b>falsch</b>.'+(NIV==='R'?' Schau auf die Ordnungszahl.':''));else msg.push('Anzahl der Protonen: richtig.');
+  if(!okE)msg.push('Anzahl der Elektronen: <b>falsch</b>.'+(NIV==='R'?' Ein Atom hat genauso viele Elektronen wie Protonen.':''));else msg.push('Anzahl der Elektronen: richtig.');
+  fb($('#fb1'),false,msg.join(' '))};
+function drawModel1(){const e=EL(curEl),ok=!!solved1[curEl],Z=e.z;const cx=250,cy=195,R=150;let s='';
+  s+='<defs><radialGradient id="cg" cx="45%" cy="40%" r="65%"><stop offset="0" stop-color="'+COL.pos+'" stop-opacity=".30"/><stop offset=".8" stop-color="'+COL.pos+'" stop-opacity=".16"/><stop offset="1" stop-color="'+COL.pos+'" stop-opacity=".04"/></radialGradient>'+
+     '<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="'+COL.dim+'"/></marker></defs>';
+  s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="url(#cg)" stroke="'+COL.pos+'" stroke-opacity=".35" stroke-dasharray="4 5"/>';
+  const ex=330,ey=118;
+  if(ok){const rnd=mulberry(Z*7919);const pts=[{x:ex,y:ey,t:'e'}];const dmin=Z>30?13:Z>10?22:30;
+    const want=[];for(let i=0;i<Z;i++)want.push('p');for(let i=1;i<Z;i++)want.push('e');
+    want.forEach(t=>{for(let k=0;k<400;k++){const a=rnd()*Math.PI*2,r=Math.sqrt(rnd())*(R-16);const x=cx+r*Math.cos(a),y=cy+r*Math.sin(a);const dm=k>250?dmin*.6:dmin;if(pts.every(q=>Math.hypot(q.x-x,q.y-y)>dm)){pts.push({x,y,t});return}}});
+    const fs=Z>30?13:20,er=Z>30?4:6.5;
+    pts.forEach(q=>{if(q.t==='p')s+='<text x="'+q.x+'" y="'+(q.y+fs*.35)+'" text-anchor="middle" font-size="'+fs+'" font-weight="700" fill="'+COL.pos+'">+</text>';
+      else s+='<circle cx="'+q.x+'" cy="'+q.y+'" r="'+er+'" fill="'+COL.neg+'"/>'+(Z<=30?'<text x="'+q.x+'" y="'+(q.y+3.5)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">−</text>':'')});
+    s+='<text x="'+cx+'" y="'+(cy-R-10)+'" text-anchor="middle" font-size="14" fill="'+COL.dim+'">'+e.n+': '+Z+' × positive Ladung, '+Z+' Elektronen</text>';
+  }else{s+='<circle cx="'+ex+'" cy="'+ey+'" r="6.5" fill="'+COL.neg+'"/><text x="'+ex+'" y="'+(ey+3.5)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">−</text>';
+    s+='<text x="'+cx+'" y="'+(cy+10)+'" text-anchor="middle" font-size="46" fill="'+COL.dim+'" opacity=".6">?</text><text x="'+cx+'" y="'+(cy+40)+'" text-anchor="middle" font-size="13" fill="'+COL.dim+'">Trage zuerst Protonen und Elektronen richtig ein.</text>'}
+  s+='<line x1="100" y1="372" x2="400" y2="372" stroke="'+COL.dim+'" stroke-width="2" marker-start="url(#ah)" marker-end="url(#ah)"/><line x1="100" y1="'+(cy)+'" x2="100" y2="380" stroke="'+COL.dim+'" stroke-dasharray="3 4"/><line x1="400" y1="'+(cy)+'" x2="400" y2="380" stroke="'+COL.dim+'" stroke-dasharray="3 4"/>';
+  const ld='stroke="'+COL.text+'" stroke-width="1.3"';
+  s+='<line x1="'+(ex+6)+'" y1="'+(ey-3)+'" x2="418" y2="80" '+ld+'/><circle cx="'+ex+'" cy="'+ey+'" r="10" fill="none" '+ld+'/>';
+  s+='<line x1="350" y1="232" x2="418" y2="200" '+ld+'/><circle cx="350" cy="232" r="3" fill="'+COL.text+'"/>';
+  s+='<line x1="400" y1="372" x2="418" y2="372" '+ld+'/>';
+  $('#svg1').innerHTML=s}
+
+/* ======================= TAB 2: Setup figure ======================= */
+const G2={cx:500,cy:220,R:170,gap:7};
+function setupSVG(withNums){const {cx,cy,R,gap}=G2;let s='';
+  s+='<defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="'+COL.pos+'"/></marker></defs>';
+  const a0=(180+gap)*Math.PI/180,a1=(180-gap)*Math.PI/180;
+  s+='<path d="M'+(cx+R*Math.cos(a0))+','+(cy+R*Math.sin(a0))+' A'+R+','+R+' 0 1,1 '+(cx+R*Math.cos(a1))+','+(cy+R*Math.sin(a1))+'" fill="none" stroke="'+COL.screen+'" stroke-width="10" stroke-opacity=".55"/>';
+  s+='<rect x="60" y="175" width="140" height="90" rx="4" fill="'+COL.lead+'"/><rect x="85" y="200" width="50" height="40" rx="3" fill="'+COL.leadd+'"/><rect x="135" y="214" width="65" height="12" fill="'+COL.leadd+'"/>';
+  s+='<circle cx="110" cy="220" r="11" fill="'+COL.warn+'"/><text x="110" y="224.5" text-anchor="middle" font-size="11" font-weight="700" fill="#222">Ra</text>';
+  s+='<line x1="200" y1="220" x2="'+(cx-8)+'" y2="220" stroke="'+COL.pos+'" stroke-width="3" stroke-dasharray="7 6" marker-end="url(#ah2)"/>';
+  s+='<rect x="'+(cx-3)+'" y="'+(cy-55)+'" width="6" height="110" fill="'+COL.gold+'"/>';
+  const ld='stroke="'+COL.text+'" stroke-width="1.3"';
+  s+='<line x1="110" y1="208" x2="110" y2="118" '+ld+'/>';
+  s+='<line x1="185" y1="262" x2="185" y2="338" '+ld+'/>';
+  s+='<line x1="290" y1="220" x2="290" y2="150" '+ld+'/>';
+  s+='<line x1="'+cx+'" y1="'+(cy-55)+'" x2="600" y2="38" '+ld+'/>';
+  const px=cx+R*Math.cos(Math.PI/6),py=cy+R*Math.sin(Math.PI/6);s+='<line x1="'+px+'" y1="'+py+'" x2="660" y2="395" '+ld+'/>';
+  return s}
+function drawSetup(){$('#svg2').innerHTML=setupSVG()}
+const lab1=makeLabeler({fig:$('#fig1'),pool:$('#pool1'),check:$('#chkL1'),reset:$('#rstL1'),fb:$('#fbL1'),
+  targets:[{id:'el',x:70,y:20,w:29},{id:'wolke',x:70,y:50,w:29},{id:'dm',x:70,y:93,w:29}],
+  items:[{id:'el',t:'Elektron (negativ geladen)'},{id:'wolke',t:'positiv geladene Kugelwolke'},{id:'dm',t:'Atomdurchmesser'}],
+  extraG:[{id:'x1',t:'Atomkern'},{id:'x2',t:'Neutron'}]});
+const lab2=makeLabeler({fig:$('#fig2'),pool:$('#pool2'),check:$('#chkL2'),reset:$('#rstL2'),fb:$('#fbL2'),
+  targets:[{id:'pr',x:3,y:22,w:23},{id:'pb',x:12,y:80,w:22},{id:'al',x:27,y:32,w:18},{id:'au',x:73,y:8,w:20},{id:'ls',x:81,y:92,w:18}],
+  items:[{id:'pr',t:'radioaktives Präparat (Radium)'},{id:'pb',t:'Bleiblock mit Blende'},{id:'al',t:'Alpha-Strahlung'},{id:'au',t:'Goldfolie'},{id:'ls',t:'Leuchtschirm'}],
+  extraG:[{id:'x1',t:'Elektronenstrahl'},{id:'x2',t:'Atomkern'}]});
+labelers.push(lab1,lab2);
+
+/* ======================= TAB 2: Phenomenon simulation ======================= */
+const cv2=$('#cv2');let c2;const W2=800,H2=460;
+const S2={run:false,parts:[],acc:0,n:0,a:0,b:0,c:0,flashes:[],layer:null};
+const SC={cx:500,cy:230,R:180,gap:6};
+function initCv2(){c2=fitCanvas(cv2,W2,H2);const d=Math.min(window.devicePixelRatio||1,2);if(!S2.layer){S2.layer=document.createElement('canvas');S2.layer.width=W2*d;S2.layer.height=H2*d;S2.lctx=S2.layer.getContext('2d');S2.lctx.setTransform(d,0,0,d,0,0)}}
+function sampleTheta(){const c2r=1/8000;const real=$('#real2').checked&&NIV==='G';
+  if(!real&&Math.random()<0.006){const b=Math.random()*Math.sqrt(c2r);return 2*Math.atan(Math.sqrt(c2r)/Math.max(b,1e-9))}
+  const b=Math.sqrt(Math.random());let th=2*Math.atan(Math.sqrt(c2r)/Math.max(b,1e-9));
+  if(!real&&th>Math.PI/2){th=Math.PI/2*Math.random()}
+  return th}
+function classify(S,th){const d=th*180/Math.PI;S.n++;if(d<5)S.a++;else if(d<=90)S.b++;else S.c++}
+function addHit(th,sign,instant){let a=sign*th;const lim=Math.PI-SC.gap*Math.PI/180;if(Math.abs(a)>lim)a=Math.sign(a)*lim;
+  const rj=(Math.random()-.5)*6;const x=SC.cx+(SC.R+rj)*Math.cos(a),y=SC.cy+(SC.R+rj)*Math.sin(a);
+  const l=S2.lctx;l.fillStyle=COL.screen;l.globalAlpha=.5;l.beginPath();l.arc(x,y,1.6,0,7);l.fill();l.globalAlpha=1;
+  if(!instant)S2.flashes.push({x,y,t:0});classify(S2,th)}
+function spawn2(){const th=sampleTheta();S2.parts.push({ph:0,x:200,y:SC.cy+(Math.random()-.5)*4,th,sg:Math.random()<.5?-1:1,tr:[]})}
+function step2(dt){if(S2.run){const r=+$('#rate2').value;const perS=Math.round(2+Math.pow(r/100,2)*400);S2.acc+=dt*perS;while(S2.acc>=1){S2.acc--;spawn2()}}
+  const v=420;
+  S2.parts.forEach(p=>{if(p.ph===0){p.x+=v*dt;if(p.x>=SC.cx){p.x=SC.cx;p.ph=1;p.y0=p.y;p.d=0;let a=p.sg*p.th;const lim=Math.PI-SC.gap*Math.PI/180;if(Math.abs(a)>lim)a=Math.sign(a)*lim;p.ang=a}}
+    else{p.d+=v*dt;if(p.d>=SC.R){p.dead=true;addHit(p.th,p.sg,false);if($('#trail2').checked){const l=S2.lctx;l.strokeStyle=COL.pos;l.globalAlpha=.12;l.beginPath();l.moveTo(SC.cx,SC.cy);l.lineTo(SC.cx+SC.R*Math.cos(p.ang),SC.cy+SC.R*Math.sin(p.ang));l.stroke();l.globalAlpha=1}}
+      p.x=SC.cx+p.d*Math.cos(p.ang);p.y=SC.cy+p.d*Math.sin(p.ang)}});
+  S2.parts=S2.parts.filter(p=>!p.dead);
+  S2.flashes.forEach(f=>f.t+=dt);S2.flashes=S2.flashes.filter(f=>f.t<.6);
+}
+function draw2(){if(!c2)return;const c=c2;c.clearRect(0,0,W2,H2);const {cx,cy,R,gap}=SC;
+  c.lineWidth=12;c.strokeStyle=COL.screen;c.globalAlpha=.22;c.beginPath();c.arc(cx,cy,R,(-180+gap)*Math.PI/180,(180-gap)*Math.PI/180);c.stroke();c.globalAlpha=1;
+  c.drawImage(S2.layer,0,0,W2,H2);
+  c.fillStyle=COL.lead;c.fillRect(60,185,140,90);c.fillStyle=COL.leadd;c.fillRect(85,210,50,40);c.fillRect(135,224,65,12);
+  c.fillStyle=COL.warn;c.beginPath();c.arc(110,230,11,0,7);c.fill();c.fillStyle='#222';c.font='bold 11px system-ui';c.textAlign='center';c.fillText('Ra',110,234);
+  c.fillStyle=COL.gold;c.fillRect(cx-3,cy-55,6,110);
+  c.fillStyle=COL.dim;c.font='13px system-ui';c.fillText('Goldfolie',cx,cy-64);c.fillText('Leuchtschirm',cx+R-20,cy-R+6);c.fillText('radioaktives Präparat im Bleiblock',130,170);
+  S2.parts.forEach(p=>{c.fillStyle=COL.pos;c.beginPath();c.arc(p.x,p.y,3,0,7);c.fill()});
+  S2.flashes.forEach(f=>{const a=1-f.t/.6;c.fillStyle=COL.screen;c.globalAlpha=a;c.beginPath();c.arc(f.x,f.y,3+8*a,0,7);c.fill();c.globalAlpha=1});
+  c.fillStyle=COL.dim;c.font='12px system-ui';c.textAlign='left';c.fillText('Blick von oben auf den Versuchsaufbau',12,H2-12);
+  ['s2n','s2a','s2b','s2c'].forEach((id,i)=>$('#'+id).textContent=[S2.n,S2.a,S2.b,S2.c][i].toLocaleString('de-DE'));
+  $('#s2ap').textContent=pct(S2.a,S2.n);$('#s2bp').textContent=pct(S2.b,S2.n);$('#s2cp').textContent=pct(S2.c,S2.n);
+}
+$('#run2').onclick=()=>{S2.run=!S2.run;$('#run2').textContent=S2.run?'Pause':'Start'};
+$('#burst2').onclick=()=>{for(let i=0;i<1000;i++){addHit(sampleTheta(),Math.random()<.5?-1:1,true)}};
+$('#clr2').onclick=()=>{S2.lctx.clearRect(0,0,W2,H2);Object.assign(S2,{n:0,a:0,b:0,c:0,parts:[],flashes:[]})};
+$('#real2').onchange=updateNote2;
+function updateNote2(){$('#note2').textContent=($('#real2').checked&&NIV==='G')?'Realistische Häufigkeit: Im Originalversuch wurde nur etwa eines von 8000 Alpha-Teilchen um mehr als 90° abgelenkt. Du musst sehr viele Teilchen fliegen lassen, um einen Rückwurf zu sehen.':'Hinweis: Damit man in kurzer Zeit zurückgeworfene Alpha-Teilchen beobachten kann, ist ihr Anteil in der Simulation stark vergrößert (Original: etwa 1 von 8000).'}
+
+const OBS=[{t:'gerade hinter der Goldfolie (geradeaus, kaum abgelenkt)',a:'fast alle'},{t:'seitlich (abgelenkt)',a:'einige'},{t:'vor der Goldfolie, also auf der Seite des Präparats (zurückgeworfen)',a:'sehr wenige'}];
+function buildObs(){const t=$('#obsT');t.querySelectorAll('tr.r').forEach(r=>r.remove());const opts=['keine','sehr wenige','einige','fast alle'];
+  OBS.forEach((o,i)=>{const tr=document.createElement('tr');tr.className='r';tr.innerHTML='<td>'+o.t+'</td><td><select data-i="'+i+'"><option value="">– wählen –</option>'+opts.map(x=>'<option>'+x+'</option>').join('')+'</select></td>';t.appendChild(tr)});$('#fbObs').textContent=''}
+$('#chkObs').onclick=()=>{let ok=0;$$('#obsT select').forEach(s=>{const r=s.value===OBS[s.dataset.i].a;s.className=s.value?(r?'ok':'bad'):'';if(r)ok++});
+  if(ok===3)fb($('#fbObs'),true,'Richtig. Notiere die Beobachtungen auf dem Arbeitsblatt (2 c).');else fb($('#fbObs'),false,ok+' von 3 richtig. Rot markierte Angaben sind <b>falsch</b>. Lass mehr Teilchen fliegen und vergleiche die Zähler.')};
+
+/* ======================= TAB 3 ======================= */
+const MC3={R:[{t:'Fast alle Alpha-Teilchen gehen ungehindert durch die Goldfolie. Kein Teilchen wird zurückgeworfen.',ok:1},{t:'Alle Alpha-Teilchen werden von der Goldfolie zurückgeworfen.'},{t:'Die Hälfte der Alpha-Teilchen wird zurückgeworfen.'}],
+ G:[{t:'Die Alpha-Teilchen durchdringen die Goldfolie nahezu ungehindert; sie werden höchstens minimal abgelenkt, keines wird zurückgeworfen.',ok:1},{t:'Alle Alpha-Teilchen werden von der Goldfolie zurückgeworfen.'},{t:'Die Alpha-Teilchen werden gleichmäßig in alle Richtungen abgelenkt.'},{t:'Die Alpha-Teilchen werden von den Elektronen eingefangen und erreichen den Leuchtschirm nicht.'}]};
+let mcOrder=[];
+function buildMc3(){const L=MC3[NIV];mcOrder=shuffle(L.map((x,i)=>i));$('#mc3').innerHTML=mcOrder.map(i=>'<label><input type="radio" name="mc3" value="'+i+'"><span>'+L[i].t+'</span></label>').join('');$('#fbMc3').textContent=''}
+$('#chkMc3').onclick=()=>{const r=document.querySelector('input[name=mc3]:checked');const L=MC3[NIV];$$('#mc3 label').forEach(l=>l.className='');
+  if(!r){fb($('#fbMc3'),false,'Wähle eine Antwort aus.');return}
+  const ok=!!L[+r.value].ok;r.closest('label').className=ok?'ok':'bad';
+  if(ok)fb($('#fbMc3'),true,(NIV==='G'?'Richtig. Im Kugelwolkenmodell sind positive Ladung und Masse gleichmäßig über das ganze Atom verteilt. Nirgends gibt es eine starke Abstoßung, die ein Alpha-Teilchen deutlich ablenken oder zurückwerfen könnte. ':'Richtig. Im Kugelwolkenmodell ist die positive Ladung überall gleich verteilt. Deshalb gibt es keine Stelle, die ein Alpha-Teilchen stark ablenkt. ')+'<br><b>Vergleich mit der Beobachtung:</b> Einige Alpha-Teilchen werden abgelenkt, sehr wenige sogar zurückgeworfen. Die Erwartung stimmt nicht mit der Beobachtung überein – das Kugelwolkenmodell muss verändert werden.');
+  else fb($('#fbMc3'),false,'<b>Falsch.</b> Überlege: Wie ist die positive Ladung im Kugelwolkenmodell verteilt? Probiere in Reiter 4 c das Kugelwolkenmodell aus.')};
+const CONC=[{k:'A',t:'Der positiv geladene Bereich im Atom ist sehr klein und enthält fast die gesamte Masse des Atoms (Atomkern).',o:2},{k:'B',t:'Das Atom besteht größtenteils aus nahezu leerem Raum mit sehr geringer Masse (Atomhülle).',o:0},{k:'C',t:'Im Atom gibt es einen positiv geladenen Bereich, der die positiv geladenen Alpha-Teilchen abstößt.',o:1},{k:'D',t:'Die Elektronen lenken die Alpha-Teilchen stark ab, weil sie negativ geladen sind.',o:-1,g:1}];
+const ZUOBS=['Fast alle Alpha-Teilchen durchdringen die Goldfolie ohne Ablenkung.','Einige Alpha-Teilchen werden abgelenkt.','Sehr wenige Alpha-Teilchen werden zurückgeworfen.'];
+function buildZu(){const cs=CONC.filter(c=>!c.g||NIV==='G');$('#concl').innerHTML=cs.map(c=>'<li style="list-style:none;margin:4px 0"><b>'+c.k+'</b> – '+c.t+'</li>').join('');
+  const t=$('#zuT');t.querySelectorAll('tr.r').forEach(r=>r.remove());ZUOBS.forEach((o,i)=>{const tr=document.createElement('tr');tr.className='r';tr.innerHTML='<td>'+(i+1)+'. '+o+'</td><td><select data-i="'+i+'"><option value="">–</option>'+cs.map(c=>'<option>'+c.k+'</option>').join('')+'</select></td>';t.appendChild(tr)});$('#fbZu').textContent=''}
+$('#chkZu').onclick=()=>{let ok=0;$$('#zuT select').forEach(s=>{const c=CONC.find(x=>x.k===s.value);const r=c&&c.o===+s.dataset.i;s.className=s.value?(r?'ok':'bad'):'';if(r)ok++});
+  if(ok===3){fb($('#fbZu'),true,'Richtig. Damit hast du das Kern-Hülle-Modell abgeleitet. Notiere die Zuordnung auf dem Arbeitsblatt (3 b).');unlockKH()}
+  else fb($('#fbZu'),false,ok+' von 3 richtig. Rot markierte Zuordnungen sind <b>falsch</b>.')};
+function unlockKH(){$('#khBody').classList.remove('locked');$('#khLock').style.display='none';drawKH()}
+$('#unlock3').onclick=unlockKH;
+let khZ=6;
+$$('#khEl button').forEach(b=>b.onclick=()=>{khZ=+b.dataset.z;$$('#khEl button').forEach(x=>x.classList.toggle('on',x===b));drawKH()});
+$('#khLab').onchange=drawKH;
+function drawKH(){const Z=khZ,cx=260,cy=200,R=165;let s='';
+  s+='<defs><radialGradient id="hg" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="'+COL.neg+'" stop-opacity=".05"/><stop offset=".7" stop-color="'+COL.neg+'" stop-opacity=".13"/><stop offset="1" stop-color="'+COL.neg+'" stop-opacity=".03"/></radialGradient></defs>';
+  s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="url(#hg)" stroke="'+COL.neg+'" stroke-opacity=".35" stroke-dasharray="4 5"/>';
+  const rn=12+9.5*Math.sqrt(Z-1);
+  s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+rn+'" fill="'+COL.posbg+'" stroke="'+COL.pos+'" stroke-width="1.5"/>';
+  const pp=[];for(let i=0;i<Z;i++){const a=i*2.39996,r=i===0?0:10*Math.sqrt(i);pp.push([cx+r*Math.cos(a),cy+r*Math.sin(a)])}
+  pp.forEach(q=>s+='<circle cx="'+q[0]+'" cy="'+q[1]+'" r="6.5" fill="'+COL.pos+'"/><text x="'+q[0]+'" y="'+(q[1]+3.6)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">+</text>');
+  const ee=[];for(let i=0;i<Z;i++){const a=-Math.PI/4+i*2*Math.PI/Z+(i%2?0.35:0),r=(i%2?95:130)-(Z<4?20:0);ee.push([cx+r*Math.cos(a),cy+r*Math.sin(a)])}
+  ee.forEach(q=>s+='<circle cx="'+q[0]+'" cy="'+q[1]+'" r="7" fill="'+COL.neg+'"/><text x="'+q[0]+'" y="'+(q[1]+3.6)+'" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">−</text>');
+  if($('#khLab').checked){const t='fill="'+COL.text+'" font-size="15"',l='stroke="'+COL.text+'" stroke-width="1.2"';
+    s+='<line x1="'+(cx+rn)+'" y1="'+cy+'" x2="470" y2="200" '+l+'/><text x="476" y="205" '+t+'>Atomkern</text>';
+    s+='<line x1="'+pp[0][0]+'" y1="'+pp[0][1]+'" x2="470" y2="265" '+l+'/><text x="476" y="270" '+t+'>Proton (+)</text>';
+    s+='<line x1="'+ee[0][0]+'" y1="'+ee[0][1]+'" x2="470" y2="95" '+l+'/><text x="476" y="100" '+t+'>Elektron (−)</text>';
+    s+='<line x1="'+(cx+R*Math.cos(.9))+'" y1="'+(cy+R*Math.sin(.9))+'" x2="470" y2="345" '+l+'/><text x="476" y="350" '+t+'>Atomhülle</text>'}
+  s+='<text x="'+cx+'" y="392" text-anchor="middle" font-size="12" fill="'+COL.dim+'">'+({2:'Helium',3:'Lithium',6:'Kohlenstoff'})[Z]+': '+Z+' Protonen im Kern, '+Z+' Elektronen in der Hülle (Kern stark vergrößert)</text>';
+  $('#svg3').innerHTML=s}
+
+/* ======================= TAB 4a: Charges ======================= */
+const cvQ=$('#cvQ');let cQ;const WQ=640,HQ=210;const Q={l:1,r:1,xl:220,xr:420,st:'idle',t:0};
+function drawQ(){const c=cQ;c.clearRect(0,0,WQ,HQ);const y=105,r=36;
+  [['l',Q.xl],['r',Q.xr]].forEach(([k,x])=>{const s=Q[k];const col=s>0?COL.pos:COL.neg;c.fillStyle=col;c.globalAlpha=.9;c.beginPath();c.arc(x,y,r,0,7);c.fill();c.globalAlpha=1;c.fillStyle='#fff';c.font='bold 34px system-ui';c.textAlign='center';c.fillText(s>0?'+':'−',x,y+12)});
+  if(Q.st!=='idle'){const rep=Q.l===Q.r;c.strokeStyle=COL.text;c.fillStyle=COL.text;c.lineWidth=2.5;
+    const arr=(x0,x1)=>{c.beginPath();c.moveTo(x0,y-58);c.lineTo(x1,y-58);c.stroke();const d=Math.sign(x1-x0);c.beginPath();c.moveTo(x1,y-58);c.lineTo(x1-10*d,y-64);c.lineTo(x1-10*d,y-52);c.fill()};
+    if(rep){arr(Q.xl,Q.xl-60);arr(Q.xr,Q.xr+60)}else{arr(Q.xl-20,Q.xl+40);arr(Q.xr+20,Q.xr-40)}
+    c.font='15px system-ui';c.fillStyle=COL.text;c.fillText(rep?'Abstoßung':'Anziehung',WQ/2,HQ-14)}}
+function stepQ(dt){if(Q.st!=='run')return;Q.t=Math.min(1,Q.t+dt*1.1);const e=1-Math.pow(1-Q.t,3);const rep=Q.l===Q.r;
+  if(rep){Q.xl=220-120*e;Q.xr=420+120*e}else{Q.xl=220+64*e;Q.xr=420-64*e}if(Q.t>=1)Q.st='done'}
+function qBtns(){$('#qL').textContent='linke Kugel: '+(Q.l>0?'+':'−');$('#qR').textContent='rechte Kugel: '+(Q.r>0?'+':'−')}
+function qReset(){Q.xl=220;Q.xr=420;Q.st='idle';Q.t=0;$('#fbQ').textContent=''}
+$('#qL').onclick=()=>{Q.l*=-1;qReset();qBtns()};$('#qR').onclick=()=>{Q.r*=-1;qReset();qBtns()};
+$('#qGo').onclick=()=>{qReset();Q.st='run';const rep=Q.l===Q.r;const pair=(Q.l>0?'+':'−')+' und '+(Q.r>0?'+':'−');fb($('#fbQ'),null,pair+': '+(rep?'Die Kugeln <b>stoßen sich ab</b> (gleichnamige Ladungen).':'Die Kugeln <b>ziehen sich an</b> (ungleichnamige Ladungen).'))};
+$('#qBack').onclick=qReset;
+const LTQ={R:{txt:'Gleichnamige Ladungen (+ und + oder − und −) {0} sich {1}. Ungleichnamige Ladungen (+ und −) {2} sich {3}. Alpha-Teilchen und Atomkern sind beide positiv geladen. Sie {4} sich deshalb ab.',ans:['stoßen','ab','ziehen','an','stoßen'],opts:['ab','an','stoßen','ziehen']},
+           G:{txt:'Gleichnamige Ladungen {0} sich {1}, ungleichnamige Ladungen {2} sich {3}. Alpha-Teilchen und Atomkern sind beide {5} geladen; zwischen ihnen wirkt deshalb eine {6}.',ans:['stoßen','ab','ziehen','an',null,'positiv','Abstoßung'],opts:['ab','an','stoßen','ziehen','positiv','negativ','Anziehung','Abstoßung']}};
+function buildLtQ(){const L=LTQ[NIV];let h=L.txt.replace(/\{(\d)\}/g,(m,i)=>'<select data-i="'+i+'"><option value="">…</option>'+shuffle(L.opts).map(o=>'<option>'+o+'</option>').join('')+'</select>');$('#ltQ').innerHTML=h;
+  const words=L.txt.match(/\{\d\}/g).map(m=>L.ans[+m[1]]);$('#bankQ').innerHTML='<b>Wortliste:</b> '+shuffle(words).join(' – ');$('#fbQ2').textContent=''}
+$('#chkQ').onclick=()=>{const L=LTQ[NIV];let ok=0,n=0;$$('#ltQ select').forEach(s=>{n++;const r=s.value===L.ans[+s.dataset.i];s.className=s.value?(r?'ok':'bad'):'';if(r)ok++});
+  if(ok===n)fb($('#fbQ2'),true,'Richtig. Übertrage die Regeln auf das Arbeitsblatt (4 a).');else fb($('#fbQ2'),false,ok+' von '+n+' richtig. Rot markierte Wörter sind <b>falsch</b>. Probiere die Ladungen oben noch einmal aus.')};
+
+/* ======================= TAB 4b: Zoom ======================= */
+const cvZ=$('#cvZ');let cZ;const WZ=640,HZ=360;const RATIO=20571;const ATOM_D=0.288e-9;
+function niceLen(m){const p=Math.pow(10,Math.floor(Math.log10(m)));const f=m/p;const n=f<1.5?1:f<3.5?2:f<7.5?5:10;return n*p}
+function fmtLen(m){if(m>=1e-9)return (m/1e-9).toLocaleString('de-DE',{maximumFractionDigits:3})+' nm';if(m>=1e-12)return (m/1e-12).toLocaleString('de-DE',{maximumFractionDigits:3})+' pm';return (m/1e-15).toLocaleString('de-DE',{maximumFractionDigits:3})+' fm'}
+const zElec=(()=>{const r=mulberry(79);const a=[];for(let i=0;i<79;i++){a.push([r()*Math.PI*2,0.25+0.75*Math.sqrt(r())])}return a})();
+function drawZ(){const c=cZ;c.clearRect(0,0,WZ,HZ);const v=+$('#zoom').value/1000;const mag=Math.pow(10,v*Math.log10(RATIO*0.8));const Ra=150*mag,cx=WZ/2,cy=HZ/2;const rn=Ra/RATIO;
+  const g=c.createRadialGradient(cx,cy,0,cx,cy,Math.max(Ra,1));g.addColorStop(0,COL.shell);g.addColorStop(.85,COL.shell);g.addColorStop(1,'rgba(0,0,0,0)');
+  c.fillStyle=g;c.beginPath();c.arc(cx,cy,Math.min(Ra,5000),0,7);c.fill();
+  if(Ra<4000){c.strokeStyle=COL.neg;c.globalAlpha=.4;c.setLineDash([4,5]);c.beginPath();c.arc(cx,cy,Ra,0,7);c.stroke();c.setLineDash([]);c.globalAlpha=1}
+  c.fillStyle=COL.neg;zElec.forEach(([a,r])=>{const x=cx+Ra*r*Math.cos(a),y=cy+Ra*r*Math.sin(a);if(x>-5&&x<WZ+5&&y>-5&&y<HZ+5){c.beginPath();c.arc(x,y,2.2,0,7);c.fill()}});
+  if(rn<1.2){c.fillStyle=COL.pos;c.beginPath();c.arc(cx,cy,1,0,7);c.fill();c.strokeStyle=COL.pos;c.lineWidth=1.5;c.beginPath();c.arc(cx,cy,16,0,7);c.stroke();
+    c.fillStyle=COL.text;c.font='13px system-ui';c.textAlign='center';c.fillText('Hier liegt der Atomkern. In diesem Maßstab wäre er nur',cx,cy+38);c.fillText((rn*2).toLocaleString('de-DE',{maximumSignificantDigits:2})+' Pixel groß – also unsichtbar.',cx,cy+55)}
+  else{c.fillStyle=COL.pos;c.beginPath();c.arc(cx,cy,rn,0,7);c.fill();if(rn>14){c.fillStyle='#fff';c.font='bold '+Math.min(40,rn*.6)+'px system-ui';c.textAlign='center';c.fillText('79+',cx,cy+Math.min(40,rn*.6)*.35)}
+    c.fillStyle=COL.text;c.font='13px system-ui';c.textAlign='left';c.fillText('Atomkern',cx+rn+8,cy-rn*.7)}
+  const ppm=300*mag/ATOM_D;const L=niceLen(110/ppm);const px=L*ppm;c.strokeStyle=COL.text;c.lineWidth=2;c.beginPath();c.moveTo(20,HZ-22);c.lineTo(20+px,HZ-22);c.moveTo(20,HZ-28);c.lineTo(20,HZ-16);c.moveTo(20+px,HZ-28);c.lineTo(20+px,HZ-16);c.stroke();
+  c.fillStyle=COL.text;c.font='13px system-ui';c.textAlign='left';c.fillText(fmtLen(L),24+px,HZ-17);
+  c.fillStyle=COL.dim;c.textAlign='right';c.fillText('Goldatom, Vergrößerung ca. '+Math.round(mag).toLocaleString('de-DE')+'-fach gegenüber Startansicht',WZ-12,18);
+  if(Ra>WZ){c.textAlign='right';c.fillText('Die Atomhülle reicht weit über den Bildrand hinaus.',WZ-12,HZ-17)}
+}
+function anaUpd(){const A=[['Stecknadelkopf',0.001],['Murmel',0.01],['Fußball',0.22]][+$('#anaSel').value];const d=A[1]*RATIO;let ds=d>=1000?(d/1000).toLocaleString('de-DE',{maximumFractionDigits:1})+' km':Math.round(d).toLocaleString('de-DE')+' m';
+  const cmp=d<50?'etwa so hoch wie ein sechsstöckiges Haus':d<1000?'etwa so lang wie zwei Fußballfelder hintereinander':'so groß wie eine Kleinstadt';
+  $('#anaTxt').innerHTML='… dann hätte das Goldatom einen Durchmesser von etwa <b>'+ds+'</b> – '+cmp+'.'}
+$('#anaSel').onchange=anaUpd;$('#zoom').oninput=drawZ;
+function sizeFacts(){$('#sizeFacts').innerHTML=NIV==='G'?
+ 'Durchmesser Goldatom: ca. 0,29 nm<br>Durchmesser Goldatomkern: ca. 0,000 014 nm (14 fm)<br>Verhältnis: etwa 1 : 20 000 (beim Wasserstoffatom etwa 1 : 60 000)<br>Masse: Der Atomkern enthält mehr als 99,9 % der Masse des Atoms.':
+ 'Das Goldatom ist etwa <b>20 000-mal</b> so groß wie sein Atomkern.<br>Trotzdem steckt fast die ganze Masse des Atoms (mehr als 99,9 %) im winzigen Atomkern.'}
+
+/* ======================= TAB 4c: Model scattering ======================= */
+const cvM=$('#cvM');let cM;const WM=800,HM=420;
+const MS={mode:'kern',run:true,parts:[],acc:0,n:0,a:0,b:0,c:0,trails:null};
+const RA=70;const ATOMS=[];[[380,[70,210,350]],[501,[0,140,280,420]]].forEach(([x,ys])=>ys.forEach(y=>ATOMS.push({x,y,e:(()=>{const r=mulberry(x*31+y);const a=[];for(let i=0;i<9;i++)a.push([r()*7,20+r()*45]);return a})(),p:(()=>{const r=mulberry(x+y*17);const a=[];for(let i=0;i<10;i++)a.push([r()*7,Math.sqrt(r())*60]);return a})()})));
+const V0=190;
+function mPar(){const t=$('#msTrue').checked;return t?{rmin:1.3,Rs:6,rn:1.1}:{rmin:5,Rs:20,rn:4.5}}
+function kFor(p){return 0.5*V0*V0/(1/p.rmin+p.rmin/(p.Rs*p.Rs)-2/p.Rs)}
+function accel(x,y,p,K){let ax=0,ay=0,rnear=1e9;for(const A of ATOMS){const dx=x-A.x,dy=y-A.y;if(Math.abs(dx)>RA||Math.abs(dy)>RA)continue;const r=Math.hypot(dx,dy);if(r<rnear)rnear=r;
+    if(MS.mode==='kern'){if(r<p.Rs){const rr=Math.max(r,0.15);const f=K*(1/(rr*rr)-1/(p.Rs*p.Rs));ax+=f*dx/rr;ay+=f*dy/rr}}
+    else{if(r<RA){const f=0.3*K/(RA*RA*RA);ax+=f*dx;ay+=f*dy}}}
+  return{ax,ay,rnear}}
+function spawnM(y){MS.parts.push({x:-6,y:y===undefined?10+Math.random()*(HM-20):y,vx:V0,vy:0,tr:[]})}
+function stepM(dt){if(MS.run){const perS=+$('#msRate').value;MS.acc+=dt*perS;while(MS.acc>=1){MS.acc--;spawnM()}}
+  const p=mPar(),K=kFor(p);
+  MS.parts.forEach(q=>{let t=0;let guard=0;while(t<dt&&guard<4000){guard++;const A=accel(q.x,q.y,p,K);const sp=Math.hypot(q.vx,q.vy)||1;let h=Math.min(dt-t,1/240);if(MS.mode==='kern'&&A.rnear<p.Rs*1.5)h=Math.min(h,0.03*Math.max(A.rnear,0.2)/sp);
+      q.vx+=A.ax*h;q.vy+=A.ay*h;q.x+=q.vx*h;q.y+=q.vy*h;t+=h}
+    q.tr.push([q.x,q.y]);if(q.tr.length>700)q.tr.shift();
+    if(q.x<-10||q.x>WM+10||q.y<-10||q.y>HM+10){q.dead=true;const th=Math.abs(Math.atan2(q.vy,q.vx));classify(MS,th);
+      const l=MS.tctx;l.strokeStyle=th>Math.PI/2?COL.warn:th>5*Math.PI/180?COL.pos:COL.pos;l.globalAlpha=th>5*Math.PI/180?.55:.06;l.lineWidth=1.2;l.beginPath();q.tr.forEach((pt,i)=>i?l.lineTo(pt[0],pt[1]):l.moveTo(pt[0],pt[1]));l.stroke();l.globalAlpha=1}});
+  MS.parts=MS.parts.filter(q=>!q.dead)}
+function drawM(){if(!cM)return;const c=cM;c.clearRect(0,0,WM,HM);const p=mPar();
+  ATOMS.forEach(A=>{if(MS.mode==='kern'){c.fillStyle=COL.shell;c.beginPath();c.arc(A.x,A.y,RA,0,7);c.fill();c.strokeStyle=COL.neg;c.globalAlpha=.3;c.setLineDash([3,5]);c.beginPath();c.arc(A.x,A.y,RA,0,7);c.stroke();c.setLineDash([]);c.globalAlpha=1;
+      c.fillStyle=COL.neg;A.e.forEach(([a,r])=>{c.beginPath();c.arc(A.x+r*Math.cos(a),A.y+r*Math.sin(a),2,0,7);c.fill()});
+      c.fillStyle=COL.pos;c.beginPath();c.arc(A.x,A.y,p.rn,0,7);c.fill();
+      if(!$('#msTrue').checked&&NIV==='G'){c.fillStyle=COL.dim;c.font='9px system-ui';c.textAlign='center';c.fillText('79+',A.x,A.y-8)}}
+    else{c.fillStyle=COL.cloud;c.beginPath();c.arc(A.x,A.y,RA,0,7);c.fill();c.fillStyle=COL.pos;c.font='bold 12px system-ui';c.textAlign='center';A.p.forEach(([a,r])=>c.fillText('+',A.x+r*Math.cos(a),A.y+r*Math.sin(a)+4));
+      c.fillStyle=COL.neg;A.e.forEach(([a,r])=>{c.beginPath();c.arc(A.x+r*Math.cos(a+1),A.y+r*Math.sin(a+1),2,0,7);c.fill()})}});
+  c.drawImage(MS.trails,0,0,WM,HM);
+  MS.parts.forEach(q=>{c.strokeStyle=COL.pos;c.globalAlpha=.5;c.lineWidth=1.2;c.beginPath();q.tr.slice(-70).forEach((pt,i)=>i?c.lineTo(pt[0],pt[1]):c.moveTo(pt[0],pt[1]));c.stroke();c.globalAlpha=1;
+    c.fillStyle=COL.pos;c.beginPath();c.arc(q.x,q.y,5,0,7);c.fill();c.fillStyle='#fff';c.font='bold 9px system-ui';c.textAlign='center';c.fillText('+',q.x,q.y+3)});
+  c.fillStyle=COL.dim;c.font='12px system-ui';c.textAlign='left';c.fillText('Ausschnitt aus der Goldfolie: zwei Lagen von Goldatomen',10,HM-10);c.fillText('Alpha-Strahl →',10,18);
+  ['m_n','m_a','m_b','m_c'].forEach((id,i)=>$('#'+id).textContent=[MS.n,MS.a,MS.b,MS.c][i].toLocaleString('de-DE'));
+  $('#m_ap').textContent=pct(MS.a,MS.n);$('#m_bp').textContent=pct(MS.b,MS.n);$('#m_cp').textContent=pct(MS.c,MS.n)}
+function clrM(){MS.parts=[];MS.n=MS.a=MS.b=MS.c=0;if(MS.tctx)MS.tctx.clearRect(0,0,WM,HM)}
+function updateModelNote(){const t=$('#msTrue').checked;let s;
+  if(MS.mode==='cloud')s=NIV==='G'?'Kugelwolkenmodell: Die positive Ladung ist über das ganze Atom verteilt. Die abstoßende Wirkung auf ein Alpha-Teilchen ist überall schwach – die Teilchen fliegen nahezu geradeaus. Zurückgeworfene Alpha-Teilchen lassen sich mit diesem Modell nicht erklären.':'Kugelwolkenmodell: Die positive Ladung ist überall verteilt. Die Alpha-Teilchen fliegen fast geradeaus durch. Kein Teilchen wird zurückgeworfen – das passt nicht zur Beobachtung.';
+  else s=(t?'Atomkern kleiner dargestellt: Abgelenkte Alpha-Teilchen werden seltener. Maßstabsgetreu wäre der Atomkern noch etwa 1000-mal kleiner als hier – deshalb wird im echten Versuch nur ein winziger Anteil stark abgelenkt.':'Kern-Hülle-Modell: Nur Alpha-Teilchen, die dem positiv geladenen Atomkern sehr nahe kommen, werden abgestoßen und abgelenkt. Trifft ein Alpha-Teilchen fast genau auf den Kern zu, wird es zurückgeworfen. Atomkern und Häufigkeit der Ablenkungen sind hier stark vergrößert.');
+  $('#msNote').textContent=s}
+$$('#msMode button').forEach(b=>b.onclick=()=>{MS.mode=b.dataset.m;$$('#msMode button').forEach(x=>x.classList.toggle('on',x===b));$('#msTrue').disabled=MS.mode!=='kern';clrM();updateModelNote()});
+$('#msTrue').onchange=()=>{clrM();updateModelNote()};
+$('#msRun').onclick=()=>{MS.run=!MS.run;$('#msRun').textContent=MS.run?'Pause':'Start'};
+$('#msClr').onclick=clrM;
+$('#msAim').onclick=()=>{const cand=ATOMS.filter(A=>A.x<450&&A.y>40&&A.y<HM-40);const A=cand[Math.floor(Math.random()*cand.length)];spawnM(A.y+(Math.random()*2-1)*0.4)};
+cvM.addEventListener('click',e=>{const p=cvPos(cvM,e);spawnM(p.y)});
+
+/* ======================= TAB 5: Sicherung ======================= */
+const SOL=[
+ {h:'Aufgabe 1 a – Protonen und Elektronen',G:'<table class="t"><tr><th>Element</th><th>Symbol</th><th>Ordnungszahl</th><th>Protonen</th><th>Elektronen</th></tr><tr><td>Helium</td><td>He</td><td>2</td><td>2</td><td>2</td></tr><tr><td>Kohlenstoff</td><td>C</td><td>6</td><td>6</td><td>6</td></tr><tr><td>Natrium</td><td>Na</td><td>11</td><td>11</td><td>11</td></tr><tr><td>Gold</td><td>Au</td><td>79</td><td>79</td><td>79</td></tr></table>'},
+ {h:'Aufgabe 1 b – Beschriftung Kugelwolkenmodell',G:'1 Elektron (negativ geladen) · 2 positiv geladene Kugelwolke · 3 Atomdurchmesser'},
+ {h:'Aufgabe 1 c – Elektrische Neutralität',G:'Die Anzahl der Elektronen ist gleich der Anzahl der Protonen. Die positiven und negativen Ladungen gleichen sich aus; das Atom ist daher nach außen elektrisch neutral.',R:'Die Ordnungszahl gibt die Anzahl der <b>Protonen</b> an. Ein Atom hat genauso viele <b>Elektronen</b> wie Protonen. Deshalb ist das Atom nach außen elektrisch <b>neutral</b>.'},
+ {h:'Aufgabe 2 a – Versuchsaufbau',G:'1 radioaktives Präparat (Radium) · 2 Bleiblock mit Blende · 3 Alpha-Strahlung · 4 Goldfolie · 5 Leuchtschirm'},
+ {h:'Aufgabe 2 b – Ladung der Alpha-Teilchen',G:'Alpha-Teilchen sind zweifach positiv geladen (2+).'},
+ {h:'Aufgabe 2 c – Beobachtungen',G:'<table class="t"><tr><th>Auftreffort auf dem Leuchtschirm</th><th>Anzahl</th></tr><tr><td>gerade hinter der Goldfolie (kaum abgelenkt)</td><td>fast alle</td></tr><tr><td>seitlich (abgelenkt)</td><td>einige</td></tr><tr><td>vor der Goldfolie (zurückgeworfen)</td><td>sehr wenige</td></tr></table>'},
+ {h:'Aufgabe 3 a – Erwartung und Vergleich',G:'Nach dem Kugelwolkenmodell sind positive Ladung und Masse gleichmäßig über das Atom verteilt. Erwartet wird daher, dass alle Alpha-Teilchen die Goldfolie nahezu ungehindert und höchstens minimal abgelenkt durchdringen; kein Alpha-Teilchen sollte zurückgeworfen werden. Beobachtet wird jedoch, dass einige Alpha-Teilchen abgelenkt und sehr wenige zurückgeworfen werden. Erwartung und Beobachtung widersprechen sich – das Kugelwolkenmodell muss verändert werden.',R:'Angekreuzt: „Fast alle Alpha-Teilchen gehen ungehindert durch die Goldfolie. Kein Teilchen wird zurückgeworfen.“ – Die Erwartung stimmt <b>nicht</b> mit der Beobachtung überein (Nein).'},
+ {h:'Aufgabe 3 b – Schlussfolgerungen',G:'1 → B (Atom größtenteils nahezu leerer Raum, Atomhülle) · 2 → C (positiv geladener Bereich stößt Alpha-Teilchen ab) · 3 → A (dieser Bereich ist sehr klein und enthält fast die gesamte Masse: Atomkern). D ist falsch: Elektronen sind sehr leicht und lenken die schweren Alpha-Teilchen kaum ab.',R:'1 → B · 2 → C · 3 → A'},
+ {h:'Aufgabe 3 c – Kern-Hülle-Modell (Kohlenstoffatom)',G:'Zeichnung: kleiner Atomkern im Zentrum mit 6 Protonen (+), große Atomhülle mit 6 Elektronen (−). Beschriftung: Atomkern, Atomhülle, Proton, Elektron. Hinweis auf Nicht-Maßstäblichkeit (Kern stark vergrößert) wünschenswert. Neutronen werden noch nicht eingezeichnet.'},
+ {h:'Aufgabe 4 a – Ladungsregeln',G:'Gleichnamige Ladungen stoßen sich ab, ungleichnamige Ladungen ziehen sich an. Alpha-Teilchen und Atomkern sind beide positiv geladen; zwischen ihnen wirkt eine Abstoßung.',R:'Gleichnamige Ladungen <b>stoßen</b> sich <b>ab</b>. Ungleichnamige Ladungen <b>ziehen</b> sich <b>an</b>. Alpha-Teilchen und Atomkern <b>stoßen</b> sich ab.'},
+ {h:'Aufgabe 4 b – Größenvergleich',G:'0,29 nm : 0,000 014 nm ≈ 20 700, also rund 20 000. Der Atomdurchmesser ist etwa 20 000-mal so groß wie der Kerndurchmesser. Murmel 1 cm · 20 000 = 20 000 cm = 200 m: Das Atom hätte einen Durchmesser von etwa 200 m.',R:'Angekreuzt: „ein Fußballstadion (ca. 200 m)“.'},
+ {h:'Aufgabe 4 c – Erklärung des Streuversuchs',G:'Die Atomhülle besteht größtenteils aus nahezu leerem Raum und hat fast keine Masse; die sehr leichten Elektronen lenken die Alpha-Teilchen kaum ab. Deshalb durchdringen fast alle Alpha-Teilchen die Goldfolie ungehindert. Der Atomkern ist positiv geladen, ebenso die Alpha-Teilchen: Gleichnamige Ladungen stoßen sich ab. Alpha-Teilchen, die nahe an einem Atomkern vorbeifliegen, werden deshalb abgelenkt. Da der Atomkern etwa 20 000-mal kleiner ist als das Atom, kommen nur sehr wenige Alpha-Teilchen einem Kern so nahe; trifft eines fast zentral auf einen Kern zu, wird es wegen der großen Masse und Ladung des Kerns zurückgeworfen.',R:'Die Atomhülle besteht größtenteils aus <b>leerem</b> Raum. Der Atomkern ist positiv geladen, die Alpha-Teilchen sind ebenfalls <b>positiv</b> geladen. Deshalb <b>stoßen</b> sich Atomkern und Alpha-Teilchen ab. Weil der Atomkern sehr <b>klein</b> ist, kommen ihm nur sehr wenige Alpha-Teilchen so nahe, dass sie zurückgeworfen werden.'}];
+let solShown=false;
+function buildSol(){$('#solList').innerHTML=SOL.map((s,i)=>'<div class="acc"><div class="row" style="justify-content:space-between"><h4>'+s.h+'</h4><button class="btn sm" data-sol="'+i+'">Lösung anzeigen</button></div><div class="sol'+(solShown?' on':'')+'" id="sol'+i+'">'+((NIV==='R'&&s.R)?s.R:s.G)+'</div></div>').join('');
+  $$('[data-sol]').forEach(b=>b.onclick=()=>{const d=$('#sol'+b.dataset.sol);d.classList.toggle('on');b.textContent=d.classList.contains('on')?'Lösung ausblenden':'Lösung anzeigen'})}
+$('#solAll').onclick=()=>{solShown=!solShown;buildSol()};
+
+/* ======================= Loop / Init ======================= */
+function redrawAll(){if(TAB===2)draw2();if(TAB===4){drawQ();drawZ();drawM()}}
+let last=performance.now();
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+  if(TAB===2){step2(dt);draw2()}
+  if(TAB===4){stepQ(dt);drawQ();stepM(dt);drawM()}
+  requestAnimationFrame(loop)}
+function init(){const th=store.get('atombau-theme','dark');document.body.dataset.theme=th;readCols();
+  initCv2();cQ=fitCanvas(cvQ,WQ,HQ);cZ=fitCanvas(cvZ,WZ,HZ);cM=fitCanvas(cvM,WM,HM);
+  const d=Math.min(window.devicePixelRatio||1,2);MS.trails=document.createElement('canvas');MS.trails.width=WM*d;MS.trails.height=HM*d;MS.tctx=MS.trails.getContext('2d');MS.tctx.setTransform(d,0,0,d,0,0);
+  buildPSE();drawSetup();selectEl('He');qBtns();anaUpd();
+  setNiv(store.get('atombau-niv','G'));sizeFacts();updateNote2();drawKH();
+  $$('.seg[role=radiogroup] button').forEach(b=>b.addEventListener('click',()=>{sizeFacts();updateNote2()}));
+  requestAnimationFrame(loop)}
+init();
+</script>
+</body>
+</html>
