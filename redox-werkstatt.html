@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Redox-Werkstatt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* VOICE: Laborheft eines Oberstufenkurses – sachlich, präzise, aber handgezeichnet und einladend.
+   IDEA: Ein Sketchnote-Arbeitsheft auf weißem Papier, in dem Regeln entdeckt und Gleichungen ausbalanciert werden.
+   PICTURE: Becherglas mit violetter Permanganat-Lösung, Elektronenpfeil und Balkenwaage für die Ladungsbilanz.
+   COLOUR and TYPE: Permanganat-Violett dominant, Textmarker-Gelb als Akzent, Orange = Oxidation, Blau = Reduktion; Caveat + Atkinson Hyperlegible.
+   LAYOUT: Kopfband mit Bild, vier Stationen als Reiter, darunter jeweils Arbeitskarten mit harter Skizzen-Kontur. */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#181a22);--card:light-dark(#ffffff,#22252f);--ink:light-dark(#1f2136,#ecebe4);--mut:light-dark(#575a72,#a9abbb);
+--grid:light-dark(#e4e1d4,#2a2d39);--vio:light-dark(#6b21a8,#c79bf2);--vio2:light-dark(#efe3fa,#3a2a4d);--hl:light-dark(#ffe45c,#7a6612);
+--ox:light-dark(#c2410c,#fb9a5b);--re:light-dark(#1d4ed8,#86a8ff);--ok:light-dark(#157a52,#5fd3a0);--bad:light-dark(#c0322b,#ff8a80);--okb:light-dark(#e3f5ec,#173a2c);--badb:light-dark(#fde7e5,#45201e)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body.paper{--bg:light-dark(#fbfaf5,#181a22);background:var(--bg) radial-gradient(var(--grid) 1.2px,transparent 1.3px) 0 0/22px 22px}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 "Atkinson Hyperlegible",system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(22px,3.5vw,48px) max(4vw,16px)}
+.wrap{max-width:1240px;margin:0 auto}
+h1,h2,h3,.hand{font-family:Caveat,"Comic Sans MS",cursive;font-weight:700;line-height:1.05;text-wrap:balance;margin:0}
+h1{font-size:clamp(44px,6vw,72px)}h2{font-size:clamp(32px,3.6vw,44px);margin-bottom:.3em}h3{font-size:30px;margin-bottom:.25em}
+.mark{background:linear-gradient(transparent 55%,var(--hl) 55%,var(--hl) 88%,transparent 88%);padding:0 .15em}
+p{margin:.4em 0 .8em;max-width:70ch}
+.sk{background:var(--card);border:2px solid var(--ink);border-radius:20px 7px 18px 9px/9px 18px 7px 20px;box-shadow:4px 4px 0 var(--ink);padding:clamp(16px,2.4vw,26px)}
+.top{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px;align-items:center}
+.top p{font-size:18px;color:var(--mut)}
+.hero{width:100%;height:auto;max-height:300px}
+.hero .ln{fill:none;stroke:var(--ink);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.hero text{font-family:Caveat,cursive;font-weight:700;fill:var(--ink)}
+nav.bar{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);border-bottom:2px solid var(--ink)}
+nav .wrap{display:flex;gap:10px;align-items:center;padding:10px max(4vw,16px);flex-wrap:wrap}
+.tabs{display:flex;gap:8px;overflow-x:auto;flex:1 1 420px;padding:4px 2px 8px}
+.tabs a{flex:none;text-decoration:none;color:var(--ink);font:700 24px Caveat,cursive;padding:6px 16px;border:2px solid var(--ink);border-radius:14px 5px 12px 6px;background:var(--card);min-height:44px;display:flex;align-items:center}
+.tabs a[aria-current=page]{background:var(--vio);color:#fff;border-color:var(--vio);box-shadow:3px 3px 0 var(--ink)}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button,.btn{font:inherit;font-size:16px;cursor:pointer;color:var(--ink);background:var(--card);border:2px solid var(--ink);border-radius:12px 5px 11px 6px;padding:8px 14px;min-height:44px;box-shadow:2px 2px 0 var(--ink);transition:transform .08s}
+button:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
+button:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink)}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--hl);outline-offset:2px}
+button.pri{background:var(--vio);color:#fff;border-color:var(--ink)}
+button[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.chip{display:inline-flex;align-items:center;gap:6px;border:2px dashed var(--ink);border-radius:999px;padding:4px 12px;font-weight:700;white-space:nowrap}
+.seg{display:inline-flex;border:2px solid var(--ink);border-radius:12px;overflow:hidden}
+.seg button{border:0;border-radius:0;box-shadow:none;min-height:40px;padding:6px 10px}
+.seg button.on{background:var(--hl);font-weight:700}
+.view{display:none}.view.on{display:block}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:26px;align-items:start}
+.lead{font-size:18px}
+.f{white-space:nowrap}
+ruby{ruby-align:center}rt{font-size:.58em;font-weight:700;color:var(--vio);letter-spacing:0}
+rt.p{color:var(--ox)}rt.n{color:var(--re)}rt.z{color:var(--mut)}
+.exs{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin:14px 0}
+.ex{border:2px dashed var(--mut);border-radius:14px;padding:14px 8px 10px;text-align:center;font-size:30px;line-height:1.7;background:var(--bg)}
+.ex small{display:block;font-size:13px;line-height:1.3;color:var(--mut)}
+.opts{display:grid;gap:10px;margin:12px 0}
+.opts button{text-align:left;line-height:1.4}
+.opts button.right{background:var(--okb);border-color:var(--ok)}.opts button.wrong{background:var(--badb);border-color:var(--bad)}
+.fb{border-left:5px solid var(--mut);padding:8px 12px;margin:10px 0;border-radius:4px;background:var(--bg)}
+.fb.ok{border-color:var(--ok);background:var(--okb)}.fb.no{border-color:var(--bad);background:var(--badb)}
+.fb b.v{font-family:Caveat,cursive;font-size:24px;margin-right:6px}
+.dots{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 12px}
+.dots span{width:34px;height:34px;border-radius:50%;border:2px solid var(--ink);display:grid;place-items:center;font:700 18px Caveat,cursive}
+.dots span.done{background:var(--ok);color:#fff;border-color:var(--ok)}.dots span.cur{background:var(--hl)}
+.stp{display:inline-flex;align-items:center;border:2px solid var(--ink);border-radius:12px;overflow:hidden;background:var(--card)}
+.stp button{border:0;border-radius:0;box-shadow:none;min-height:42px;min-width:42px;padding:0;font-size:22px;font-weight:700}
+.stp output{min-width:64px;text-align:center;font:700 26px Caveat,cursive}
+.stp.ok{border-color:var(--ok);background:var(--okb)}.stp.no{border-color:var(--bad);background:var(--badb)}
+.big{font-size:clamp(46px,8vw,72px);text-align:center;margin:8px 0 6px;line-height:1.8}
+.rows{display:grid;gap:10px}
+.row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--grid)}
+.row .f{font-size:24px}
+.eq{font-size:clamp(19px,2.2vw,24px);line-height:2.1;padding:4px 2px}.term{white-space:nowrap}
+.eq .co{color:var(--vio);font-size:1.05em}
+.ar{display:inline-block;margin:0 .35em;font-weight:700}
+.tag{display:inline-block;font-size:14px;font-weight:700;border-radius:8px;padding:2px 8px;border:2px solid currentColor}
+.t-ox{color:var(--ox)}.t-re{color:var(--re)}.t-s{color:var(--bad)}.t-a{color:var(--re)}.t-n{color:var(--mut)}.t-k{color:var(--vio)}
+.ladder{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:12px 0}
+.ladder button{display:grid;gap:4px;justify-items:center;padding:12px 4px;font-size:22px}
+.ladder button.placed{background:var(--okb);border-color:var(--ok)}
+.sw{width:34px;height:34px;border-radius:50%;border:2px solid var(--ink)}
+.scale{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));border-top:3px solid var(--ink);margin-top:20px;position:relative;font:700 20px Caveat,cursive;text-align:center}
+.scale span{padding-top:4px;border-left:1px dashed var(--mut)}
+.scale i{position:absolute;bottom:100%;transform:translateX(-50%);font-style:normal;font-size:15px;font-family:"Atkinson Hyperlegible",sans-serif;background:var(--card);border:2px solid var(--ink);border-radius:8px;padding:0 6px;margin-bottom:6px;white-space:nowrap}
+.beaker{width:100%;max-width:260px;height:auto;display:block;margin:0 auto}
+.liq{transition:fill 1.8s ease}
+.ppt circle{transition:opacity 1.8s ease,transform 2s ease}
+.stepnav{display:flex;gap:10px;justify-content:space-between;align-items:center;margin-top:14px;flex-wrap:wrap}
+.stepbox{min-height:230px}
+.note{font-size:15px;color:var(--mut)}
+table{border-collapse:collapse;width:100%;font-size:16px}
+th,td{border-bottom:1px solid var(--grid);padding:5px 8px;text-align:right}th:first-child,td:first-child{text-align:left}
+td.okc{color:var(--ok);font-weight:700}td.noc{color:var(--bad);font-weight:700}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}
+.filters button.on{background:var(--hl);font-weight:700}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:22px}
+.card{display:grid;gap:8px;align-content:start;cursor:pointer;text-align:left}
+.card .eq{font-size:19px;line-height:1.9}
+.stars{color:var(--vio);letter-spacing:2px;font-size:18px}
+.done-mark{color:var(--ok);font-weight:700}
+.wstep{border-top:2px dashed var(--ink);padding-top:14px;margin-top:16px}
+.wstep.locked{opacity:.35;pointer-events:none}
+.wstep h3 .ck{color:var(--ok)}
+.tr{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:6px 0}
+.tr .f{font-size:22px}
+.tr .seg button.on-ox{background:var(--ox);color:#fff}.tr .seg button.on-re{background:var(--re);color:#fff}
+input.co{width:3.2em;font:700 22px Caveat,cursive;text-align:center;border:2px solid var(--ink);border-radius:9px;padding:2px;background:var(--bg);color:var(--vio);min-height:40px}
+.tpl{font-size:22px;line-height:2.6;padding:4px}
+.bal{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:18px;align-items:center;margin-top:10px}
+.waage{width:100%;height:auto}
+.waage .beam{transition:transform .5s ease;transform-origin:110px 60px}
+.opt{display:inline-flex;align-items:center;gap:10px;margin:0 0 18px;cursor:pointer}.opt input{width:22px;height:22px;accent-color:var(--vio)}
+.tr .seg button.on{background:var(--hl);font-weight:700}
+.xbox{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:6px 0 4px}.xc{display:inline-flex;align-items:center;gap:6px;border:2px dashed var(--mut);border-radius:12px;padding:4px 8px;font-size:20px}.xc button{min-height:36px;padding:2px 10px;font-size:15px;box-shadow:none}
+button.rm{min-height:28px;min-width:28px;padding:0 6px;margin-left:4px;font-size:16px;line-height:1;box-shadow:none;border-width:1.5px;vertical-align:middle}
+.drawer{position:fixed;inset:0 0 0 auto;width:min(440px,100%);z-index:20;overflow:auto;border-radius:0;box-shadow:-6px 0 0 var(--ink)}
+.drawer[hidden]{display:none}
+.drawer li{margin:.5em 0}
+.lew{width:100%;height:auto;max-height:240px}
+.lew text{font:700 30px "Atkinson Hyperlegible",sans-serif;fill:var(--ink);text-anchor:middle;dominant-baseline:central}
+.lew circle.e{fill:var(--vio);transition:transform 1s ease}
+.lew text.oz{font:700 22px Caveat,cursive;fill:var(--ox)}
+.hidden{display:none!important}
+footer{color:var(--mut);font-size:14px}
+@media(max-width:860px){.grid2,.top{grid-template-columns:minmax(0,1fr)}.bal{grid-template-columns:minmax(0,1fr)}.waage{max-width:240px;margin:auto}}
+@media(max-width:600px){.ladder{grid-template-columns:repeat(3,minmax(0,1fr))}.ex{font-size:26px}.hero{max-height:200px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header class="band"><div class="wrap top">
+ <div>
+  <h1>Redox-<span class="mark">Werkstatt</span></h1>
+  <p>Oxidationszahlen selbst entdecken, sicher bestimmen und damit Redoxgleichungen ausgleichen – im sauren wie im alkalischen Milieu. Im Mittelpunkt: das „Chamäleon“ Kaliumpermanganat.</p>
+  <p class="note">Abiturniveau, Schwerpunkt anorganische Teilchen. Dein Fortschritt wird nur in diesem Browser gespeichert.</p>
+ </div>
+ <svg class="hero" viewBox="0 0 460 280" role="img" aria-label="Skizze: Permanganat-Lösung wird reduziert, Mangan nimmt fünf Elektronen auf">
+  <path class="ln" d="M40 70 q-4 0 -4 -6 M44 66 L46 230 q2 18 22 18 L156 247 q20 0 21 -18 L178 66"/>
+  <path d="M50 130 q30 -8 60 0 t64 0 L172 228 q-1 14 -18 15 L70 244 q-18 0 -19 -14 Z" fill="#6b21a8" opacity=".88"/>
+  <circle cx="90" cy="190" r="5" fill="#fff" opacity=".6"/><circle cx="130" cy="165" r="4" fill="#fff" opacity=".5"/><circle cx="110" cy="215" r="3" fill="#fff" opacity=".5"/>
+  <text x="62" y="112" font-size="30">MnO₄⁻</text>
+  <path class="ln" d="M190 120 q55 -60 100 -4" /><path class="ln" d="M278 104 l14 12 l-18 6"/>
+  <text x="205" y="62" font-size="30" fill="#c2410c" style="fill:#c2410c">+ 5 e⁻</text>
+  <text x="192" y="160" font-size="23">+VII → +II</text>
+  <path class="ln" d="M300 70 q-4 0 -4 -6 M304 66 L306 230 q2 18 22 18 L410 247 q20 0 21 -18 L432 66"/>
+  <path d="M310 150 q30 -8 60 0 t56 0 L426 228 q-1 14 -18 15 L330 244 q-18 0 -19 -14 Z" fill="#f3dfe8" opacity=".9"/>
+  <text x="338" y="132" font-size="30">Mn²⁺</text>
+  <text x="318" y="205" font-size="20" style="fill:#7b6a75">fast farblos</text>
+ </svg>
+</div></header>
+
+<nav class="bar"><div class="wrap">
+ <div class="tabs" role="tablist">
+  <a href="#regeln" data-v="regeln">Regeln entdecken</a>
+  <a href="#training" data-v="training">OZ-Training</a>
+  <a href="#beispiel" data-v="beispiel">Musterbeispiel</a>
+  <a href="#werkstatt" data-v="werkstatt">Werkstatt</a>
+ </div>
+ <div class="tools">
+  <span class="chip" title="Punkte">Punkte: <span id="pts">0</span></span>
+  <span class="seg" aria-label="Hintergrund"><button id="bg-w">Weiß</button><button id="bg-p">Punkte</button></span>
+  <span class="seg" aria-label="Schreibweise im sauren Milieu"><button id="n-h3o">H₃O⁺</button><button id="n-h">H⁺</button></span>
+  <button id="open-heft">Regelheft</button>
+ </div>
+</div></nav>
+
+<main class="wrap">
+<!-- STATION REGELN -->
+<section id="v-regeln" class="view band">
+ <h2>Regeln für Oxidationszahlen entdecken</h2>
+ <p class="lead">In jedem Fall siehst du Teilchen, über deren Elementsymbolen die Oxidationszahl (OZ) steht – in der üblichen Schreibweise mit römischen Ziffern. Untersuche die Beispiele und entscheide, welche Regel <em>alle</em> Beispiele erklärt. Gefundene Regeln landen im Regelheft.</p>
+ <div class="dots" id="rule-dots"></div>
+ <div class="sk" id="rule-box"></div>
+ <div class="sk" style="margin-top:30px">
+  <h3>Das Prinzip hinter allen Regeln</h3>
+  <p>Die Oxidationszahl ist eine <b>formale Ladung</b>: Man ordnet alle Bindungselektronen gedanklich dem elektronegativeren Bindungspartner zu (bei gleichen Atomen wird geteilt) und vergleicht die zugeordneten Elektronen mit der Valenzelektronenzahl des Atoms: <b>OZ = Valenzelektronen − zugeordnete Elektronen</b>.</p>
+  <div class="grid2">
+   <div>
+    <div class="filters" id="lew-pick"></div>
+    <svg class="lew" id="lew" viewBox="0 0 420 210" role="img" aria-label="Lewis-Formel mit Elektronenzuordnung"></svg>
+    <button class="pri" id="lew-go">Bindungselektronen zuordnen</button>
+   </div>
+   <div id="lew-tab"></div>
+  </div>
+ </div>
+</section>
+
+<!-- STATION TRAINING -->
+<section id="v-training" class="view band">
+ <h2>Oxidationszahlen trainieren</h2>
+ <div class="grid2">
+  <div class="sk">
+   <h3>OZ-Trainer</h3>
+   <div class="filters" id="lvl"></div>
+   <div class="big" id="tr-f"></div>
+   <div class="rows" id="tr-rows"></div>
+   <div id="tr-fb"></div>
+   <div class="stepnav"><button id="tr-hint">Tipp</button><span><button class="pri" id="tr-check">Prüfen</button> <button id="tr-next">Neue Aufgabe</button></span></div>
+  </div>
+  <div class="sk">
+   <h3>Die Mangan-Leiter</h3>
+   <p>Mangan kommt in sehr vielen Oxidationsstufen vor. Tippe die Teilchen in der Reihenfolge <b>steigender</b> Oxidationszahl des Mangans an.</p>
+   <div class="ladder" id="ml"></div>
+   <div class="scale" id="ml-scale"></div>
+   <div id="ml-fb" style="margin-top:14px"></div>
+   <button id="ml-reset" style="margin-top:8px">Neu mischen</button>
+  </div>
+ </div>
+</section>
+
+<!-- STATION BEISPIEL -->
+<section id="v-beispiel" class="view band">
+ <h2>Musterbeispiel: Permanganat als Oxidationsmittel</h2>
+ <div class="grid2">
+  <div class="sk">
+   <h3>Das Chamäleon-Experiment</h3>
+   <p>Violette Kaliumpermanganat-Lösung wird mit Natriumsulfit-Lösung versetzt. Welches Produkt entsteht, hängt vom pH-Wert ab. Wähle das Milieu.</p>
+   <div class="filters" id="ch-pick"></div>
+   <svg class="beaker" viewBox="0 0 200 230" aria-label="Becherglas">
+    <path class="liq" id="ch-liq" d="M31 78 L33 198 q2 16 19 16 L148 214 q17 0 19 -16 L169 78 Z" fill="#6b21a8"/>
+    <g class="ppt" id="ch-ppt"></g>
+    <path d="M28 22 L32 198 q2 18 20 18 L148 216 q18 0 20 -18 L172 22" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+    <path d="M24 22 h12 M164 22 h12" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+   </svg>
+   <div id="ch-out"></div>
+  </div>
+  <div class="sk">
+   <h3>Schritt für Schritt</h3>
+   <div class="filters" id="ex-pick"></div>
+   <div class="dots" id="ex-dots"></div>
+   <div class="stepbox" id="ex-box"></div>
+   <div class="stepnav"><button id="ex-prev">Zurück</button><button class="pri" id="ex-next">Weiter</button></div>
+  </div>
+ </div>
+</section>
+
+<!-- STATION WERKSTATT -->
+<section id="v-werkstatt" class="view band">
+ <div id="w-list">
+  <h2>Werkstatt: Redoxgleichungen ausgleichen</h2>
+  <p class="lead">Wähle eine Aufgabe. Jede Aufgabe führt dich in vier Schritten zur Ionengleichung: Oxidationszahlen, Zuordnung, Elektronenbilanz, Gesamtgleichung. Zuschauer-Ionen wie K⁺, Na⁺ oder SO₄²⁻ werden weggelassen.</p>
+  <div class="filters" id="w-filter"></div>
+  <label class="opt"><input type="checkbox" class="omrm-t"> In Schritt 2 zusätzlich Oxidations- und Reduktionsmittel zuordnen</label>
+  <div class="cards" id="w-cards"></div>
+ </div>
+ <div id="w-task" class="hidden"></div>
+</section>
+</main>
+
+<aside class="drawer sk" id="heft" hidden aria-label="Regelheft">
+ <div style="display:flex;justify-content:space-between;align-items:center"><h2>Mein Regelheft</h2><button id="close-heft">Schließen</button></div>
+ <div id="heft-body"></div>
+</aside>
+
+<footer class="band"><div class="wrap" style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+ <span>Ionengleichungen ohne Zuschauer-Ionen. Im sauren Milieu wahlweise mit H₃O⁺ oder H⁺ (oben umschaltbar).</span>
+ <button id="reset">Fortschritt zurücksetzen</button>
+</div></footer>
+
+<script>
+{
+const $=s=>document.querySelector(s);
+const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a), lcm=(a,b)=>a/gcd(a,b)*b;
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const uniq=a=>[...new Set(a)];
+
+/* ---------- Zustand ---------- */
+let S={pts:0,rules:[],solved:[],h3o:true,omrm:true,bg:'w'};
+try{const s=JSON.parse(localStorage.getItem('redoxWerkstatt')||'null');if(s)S={...S,...s}}catch(e){}
+const save=()=>{try{localStorage.setItem('redoxWerkstatt',JSON.stringify(S))}catch(e){}};
+const pts=n=>{S.pts=Math.max(0,S.pts+n);$('#pts').textContent=S.pts;save()};
+
+/* ---------- Chemie-Kern ---------- */
+const OZ={'O2':{O:0},'Fe':{Fe:0},'Cl2':{Cl:0},'S8':{S:0},'Na':{Na:0},'P4':{P:0},'Cu':{Cu:0},'Ag':{Ag:0},'Al':{Al:0},'Mn':{Mn:0},'I2':{I:0},
+'Na^+':{Na:1},'Cl^-':{Cl:-1},'Fe^3+':{Fe:3},'Fe^2+':{Fe:2},'S^2-':{S:-2},'Al^3+':{Al:3},'Mn^2+':{Mn:2},'Cu^2+':{Cu:2},'Ag^+':{Ag:1},'Cr^3+':{Cr:3},'I^-':{I:-1},
+'H2O':{H:1,O:-2},'CO2':{C:4,O:-2},'SO4^2-':{S:6,O:-2},'NH4^+':{N:-3,H:1},'MnO4^-':{Mn:7,O:-2},'MnO4^2-':{Mn:6,O:-2},'MnO2':{Mn:4,O:-2},
+'NaCl':{Na:1,Cl:-1},'K2O':{K:1,O:-2},'MgO':{Mg:2,O:-2},'CaCl2':{Ca:2,Cl:-1},'Al2O3':{Al:3,O:-2},'HCl':{H:1,Cl:-1},'NH3':{N:-3,H:1},'CH4':{C:-4,H:1},
+'NaH':{Na:1,H:-1},'CaH2':{Ca:2,H:-1},'Fe2O3':{Fe:3,O:-2},'H2O2':{H:1,O:-1},'Na2O2':{Na:1,O:-1},'OF2':{O:2,F:-1},'NaBr':{Na:1,Br:-1},'KI':{K:1,I:-1},
+'HClO':{H:1,Cl:1,O:-2},'ClO3^-':{Cl:5,O:-2},'ClF3':{Cl:3,F:-1},'ClO^-':{Cl:1,O:-2},'ClO4^-':{Cl:7,O:-2},'SO2':{S:4,O:-2},'H2S':{H:1,S:-2},'NO2':{N:4,O:-2},
+'H2SO4':{H:1,S:6,O:-2},'HNO3':{H:1,N:5,O:-2},'KMnO4':{K:1,Mn:7,O:-2},'NO3^-':{N:5,O:-2},'PO4^3-':{P:5,O:-2},'CO3^2-':{C:4,O:-2},'MnSO4':{Mn:2,S:6,O:-2},
+'K2MnO4':{K:1,Mn:6,O:-2},'H3PO4':{H:1,P:5,O:-2},'NaClO':{Na:1,Cl:1,O:-2},'KClO3':{K:1,Cl:5,O:-2},'CrO4^2-':{Cr:6,O:-2},'K2Cr2O7':{K:1,Cr:6,O:-2},
+'Cr2O7^2-':{Cr:6,O:-2},'Na2S2O3':{Na:1,S:2,O:-2},'S2O3^2-':{S:2,O:-2},'S4O6^2-':{S:2.5,O:-2},'N2H4':{N:-2,H:1},'NH2OH':{N:-1,H:1,O:-2},'LiAlH4':{Li:1,Al:3,H:-1},
+'HClO4':{H:1,Cl:7,O:-2},'N2O':{N:1,O:-2},'Cu2O':{Cu:1,O:-2},'[Al(OH)4]^-':{Al:3,O:-2,H:1},'C2O4^2-':{C:3,O:-2},'SO3^2-':{S:4,O:-2},'NO':{N:2,O:-2},
+'IO3^-':{I:5,O:-2},'Cr(OH)3':{Cr:3,O:-2,H:1},'H^+':{H:1},'H3O^+':{H:1,O:-2},'OH^-':{O:-2,H:1},'PbO2':{Pb:4,O:-2},'SnCl2':{Sn:2,Cl:-1}};
+const PC={};
+function parse(f){if(PC[f])return PC[f];if(f==='e^-')return PC[f]={c:{},q:-1};
+ const [b,ch]=f.split('^');let i=0;
+ const num=()=>{let d='';while(i<b.length&&/\d/.test(b[i]))d+=b[i++];return d?+d:1};
+ const grp=()=>{const c={};while(i<b.length){const x=b[i];
+  if(x==='('||x==='['){i++;const g=grp();i++;const n=num();for(const k in g)c[k]=(c[k]||0)+g[k]*n}
+  else if(x===')'||x===']')return c;
+  else{let el=b[i++];while(i<b.length&&/[a-z]/.test(b[i]))el+=b[i++];const n=num();c[el]=(c[el]||0)+n}}return c};
+ const c=grp();let q=0;if(ch){const m=ch.match(/^(\d*)([+-])$/);q=(m[1]?+m[1]:1)*(m[2]==='+'?1:-1)}
+ return PC[f]={c,q}}
+const RN=['0','I','II','III','IV','V','VI','VII','VIII'];
+const rom=v=>v===0?'0':(v>0?'+':'−')+(Number.isInteger(v)?RN[Math.abs(v)]:String(Math.abs(v)).replace('.',','));
+const sgn=v=>v===0?'0':(v>0?'+':'−')+String(Math.abs(v)).replace('.',',');
+function fmt(f,oz,only){
+ if(f==='e^-')return'<span class="f">e<sup>−</sup></span>';
+ const [b,c]=f.split('^');let h='',i=0;
+ while(i<b.length){const x=b[i];
+  if(/[A-Z]/.test(x)){let el=x;i++;while(i<b.length&&/[a-z]/.test(b[i]))el+=b[i++];
+   h+=(oz&&oz[el]!==undefined&&(!only||only===el))?`<ruby>${el}<rt class="${oz[el]>0?'p':oz[el]<0?'n':'z'}">${rom(oz[el])}</rt></ruby>`:el}
+  else if(/\d/.test(x)){let d='';while(i<b.length&&/\d/.test(b[i]))d+=b[i++];h+=`<sub>${d}</sub>`}
+  else{h+=x;i++}}
+ if(c)h+=`<sup>${c.replace('-','−')}</sup>`;
+ return`<span class="f">${h}</span>`}
+const add=(S_,f,n)=>{if(!n)return;S_[f]=(S_[f]||0)+n;if(S_[f]===0)delete S_[f]};
+const cnt=(X,el)=>Object.entries(X).reduce((s,[f,n])=>s+n*(parse(f).c[el]||0),0);
+const chg=X=>Object.entries(X).reduce((s,[f,n])=>s+n*parse(f).q,0);
+const clone=e=>({L:{...e.L},R:{...e.R}});
+const E=(L,R)=>{const e={L:{},R:{}};L.forEach(([n,f])=>add(e.L,f,n));R.forEach(([n,f])=>add(e.R,f,n));return e};
+function cancel(e){for(const f of Object.keys(e.L)){if(e.R[f]){const m=Math.min(e.L[f],e.R[f]);add(e.L,f,-m);add(e.R,f,-m)}}return e}
+function swapH(e,to){e=clone(e);for(const[A,B]of[['L','R'],['R','L']]){const n=e[A]['H^+'];if(n){delete e[A]['H^+'];
+  if(to==='OH'){add(e[A],'H2O',n);add(e[B],'OH^-',n)}else{add(e[A],'H3O^+',n);add(e[B],'H2O',n)}}}return cancel(e)}
+function half(from,to,el,mil){const a=parse(from).c[el],b=parse(to).c[el],l=lcm(a,b),e={L:{},R:{}};
+ add(e.L,from,l/a);add(e.R,to,l/b);
+ const dO=cnt(e.L,'O')-cnt(e.R,'O');if(dO>0)add(e.R,'H2O',dO);else add(e.L,'H2O',-dO);
+ const dH=cnt(e.L,'H')-cnt(e.R,'H');if(dH>0)add(e.R,'H^+',dH);else add(e.L,'H^+',-dH);
+ const dq=chg(e.L)-chg(e.R);if(dq>0)add(e.L,'e^-',dq);else add(e.R,'e^-',-dq);
+ return mil==='alkalisch'?swapH(e,'OH'):e}
+function solve(t){const ho=half(...t.ox,t.mil),hr=half(...t.red,t.mil);
+ const eo=ho.R['e^-'],er=hr.L['e^-'],l=lcm(eo,er),fo=l/eo,fr=l/er,e={L:{},R:{}};
+ for(const[h,k]of[[ho,fo],[hr,fr]])for(const s of['L','R'])for(const f in h[s])add(e[s],f,h[s][f]*k);
+ cancel(e);const g=[...Object.values(e.L),...Object.values(e.R)].reduce(gcd);
+ if(g>1)for(const s of['L','R'])for(const f in e[s])e[s][f]/=g;
+ return{ho,hr,eo,er,fo,fr,g,eq:e}}
+const nota=e=>S.h3o?swapH(e,'H3O'):e;
+const HELP=['e^-','H3O^+','H^+','OH^-','H2O'];
+function side(X,ord,oz){const k=Object.keys(X).sort((a,b)=>{const ia=ord.indexOf(a),ib=ord.indexOf(b);return(ia<0?20+HELP.indexOf(a):ia)-(ib<0?20+HELP.indexOf(b):ib)});
+ return k.map(f=>`<span class="term">${X[f]!==1?`<b class="co">${X[f]}</b>&#8239;`:''}${fmt(f,oz?OZ[f]:null)}</span>`).join(' + ')}
+const eqH=(e,ord=[],oz)=>`<div class="eq">${side(e.L,ord,oz)}<span class="ar">⟶</span>${side(e.R,ord,oz)}</div>`;
+function balTable(e){const els=uniq([...Object.keys(e.L),...Object.keys(e.R)].flatMap(f=>Object.keys(parse(f).c)));
+ const r=els.map(el=>{const l=cnt(e.L,el),rr=cnt(e.R,el);return`<tr><td>${el}</td><td>${l}</td><td>${rr}</td><td class="${l===rr?'okc':'noc'}">${l===rr?'ausgeglichen':'falsch'}</td></tr>`}).join('');
+ const ql=chg(e.L),qr=chg(e.R);
+ return`<table><tr><th>Bilanz</th><th>links</th><th>rechts</th><th></th></tr>${r}<tr><td>Ladung</td><td>${sgn(ql)}</td><td>${sgn(qr)}</td><td class="${ql===qr?'okc':'noc'}">${ql===qr?'ausgeglichen':'falsch'}</td></tr></table>`}
+const fb=(ok,t)=>`<div class="fb ${ok?'ok':'no'}"><b class="v">${ok?'Richtig.':'Falsch.'}</b>${t}</div>`;
+
+/* ---------- Stepper ---------- */
+const V={};
+const stp=(k,v=0,step=1,min=-4,max=8,fmtF=rom)=>{V[k]={v,step,min,max,fmtF};return`<span class="stp" data-k="${k}"><button data-d="-1" aria-label="kleiner">−</button><output>${fmtF(v)}</output><button data-d="1" aria-label="größer">+</button></span>`};
+document.addEventListener('click',ev=>{const b=ev.target.closest('.stp button');if(!b)return;const w=b.closest('.stp'),o=V[w.dataset.k];
+ o.v=Math.min(o.max,Math.max(o.min,+(o.v+o.step*+b.dataset.d).toFixed(2)));w.querySelector('output').textContent=o.fmtF(o.v);w.classList.remove('ok','no')});
+const mark=(k,ok)=>{const w=document.querySelector(`.stp[data-k="${k}"]`);if(w){w.classList.toggle('ok',ok);w.classList.toggle('no',!ok)}};
+
+/* ---------- Station: Regeln ---------- */
+const RULES=[
+{n:'Elementsubstanzen',ex:['O2','Fe','Cl2','S8','Na','P4'],r:'Elementsubstanzen: Alle Atome haben die OZ 0 (O₂, Fe, S₈).',o:[
+ ['Atome in Elementsubstanzen (ungeladene Teilchen bzw. Stoffe aus nur einer Atomsorte) haben die Oxidationszahl 0.',1,'Zwischen gleichartigen Atomen besteht keine Elektronegativitätsdifferenz – die Bindungselektronen werden gleichmäßig aufgeteilt.'],
+ ['Gasförmige Stoffe haben die Oxidationszahl 0.',0,'Eisen und Natrium sind Feststoffe und haben dennoch die OZ 0; umgekehrt hat C im gasförmigen CO₂ die OZ +IV.'],
+ ['Nichtmetall-Atome haben grundsätzlich die Oxidationszahl 0.',0,'Fe und Na sind Metalle; außerdem hat das Nichtmetall O in H₂O die OZ −II.']]},
+{n:'Einatomige Ionen',ex:['Na^+','Cl^-','Fe^3+','S^2-','Al^3+','Fe^2+'],r:'Einatomige Ionen: OZ = Ionenladung (Fe³⁺: +III, S²⁻: −II).',o:[
+ ['Bei einatomigen Ionen entspricht die Oxidationszahl der Ionenladung.',1,'Hier ist die OZ keine bloß formale, sondern die tatsächliche Ladung des Ions.'],
+ ['Die Oxidationszahl entspricht der Hauptgruppennummer des Elements.',0,'Chlor steht in der VII. Hauptgruppe, Cl⁻ hat aber −I; Eisen bildet sowohl Fe²⁺ als auch Fe³⁺.'],
+ ['Kationen haben stets +I, Anionen stets −I.',0,'Fe³⁺ hat +III und S²⁻ hat −II.']]},
+{n:'Summenregel',ex:['H2O','CO2','NH3','SO4^2-','NH4^+','MnO4^-'],sum:1,r:'Summenregel: Σ (Atomanzahl · OZ) = Ladung des Teilchens (0 bei Molekülen und Formeleinheiten).',o:[
+ ['Die Summe aller Oxidationszahlen (jeweils mal Atomanzahl) ergibt die Ladung des Teilchens: 0 bei neutralen Teilchen, die Ionenladung bei Molekül-Ionen.',1,'Mit der Summenregel lässt sich die letzte unbekannte OZ in einem Teilchen immer berechnen.'],
+ ['Die Summe aller Oxidationszahlen ist in jedem Teilchen 0.',0,'Im Sulfat-Ion ergibt die Summe −2, im Ammonium-Ion +1.'],
+ ['Die Summe der Oxidationszahlen entspricht der Anzahl der Atome im Teilchen.',0,'In H₂O ist die Summe 0, das Molekül besteht aber aus drei Atomen.']]},
+{n:'Metalle der I.–III. Hauptgruppe',ex:['NaCl','K2O','MgO','CaCl2','Al2O3','KMnO4'],r:'In Verbindungen: Alkalimetalle +I, Erdalkalimetalle +II, Aluminium +III. Übergangsmetalle (Mn, Fe, Cr …) sind variabel.',o:[
+ ['In Verbindungen haben Alkalimetalle stets +I, Erdalkalimetalle stets +II und Aluminium +III.',1,'Diese Metalle besitzen sehr kleine Elektronegativitäten und liegen in Verbindungen als Kationen mit Edelgaskonfiguration vor. Übergangsmetalle wie Mangan zeigen dagegen variable OZ (in KMnO₄: +VII).'],
+ ['Metall-Atome haben in Verbindungen stets die Oxidationszahl +II.',0,'Na und K haben +I, Al hat +III, Mn in KMnO₄ sogar +VII.'],
+ ['Metall-Atome behalten in Verbindungen die Oxidationszahl 0.',0,'In allen Beispielen tragen die Metall-Atome positive OZ.']]},
+{n:'Wasserstoff',ex:['H2O','HCl','NH3','CH4','NaH','CaH2'],r:'Wasserstoff: +I; in Metallhydriden (NaH, CaH₂, LiAlH₄) −I.',o:[
+ ['Wasserstoff hat in Verbindungen meist +I; in Metallhydriden hat er −I.',1,'In Metallhydriden ist Wasserstoff der elektronegativere Partner (EN nach Pauling: H 2,2; Na 0,9; Ca 1,0).'],
+ ['Wasserstoff hat in Verbindungen immer +I.',0,'In NaH und CaH₂ hat Wasserstoff die OZ −I.'],
+ ['Wasserstoff hat in Verbindungen mit Nichtmetallen −I, mit Metallen +I.',0,'Es ist genau umgekehrt: H₂O, HCl, NH₃ → +I; NaH, CaH₂ → −I.']]},
+{n:'Sauerstoff',ex:['H2O','CO2','Fe2O3','H2O2','Na2O2','OF2'],r:'Sauerstoff: −II; in Peroxiden (O–O-Bindung) −I; in OF₂ +II.',o:[
+ ['Sauerstoff hat in Verbindungen meist −II; Ausnahmen sind Peroxide (O–O-Bindung: −I) und Verbindungen mit Fluor (OF₂: +II).',1,'Bei der O–O-Bindung im Peroxid wird das bindende Elektronenpaar geteilt, daher nur −I. Fluor ist das einzige Element, das elektronegativer als Sauerstoff ist.'],
+ ['Sauerstoff hat in Verbindungen stets −II.',0,'H₂O₂ und Na₂O₂ zeigen −I, in OF₂ hat Sauerstoff sogar +II.'],
+ ['Sauerstoff hat in Verbindungen mit Wasserstoff stets −I.',0,'In H₂O hat Sauerstoff −II; −I liegt nur im Peroxid vor.']]},
+{n:'Halogene',ex:['HCl','NaBr','KI','ClF3','HClO','ClO3^-'],r:'Fluor: stets −I. Cl, Br, I: meist −I, in Verbindungen mit O oder F positiv (über die Summenregel bestimmen).',o:[
+ ['Fluor hat in Verbindungen stets −I. Chlor, Brom und Iod haben meist −I, in Verbindungen mit Sauerstoff oder Fluor jedoch positive Oxidationszahlen.',1,'Bei Oxoanionen des Chlors (ClO⁻, ClO₃⁻, ClO₄⁻) wird die OZ des Chlors über die Summenregel bestimmt.'],
+ ['Alle Halogene haben in Verbindungen stets −I.',0,'In HClO hat Chlor +I, im Chlorat-Ion +V und in ClF₃ +III.'],
+ ['Halogene haben in Oxoverbindungen stets +VII.',0,'+VII liegt nur im Perchlorat vor; in HClO hat Chlor +I, in ClO₃⁻ +V.']]}];
+let rIdx=Math.min(S.rules.length,RULES.length-1),rDone=false;
+function sumLine(f){const p=parse(f),o=OZ[f];return Object.keys(p.c).map(el=>`${p.c[el]}·(${rom(o[el])})`).join(' + ')+' = '+sgn(p.q)}
+function renderRule(){const R=RULES[rIdx],found=S.rules.includes(rIdx);
+ $('#rule-dots').innerHTML=RULES.map((r,i)=>`<span class="${S.rules.includes(i)?'done':''} ${i===rIdx?'cur':''}" title="${r.n}">${i+1}</span>`).join('');
+ const opts=R._o||(R._o=shuffle(R.o));
+ $('#rule-box').innerHTML=`<h3>Fall ${rIdx+1} von ${RULES.length}: ${found?R.n:'Welche Regel steckt dahinter?'}</h3>
+ <div class="exs">${R.ex.map(f=>`<div class="ex">${fmt(f,OZ[f])}${R.sum?`<small>${sumLine(f)}</small>`:''}</div>`).join('')}</div>
+ <p><b>Welche Aussage erklärt alle Beispiele?</b></p>
+ <div class="opts">${opts.map((o,i)=>`<button data-o="${i}" class="${found&&o[1]?'right':''}">${o[0]}</button>`).join('')}</div>
+ <div id="rule-fb">${found?fb(true,opts.find(o=>o[1])[2]):''}</div>
+ <div class="stepnav"><button id="r-prev" ${rIdx?'':'disabled'}>Vorheriger Fall</button><button class="pri" id="r-next" ${found&&rIdx<RULES.length-1?'':'disabled'}>Nächster Fall</button></div>`}
+$('#rule-box').addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;
+ if(b.id==='r-prev'){rIdx--;renderRule();return}if(b.id==='r-next'){rIdx++;renderRule();return}
+ const R=RULES[rIdx],o=R._o[+b.dataset.o];if(!o)return;
+ b.classList.add(o[1]?'right':'wrong');$('#rule-fb').innerHTML=fb(!!o[1],' '+o[2]);
+ if(o[1]&&!S.rules.includes(rIdx)){S.rules.push(rIdx);pts(10);save();
+  setTimeout(()=>{renderRule();renderHeft()},50)}
+});
+dotsClick();function dotsClick(){$('#rule-dots').addEventListener('click',ev=>{const s=ev.target.closest('span');if(!s)return;const i=+s.textContent-1;if(i<=S.rules.length){rIdx=i;renderRule()}})}
+function renderHeft(){const f=RULES.map((r,i)=>S.rules.includes(i)?`<li><b>${r.n}:</b> ${r.r.split(': ').slice(1).join(': ')||r.r}</li>`:`<li class="note">Regel ${i+1}: noch nicht entdeckt</li>`).join('');
+ $('#heft-body').innerHTML=`<ol>${f}</ol>${S.rules.length===RULES.length?`<h3>Vorgehen bei Konflikten</h3><ol><li>Elementsubstanz → 0; einatomiges Ion → Ionenladung</li><li>Fluor → −I</li><li>Alkali- / Erdalkalimetalle / Al → +I / +II / +III</li><li>Wasserstoff → +I (Metallhydrid: −I)</li><li>Sauerstoff → −II (Peroxid: −I)</li><li>Rest über die Summenregel</li></ol><p class="note">Bei Zweifeln hilft immer die Lewis-Formel: Bindungselektronen dem elektronegativeren Partner zuordnen.</p>`:'<p class="note">Entdecke alle Regeln in der Station „Regeln entdecken“.</p>'}`}
+
+/* Lewis-Zuordnung */
+const LEW={'H₂O':{a:[['O',200,95,6,[-133,-47]],['H',115,165,1,[]],['H',285,165,1,[]]],b:[[0,1,0,1],[0,2,0,1]]},
+ 'H₂O₂':{a:[['O',165,110,6,[215,-75]],['O',255,110,6,[35,110]],['H',90,170,1,[]],['H',330,50,1,[]]],b:[[2,0,0,1],[0,1,-1,1],[1,3,1,1]]},
+ 'CO₂':{a:[['C',210,105,4,[]],['O',120,105,6,[120,240]],['O',300,105,6,[60,-60]]],b:[[1,0,1,2],[0,2,2,2]]}};
+let lewK='H₂O',lewOn=false;
+function renderLew(){const L=LEW[lewK];let s='';const dots=[];
+ L.a.forEach(([sym,x,y,v,lp])=>{lp.forEach(an=>{const r=an*Math.PI/180,cx=x+27*Math.cos(r),cy=y+27*Math.sin(r),px=-Math.sin(r)*5,py=Math.cos(r)*5;dots.push([cx+px,cy+py,cx+px,cy+py],[cx-px,cy-py,cx-px,cy-py])})});
+ L.b.forEach(([i,j,as,ord])=>{const A=L.a[i],B=L.a[j],dx=B[1]-A[1],dy=B[2]-A[2],len=Math.hypot(dx,dy),ux=dx/len,uy=dy/len,px=-uy,py=ux,mx=(A[1]+B[1])/2,my=(A[2]+B[2])/2;
+  for(let k=0;k<ord;k++){const off=(k-(ord-1)/2)*12;
+   for(const sgn2 of[-1,1]){const sx=mx+px*(off+sgn2*4),sy=my+py*(off+sgn2*4);let tx,ty;
+    if(as===-1){const T=sgn2<0?A:B,O=sgn2<0?B:A;tx=T[1]+(O[1]-T[1])*0.3+px*off;ty=T[2]+(O[2]-T[2])*0.3+py*off}
+    else{const T=L.a[as],O=T===A?B:A;tx=T[1]+(O[1]-T[1])*0.3+px*(off+sgn2*4);ty=T[2]+(O[2]-T[2])*0.3+py*(off+sgn2*4)}
+    dots.push([sx,sy,tx,ty])}}});
+ s+=L.a.map(([sym,x,y])=>`<text x="${x}" y="${y}">${sym}</text>`).join('');
+ s+=dots.map(([x,y,tx,ty])=>`<circle class="e" r="4" cx="0" cy="0" style="transform:translate(${lewOn?tx:x}px,${lewOn?ty:y}px)"/>`).join('');
+ const cntE=L.a.map((a,i)=>a[4].length*2+L.b.reduce((t,[p,q,as,o])=>t+(p===i||q===i?(as===-1?o:as===i?2*o:0):0),0));
+ if(lewOn)s+=L.a.map(([sym,x,y,v],i)=>`<text class="oz" x="${x}" y="${y-40}">${rom(v-cntE[i])}</text>`).join('');
+ $('#lew').innerHTML=s;
+ $('#lew-tab').innerHTML=lewOn?`<table><tr><th>Atom</th><th>Valenz-e⁻</th><th>zugeordnet</th><th>OZ</th></tr>${L.a.map((a,i)=>`<tr><td>${a[0]}</td><td>${a[3]}</td><td>${cntE[i]}</td><td><b>${rom(a[3]-cntE[i])}</b></td></tr>`).join('')}</table>
+  <p class="note">${lewK==='H₂O₂'?'Das bindende Elektronenpaar der O–O-Bindung wird geteilt: Jedes O erhält 7 Elektronen, also −I.':lewK==='CO₂'?'Beide Doppelbindungen werden vollständig dem Sauerstoff zugeordnet: C behält keine Valenzelektronen, also +IV.':'Sauerstoff ist elektronegativer als Wasserstoff und erhält beide Bindungselektronenpaare.'}</p>`:'<p class="note">Die violetten Punkte sind Valenzelektronen. Ordne die Bindungselektronen zu und vergleiche anschließend die Elektronenzahlen.</p>';
+ $('#lew-go').textContent=lewOn?'Zurücksetzen':'Bindungselektronen zuordnen';
+ $('#lew-pick').innerHTML=Object.keys(LEW).map(k=>`<button class="${k===lewK?'on':''}" data-k="${k}">${k}</button>`).join('')}
+$('#lew-pick').addEventListener('click',ev=>{const b=ev.target.closest('button');if(b){lewK=b.dataset.k;lewOn=false;renderLew()}});
+$('#lew-go').addEventListener('click',()=>{lewOn=!lewOn;renderLew()});
+
+/* ---------- Station: Training ---------- */
+const POOL={Basis:['H2O','CO2','NaCl','SO2','NH3','HCl','Fe2O3','MgO','H2S','CaCl2','Al2O3','NO2'],
+ Fortgeschritten:['H2SO4','HNO3','KMnO4','MnO2','SO4^2-','NO3^-','NH4^+','PO4^3-','CO3^2-','MnSO4','K2MnO4','H3PO4','NaClO','KClO3','CrO4^2-','SO3^2-','PbO2'],
+ Knifflig:['H2O2','Na2O2','NaH','CaH2','OF2','K2Cr2O7','Na2S2O3','S4O6^2-','N2H4','NH2OH','LiAlH4','ClF3','HClO4','N2O','Cu2O','[Al(OH)4]^-','C2O4^2-','Cr2O7^2-','MnO4^2-']};
+const TIPS={'H2O2':'Peroxid: Die O–O-Bindung wird geteilt.','Na2O2':'Peroxid: Die O–O-Bindung wird geteilt.','NaH':'Metallhydrid: Wasserstoff ist hier der elektronegativere Partner.','CaH2':'Metallhydrid: Wasserstoff ist hier der elektronegativere Partner.','LiAlH4':'Metallhydrid: Li und Al sind beide weniger elektronegativ als H.','OF2':'Fluor ist elektronegativer als Sauerstoff.','ClF3':'Fluor hat stets −I; Chlor über die Summenregel.','S4O6^2-':'Die Summenregel liefert hier nur einen Mittelwert, der nicht ganzzahlig sein muss.','Na2S2O3':'Die Summenregel liefert die mittlere OZ des Schwefels; nach Lewis-Formel tragen die beiden S-Atome unterschiedliche OZ.','Cu2O':'Zwei Kupfer-Atome gleichen gemeinsam die Ladung von einem O aus.','[Al(OH)4]^-':'Komplex-Ion: Ionenladung −1 bei der Summenregel beachten.','N2H4':'Kein Metall beteiligt: H hat +I.','NH2OH':'Bestimme H und O zuerst, dann N über die Summenregel.'};
+let lvl='Fortgeschritten',cur=null,trTries=0;
+function newTr(){const p=POOL[lvl];let f;do f=p[Math.floor(Math.random()*p.length)];while(f===cur&&p.length>1);cur=f;trTries=0;
+ $('#tr-f').innerHTML=fmt(f);const els=Object.keys(parse(f).c);
+ $('#tr-rows').innerHTML=els.map(el=>{const t=OZ[f][el];return`<div class="row"><span>OZ von <b>${el}</b>${parse(f).c[el]>1?` <span class="note">(${parse(f).c[el]} Atome)</span>`:''}</span>${stp('t_'+el,0,Number.isInteger(t)?1:0.5)}</div>`}).join('');
+ $('#tr-fb').innerHTML='';$('#lvl').innerHTML=Object.keys(POOL).map(k=>`<button class="${k===lvl?'on':''}" data-l="${k}">${k}</button>`).join('')}
+$('#lvl').addEventListener('click',ev=>{const b=ev.target.closest('button');if(b){lvl=b.dataset.l;newTr()}});
+$('#tr-next').addEventListener('click',newTr);
+$('#tr-hint').addEventListener('click',()=>{$('#tr-fb').innerHTML=`<div class="fb"><b>Tipp:</b> ${TIPS[cur]||'Beginne mit den Elementen mit festen Regeln (Metalle der I.–III. Hauptgruppe, H, O, F) und bestimme den Rest über die Summenregel.'}</div>`});
+$('#tr-check').addEventListener('click',()=>{const els=Object.keys(parse(cur).c);let all=true;
+ els.forEach(el=>{const ok=V['t_'+el].v===OZ[cur][el];mark('t_'+el,ok);if(!ok)all=false});trTries++;
+ const sum=`<div class="eq" style="font-size:18px">${fmt(cur,OZ[cur])}: &nbsp;${sumLine(cur)}</div>`;
+ if(all){pts(trTries===1?5:2);$('#tr-fb').innerHTML=fb(true,' Summenregel zur Kontrolle:'+sum)}
+ else $('#tr-fb').innerHTML=fb(false,trTries<2?' Mindestens eine OZ stimmt nicht (rot markiert). Prüfe mit der Summenregel.':' Lösung:'+sum)});
+/* Mangan-Leiter */
+const MN=[['Mn','#8d8d94','grau, metallisch'],['Mn^2+','#f3dfe8','blassrosa, fast farblos'],['MnO2','#5b3a1e','braunschwarz (Braunstein)'],['MnO4^2-','#2f8a3c','grün (Manganat)'],['MnO4^-','#6b21a8','violett (Permanganat)']];
+let mlOrder=[],mlShuf=[];
+function renderMl(){if(!mlShuf.length)mlShuf=shuffle(MN);
+ $('#ml').innerHTML=mlShuf.map(m=>`<button data-f="${m[0]}" class="${mlOrder.includes(m[0])?'placed':''}">${fmt(m[0])}${mlOrder.includes(m[0])?`<span class="sw" style="background:${m[1]}"></span>`:''}</button>`).join('');
+ $('#ml-scale').innerHTML=RN.slice(0,8).map((r,i)=>`<span>${i?'+'+r:'0'}</span>`).join('')+mlOrder.map(f=>{const v=OZ[f].Mn;return`<i style="left:${(v+.5)/8*100}%">${fmt(f).replace('class="f"','')}</i>`}).join('')}
+$('#ml').addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;const f=b.dataset.f;if(mlOrder.includes(f))return;
+ const next=MN[mlOrder.length][0];
+ if(f===next){mlOrder.push(f);renderMl();
+  $('#ml-fb').innerHTML=mlOrder.length===5?fb(true,' Mangan durchläuft von 0 bis +VII viele Oxidationsstufen. Permanganat (+VII) ist deshalb ein starkes Oxidationsmittel – wie weit es reduziert wird, hängt vom Milieu ab (siehe Musterbeispiel).'):'';if(mlOrder.length===5)pts(10)}
+ else $('#ml-fb').innerHTML=fb(false,` ${fmt(f)} hat Mn mit ${rom(OZ[f].Mn)} – gesucht ist die nächstniedrigere Oxidationsstufe.`)});
+$('#ml-reset').addEventListener('click',()=>{mlOrder=[];mlShuf=[];$('#ml-fb').innerHTML='';renderMl()});
+
+/* ---------- Station: Musterbeispiel ---------- */
+const CH={sauer:{lab:'sauer',to:'Mn^2+',mil:'sauer',col:'#f3dfe8',txt:'Die Lösung entfärbt sich: Es entstehen nahezu farblose Mn²⁺-Ionen.'},
+ neutral:{lab:'neutral / schwach alkalisch',to:'MnO2',mil:'alkalisch',col:'#dccbb1',ppt:1,txt:'Es bildet sich ein brauner Niederschlag von Mangan(IV)-oxid (Braunstein).'},
+ alk:{lab:'stark alkalisch',to:'MnO4^2-',mil:'alkalisch',col:'#2f8a3c',txt:'Die Lösung färbt sich grün: Es entsteht das Manganat(VI)-Ion.'}};
+let chK=null;
+$('#ch-ppt').innerHTML=Array.from({length:26},(_,i)=>`<circle cx="${44+((i*37)%112)}" cy="${120+((i*53)%50)}" r="${3+(i%3)}" fill="#5b3a1e" style="opacity:0;transform:translateY(0)"/>`).join('');
+function renderCh(){$('#ch-pick').innerHTML=Object.entries(CH).map(([k,c])=>`<button class="${k===chK?'on':''}" data-k="${k}">${c.lab}</button>`).join('')+`<button data-k="">zurücksetzen</button>`;
+ $('#ch-liq').style.fill=chK?CH[chK].col:'#6b21a8';
+ document.querySelectorAll('#ch-ppt circle').forEach((c,i)=>{const on=chK&&CH[chK].ppt;c.style.opacity=on?'.95':'0';c.style.transform=on?`translateY(${205-c.getAttribute('cy')-(i%4)*3}px)`:'translateY(0)'});
+ if(!chK){$('#ch-out').innerHTML='<p class="note">Ausgangslösung: violettes Permanganat-Ion, Mn mit +VII.</p>';return}
+ const c=CH[chK],t={mil:c.mil,ox:['SO3^2-','SO4^2-','S'],red:['MnO4^-',c.to,'Mn']},s=solve(t),ord=['MnO4^-','SO3^2-',c.to,'SO4^2-'],n=c.mil==='sauer'?nota:x=>x;
+ $('#ch-out').innerHTML=`<p>${c.txt} Mn: +VII → ${rom(OZ[c.to].Mn)}, also <b>${s.er} Elektron${s.er>1?'en':''}</b> pro Permanganat-Ion.</p>
+  <p class="note">Reduktion:</p>${eqH(n(s.hr),ord)}<p class="note">Gesamtgleichung mit Sulfit:</p>${eqH(n(s.eq),ord)}`}
+$('#ch-pick').addEventListener('click',ev=>{const b=ev.target.closest('button');if(b){chK=b.dataset.k||null;renderCh()}});
+
+const EXA={ox:['Fe^2+','Fe^3+','Fe'],red:['MnO4^-','Mn^2+','Mn'],mil:'sauer'},EXB={ox:['SO3^2-','SO4^2-','S'],red:['MnO4^-','MnO2','Mn'],mil:'alkalisch'};
+const oxs=t=>`<span class="tag t-ox">Oxidation</span>`,res=t=>`<span class="tag t-re">Reduktion</span>`;
+function stepsA(){const H=S.h3o?'H3O^+':'H^+',hn=S.h3o?'Oxonium-Ionen (H₃O⁺)':'Protonen (H⁺)',w=S.h3o?12:4,o=['MnO4^-','Fe^2+','Mn^2+','Fe^3+'],sol=solve(EXA);
+ return[
+ ['Reaktionsschema aufstellen','<p>Eine violette Kaliumpermanganat-Lösung wird zu einer schwefelsauren Eisen(II)-sulfat-Lösung getropft. Die Lösung wird entfärbt. Zuschauer-Ionen (K⁺, SO₄²⁻) werden weggelassen:</p>'+eqH(E([[1,'MnO4^-'],[1,'Fe^2+']],[[1,'Mn^2+'],[1,'Fe^3+']]),o)],
+ ['Oxidationszahlen bestimmen','<p>Über jedes relevante Teilchen werden die Oxidationszahlen geschrieben:</p>'+eqH(E([[1,'MnO4^-'],[1,'Fe^2+']],[[1,'Mn^2+'],[1,'Fe^3+']]),o,1)+'<p>Sauerstoff behält −II. Mn ändert sich von +VII nach +II, Fe von +II nach +III.</p>'],
+ ['Oxidation und Reduktion zuordnen',`<p>${oxs()} Fe: +II → +III, Elektronenabgabe. Fe²⁺ ist das <b>Reduktionsmittel</b>.</p><p>${res()} Mn: +VII → +II, Elektronenaufnahme. MnO₄⁻ ist das <b>Oxidationsmittel</b>.</p>`],
+ ['Teilgleichung der Oxidation','<p>Die OZ steigt um 1, also wird ein Elektron abgegeben. Ladung links +2, rechts +3 − 1 = +2: ausgeglichen.</p>'+eqH(E([[1,'Fe^2+']],[[1,'Fe^3+'],[1,'e^-']]),o)],
+ ['Reduktion: Elektronen ergänzen','<p>Die OZ des Mangans sinkt um 5, also werden 5 Elektronen aufgenommen:</p>'+eqH(E([[1,'MnO4^-'],[5,'e^-']],[[1,'Mn^2+']]),o)+'<p>Ladung links: −1 + 5·(−1) = <b>−6</b>, rechts: <b>+2</b>. Noch nicht ausgeglichen.</p>'],
+ ['Reduktion: Ladungsausgleich',`<p>Im <b>sauren Milieu</b> wird die Ladung mit ${hn} ausgeglichen. Es fehlen links 8 positive Ladungen:</p>`+eqH(E([[1,'MnO4^-'],[5,'e^-'],[8,H]],[[1,'Mn^2+']]),o)+'<p>Ladung links: −6 + 8 = +2 = rechts.</p>'],
+ ['Reduktion: Stoffausgleich mit Wasser',`<p>Die überzähligen O- und H-Atome links ergeben auf der rechten Seite ${w} Wassermoleküle:</p>`+eqH(E([[1,'MnO4^-'],[5,'e^-'],[8,H]],[[1,'Mn^2+'],[w,'H2O']]),o)],
+ ['Elektronenbilanz ausgleichen',`<p>Abgegebene und aufgenommene Elektronen müssen gleich sein. kgV(1; 5) = 5: Die Oxidation wird mit 5 multipliziert.</p>`+eqH(nota(E([[5,'Fe^2+']],[[5,'Fe^3+'],[5,'e^-']])),o)+eqH(nota(sol.hr),o)],
+ ['Addieren und kürzen','<p>Beide Teilgleichungen werden addiert; die 5 Elektronen stehen auf beiden Seiten und entfallen:</p>'+eqH(nota(sol.eq),o)],
+ ['Kontrolle','<p>Eine Redoxgleichung ist erst korrekt, wenn Atombilanz <i>und</i> Ladungsbilanz stimmen:</p>'+eqH(nota(sol.eq),o)+balTable(nota(sol.eq))]]}
+function stepsB(){const o=['MnO4^-','SO3^2-','MnO2','SO4^2-'],s=solve(EXB);
+ return[
+ ['Reaktionsschema aufstellen','<p>Permanganat-Lösung wird in neutraler bis schwach alkalischer Lösung mit Natriumsulfit versetzt. Es fällt brauner Braunstein aus.</p>'+eqH(E([[1,'MnO4^-'],[1,'SO3^2-']],[[1,'MnO2'],[1,'SO4^2-']]),o)],
+ ['Oxidationszahlen bestimmen',eqH(E([[1,'MnO4^-'],[1,'SO3^2-']],[[1,'MnO2'],[1,'SO4^2-']]),o,1)+`<p>${res()} Mn: +VII → +IV (3 e⁻ aufgenommen). ${oxs()} S: +IV → +VI (2 e⁻ abgegeben).</p>`],
+ ['Oxidation: Elektronen und Ladung','<p>Ladung links −2, rechts −2 − 2 = −4. Im <b>alkalischen Milieu</b> wird mit Hydroxid-Ionen ausgeglichen: 2 OH⁻ links.</p>'+eqH(E([[1,'SO3^2-'],[2,'OH^-']],[[1,'SO4^2-'],[2,'e^-']]),o)],
+ ['Oxidation: Stoffausgleich','<p>Links stehen ein O und zwei H mehr – rechts ein Wassermolekül ergänzen:</p>'+eqH(s.ho,o)],
+ ['Reduktion: Elektronen und Ladung','<p>Ladung links −1 − 3 = −4, rechts 0. Rechts werden 4 OH⁻ ergänzt:</p>'+eqH(E([[1,'MnO4^-'],[3,'e^-']],[[1,'MnO2'],[4,'OH^-']]),o)],
+ ['Reduktion: Stoffausgleich','<p>Rechts stehen jetzt 6 O und 4 H, links 4 O: Es fehlen 2 H₂O auf der linken Seite.</p>'+eqH(s.hr,o)],
+ ['Elektronenbilanz',`<p>kgV(2; 3) = 6: Oxidation ·3, Reduktion ·2.</p>`+eqH(E([[3,'SO3^2-'],[6,'OH^-']],[[3,'SO4^2-'],[3,'H2O'],[6,'e^-']]),o)+eqH(E([[2,'MnO4^-'],[6,'e^-'],[4,'H2O']],[[2,'MnO2'],[8,'OH^-']]),o)],
+ ['Addieren und kürzen','<p>Elektronen entfallen; außerdem werden H₂O und OH⁻ gekürzt, die auf beiden Seiten stehen (links 4 H₂O, rechts 3 H₂O; links 6 OH⁻, rechts 8 OH⁻):</p>'+eqH(s.eq,o)],
+ ['Kontrolle',eqH(s.eq,o)+balTable(s.eq)+'<p class="note">Faustregel: Im Alkalischen tauchen OH⁻ und H₂O auf, im Sauren H₃O⁺ (bzw. H⁺) und H₂O.</p>']]}
+let exK='A',exI=0;
+function renderEx(){const st=exK==='A'?stepsA():stepsB();exI=Math.min(exI,st.length-1);
+ $('#ex-pick').innerHTML=`<button class="${exK==='A'?'on':''}" data-k="A">A: sauer – Fe²⁺</button><button class="${exK==='B'?'on':''}" data-k="B">B: alkalisch – SO₃²⁻</button>`;
+ $('#ex-dots').innerHTML=st.map((_,i)=>`<span class="${i<exI?'done':i===exI?'cur':''}">${i+1}</span>`).join('');
+ $('#ex-box').innerHTML=`<h3>${st[exI][0]}</h3>${st[exI][1]}`;
+ $('#ex-prev').disabled=exI===0;$('#ex-next').disabled=exI===st.length-1}
+$('#ex-pick').addEventListener('click',ev=>{const b=ev.target.closest('button');if(b){exK=b.dataset.k;exI=0;renderEx()}});
+$('#ex-dots').addEventListener('click',ev=>{const s=ev.target.closest('span');if(s){exI=+s.textContent-1;renderEx()}});
+$('#ex-prev').addEventListener('click',()=>{exI--;renderEx()});$('#ex-next').addEventListener('click',()=>{exI++;renderEx()});
+
+/* ---------- Station: Werkstatt ---------- */
+const TASKS=[
+{id:'ag',t:'Silberbaum',c:'Ein Kupferdraht in Silbernitrat-Lösung überzieht sich mit Silberkristallen; die Lösung färbt sich blau.',st:1,mil:'neutral',ox:['Cu','Cu^2+','Cu'],red:['Ag^+','Ag','Ag']},
+{id:'cl',t:'Chlor aus Salzsäure',c:'Laborherstellung von Chlor: Kaliumpermanganat wird mit konzentrierter Salzsäure versetzt.',st:2,mil:'sauer',ox:['Cl^-','Cl2','Cl'],red:['MnO4^-','Mn^2+','Mn'],km:1},
+{id:'so3s',t:'Sulfit im Sauren',c:'Schwefelsaure Permanganat-Lösung wird durch Natriumsulfit-Lösung entfärbt.',st:2,mil:'sauer',ox:['SO3^2-','SO4^2-','S'],red:['MnO4^-','Mn^2+','Mn'],km:1},
+{id:'h2o2',t:'Peroxid-Bestimmung',c:'Permanganometrische Titration von Wasserstoffperoxid in schwefelsaurer Lösung; es entsteht ein Gas.',st:3,mil:'sauer',ox:['H2O2','O2','O'],red:['MnO4^-','Mn^2+','Mn'],km:1},
+{id:'oxal',t:'Oxalat-Titration',c:'Natriumoxalat (Urtitersubstanz) wird bei etwa 70 °C in schwefelsaurer Lösung mit Permanganat titriert.',st:3,mil:'sauer',ox:['C2O4^2-','CO2','C'],red:['MnO4^-','Mn^2+','Mn'],km:1},
+{id:'iod',t:'Permanganat und Iodid',c:'In neutraler bis schwach alkalischer Lösung entsteht Braunstein; Iodid wird dabei zu Iodat oxidiert.',st:2,mil:'alkalisch',ox:['I^-','IO3^-','I'],red:['MnO4^-','MnO2','Mn'],km:1},
+{id:'so3b',t:'Grünes Manganat',c:'In stark alkalischer Lösung färbt sich Permanganat mit wenig Sulfit grün.',st:3,mil:'alkalisch',ox:['SO3^2-','SO4^2-','S'],red:['MnO4^-','MnO4^2-','Mn'],km:1},
+{id:'kom',t:'Komproportionierung',c:'Permanganat reagiert mit Mangan(II)-Ionen zu Braunstein; dabei entsteht eine saure Lösung.',st:3,mil:'sauer',ox:['Mn^2+','MnO2','Mn'],red:['MnO4^-','MnO2','Mn'],km:1},
+{id:'cr',t:'Dichromat und Eisen(II)',c:'Orange Kaliumdichromat-Lösung wird mit Eisen(II)-Salz in schwefelsaurer Lösung grün.',st:2,mil:'sauer',ox:['Fe^2+','Fe^3+','Fe'],red:['Cr2O7^2-','Cr^3+','Cr']},
+{id:'cu',t:'Kupfer in Salpetersäure',c:'Kupfer löst sich in verdünnter Salpetersäure; es entsteht farbloses Stickstoffmonooxid.',st:2,mil:'sauer',ox:['Cu','Cu^2+','Cu'],red:['NO3^-','NO','N']},
+{id:'mno2',t:'Braunstein und Salzsäure',c:'Historische Chlorherstellung nach Scheele: Braunstein wird mit Salzsäure erwärmt.',st:2,mil:'sauer',ox:['Cl^-','Cl2','Cl'],red:['MnO2','Mn^2+','Mn'],km:1},
+{id:'pi',t:'Peroxid oxidiert Iodid',c:'Angesäuerte Kaliumiodid-Lösung färbt sich nach Zugabe von Wasserstoffperoxid braun.',st:2,mil:'sauer',ox:['I^-','I2','I'],red:['H2O2','H2O','O']},
+{id:'thio',t:'Iodometrie',c:'Iod wird mit Natriumthiosulfat-Lösung titriert; es entsteht das Tetrathionat-Ion.',st:2,mil:'neutral',ox:['S2O3^2-','S4O6^2-','S'],red:['I2','I^-','I']},
+{id:'disp',t:'Chlor in heißer Natronlauge',c:'Chlor reagiert in heißer Natronlauge zu Chlorid und Chlorat (Disproportionierung).',st:3,mil:'alkalisch',ox:['Cl2','ClO3^-','Cl'],red:['Cl2','Cl^-','Cl']},
+{id:'chro',t:'Chromat-Bildung',c:'Chrom(III)-hydroxid wird in alkalischer Lösung mit Wasserstoffperoxid zu gelbem Chromat oxidiert.',st:3,mil:'alkalisch',ox:['Cr(OH)3','CrO4^2-','Cr'],red:['H2O2','H2O','O']},
+{id:'dev',t:'Nitrat-Nachweis nach Devarda',c:'Aluminium reduziert Nitrat in stark alkalischer Lösung zu Ammoniak; es entsteht das Tetrahydroxidoaluminat-Ion.',st:3,mil:'alkalisch',ox:['Al','[Al(OH)4]^-','Al'],red:['NO3^-','NH3','N']}];
+const MILT={sauer:'<span class="tag t-s">sauer</span>',alkalisch:'<span class="tag t-a">alkalisch</span>',neutral:'<span class="tag t-n">ohne Milieu</span>'};
+const reac=t=>uniq([t.red[0],t.ox[0]]),prod=t=>uniq([t.red[1],t.ox[1]]),ordT=t=>[...reac(t),...prod(t)];
+const schema=t=>E(reac(t).map(f=>[1,f]),prod(t).map(f=>[1,f]));
+const helpers=m=>m==='sauer'?[S.h3o?'H3O^+':'H^+','H2O']:m==='alkalisch'?['OH^-','H2O']:[];
+let wf='alle',W=null;
+function renderList(){const F={alle:'Alle',sauer:'sauer',alkalisch:'alkalisch',km:'mit Permanganat / Braunstein',offen:'noch offen'};
+ $('#w-filter').innerHTML=Object.entries(F).map(([k,v])=>`<button class="${k===wf?'on':''}" data-f="${k}">${v}</button>`).join('');
+ const L=TASKS.filter(t=>wf==='alle'||t.mil===wf||(wf==='km'&&t.km)||(wf==='offen'&&!S.solved.includes(t.id)));
+ $('#w-cards').innerHTML=L.map(t=>`<button class="sk card" data-id="${t.id}"><span style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span class="stars" aria-label="Schwierigkeit ${t.st}">${'★'.repeat(t.st)}${'☆'.repeat(3-t.st)}</span>${S.solved.includes(t.id)?'<span class="done-mark">gelöst</span>':''}</span>
+  <span class="hand" style="font-size:28px">${t.t}</span>${eqH(schema(t),ordT(t))}<span>${MILT[t.mil]} ${t.km?'<span class="tag t-k">Mangan</span>':''}</span></button>`).join('')||'<p>Alle Aufgaben dieser Auswahl sind gelöst.</p>'}
+$('#w-filter').addEventListener('click',ev=>{const b=ev.target.closest('button');if(b){wf=b.dataset.f;renderList()}});
+$('#w-cards').addEventListener('click',ev=>{const b=ev.target.closest('.card');if(b)openTask(b.dataset.id)});
+function openTask(id){const t=TASKS.find(x=>x.id===id);
+ W={t,step:0,fails:[0,0,0,0],help:false,sol:solve(t),trs:shuffle([{f:t.ox[0],to:t.ox[1],k:'ox'},{f:t.red[0],to:t.red[1],k:'re'}]),cls:{},extra:[],role:{}};
+ $('#w-list').classList.add('hidden');$('#w-task').classList.remove('hidden');renderTask();window.scrollTo({top:$('#w-task').offsetTop-80})}
+function closeTask(){W=null;$('#w-task').classList.add('hidden');$('#w-list').classList.remove('hidden');renderList()}
+const spc=t=>{const L=[];for(const[f,el]of[[t.red[0],t.red[2]],[t.ox[0],t.ox[2]],[t.red[1],t.red[2]],[t.ox[1],t.ox[2]]])if(!L.some(x=>x[0]===f))L.push([f,el]);return L};
+function slots(t){const x=sd=>W.extra.filter(e=>e.s===sd).map(e=>e.f);return{L:uniq([...reac(t),...x('L')]),R:uniq([...prod(t),...x('R')])}}
+const isX=(sd,f)=>W.extra.some(e=>e.s===sd&&e.f===f);
+const CAND=()=>[S.h3o?'H3O^+':'H^+','OH^-','H2O'];
+function solD(){return W.t.mil==='sauer'?{ho:nota(W.sol.ho),hr:nota(W.sol.hr),eq:nota(W.sol.eq)}:W.sol}
+function renderTask(){const t=W.t,s=W.step,o=ordT(t),sl=slots(t),sd=solD(),ck=i=>s>i?' <span class="ck">✓</span>':'';
+ const elB=(x)=>{const a=parse(x[0]).c[x[2]],b=parse(x[1]).c[x[2]],l=lcm(a,b);return E([[l/a,x[0]]],[[l/b,x[1]]])};
+ $('#w-task').innerHTML=`<div class="sk">
+ <div class="stepnav" style="margin:0 0 10px"><button id="w-back">Zur Aufgabenübersicht</button><label class="opt" style="margin:0"><input type="checkbox" class="omrm-t" ${S.omrm?'checked':''}> Oxidations-/Reduktionsmittel zuordnen</label><span>${MILT[t.mil]} <span class="stars">${'★'.repeat(t.st)}${'☆'.repeat(3-t.st)}</span></span></div>
+ <h2>${t.t}</h2><p>${t.c}</p>${eqH(schema(t),o)}
+ <div class="wstep"><h3>Schritt 1: Oxidationszahlen${ck(0)}</h3><p>Bestimme die OZ des Elements, das seine Oxidationszahl ändert.</p>
+  <div class="rows">${spc(t).map(([f,el],i)=>`<div class="row"><span>${fmt(f)} &nbsp;OZ von <b>${el}</b></span>${stp('w1_'+i,V['w1_'+i]?V['w1_'+i].v:0,Number.isInteger(OZ[f][el])?1:0.5)}</div>`).join('')}</div>
+  <div id="w1fb"></div>${s===0?'<button class="pri" data-a="c1">Prüfen</button>':''}</div>
+ <div class="wstep ${s<1?'locked':''}"><h3>Schritt 2: Oxidation oder Reduktion?${S.omrm?' Wer ist Oxidations-, wer Reduktionsmittel?':''}${ck(1)}</h3>
+  ${W.trs.map((x,i)=>`<div class="tr">${fmt(x.f,s>0?OZ[x.f]:null,x.k==='ox'?t.ox[2]:t.red[2])}<span class="ar">⟶</span>${fmt(x.to,s>0?OZ[x.to]:null,x.k==='ox'?t.ox[2]:t.red[2])}<span class="seg"><button data-tr="${i}" data-v="ox" class="${W.cls[i]==='ox'?'on-ox':''}">Oxidation</button><button data-tr="${i}" data-v="re" class="${W.cls[i]==='re'?'on-re':''}">Reduktion</button></span></div>`).join('')}
+  ${S.omrm?`<p style="margin-top:12px"><b>Welche Rolle spielt das Edukt?</b></p>${reac(t).map(f=>`<div class="tr">${fmt(f)}<span class="seg">${[['om','Oxidationsmittel'],['rm','Reduktionsmittel'],['both','beides']].map(([v,l])=>`<button data-role="${f}" data-v="${v}" class="${W.role[f]===v?'on':''}">${l}</button>`).join('')}</span></div>`).join('')}`:''}
+  <div id="w2fb">${s>1?`<p>Oxidationsmittel: ${fmt(t.red[0])} &nbsp;·&nbsp; Reduktionsmittel: ${fmt(t.ox[0])}${t.red[0]===t.ox[0]?' (Disproportionierung: dasselbe Teilchen wird oxidiert und reduziert)':''}</p>`:''}</div>${s===1?'<button class="pri" data-a="c2">Prüfen</button>':''}</div>
+ <div class="wstep ${s<2?'locked':''}"><h3>Schritt 3: Elektronenbilanz${ck(2)}</h3><p>Wie viele Elektronen werden in der jeweiligen Teilgleichung (Element bereits ausgeglichen) übertragen? Mit welchem Faktor muss jede Teilgleichung multipliziert werden, damit die Elektronenzahlen gleich sind?</p>
+  <div class="rows"><div class="row"><span><span class="tag t-ox">Ox.</span> ${eqH(elB(t.ox),o).replace('class="eq"','class="eq" style="display:inline-block"')}</span><span>e⁻: ${stp('w3eo',V.w3eo?V.w3eo.v:1,1,1,16,String)} &nbsp;Faktor: ${stp('w3fo',V.w3fo?V.w3fo.v:1,1,1,16,String)}</span></div>
+  <div class="row"><span><span class="tag t-re">Red.</span> ${eqH(elB(t.red),o).replace('class="eq"','class="eq" style="display:inline-block"')}</span><span>e⁻: ${stp('w3er',V.w3er?V.w3er.v:1,1,1,16,String)} &nbsp;Faktor: ${stp('w3fr',V.w3fr?V.w3fr.v:1,1,1,16,String)}</span></div></div>
+  <div id="w3fb"></div>${s===2?'<button class="pri" data-a="c3">Prüfen</button>':''}</div>
+ <div class="wstep ${s<3?'locked':''}"><h3>Schritt 4: Gesamtgleichung${ck(3)}</h3><p>Trage alle Koeffizienten ein – auch die 1. Leere Felder zählen als 0. Prüfe mit der Bilanz unten, ob Ladung und Atome ausgeglichen sind. Fehlen Teilchen, ergänze sie selbst: Überlege, welche Teilchen im vorliegenden Milieu in großer Zahl zur Verfügung stehen.</p>
+  <div class="tpl">${['L','R'].map(sd2=>sl[sd2].map(f=>`<span class="term"><input class="co" type="number" inputmode="numeric" min="0" max="40" data-s="${sd2}" data-f="${f}" aria-label="Koeffizient">&#8239;${fmt(f)}${isX(sd2,f)?`<button class="rm" data-a="rm" data-s="${sd2}" data-f="${f}" aria-label="entfernen" title="entfernen">×</button>`:''}</span>`).join(' + ')).join('<span class="ar">⟶</span>')}</div>
+  <div class="xbox"><span class="note">Teilchen ergänzen:</span>${CAND().map(f=>`<span class="xc">${fmt(f)}<button data-a="addx" data-s="L" data-f="${f}">links</button><button data-a="addx" data-s="R" data-f="${f}">rechts</button></span>`).join('')}</div>
+  <div class="bal"><div id="w4tab"></div><svg class="waage" viewBox="0 0 220 150" aria-label="Ladungswaage"><path d="M110 60 L110 135 M80 138 h60" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><g class="beam" id="beam"><path d="M25 60 h170" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M25 60 l-15 35 h30 z M195 60 l-15 35 h30 z" fill="none" stroke="currentColor" stroke-width="3"/><text id="ql" x="25" y="115" text-anchor="middle" font-size="18" font-weight="700" fill="currentColor">0</text><text id="qr" x="195" y="115" text-anchor="middle" font-size="18" font-weight="700" fill="currentColor">0</text></g><text x="110" y="20" text-anchor="middle" font-size="15" fill="currentColor">Ladungsbilanz</text></svg></div>
+  <div id="w4fb"></div>${s===3?'<button class="pri" data-a="c4">Prüfen</button>':''}</div>
+ <div class="wstep"><div class="stepnav"><button data-a="help" ${s<2?'disabled':''}>Teilgleichungen zeigen (−5 Punkte)</button><button data-a="sol">Lösung zeigen</button></div><div id="wsol"></div></div></div>`;
+ updBal()}
+function readCo(){const e={L:{},R:{}};let bad=false;document.querySelectorAll('#w-task input.co').forEach(i=>{const v=i.value.trim()===''?0:+i.value;if(!Number.isInteger(v)||v<0)bad=true;else add(e[i.dataset.s],i.dataset.f,v)});return{e,bad}}
+function updBal(){if(!W||!$('#w4tab'))return;const{e}=readCo();$('#w4tab').innerHTML=balTable(e);const ql=chg(e.L),qr=chg(e.R);
+ $('#ql').textContent=sgn(ql);$('#qr').textContent=sgn(qr);$('#beam').style.transform=`rotate(${Math.max(-14,Math.min(14,(qr-ql)*2))}deg)`}
+function solHTML(){const sd=solD(),o=ordT(W.t);return`<h3>Lösungsweg</h3><p><span class="tag t-ox">Oxidation</span> ·${W.sol.fo}</p>${eqH(sd.ho,o)}<p><span class="tag t-re">Reduktion</span> ·${W.sol.fr}</p>${eqH(sd.hr,o)}<p>Gesamtgleichung${W.sol.g>1?` (nach Addition durch ${W.sol.g} gekürzt)`:''}:</p>${eqH(sd.eq,o)}`}
+$('#w-task').addEventListener('input',ev=>{if(ev.target.matches('input.co'))updBal()});
+$('#w-task').addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;
+ if(b.id==='w-back')return closeTask();
+ if(b.dataset.role!==undefined){W.role[b.dataset.role]=b.dataset.v;b.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));return}
+ if(b.dataset.tr!==undefined){W.cls[b.dataset.tr]=b.dataset.v;b.parentNode.querySelectorAll('button').forEach(x=>x.className='');b.className=b.dataset.v==='ox'?'on-ox':'on-re';return}
+ const a=b.dataset.a,t=W.t;
+ if(a==='addx'||a==='rm'){keep();const sd=b.dataset.s,f=b.dataset.f;
+  if(a==='rm')W.extra=W.extra.filter(e=>!(e.s===sd&&e.f===f));
+  else if(!isX(sd,f)&&!(sd==='L'?reac(t):prod(t)).includes(f))W.extra.push({s:sd,f});
+  renderTask();restore();return}
+ const win=i=>{pts(W.fails[i]?5:10);W.step=i+1;keep();renderTask();restore()};
+ if(a==='c1'){let ok=true;spc(t).forEach(([f,el],i)=>{const g=V['w1_'+i].v===OZ[f][el];mark('w1_'+i,g);if(!g)ok=false});
+  if(ok)win(0);else{W.fails[0]++;$('#w1fb').innerHTML=fb(false,' Rot markierte Werte stimmen nicht. Nutze dein Regelheft und die Summenregel.')}}
+ if(a==='c2'){const okT=W.trs.every((x,i)=>W.cls[i]===x.k);
+  const want=f=>t.red[0]===t.ox[0]?'both':f===t.red[0]?'om':'rm',okR=!S.omrm||reac(t).every(f=>W.role[f]===want(f));
+  if(okT&&okR)win(1);else{W.fails[1]++;$('#w2fb').innerHTML=fb(false,(okT?'':' Erinnerung: Oxidation = Erhöhung der OZ (Elektronenabgabe), Reduktion = Erniedrigung der OZ (Elektronenaufnahme).')+(okR?'':' Die Rollenzuordnung stimmt nicht: Das Oxidationsmittel ist der Elektronenakzeptor und wird dabei selbst reduziert; das Reduktionsmittel ist der Elektronendonator und wird selbst oxidiert.'))}}
+ if(a==='c3'){const r=[['w3eo',W.sol.eo],['w3er',W.sol.er],['w3fo',W.sol.fo],['w3fr',W.sol.fr]];let ok=true;r.forEach(([k,v])=>{const g=V[k].v===v;mark(k,g);if(!g)ok=false});
+  if(ok)win(2);else{W.fails[2]++;$('#w3fb').innerHTML=fb(false,' Elektronenzahl = Änderung der OZ × Anzahl der betroffenen Atome. Die Faktoren ergeben sich aus dem kgV der beiden Elektronenzahlen.')}}
+ if(a==='c4'){const{e,bad}=readCo(),sol=solD().eq;if(bad){$('#w4fb').innerHTML=fb(false,' Nur natürliche Zahlen eintragen.');return}
+  const keys=uniq([...Object.keys(e.L).map(f=>'L'+f),...Object.keys(e.R).map(f=>'R'+f),...Object.keys(sol.L).map(f=>'L'+f),...Object.keys(sol.R).map(f=>'R'+f)]);
+  const gv=(X,k)=>X[k[0]][k.slice(1)]||0,exact=keys.every(k=>gv(e,k)===gv(sol,k));
+  const ratio=keys.length&&gv(sol,keys[0])?gv(e,keys[0])/gv(sol,keys[0]):0,prop=ratio>1&&keys.every(k=>gv(e,k)===ratio*gv(sol,k));
+  const both=Object.keys(e.L).filter(f=>e.R[f]);
+  const els=uniq(keys.flatMap(k=>Object.keys(parse(k.slice(1)).c))),atomsOk=els.every(el=>cnt(e.L,el)===cnt(e.R,el)),qOk=chg(e.L)===chg(e.R);
+  if(exact){win(3);S.solved=uniq([...S.solved,t.id]);save();$('#w4fb').innerHTML=fb(true,' Atom-, Ladungs- und Elektronenbilanz stimmen.'+solHTML());return}
+  W.fails[3]++;let m;const used=f=>(e.L[f]||0)+(e.R[f]||0)>0;
+  if(!Object.keys(e.L).length)m=' Es sind noch keine Koeffizienten eingetragen.';
+  else if(t.mil==='sauer'&&used('OH^-'))m=' Im sauren Milieu liegen Hydroxid-Ionen nur in verschwindend geringer Konzentration vor. Welche Teilchen sind dort im Überschuss vorhanden?';
+  else if(t.mil==='alkalisch'&&(used('H3O^+')||used('H^+')))m=' Im alkalischen Milieu sind Oxonium-Ionen praktisch nicht vorhanden. Welche Teilchen liegen dort im Überschuss vor?';
+  else if(t.mil==='neutral'&&W.extra.some(x=>used(x.f)))m=' Bei dieser Reaktion lassen sich Atom- und Ladungsbilanz ohne zusätzliche Teilchen ausgleichen. Entferne die ergänzten Teilchen.';
+  else if(both.length)m=` ${both.map(f=>fmt(f)).join(', ')} steht auf beiden Seiten – kürze so, dass es nur auf einer Seite vorkommt.`;
+  else if(prop)m=` Die Verhältnisse stimmen, aber die Koeffizienten sind nicht vollständig gekürzt (alle durch ${ratio} teilbar).`;
+  else if(atomsOk&&qOk)m=' Atome und Ladung sind zwar ausgeglichen, aber die Elektronenbilanz stimmt nicht: Abgegebene und aufgenommene Elektronen müssen gleich sein. Prüfe die Verhältnisse mit deinen Faktoren aus Schritt 3.';
+  else m=` ${!atomsOk?'Die Atombilanz ist nicht ausgeglichen ('+els.filter(el=>cnt(e.L,el)!==cnt(e.R,el)).join(', ')+'). ':''}${!qOk?'Die Ladungsbilanz ist nicht ausgeglichen.':''}`;
+  $('#w4fb').innerHTML=fb(false,m)}
+ if(a==='help'){if(!W.help){W.help=true;pts(-5)}const sd=solD(),o=ordT(t);$('#wsol').innerHTML=`<p><span class="tag t-ox">Oxidation</span></p>${eqH(sd.ho,o)}<p><span class="tag t-re">Reduktion</span></p>${eqH(sd.hr,o)}`}
+ if(a==='sol'){W.help=true;$('#wsol').innerHTML=solHTML()}});
+let saved={};const keep=()=>{saved={};document.querySelectorAll('#w-task input.co').forEach(i=>saved[i.dataset.s+i.dataset.f]=i.value)},restore=()=>{document.querySelectorAll('#w-task input.co').forEach(i=>{if(saved[i.dataset.s+i.dataset.f]!==undefined)i.value=saved[i.dataset.s+i.dataset.f]});updBal()};
+
+/* ---------- Navigation & Allgemeines ---------- */
+function route(){const v=(location.hash||'#regeln').slice(1),ok=['regeln','training','beispiel','werkstatt'].includes(v)?v:'regeln';
+ document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+ok));
+ document.querySelectorAll('.tabs a').forEach(a=>{if(a.dataset.v===ok)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')})}
+addEventListener('hashchange',route);
+function setNota(h){S.h3o=h;if(W)W.extra.forEach(x=>{if(x.f==='H3O^+'&&!h)x.f='H^+';else if(x.f==='H^+'&&h)x.f='H3O^+'});save();$('#n-h3o').classList.toggle('on',h);$('#n-h').classList.toggle('on',!h);renderEx();renderCh();if(W){keep();renderTask();restore()}else renderList()}
+document.addEventListener('change',ev=>{if(!ev.target.classList.contains('omrm-t'))return;S.omrm=ev.target.checked;save();document.querySelectorAll('.omrm-t').forEach(c=>c.checked=S.omrm);if(W){keep();renderTask();restore()}});
+document.querySelectorAll('.omrm-t').forEach(c=>c.checked=S.omrm);
+function setBg(v){S.bg=v;save();document.body.classList.toggle('paper',v==='p');$('#bg-w').classList.toggle('on',v!=='p');$('#bg-p').classList.toggle('on',v==='p')}
+$('#bg-w').addEventListener('click',()=>setBg('w'));$('#bg-p').addEventListener('click',()=>setBg('p'));setBg(S.bg);
+$('#n-h3o').addEventListener('click',()=>setNota(true));$('#n-h').addEventListener('click',()=>setNota(false));
+$('#open-heft').addEventListener('click',()=>{renderHeft();$('#heft').hidden=false;$('#close-heft').focus()});
+$('#close-heft').addEventListener('click',()=>{$('#heft').hidden=true});
+addEventListener('keydown',ev=>{if(ev.key==='Escape')$('#heft').hidden=true});
+$('#reset').addEventListener('click',ev=>{if(ev.target.dataset.c){S={pts:0,rules:[],solved:[],h3o:S.h3o};save();$('#pts').textContent=0;rIdx=0;renderRule();renderHeft();renderList();ev.target.textContent='Fortschritt zurücksetzen';delete ev.target.dataset.c}else{ev.target.dataset.c=1;ev.target.textContent='Wirklich zurücksetzen? Erneut tippen'}});
+$('#pts').textContent=S.pts;setNota(S.h3o);renderRule();renderHeft();renderLew();newTr();renderMl();route();
+window.__redox={solve,TASKS,OZ,parse,cnt,chg,swapH};
+}
+</script>
+</body>
+</html>

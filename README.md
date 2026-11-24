@@ -37,6 +37,7 @@ git clone https://github.com/makro5652/animationen.git
 | Elektronenübergang (Redox) | [`redox_elektronenuebergang_jgst9_v3.html`](redox_elektronenuebergang_jgst9_v3.html) |
 | Salzlösung: Leitfähigkeit und Elektrolyse | [`Salzloesung_Leitfaehigkeit Elektrolyse.html`](Salzloesung_Leitfaehigkeit%20Elektrolyse.html) |
 | Elektrolyse einer NaCl-Schmelze | [`Elektrolyse_klasse9.html`](Elektrolyse_klasse9.html) |
+| Redox-Werkstatt: Oxidationszahlen und Redoxgleichungen (sauer/alkalisch, Permanganat) | [`redox-werkstatt.html`](redox-werkstatt.html) |
 | Doppelschicht und galvanische Zelle | [`redox-galvanik-doppelschicht.html`](redox-galvanik-doppelschicht.html) |
 | Mystery Q12: Stromausfall im Chemieraum (galvanische Zellen) | [`galvanik-q12.html`](galvanik-q12.html) |
 | Quiz: Zelldiagramme und galvanische Elemente (Jgst. 12) | [`quiz-zelldiagramme-q12.html`](quiz-zelldiagramme-q12.html) |
