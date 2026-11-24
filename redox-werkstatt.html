@@ -121,7 +121,7 @@ input.co{-moz-appearance:textfield;appearance:textfield;width:3.2em;font:700 22p
 .bal{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:18px;align-items:center;margin-top:10px}
 .waage{width:100%;height:auto}
 .waage .beam{transition:transform .5s ease;transform-origin:110px 60px}
-.opt{display:inline-flex;align-items:center;gap:10px;margin:0 0 18px;cursor:pointer}.opt input{width:22px;height:22px;accent-color:var(--vio)}
+.opts2{display:flex;flex-wrap:wrap;gap:0 24px}.opt{display:inline-flex;align-items:center;gap:10px;margin:0 0 18px;cursor:pointer}.opt input{-webkit-appearance:none;appearance:none;width:26px;height:26px;margin:0;flex:none;border:2px solid var(--ink);border-radius:7px;background:var(--card);display:grid;place-content:center;cursor:pointer}.opt input:checked{background:var(--vio);border-color:var(--vio)}.opt input:checked::after{content:"";width:7px;height:13px;border:solid #fff;border-width:0 3px 3px 0;transform:translateY(-2px) rotate(45deg)}
 .tr .seg button.on{background:var(--hl);font-weight:700}
 .hgrid{display:grid;grid-template-columns:auto auto auto;justify-content:start;align-items:center;gap:12px 16px;margin:12px 0}.hrow{display:contents}
 .hrow .eq{padding:2px 0;white-space:nowrap;overflow-x:auto}.eq .stp{vertical-align:middle;margin:0 2px}.eq .stp output{min-width:40px}
@@ -264,7 +264,8 @@ footer{color:var(--mut);font-size:14px}
   <h2>Werkstatt: Redoxgleichungen ausgleichen</h2>
   <p class="lead">Wähle eine Aufgabe. Jede Aufgabe führt dich in vier Schritten zur Ionengleichung: Oxidationszahlen, Zuordnung, Elektronenbilanz, Gesamtgleichung. Zuschauer-Ionen wie K⁺, Na⁺ oder SO₄²⁻ werden weggelassen.</p>
   <div class="filters" id="w-filter"></div>
-  <label class="opt"><input type="checkbox" class="omrm-t"> In Schritt 2 zusätzlich Oxidations- und Reduktionsmittel zuordnen</label>
+  <div class="opts2"><label class="opt"><input type="checkbox" class="omrm-t"> In Schritt 2 zusätzlich Oxidations- und Reduktionsmittel zuordnen</label>
+  <label class="opt"><input type="checkbox" class="bal-t"> Bilanz-Hilfe in Schritt 4 anzeigen (Atom- und Ladungsbilanz, Ladungswaage, Tipp zum nächsten Schritt) – ausschalten für eine realistische Prüfungssituation</label></div>
   <div class="cards" id="w-cards"></div>
  </div>
  <div id="w-task" class="hidden"></div>
@@ -289,7 +290,7 @@ const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math
 const uniq=a=>[...new Set(a)];
 
 /* ---------- Zustand ---------- */
-let S={pts:0,rules:[],solved:[],h3o:true,omrm:true,bg:'w'};
+let S={pts:0,rules:[],solved:[],h3o:true,omrm:true,bg:'w',bal:true};
 try{const s=JSON.parse(localStorage.getItem('redoxWerkstatt')||'null');if(s)S={...S,...s}}catch(e){}
 const save=()=>{try{localStorage.setItem('redoxWerkstatt',JSON.stringify(S))}catch(e){}};
 const pts=n=>{S.pts=Math.max(0,S.pts+n);$('#pts').textContent=S.pts;save()};
@@ -606,7 +607,7 @@ function nextTip(){const t=W.t,{e}=readCo(),sol=solD().eq,HX=['H2O','H3O^+','H^+
  return'Ladung und alle Atome sind ausgeglichen. Klicke auf „Prüfen“.'}
 function renderTask(){const t=W.t,s=W.step,o=ordT(t),sl=slots(t),sd=solD(),ck=i=>s>i?' <span class="ck">✓</span>':'';
  $('#w-task').innerHTML=`<div class="sk">
- <div class="stepnav" style="margin:0 0 10px"><button id="w-back">Zur Aufgabenübersicht</button><label class="opt" style="margin:0"><input type="checkbox" class="omrm-t" ${S.omrm?'checked':''}> Oxidations-/Reduktionsmittel zuordnen</label><span>${MILT[t.mil]} <span class="stars">${'★'.repeat(t.st)}${'☆'.repeat(3-t.st)}</span></span></div>
+ <div class="stepnav" style="margin:0 0 10px"><button id="w-back">Zur Aufgabenübersicht</button><span class="opts2" style="gap:4px 16px"><label class="opt" style="margin:0"><input type="checkbox" class="omrm-t" ${S.omrm?'checked':''}> Oxidations-/Reduktionsmittel zuordnen</label><label class="opt" style="margin:0"><input type="checkbox" class="bal-t" ${S.bal?'checked':''}> Bilanz-Hilfe</label></span><span>${MILT[t.mil]} <span class="stars">${'★'.repeat(t.st)}${'☆'.repeat(3-t.st)}</span></span></div>
  <h2>${t.t}</h2><p>${t.c}</p>${eqH(schema(t),o)}
  <div class="wstep"><h3>Schritt 1: Oxidationszahlen${ck(0)}</h3><p>Bestimme die OZ des Elements, das seine Oxidationszahl ändert.</p>
   <div class="rows">${spc(t).map(([f,el],i)=>`<div class="row"><span>${fmt(f)} &nbsp;OZ von <b>${el}</b></span>${stp('w1_'+i,V['w1_'+i]?V['w1_'+i].v:0,Number.isInteger(OZ[f][el])?1:0.5)}</div>`).join('')}</div>
@@ -622,8 +623,8 @@ function renderTask(){const t=W.t,s=W.step,o=ordT(t),sl=slots(t),sd=solD(),ck=i=
   <details class="hint"><summary>Hinweis: So gleichst du die Gesamtgleichung aus</summary>${mHint(t)}</details>
   <div class="tpl">${['L','R'].map(sd2=>sl[sd2].map(f=>`<span class="term"><input class="co" type="number" inputmode="numeric" min="0" max="40" data-s="${sd2}" data-f="${f}" aria-label="Koeffizient">&#8239;${fmt(f)}${isX(sd2,f)?`<button class="rm" data-a="rm" data-s="${sd2}" data-f="${f}" aria-label="entfernen" title="entfernen">×</button>`:''}</span>`).join(' + ')).join('<span class="ar">⟶</span>')}</div>
   <div class="xbox"><span class="note">Teilchen ergänzen:</span>${CAND().map(f=>`<span class="xc">${fmt(f)}<button data-a="addx" data-s="L" data-f="${f}">links</button><button data-a="addx" data-s="R" data-f="${f}">rechts</button></span>`).join('')}</div>
-  <div class="bal"><div id="w4tab"></div><svg class="waage" viewBox="0 0 220 150" aria-label="Ladungswaage"><path d="M110 60 L110 135 M80 138 h60" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><g class="beam" id="beam"><path d="M25 60 h170" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M25 60 l-15 35 h30 z M195 60 l-15 35 h30 z" fill="none" stroke="currentColor" stroke-width="3"/><text id="ql" x="25" y="115" text-anchor="middle" font-size="18" font-weight="700" fill="currentColor">0</text><text id="qr" x="195" y="115" text-anchor="middle" font-size="18" font-weight="700" fill="currentColor">0</text></g><text x="110" y="20" text-anchor="middle" font-size="15" fill="currentColor">Ladungsbilanz</text></svg></div>
-  <div id="w4tip"></div><div id="w4fb"></div>${s===3?'<span class="stepnav" style="justify-content:flex-start"><button data-a="tip">Was ist mein nächster Schritt?</button><button class="pri" data-a="c4">Prüfen</button></span>':''}</div>
+  ${S.bal?`<div class="bal"><div id="w4tab"></div><svg class="waage" viewBox="0 0 220 150" aria-label="Ladungswaage"><path d="M110 60 L110 135 M80 138 h60" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><g class="beam" id="beam"><path d="M25 60 h170" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M25 60 l-15 35 h30 z M195 60 l-15 35 h30 z" fill="none" stroke="currentColor" stroke-width="3"/><text id="ql" x="25" y="115" text-anchor="middle" font-size="18" font-weight="700" fill="currentColor">0</text><text id="qr" x="195" y="115" text-anchor="middle" font-size="18" font-weight="700" fill="currentColor">0</text></g><text x="110" y="20" text-anchor="middle" font-size="15" fill="currentColor">Ladungsbilanz</text></svg></div>`:`<p class="note">Bilanz-Hilfe ausgeschaltet: Prüfe Atome und Ladung selbst, bevor du auf „Prüfen“ tippst.</p>`}
+  <div id="w4tip"></div><div id="w4fb"></div>${s===3?`<span class="stepnav" style="justify-content:flex-start">${S.bal?'<button data-a="tip">Was ist mein nächster Schritt?</button>':''}<button class="pri" data-a="c4">Prüfen</button></span>`:''}</div>
  <div class="wstep"><div class="stepnav"><button data-a="help" ${s<2?'disabled':''}>Teilgleichungen zeigen (−5 Punkte)</button><button data-a="sol">Lösung zeigen</button></div><div id="wsol"></div></div></div>`;
  updBal()}
 function readCo(){const e={L:{},R:{}};let bad=false;document.querySelectorAll('#w-task input.co').forEach(i=>{const v=i.value.trim()===''?0:+i.value;if(!Number.isInteger(v)||v<0)bad=true;else add(e[i.dataset.s],i.dataset.f,v)});return{e,bad}}
@@ -676,8 +677,8 @@ function route(){const v=(location.hash||'#regeln').slice(1),ok=['regeln','train
  document.querySelectorAll('.tabs a').forEach(a=>{if(a.dataset.v===ok)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')})}
 addEventListener('hashchange',route);
 function setNota(h){S.h3o=h;if(W)W.extra.forEach(x=>{if(x.f==='H3O^+'&&!h)x.f='H^+';else if(x.f==='H^+'&&h)x.f='H3O^+'});save();$('#n-h3o').classList.toggle('on',h);$('#n-h').classList.toggle('on',!h);renderEx();renderCh();if(W){keep();renderTask();restore()}else renderList()}
-document.addEventListener('change',ev=>{if(!ev.target.classList.contains('omrm-t'))return;S.omrm=ev.target.checked;save();document.querySelectorAll('.omrm-t').forEach(c=>c.checked=S.omrm);if(W){keep();renderTask();restore()}});
-document.querySelectorAll('.omrm-t').forEach(c=>c.checked=S.omrm);
+document.addEventListener('change',ev=>{const c=ev.target.classList;if(c.contains('bal-t')){S.bal=ev.target.checked;save();document.querySelectorAll('.bal-t').forEach(x=>x.checked=S.bal);if(W){keep();renderTask();restore()}return}if(!c.contains('omrm-t'))return;S.omrm=ev.target.checked;save();document.querySelectorAll('.omrm-t').forEach(c=>c.checked=S.omrm);if(W){keep();renderTask();restore()}});
+document.querySelectorAll('.omrm-t').forEach(c=>c.checked=S.omrm);document.querySelectorAll('.bal-t').forEach(c=>c.checked=S.bal);
 function setBg(v){S.bg=v;save();document.body.classList.toggle('paper',v==='p');$('#bg-w').classList.toggle('on',v!=='p');$('#bg-p').classList.toggle('on',v==='p')}
 $('#bg-w').addEventListener('click',()=>setBg('w'));$('#bg-p').addEventListener('click',()=>setBg('p'));setBg(S.bg);
 $('#n-h3o').addEventListener('click',()=>setNota(true));$('#n-h').addEventListener('click',()=>setNota(false));
