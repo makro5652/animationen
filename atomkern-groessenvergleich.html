@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atomkern und Atomhülle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: sachlich, ruhig, naturwissenschaftlich-präzise
+   IDEA: eine Messfahrt durch zehn Zehnerpotenzen – Blickfeld mit Maßstabsleiste wie im Elektronenmikroskop
+   PICTURE: großes Zoomfenster: Elektronendichte als Wolke, Kern als Nukleonenkugel, echte Maßstäbe
+   COLOUR and TYPE: Tiefblau als Feld, Hülle hellblau, Protonen rot, Neutronen grau; Atkinson Hyperlegible
+   LAYOUT: Zoomfenster oben/links, Bedienung und Kennzahlen daneben bzw. darunter */
+:root{color-scheme:light dark;--bg:light-dark(#f3f5fa,#0a0f1e);--ink:light-dark(#121a2e,#e8ecf7);--mut:light-dark(#4c5672,#a7b1cc);--card:light-dark(#fff,#121a30);--line:light-dark(#d6dbe8,#263152);--acc:#d8342c;--blue:#3d7be0}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Atkinson Hyperlegible",system-ui,sans-serif;overflow-x:clip;-webkit-tap-highlight-color:transparent}
+header{padding:20px max(4vw,16px) 8px}
+h1{font-size:clamp(26px,3.4vw,40px);line-height:1.08;margin:0 0 6px;text-wrap:balance}
+header p{margin:0;color:var(--mut);max-width:70ch}
+main{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr);gap:18px;padding:12px max(4vw,16px) 28px;max-width:1500px}
+.fig{position:relative;min-height:420px;height:min(72vh,760px);border-radius:14px;overflow:hidden;background:#0a0f1e;touch-action:none}
+.fig canvas{position:absolute;inset:0;width:100%;height:100%}
+aside{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.card h2{font-size:17px;margin:0 0 8px}
+.seg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+button{font:inherit;font-size:16px;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:8px 10px;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.seg button[aria-pressed=true]{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
+.seg small{display:block;font-size:13px;opacity:.85;font-weight:400}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row button{flex:1 1 140px}
+button.pri{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:700}
+input[type=range]{width:100%;height:44px;accent-color:var(--blue)}
+.ticks{display:flex;justify-content:space-between;font-size:13px;color:var(--mut);margin-top:-6px}
+dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;margin:0}
+dt{color:var(--mut)}dd{margin:0;text-align:right;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.big{font-size:clamp(26px,3vw,34px);font-weight:700;line-height:1.1}
+.note{font-size:14px;color:var(--mut)}
+#rec{font-size:14px;color:var(--mut);margin:8px 0 0}#rec a{color:var(--blue);font-weight:700}
+.info{padding:0 max(4vw,16px) 36px;max-width:1500px}
+.info details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:10px}
+.info summary{cursor:pointer;font-weight:700;min-height:32px}
+table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}th:first-child,td:first-child{text-align:left}
+.scroll{overflow-x:auto}
+@media (max-width:900px),(orientation:portrait) and (max-width:1100px){main{grid-template-columns:minmax(0,1fr)}.fig{height:min(62vh,640px);min-height:360px}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header>
+<h1>Der Atomkern ist rund 20 000- bis 60 000-mal kleiner als das Atom</h1>
+<p>Zoomfahrt in echten Maßstäben: vom ganzen Atom bis in den Kern. Ziehen Sie den Regler, zoomen Sie mit zwei Fingern im Bild oder starten Sie die Zoomfahrt.</p>
+</header>
+<main>
+<div class="fig" id="fig"><canvas id="cv" aria-label="Zoomdarstellung von Atomhülle und Atomkern"></canvas></div>
+<aside>
+<div class="card">
+<h2>Element</h2>
+<div class="seg" id="seg"></div>
+</div>
+<div class="card">
+<h2>Bildausschnitt</h2>
+<input type="range" id="zoom" min="0" max="1" step="0.0005" value="0" aria-label="Zoom (logarithmisch)">
+<div class="ticks"><span>ganzes Atom</span><span>Atomkern</span></div>
+<div class="row" style="margin-top:10px">
+<button class="pri" id="play">Zoomfahrt abspielen</button>
+<button id="record">Als Video aufnehmen</button>
+</div>
+<p id="rec">Die Aufnahme läuft im Browser (1920 × 1080) und enthält die Bildtexte.</p>
+</div>
+<div class="card">
+<h2>Kennzahlen</h2>
+<div class="big" id="ratio"></div>
+<div class="note">Verhältnis Atomdurchmesser : Kerndurchmesser</div>
+<dl style="margin-top:10px">
+<dt>Atomradius</dt><dd id="ra"></dd>
+<dt>Kernradius</dt><dd id="rk"></dd>
+<dt>Volumenanteil Kern</dt><dd id="vol"></dd>
+<dt>Massenanteil Kern</dt><dd id="mass"></dd>
+<dt>Blickfeld aktuell</dt><dd id="view"></dd>
+<dt>Kern auf dem Bildschirm</dt><dd id="kpx"></dd>
+</dl>
+</div>
+<div class="card">
+<h2>Vergleich im Alltag</h2>
+<p id="analogy" style="margin:0"></p>
+</div>
+</aside>
+</main>
+<section class="info">
+<details>
+<summary>Datengrundlage und Unsicherheiten</summary>
+<p>Atome haben keine scharfe Grenze: Die Elektronendichte nimmt nach außen kontinuierlich ab. Der Atomradius hängt deshalb von der Definition ab (Bohr-Radius, berechneter Radius, Kovalenz-, Metall- oder Van-der-Waals-Radius); die Werte unterscheiden sich je nach Definition bis etwa um den Faktor 2. Die angegebenen Verhältnisse sind daher Größenordnungen, keine exakten Konstanten.</p>
+<p>Kernradien sind mittlere quadratische Ladungsradien aus Elektronenstreuung bzw. Myon-Spektroskopie (Proton: 0,841 fm). Die Faustformel R ≈ 1,2 fm · A<sup>1/3</sup> liefert etwas größere Werte (Gold: ≈ 7,0 fm).</p>
+<div class="scroll"><table>
+<thead><tr><th>Element</th><th>Atomradius</th><th>Definition</th><th>Kernradius</th><th>Verhältnis</th></tr></thead>
+<tbody id="tab"></tbody></table></div>
+</details>
+<details>
+<summary>Hinweise zum Modell</summary>
+<p>Die Hülle ist als Elektronendichte (Aufenthaltswahrscheinlichkeit, 1s-artiger Verlauf) dargestellt, nicht als Bahnen. Die Darstellung „Kern plus leerer Raum“ ist eine Vereinfachung: Die Hülle ist kein leerer Raum, sondern der Bereich, in dem die Elektronendichte von null verschieden ist. Bei großen Kernen ist die Nukleonenanordnung eine zweidimensionale Projektion; Nukleonen haben ebenfalls keine scharfe Oberfläche. Farben sind frei gewählt.</p>
+<p>Bei kleiner Vergrößerung ist der Kern kleiner als ein Bildpunkt; er wird dann nur durch eine Markierung angezeigt, die angibt, wie groß er tatsächlich wäre.</p>
+</details>
+</section>
+<script>
+{
+const EL={
+ H:{name:'Wasserstoff',sym:'H',Z:1,A:1,ra:52.9e-12,raDef:'Bohr-Radius',rk:0.841e-15},
+ He:{name:'Helium',sym:'He',Z:2,A:4,ra:31e-12,raDef:'berechnet',rk:1.676e-15},
+ C:{name:'Kohlenstoff',sym:'C',Z:6,A:12,ra:67e-12,raDef:'berechnet',rk:2.470e-15},
+ Au:{name:'Gold',sym:'Au',Z:79,A:197,ra:144e-12,raDef:'Metallradius',rk:5.437e-15}
+};
+const RN=0.84e-15;
+const $=id=>document.getElementById(id);
+const cv=$('cv'),ctx=cv.getContext('2d'),fig=$('fig'),zoom=$('zoom');
+let key='H',logW=0,tour=null,rec=null,recCv=null,recCtx=null,nuc=[];
+const de=(x,d=0)=>x.toLocaleString('de-DE',{maximumFractionDigits:d,minimumFractionDigits:d});
+const sup=s=>s.replace(/[-0-9]/g,c=>'⁻⁰¹²³⁴⁵⁶⁷⁸⁹'['-0123456789'.indexOf(c)]);
+function sci(x,d=1){const e=Math.floor(Math.log10(x)),m=x/10**e;return de(m,d)+' · 10'+sup(String(e))}
+function len(m){const u=[[1e-9,'nm'],[1e-12,'pm'],[1e-15,'fm']];for(const[f,n]of u){if(m>=f*0.999){const v=m/f;return de(v,v<10&&v%1?1:0)+' '+n}}return de(m/1e-15,3)+' fm'}
+function ratioOf(e){return e.ra/e.rk}
+function lim(e){return{max:Math.log10(e.ra*5),min:Math.log10(e.rk*3.2)}}
+function setLog(v){const L=lim(EL[key]);logW=Math.min(L.max,Math.max(L.min,v));zoom.value=(L.max-logW)/(L.max-L.min);info()}
+function buildNuc(){const e=EL[key];nuc=[];const ga=Math.PI*(3-Math.sqrt(5));let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+ const R=Math.max(0,e.rk-RN*0.9),idx=[...Array(e.A).keys()];for(let i=idx.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]]}
+ for(let i=0;i<e.A;i++){const r=e.A===1?0:R*Math.sqrt((i+.5)/e.A),a=i*ga;nuc.push({x:r*Math.cos(a),y:r*Math.sin(a),z:rnd(),p:idx[i]<e.Z})}nuc.sort((a,b)=>a.z-b.z)}
+function seg(){$('seg').innerHTML=Object.entries(EL).map(([k,e])=>`<button data-k="${k}" aria-pressed="${k===key}">${e.sym}<small>${e.name}</small></button>`).join('')}
+function table(){$('tab').innerHTML=Object.values(EL).map(e=>`<tr><td>${e.name}</td><td>${de(e.ra*1e12)} pm</td><td>${e.raDef}</td><td>${de(e.rk*1e15,2)} fm</td><td>1 : ${de(Math.round(ratioOf(e)/100)*100)}</td></tr>`).join('')}
+function info(){const e=EL[key],r=ratioOf(e),s=Math.min(cv.clientWidth,cv.clientHeight)/10**logW;
+ $('ratio').textContent='1 : '+de(Math.round(r/100)*100);
+ $('ra').textContent=de(e.ra*1e12)+' pm ('+e.raDef+')';$('rk').textContent=de(e.rk*1e15,2)+' fm';
+ $('vol').textContent=sci((e.rk/e.ra)**3);
+ $('mass').textContent='≈ '+de(100*(1-e.Z*0.000548580/(e.A*1.00728)),2)+' %';
+ $('view').textContent=len(10**logW);const kp=2*e.rk*s;$('kpx').textContent=kp<0.01?sci(kp,1)+' px':de(kp,kp<10?2:0)+' px';
+ const d=r*0.01;$('analogy').textContent=`Wäre der Kern von ${e.name} so groß wie ein Kirschkern (Durchmesser 1 cm), hätte das ganze Atom einen Durchmesser von etwa ${de(Math.round(d/10)*10)} m – das entspricht ungefähr ${de(d/105,1)} Fußballfeldern hintereinander. Ein Fußball (22 cm) als Kern ergäbe ein Atom von etwa ${de(d*22/1000,1)} km Durchmesser.`}
+function draw(c,W,H,k,t,cap){
+ const e=EL[key],s=Math.min(W,H)/10**logW,cx=W/2,cy=H/2;
+ c.fillStyle='#0a0f1e';c.fillRect(0,0,W,H);
+ const Rg=5*e.ra*s,A=.55;
+ if(Rg<40000){const g=c.createRadialGradient(cx,cy,0,cx,cy,Rg);for(let i=0;i<=14;i++){const u=i/14;g.addColorStop(u,`rgba(95,160,255,${A*Math.exp(-10*u)})`)}c.fillStyle=g;c.beginPath();c.arc(cx,cy,Rg,0,7);c.fill()}
+ else{c.fillStyle=`rgba(95,160,255,${A})`;c.fillRect(0,0,W,H)}
+ const rap=e.ra*s;
+ if(rap>8&&rap<W*3){c.save();c.setLineDash([6*k,6*k]);c.strokeStyle='rgba(220,235,255,.75)';c.lineWidth=1.5*k;c.beginPath();c.arc(cx,cy,rap,0,7);c.stroke();c.restore();
+  if(rap<Math.min(W,H)*.48){c.fillStyle='#e8f0ff';c.font=`${14*k}px "Atkinson Hyperlegible",sans-serif`;c.textAlign='left';c.fillText('Atomradius ≈ '+len(e.ra),cx+rap*.72+8*k,cy-rap*.72)}}
+ const Rp=e.rk*s;
+ if(Rp<2.5){const pr=(14+3*Math.sin(t*4))*k;c.strokeStyle='#ff6b5e';c.lineWidth=2*k;c.beginPath();c.arc(cx,cy,pr,0,7);c.stroke();
+  c.fillStyle='#ff6b5e';c.beginPath();c.arc(cx,cy,Math.max(Rp,0.8*k),0,7);c.fill();
+  c.beginPath();c.moveTo(cx+pr*.7,cy+pr*.7);c.lineTo(cx+60*k,cy+60*k);c.stroke();
+  c.font=`700 ${15*k}px "Atkinson Hyperlegible",sans-serif`;c.textAlign='left';c.fillStyle='#ffd6d1';
+  const kp=2*Rp/k;c.fillText('Atomkern (markiert)',cx+64*k,cy+66*k);c.font=`${13*k}px "Atkinson Hyperlegible",sans-serif`;
+  c.fillText('tatsächlicher Durchmesser: '+(kp<0.01?sci(kp,1):de(kp,2))+' Bildpunkte',cx+64*k,cy+86*k)}
+ else{const rn=RN*s;
+  if(Rp<8){c.fillStyle='#e0574d';c.beginPath();c.arc(cx,cy,Rp,0,7);c.fill()}
+  else for(const n of nuc){const x=cx+n.x*s,y=cy+n.y*s,g=c.createRadialGradient(x-rn*.35,y-rn*.4,rn*.1,x,y,rn);
+   if(n.p){g.addColorStop(0,'#ff9a8f');g.addColorStop(.55,'#d8342c');g.addColorStop(1,'#7d1410')}else{g.addColorStop(0,'#f2f4f8');g.addColorStop(.55,'#a9b0bd');g.addColorStop(1,'#545b68')}
+   c.fillStyle=g;c.beginPath();c.arc(x,y,rn,0,7);c.fill()}
+  if(Rp>30){c.save();c.setLineDash([5*k,5*k]);c.strokeStyle='rgba(255,220,215,.8)';c.lineWidth=1.5*k;c.beginPath();c.arc(cx,cy,Rp,0,7);c.stroke();c.restore();
+   c.fillStyle='#ffe2de';c.font=`${14*k}px "Atkinson Hyperlegible",sans-serif`;c.textAlign='left';c.fillText('Kernradius ≈ '+len(e.rk),Math.min(cx+Rp*.72+8*k,W-170*k),Math.max(cy-Rp*.72,60*k))}
+  if(Rp>20){const lx=W-14*k,ly=H-20*k;c.textAlign='right';c.font=`${14*k}px "Atkinson Hyperlegible",sans-serif`;
+   c.fillStyle='#ff8a80';c.fillText('● Proton',lx,ly-20*k);c.fillStyle='#c9ced8';c.fillText('● Neutron',lx,ly)}}
+ // Maßstabsleiste
+ const tgt=W*.22/s,ex=Math.floor(Math.log10(tgt));let nice=10**ex;for(const f of[2,5])if(f*10**ex<=tgt)nice=f*10**ex;
+ const bw=nice*s,bx=16*k,by=H-24*k;c.fillStyle='#fff';c.fillRect(bx,by,bw,4*k);c.fillRect(bx,by-6*k,2*k,10*k);c.fillRect(bx+bw-2*k,by-6*k,2*k,10*k);
+ c.font=`700 ${15*k}px "Atkinson Hyperlegible",sans-serif`;c.textAlign='left';c.fillText(len(nice),bx,by-12*k);
+ // Kopfzeile
+ const L=lim(e),mag=10**(L.max-logW);c.font=`700 ${17*k}px "Atkinson Hyperlegible",sans-serif`;c.fillStyle='#fff';
+ c.fillText(e.name+' ('+e.sym+')',16*k,28*k);c.font=`${14*k}px "Atkinson Hyperlegible",sans-serif`;c.fillStyle='#c9d4ee';
+ c.fillText('Bildbreite '+len(10**logW*W/Math.min(W,H))+'  ·  Vergrößerung ×'+de(mag,mag<10?1:0),16*k,50*k);
+ if(cap){c.font=`700 ${22*k}px "Atkinson Hyperlegible",sans-serif`;const w=c.measureText(cap).width+36*k;c.fillStyle='rgba(10,15,30,.78)';
+  const yy=H-78*k;c.fillRect((W-w)/2,yy-30*k,w,44*k);c.fillStyle='#fff';c.textAlign='center';c.fillText(cap,W/2,yy)}}
+function caption(p){const e=EL[key],r=de(Math.round(ratioOf(e)/100)*100);if(!tour)return'';
+ const T=tour.t;if(T<2.5)return'Das ganze Atom: Die Hülle bestimmt seine Größe.';
+ if(T<14.5){return EL[key].rk*Math.min(cv.width,cv.height)/10**logW<2.5?'Der Kern ist noch kleiner als ein Bildpunkt.':'Jetzt wird der Atomkern sichtbar.'}
+ if(T<19)return`Der Kern: Durchmesser rund ${r}-mal kleiner als das Atom.`;return'Zurück zum ganzen Atom.'}
+const ease=u=>u<.5?4*u**3:1-(-2*u+2)**3/2;
+function tourStep(dt){tour.t+=dt;const T=tour.t,L=lim(EL[key]);let v;
+ if(T<2.5)v=L.max;else if(T<14.5)v=L.max+(L.min-L.max)*ease((T-2.5)/12);else if(T<19)v=L.min;else if(T<25)v=L.min+(L.max-L.min)*ease((T-19)/6);else{v=L.max;endTour()}
+ setLog(v)}
+function endTour(){tour=null;$('play').textContent='Zoomfahrt abspielen';if(rec&&rec.state==='recording')rec.stop()}
+function resize(){const d=window.devicePixelRatio||1;cv.width=Math.round(cv.clientWidth*d);cv.height=Math.round(cv.clientHeight*d);info()}
+let last=performance.now();
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(tour)tourStep(dt);const t=now/1000,cap=caption();
+ draw(ctx,cv.width,cv.height,window.devicePixelRatio||1,t,cap);
+ if(recCtx&&rec&&rec.state==='recording')draw(recCtx,1920,1080,2,t,cap);requestAnimationFrame(loop)}
+$('seg').addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;key=b.dataset.k;seg();buildNuc();if(!tour)setLog(lim(EL[key]).max);else tour.t=0});
+zoom.addEventListener('input',()=>{if(tour&&!rec)endTour();const L=lim(EL[key]);logW=L.max-(L.max-L.min)*zoom.value;info()});
+$('play').addEventListener('click',()=>{if(tour&&!rec){endTour();return}tour={t:0};$('play').textContent='Zoomfahrt stoppen'});
+$('record').addEventListener('click',()=>{const r=$('rec');
+ if(rec&&rec.state==='recording'){endTour();return}
+ if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream){r.textContent='Dieser Browser unterstützt keine Videoaufnahme aus der Seite.';return}
+ const types=['video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm'],type=types.find(t=>MediaRecorder.isTypeSupported(t))||'';
+ recCv=document.createElement('canvas');recCv.width=1920;recCv.height=1080;recCtx=recCv.getContext('2d');
+ const chunks=[];try{rec=new MediaRecorder(recCv.captureStream(30),type?{mimeType:type,videoBitsPerSecond:8e6}:{})}catch(err){r.textContent='Aufnahme nicht möglich: '+err.message;return}
+ rec.ondataavailable=ev=>ev.data.size&&chunks.push(ev.data);
+ rec.onstop=()=>{const mt=rec.mimeType||type||'video/webm',ext=mt.includes('mp4')?'mp4':'webm',url=URL.createObjectURL(new Blob(chunks,{type:mt}));
+  r.innerHTML='';const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener';a.textContent='Video öffnen ('+ext.toUpperCase()+')';r.append('Fertig: ',a,' – im neuen Tab über „Sichern“ bzw. Rechtsklick speichern.');
+  $('record').textContent='Als Video aufnehmen';rec=null;recCtx=null};
+ rec.start(250);tour={t:0};$('record').textContent='Aufnahme beenden';$('play').textContent='Aufnahme läuft …';r.textContent='Aufnahme läuft (ca. 25 s) …'});
+fig.addEventListener('wheel',ev=>{ev.preventDefault();if(tour&&!rec)endTour();setLog(logW+ev.deltaY*0.0025)},{passive:false});
+const pts=new Map();let pd=0;
+fig.addEventListener('pointerdown',ev=>{fig.setPointerCapture(ev.pointerId);pts.set(ev.pointerId,{x:ev.clientX,y:ev.clientY})});
+fig.addEventListener('pointermove',ev=>{if(!pts.has(ev.pointerId))return;const p=pts.get(ev.pointerId),dy=ev.clientY-p.y;pts.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});
+ if(tour&&!rec)endTour();
+ if(pts.size===2){const[a,b]=[...pts.values()],d=Math.hypot(a.x-b.x,a.y-b.y);if(pd)setLog(logW-Math.log10(d/pd));pd=d}
+ else if(pts.size===1)setLog(logW+dy*0.01)});
+const up=ev=>{pts.delete(ev.pointerId);pd=0};fig.addEventListener('pointerup',up);fig.addEventListener('pointercancel',up);
+new ResizeObserver(resize).observe(fig);
+seg();table();buildNuc();resize();setLog(lim(EL[key]).max);requestAnimationFrame(loop);
+}
+</script>
+</body>
+</html>
