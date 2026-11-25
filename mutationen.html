@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mutationen animiert</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: sachlich, präzise, wie eine gut gesetzte Lehrbuchtafel der Genetik
+   IDEA: ein bewegtes Präparat – Zelle, Karyogramm und Sequenz auf einer Bühne
+   PICTURE: große SVG-Bühne mit Zellen, Chromosomen, Basen und Polypeptidketten
+   COLOUR and TYPE: Weiß bzw. Nachtblau, Petrol als Leitfarbe, Magenta nur für Mutationen; Atkinson Hyperlegible
+   LAYOUT: Titel, drei Reiter, Varianten; Bühne mit Steuerung, Erläuterungen rechts ab 1100px, sonst darunter */
+:root{color-scheme:light;--bg:#fff;--ink:#13232c;--mute:#55666f;--line:#d6e0e4;--card:#f3f7f8;--pri:#0e5e6f;--acc:#c2185b;
+--cell:rgba(14,94,111,.07);--cellst:#0e5e6f;--tail:#b7c1c6;--prot:#dcd2ea;--onpri:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#0d151b;--ink:#e6eef2;--mute:#9fb2bc;--line:#24363f;--card:#13212a;--pri:#5cc0d2;--acc:#ff5c9a;--cell:rgba(92,192,210,.08);--cellst:#5cc0d2;--tail:#55656d;--prot:#3d3350;--onpri:#0d151b}}
+:root[data-theme=dark]{color-scheme:dark;--bg:#0d151b;--ink:#e6eef2;--mute:#9fb2bc;--line:#24363f;--card:#13212a;--pri:#5cc0d2;--acc:#ff5c9a;--cell:rgba(92,192,210,.08);--cellst:#5cc0d2;--tail:#55656d;--prot:#3d3350;--onpri:#0d151b}
+*{box-sizing:border-box;min-width:0}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 'Atkinson Hyperlegible',system-ui,-apple-system,sans-serif;overflow-x:clip;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:1400px;margin:0 auto;padding:clamp(18px,3vw,34px) max(3.5vw,14px) 40px}
+h1{font-size:clamp(28px,3.6vw,42px);line-height:1.06;margin:0 0 6px;text-wrap:balance}
+.sub{color:var(--mute);margin:0;max-width:72ch}
+.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:18px 0 10px}
+.tab{min-height:58px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;font:inherit;font-weight:700;font-size:17px;cursor:pointer;padding:8px 12px;text-align:left}
+.tab small{display:block;font-weight:400;color:var(--mute);font-size:13px}
+.tab[aria-selected=true]{border-color:var(--pri);background:var(--pri);color:var(--onpri)}
+.tab[aria-selected=true] small{color:var(--onpri);opacity:.85}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.chip{min-height:44px;padding:8px 15px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--ink);font:inherit;font-size:15px;cursor:pointer}
+.chip[aria-pressed=true]{border-color:var(--acc);color:var(--acc);font-weight:700;box-shadow:inset 0 0 0 1px var(--acc)}
+.grid{display:grid;gap:18px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:1100px){.grid{grid-template-columns:minmax(0,1fr) 370px}}
+.stagebox{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+#stage{display:block;width:100%;height:auto;max-height:70vh;margin:0 auto;user-select:none;-webkit-user-select:none}
+.cap{padding:12px 16px;border-top:1px solid var(--line);min-height:92px}
+.cap b{color:var(--pri)}.cap em{color:var(--acc);font-style:normal;font-weight:700}
+.ctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 12px;border-top:1px solid var(--line)}
+.btn{min-height:46px;min-width:46px;padding:8px 14px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-weight:700;cursor:pointer}
+.btn.main{background:var(--pri);color:var(--onpri);border-color:var(--pri);min-width:132px}
+.speed{margin-left:auto;display:flex;gap:4px;align-items:center;color:var(--mute);font-size:14px}
+.speed .btn{min-width:54px;padding:8px 10px;font-weight:400}
+.speed .btn[aria-pressed=true]{border-color:var(--pri);font-weight:700}
+.steps{display:flex;gap:6px;overflow-x:auto;padding:10px 12px;border-top:1px solid var(--line);scrollbar-width:thin}
+.step{flex:none;min-height:42px;padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--mute);font:inherit;font-size:14px;cursor:pointer}
+.step.done{color:var(--ink)}
+.step.on{color:var(--ink);border-color:var(--pri);box-shadow:inset 0 -3px 0 var(--pri);font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px}
+.card h2{font-size:22px;margin:0 0 4px;line-height:1.2;text-wrap:balance}
+.card h3{font-size:15px;margin:14px 0 3px;color:var(--pri)}
+.card p{margin:0}
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:14px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:15px;height:15px;border-radius:4px;display:inline-block;flex:none}
+.fine{font-size:13px;color:var(--mute);margin-top:10px}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+@media(max-width:600px){.tab{font-size:15px;padding:8px}.tab small{display:none}.speed{margin-left:0}}
+/* SVG */
+.cell{fill:var(--cell);stroke:var(--cellst);stroke-width:2;vector-effect:non-scaling-stroke}
+.cs{stroke:rgba(0,0,0,.4);stroke-width:1}
+.eq{stroke:var(--mute);stroke-width:2;stroke-dasharray:6 7}
+.lbl{fill:var(--ink);font-size:22px;font-weight:700;text-anchor:middle}
+.lbl.acc{fill:var(--acc)}
+.rlab{fill:var(--mute);font-size:16px;font-weight:700}
+.rlab.acc{fill:var(--acc)}
+.seg{stroke:rgba(0,0,0,.35);stroke-width:1}
+.segt{font-size:21px;font-weight:700;text-anchor:middle;fill:#2a2116}.segt.on{fill:#fff}
+.arw{fill:none;stroke:#2a2116;stroke-width:2;opacity:.6}.arw.on{stroke:#fff}
+.cen{fill:var(--mute)}
+.gene{font-size:15px;font-weight:700;text-anchor:middle;fill:var(--acc)}
+.bk{stroke:var(--acc);stroke-width:4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.hl{fill:none;stroke:var(--acc);stroke-width:2.5;stroke-dasharray:8 5}
+.hlf{fill:var(--acc);fill-opacity:.14;stroke:var(--acc);stroke-width:2.5}
+.note{font-size:15px;fill:var(--mute);text-anchor:middle}
+.note.acc{fill:var(--acc);font-weight:700}
+.bt{font-size:13px;font-weight:700;text-anchor:middle;fill:#fff}.bt.dk{fill:#2a2116}
+.mutx{stroke:var(--acc);stroke-width:3}
+.rl{font-size:13px;fill:var(--mute);text-anchor:end}
+.rr{font-size:13px;fill:var(--mute)}
+.lane{font-size:18px;font-weight:700;fill:var(--ink)}.lane.acc{fill:var(--acc)}
+.mlab{font-size:15px;font-weight:700;fill:var(--acc);text-anchor:middle}
+.bdt{font-size:9.5px;font-weight:700;text-anchor:middle;fill:#fff;pointer-events:none}
+.mutb{stroke:var(--acc);stroke-width:3.5}
+.tail{fill:var(--tail)}
+.chain{fill:none;stroke:var(--mute);stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.rib{fill:#7a5c99;fill-opacity:.5;stroke:#5b3f7a;stroke-width:1.5}
+.stopb{fill:var(--ink)}.stopt{font-size:12px;font-weight:700;text-anchor:middle;fill:var(--bg)}
+.prot{fill:var(--prot);stroke:#6b558c;stroke-width:2}
+.protl{stroke:#6b558c;stroke-width:1.5}
+.ub{fill:#8e5bb5;stroke:#fff;stroke-width:1}
+.lip{fill:#d9a441}.lipt{stroke:#b98a2e;stroke-width:2}
+.rbc{fill:#c0392b}.rbc2{fill:#e8806f}
+.frag{fill:var(--mute)}
+.sep{stroke:var(--line);stroke-width:2}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Mutationen: von der Zelle bis zum Protein</h1>
+  <p class="sub">Interaktive Animation zu Genom-, Chromosomen- und Genmutationen mit ihren möglichen Auswirkungen. Schrittweise abspielen mit „Weiter“, durchgehend mit „Abspielen“.</p>
+
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <div class="chips" id="chips" aria-label="Mutationsart"></div>
+
+  <div class="grid">
+    <section class="stagebox" aria-label="Animation">
+      <svg id="stage" viewBox="0 0 1000 600" role="img" aria-label="Animierte Darstellung der gewählten Mutation"></svg>
+      <div class="steps" id="steps"></div>
+      <div class="cap" id="cap" aria-live="polite"></div>
+      <div class="ctrl">
+        <button class="btn" id="bPrev" aria-label="Vorheriger Schritt">‹ Zurück</button>
+        <button class="btn main" id="bPlay">Abspielen</button>
+        <button class="btn" id="bNext" aria-label="Nächster Schritt">Weiter ›</button>
+        <button class="btn" id="bReset">Neustart</button>
+        <div class="speed" role="group" aria-label="Tempo">Tempo
+          <button class="btn" data-sp="0.6">langsam</button>
+          <button class="btn" data-sp="1" aria-pressed="true">normal</button>
+          <button class="btn" data-sp="1.6">schnell</button>
+        </div>
+      </div>
+    </section>
+    <aside>
+      <div class="card" id="info"></div>
+      <div class="card"><h3 style="margin-top:0">Legende</h3><div class="legend" id="legend"></div>
+        <p class="fine">Schematische Modelldarstellung, nicht maßstabsgetreu. Sequenzausschnitte nach Literaturangaben.</p></div>
+    </aside>
+  </div>
+</div>
+
+<script>
+{
+const NS='http://www.w3.org/2000/svg';
+const $=s=>document.querySelector(s);
+const svg=$('#stage');
+const clamp=v=>v<0?0:v>1?1:v;
+const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+const lerp=(a,b,t)=>a+(b-a)*t;
+const DEF={x:0,y:0,r:0,s:1,o:1,f:1};
+
+/* ---------- Szenen-Engine ---------- */
+function Scene(vb){return{vb,objs:[],ids:{},phases:[],chains:[],bg:''}}
+function add(sc,id,s,init,z){const o={id,svg:s,init:Object.assign({},DEF,init||{}),z:z||0};sc.objs.push(o);sc.ids[id]=o;return o}
+function phase(sc,title,cap,d,tr){d=d||3.4;const p={title,cap,d,tr:tr||Math.min(d*.6,1.9),set:{},meta:{}};sc.phases.push(p);return p}
+function set(p,id,props,meta){p.set[id]=Object.assign(p.set[id]||{},props);if(meta)p.meta[id]=meta}
+
+let cur=null,T=0,playing=false,stopAt=null,speed=1,lastTs=0,curPhase=-1;
+function load(sc){
+  cur=sc;svg.setAttribute('viewBox',sc.vb);svg.innerHTML=sc.bg;
+  sc.chains.forEach(c=>{c.el=document.createElementNS(NS,'polyline');c.el.setAttribute('class','chain');svg.appendChild(c.el)});
+  sc.objs.map((o,i)=>[o,i]).sort((a,b)=>a[0].z-b[0].z||a[1]-b[1]).forEach(([o])=>{
+    const g=document.createElementNS(NS,'g');g.innerHTML=o.svg;svg.appendChild(g);o.g=g;o.fe=g.querySelector('[data-f]');o.vis=undefined});
+  const st=[{}];sc.objs.forEach(o=>st[0][o.id]=o.init);
+  sc.phases.forEach((p,i)=>{const s=Object.assign({},st[i]);for(const id in p.set){if(s[id])s[id]=Object.assign({},s[id],p.set[id])}st.push(s)});
+  sc.st=st;let t=0;sc.phases.forEach(p=>{p.t0=t;t+=p.d});sc.total=t;
+}
+function idxAt(t){const ps=cur.phases;for(let k=0;k<ps.length;k++)if(t<ps[k].t0+ps[k].d)return k;return ps.length-1}
+function render(){
+  const sc=cur,i=idxAt(T),ph=sc.phases[i],A=sc.st[i],B=sc.st[i+1],p=clamp((T-ph.t0)/ph.tr);
+  for(const o of sc.objs){
+    const a=A[o.id],b=B[o.id],m=ph.meta[o.id];let q=p;
+    if(m&&m.dl!=null)q=clamp((p-m.dl)/(m.w||.12));
+    const e=m&&m.lin?q:ease(q),v={};
+    for(const k in DEF)v[k]=lerp(a[k],b[k],e);
+    o.v=v;
+    if(v.o<.01){if(o.vis!==false){o.g.style.display='none';o.vis=false}continue}
+    if(o.vis!==true){o.g.style.display='';o.vis=true}
+    o.g.setAttribute('transform',`translate(${v.x.toFixed(1)} ${v.y.toFixed(1)}) rotate(${v.r.toFixed(1)}) scale(${v.s.toFixed(3)})`);
+    o.g.setAttribute('opacity',v.o.toFixed(3));
+    if(o.fe){const f=Math.abs(v.f)<.03?.03:v.f;o.fe.setAttribute('transform',`scale(${f.toFixed(3)} 1)`)}
+  }
+  for(const c of sc.chains){const pts=[];let os=0,n=0;
+    for(const id of c.ids){const v=sc.ids[id].v;if(v.o>.25){pts.push(v.x.toFixed(1)+','+v.y.toFixed(1));os+=v.o;n++}}
+    c.el.setAttribute('points',pts.join(' '));c.el.setAttribute('opacity',n>1?(os/n).toFixed(2):0)}
+  if(i!==curPhase){curPhase=i;caption()}
+}
+function tick(ts){
+  const dt=Math.min(.05,((ts-lastTs)/1000)||0);lastTs=ts;
+  if(playing&&cur){T+=dt*speed;const lim=stopAt!=null?stopAt:cur.total;if(T>=lim){T=lim;playing=false;stopAt=null;syncBtn()}render()}
+  requestAnimationFrame(tick);
+}
+
+/* ---------- Genommutation ---------- */
+const GCOL={Am:'#1f4e79',Ap:'#8cbde6',Bm:'#a4243b',Bp:'#f2a0aa',P:'#2f8f5b'};
+function chromatid(L,c,col){const w=13,y0=-L/2,h=c*L;
+  return `<rect x="${-w/2}" y="${y0}" width="${w}" height="${h-1.5}" rx="6.5" fill="${col}" class="cs"/><rect x="${-w/2}" y="${y0+h+1.5}" width="${w}" height="${L-h-1.5}" rx="6.5" fill="${col}" class="cs"/><rect x="${-w/2+1.5}" y="${y0+h+(L-h)*.45}" width="${w-3}" height="4" fill="rgba(0,0,0,.22)"/>`}
+function buildGenome(kind){
+  const sc=Scene('0 0 1000 600'),ndj1=kind==='ndj1',ndj2=kind==='ndj2',poly=kind==='poly';
+  const CH=[{id:'Am',g:'A',L:118,c:.42},{id:'Ap',g:'A',L:118,c:.42},{id:'Bm',g:'B',L:62,c:.24},{id:'Bp',g:'B',L:62,c:.24}];
+  const cell=(rx,ry)=>`<ellipse rx="${rx}" ry="${ry}" class="cell"/>`;
+  const GC={LT:[280,180],LB:[280,420],RT:[720,180],RB:[720,420],CT:[500,180],CB:[500,420]},MC={L:280,R:720,C:500};
+  add(sc,'c0',cell(300,235),{x:500,y:300},-3);
+  ['L','R'].forEach(k=>add(sc,'c1'+k,cell(205,245),{x:500,y:300,s:.7,o:0},-3));
+  for(const k in GC)add(sc,'g'+k,cell(k[0]==='C'?215:165,108),{x:MC[k[0]],y:300,s:.6,o:0},-2);
+  add(sc,'gP',cell(165,108),{x:1180,y:300,o:0},-2);
+  add(sc,'z',cell(285,215),{x:500,y:300,s:.85,o:0},-3);
+  add(sc,'eq1','<line class="eq" y1="-215" y2="215"/>',{x:500,y:300,o:0},-1);
+  ['L','R','C'].forEach(k=>add(sc,'eq'+k,`<line class="eq" x1="${k==='C'?-215:-180}" x2="${k==='C'?215:180}"/>`,{x:MC[k],y:300,o:0},-1));
+  const off=r=>{const a=r*Math.PI/180;return[7.5*Math.cos(a),7.5*Math.sin(a)]};
+  const scat={Am:[385,235,-20],Ap:[620,370,25],Bm:[430,400,40],Bp:[590,215,-35]};
+  CH.forEach(c=>{const[x,y,r]=scat[c.id],[dx,dy]=off(r);
+    add(sc,c.id+'1',chromatid(c.L,c.c,GCOL[c.id]),{x:x-dx,y:y-dy,r});
+    add(sc,c.id+'2',chromatid(c.L,c.c,GCOL[c.id]),{x:x+dx,y:y+dy,r})});
+  add(sc,'PA',chromatid(118,.42,GCOL.P),{x:1162,y:312,o:0});
+  add(sc,'PB',chromatid(62,.24,GCOL.P),{x:1198,y:312,o:0});
+  const put=(p,id,x,y,r)=>{const[dx,dy]=off(r);set(p,id+'1',{x:x-dx,y:y-dy,r});set(p,id+'2',{x:x+dx,y:y+dy,r})};
+
+  phase(sc,'Ausgangszelle','Diploide Keimbahnzelle (Modell mit 2n = 4). Nach der DNA-Replikation besteht jedes Chromosom aus zwei Schwesterchromatiden. Dunkel: mütterliches, hell: väterliches Homolog.',3);
+  const p1=phase(sc,'Metaphase I','Die homologen Chromosomen lagern sich paarweise aneinander (Bivalente) und ordnen sich in der Äquatorialebene an.');
+  put(p1,'Am',482,205,0);put(p1,'Ap',518,205,0);put(p1,'Bm',482,405,0);put(p1,'Bp',518,405,0);set(p1,'eq1',{o:1});
+  const p2=phase(sc,'Anaphase I',ndj1?'<em>Fehlverteilung:</em> Die Homologen des kleinen Chromosomenpaares werden nicht getrennt (Non-Disjunction in Meiose I) und gelangen gemeinsam an einen Zellpol.':'Die homologen Chromosomen werden getrennt und zu entgegengesetzten Zellpolen gezogen: Reduktion des Chromosomensatzes.');
+  const mi={Am:'L',Ap:'R',Bm:'L',Bp:'R'};if(ndj1)mi.Bp='L';
+  put(p2,'Am',300,205,0);put(p2,'Ap',700,205,0);
+  if(ndj1){put(p2,'Bm',282,405,0);put(p2,'Bp',320,405,0)}else{put(p2,'Bm',300,405,0);put(p2,'Bp',700,405,0)}
+  set(p2,'eq1',{o:0});
+  const p3=phase(sc,'Metaphase II',poly?'<em>Fehler:</em> Die Zellteilung nach Meiose I unterbleibt (Restitution). Beide Chromosomensätze verbleiben in einer Zelle und ordnen sich in der Äquatorialebene an.':ndj1?'Die linke Tochterzelle enthält ein Chromosom zu viel, der rechten fehlt eines. Die Chromosomen ordnen sich in der Äquatorialebene an.':'Zwei haploide Tochterzellen. Die Chromosomen (noch aus je zwei Chromatiden) ordnen sich in der Äquatorialebene an.');
+  const cellOf=id=>poly?'C':mi[id];
+  if(poly)set(p3,'eqC',{o:1});
+  else{set(p3,'c0',{o:0,s:1.05});set(p3,'c1L',{x:280,s:1,o:1});set(p3,'c1R',{x:720,s:1,o:1});set(p3,'eqL',{o:1});set(p3,'eqR',{o:1})}
+  const xc={};
+  ['L','R','C'].forEach(k=>{const ids=CH.filter(c=>cellOf(c.id)===k);if(!ids.length)return;
+    const tot=ids.reduce((s,c)=>s+c.L,0)+(ids.length-1)*26;let x=MC[k]-tot/2;
+    ids.forEach(c=>{xc[c.id]=x+c.L/2;put(p3,c.id,xc[c.id],300,90);x+=c.L+26})});
+  const p4=phase(sc,'Anaphase II',ndj2?'<em>Fehlverteilung:</em> Die Schwesterchromatiden des kleinen mütterlichen Chromosoms werden nicht getrennt (Non-Disjunction in Meiose II).':'Die Schwesterchromatiden werden getrennt und zu den Zellpolen gezogen.');
+  ['eqL','eqR','eqC'].forEach(id=>set(p4,id,{o:0}));
+  const gk=(id,k)=>cellOf(id)+((ndj2&&id==='Bm')?'T':(k===1?'T':'B'));
+  const G={};CH.forEach(c=>[1,2].forEach(k=>{const key=gk(c.id,k);(G[key]=G[key]||[]).push({id:c.id+k,c})}));
+  CH.forEach(c=>[1,2].forEach(k=>{const key=gk(c.id,k);let y=key[1]==='T'?192:408;if(ndj2&&c.id==='Bm')y=k===1?178:205;set(p4,c.id+k,{x:xc[c.id],y,r:90})}));
+  const cap5={normal:'Vier haploide Gameten (n) mit unterschiedlicher Kombination mütterlicher und väterlicher Chromosomen.',ndj1:'Alle vier Gameten sind aneuploid: zwei mit n+1, zwei mit n−1 Chromosomen.',ndj2:'Zwei Gameten sind normal (n), je einer enthält n+1 bzw. n−1 Chromosomen.',poly:'Es entstehen unreduzierte, diploide Gameten (2n).'};
+  const p5=phase(sc,'Gameten',cap5[kind]);
+  if(poly)set(p5,'c0',{o:0});else{set(p5,'c1L',{o:0});set(p5,'c1R',{o:0})}
+  const pos={};
+  for(const key in G){const[gx,gy]=GC[key],list=G[key],n=list.length;set(p5,'g'+key,{x:gx,y:gy,s:1,o:1});
+    list.forEach((e,i)=>{const x=gx+(i-(n-1)/2)*34,y=gy+12;pos[e.id]=[x,y];set(p5,e.id,{x,y,r:0})});
+    const lab=n===4?'2n':n===2?'n':n===3?'n+1':'n−1';
+    add(sc,'lab'+key,`<text class="lbl${n!==2?' acc':''}">${lab}</text>`,{x:gx,y:gy-72,o:0});set(p5,'lab'+key,{o:1})}
+  const p6=phase(sc,'Befruchtung','Der links markierte Gamet verschmilzt mit einem normalen haploiden Gameten (grün).');
+  const K=poly?'CT':'LT',[kx,ky]=GC[K],dx=350-kx,dy=300-ky;
+  for(const key in G){if(key===K){set(p6,'g'+key,{x:350,y:300});set(p6,'lab'+key,{x:350,y:228});G[key].forEach(e=>set(p6,e.id,{x:pos[e.id][0]+dx,y:pos[e.id][1]+dy}))}
+    else{set(p6,'g'+key,{o:.12});set(p6,'lab'+key,{o:.12});G[key].forEach(e=>set(p6,e.id,{o:.12}))}}
+  add(sc,'labP','<text class="lbl">n</text>',{x:650,y:228,o:0});
+  set(p6,'gP',{x:650,o:1});set(p6,'PA',{x:633,o:1});set(p6,'PB',{x:667,o:1});set(p6,'labP',{o:1});
+  const cap7={normal:'Zygote mit 2n = 4 Chromosomen: euploid. Beim Menschen entspricht dies 46 Chromosomen.',ndj1:'Zygote mit 2n+1 = 5 Chromosomen: <em>Trisomie</em> des kleinen Chromosoms. Beim Menschen entspricht dies z. B. 47,+21 (Trisomie 21). Mit einem n−1-Gameten entstünde eine Monosomie (2n−1).',ndj2:'Zygote mit 2n+1 = 5 Chromosomen: <em>Trisomie</em>, hier mit zwei identischen mütterlichen Kopien. Mit dem n−1-Gameten entstünde eine Monosomie (2n−1).',poly:'Zygote mit 3n = 6 Chromosomen: <em>Triploidie</em>, ein ganzer Chromosomensatz ist zusätzlich vorhanden.'};
+  const p7=phase(sc,'Zygote',cap7[kind]);
+  set(p7,'z',{s:1,o:1});set(p7,'gP',{o:0});set(p7,'labP',{o:0});
+  for(const key in G){set(p7,'g'+key,{o:0});set(p7,'lab'+key,{o:0});if(key!==K)G[key].forEach(e=>set(p7,e.id,{o:0}))}
+  const zc=G[K].map(e=>({id:e.id,g:e.c.g})).concat([{id:'PA',g:'A'},{id:'PB',g:'B'}]);
+  ['A','B'].forEach((g,gi)=>{const l=zc.filter(e=>e.g===g);l.forEach((e,i)=>set(p7,e.id,{x:500+(i-(l.length-1)/2)*40,y:gi?405:235,r:0}))});
+  const zl={normal:'2n = 4 · euploid',ndj1:'2n+1 = 5 · Trisomie',ndj2:'2n+1 = 5 · Trisomie',poly:'3n = 6 · Triploidie'}[kind];
+  add(sc,'labZ',`<text class="lbl${kind==='normal'?'':' acc'}">${zl}</text>`,{x:500,y:565,o:0});set(p7,'labZ',{o:1});
+  return sc;
+}
+
+/* ---------- Chromosomenmutation ---------- */
+const CEN='<path d="M-11 -24H11L3 0 11 24H-11L-3 0Z" class="cen"/>';
+function segSvg(l,w,dark,blue,gene){
+  const fill=blue?(dark?'#4f7aa3':'#cfe0ef'):(dark?'#85715a':'#ece4d4'),on=dark?' on':'';
+  return `<rect x="${-w/2}" y="-24" width="${w}" height="48" rx="5" fill="${fill}" class="seg"/><text class="segt${on}" y="5">${l}</text><g data-f><path d="M-13 15H13M7 11l6 4-6 4" class="arw${on}"/></g>${gene?`<text class="gene" y="-34">${gene}</text>`:''}`}
+function lay(items,cx){const tot=items.reduce((s,i)=>s+i.w,0)+(items.length-1)*2;let x=cx-tot/2;const o={};items.forEach(i=>{o[i.id]=x+i.w/2;x+=i.w+2});return o}
+function chromRow(sc,pre,letters,y,cx,blue,genes){
+  const items=letters.map((l,i)=>({id:pre+(l==='|'?'cen':l),w:l==='|'?22:80,l,i}));const xs=lay(items,cx);
+  items.forEach(it=>add(sc,it.id,it.l==='|'?CEN:segSvg(it.l,it.w,it.i%2===1,blue,genes&&genes[it.l]),{x:xs[it.id],y}));return items}
+function place(p,items,cx,y){const xs=lay(items,cx);items.forEach(it=>set(p,it.id,{x:xs[it.id],y}));return xs}
+const bnd=(xs,a,b)=>(xs[a.id]+a.w/2+xs[b.id]-b.w/2)/2;
+const pick=(arr,ids)=>ids.map(id=>arr.find(i=>i.id===id));
+const L9=['A','B','C','|','D','E','F','G','H'];
+const BK='<path class="bk" d="M0 -42L-8 -28 8 -14-8 0 8 14-8 28 0 42"/>';
+const txt=(t,cls,anchor)=>`<text class="${cls}"${anchor?` text-anchor="${anchor}"`:''}>${t}</text>`;
+const box=(w,h,cls)=>`<rect x="${-w/2}" y="${-h/2}" width="${w}" height="${h}" rx="8" class="${cls||'hl'}"/>`;
+
+function buildChrom(kind){
+  const sc=Scene('0 0 1000 500');
+  if(kind==='del'){
+    const a=chromRow(sc,'a',L9,190,500),h=chromRow(sc,'h',L9,360,500),xs=lay(a,500),left=xs.aA-40;
+    add(sc,'la',txt('Chromosom (Modell)','rlab'),{x:left,y:148});
+    add(sc,'la2',txt('Deletion: Endstück des kurzen Arms fehlt','rlab acc'),{x:left,y:148,o:0});
+    add(sc,'lh',txt('homologes Chromosom (intakt)','rlab'),{x:left,y:318});
+    add(sc,'bk',BK,{x:bnd(xs,a[1],a[2]),y:190,o:0});
+    const gx=(xs.aA+xs.aB)/2;
+    add(sc,'gh',box(170,54),{x:gx,y:190,o:0});add(sc,'gl',txt('fehlt','note acc'),{x:gx,y:238,o:0});
+    add(sc,'hh',box(170,54,'hlf'),{x:gx,y:360,o:0},-1);add(sc,'hl',txt('nur noch 1 Kopie','note acc'),{x:gx,y:408,o:0});
+    phase(sc,'Ausgangslage','Zwei homologe Chromosomen mit gleicher Abfolge der Abschnitte A–H. Jeder Buchstabe steht für einen Bereich mit mehreren Genen; der Pfeil zeigt die Orientierung. Grau: Centromer.',3);
+    const p1=phase(sc,'Bruch','Ein Doppelstrangbruch trennt den Endabschnitt des kurzen Arms (A–B) ab.');set(p1,'bk',{o:1});set(p1,'aA',{x:xs.aA-16});set(p1,'aB',{x:xs.aB-16});
+    const p2=phase(sc,'Verlust','Das Bruchstück besitzt kein Centromer (azentrisches Fragment). Es wird in der Mitose nicht verteilt und geht verloren.');
+    ['aA','aB'].forEach(id=>set(p2,id,{x:xs[id]-60,y:78,o:.35}));
+    const p3=phase(sc,'Ergebnis','<em>Terminale Deletion:</em> Die Abschnitte A und B fehlen auf einem der beiden Homologen.');
+    ['aA','aB','bk','la'].forEach(id=>set(p3,id,{o:0}));['gh','gl','la2'].forEach(id=>set(p3,id,{o:1}));
+    const p4=phase(sc,'Folgen','Die Gene in A und B liegen nur noch in einer Kopie vor (Hemizygotie). Reicht die halbe Genproduktmenge nicht aus, entstehen Symptome (Haploinsuffizienz) – z. B. beim Cri-du-Chat-Syndrom (5p−).');
+    set(p4,'hh',{o:1});set(p4,'hl',{o:1});
+  }
+  if(kind==='dup'){
+    const P=chromRow(sc,'p',L9,170,500),Q=chromRow(sc,'q',L9,330,500),xs0=lay(P,500),left=xs0.pA-40;
+    add(sc,'l1',txt('Homolog 1','rlab'),{x:left,y:128});add(sc,'l2',txt('Homolog 2','rlab'),{x:left,y:288});
+    const xs1=lay(P,418);
+    add(sc,'co','<path class="bk" d="M-14 -36L14 36M14 -36-14 36"/>',{x:bnd(xs1,P[6],P[7]),y:240,o:0});
+    phase(sc,'Ausgangslage','Zwei homologe Chromosomen in der Prophase I der Meiose, vor der Paarung.',3);
+    const p1=phase(sc,'Fehlpaarung','Die Homologen paaren sich versetzt, z. B. an ähnlichen, wiederholten DNA-Sequenzen. Abschnitt D von Homolog 2 liegt neben F von Homolog 1.');
+    place(p1,P,418,213);place(p1,Q,582,267);set(p1,'l1',{o:0});set(p1,'l2',{o:0});
+    const p2=phase(sc,'Crossing-over','An der markierten Stelle findet ein Crossing-over statt – aber an nicht entsprechenden Positionen (ungleiches Crossing-over).');set(p2,'co',{o:1});
+    const p3=phase(sc,'Austausch','Die Chromatidabschnitte rechts der Austauschstelle werden zwischen den Homologen getauscht.');
+    ['pG','pH'].forEach(id=>set(p3,id,{y:267}));['qE','qF','qG','qH'].forEach(id=>set(p3,id,{y:213}));set(p3,'co',{o:0});
+    const r1=pick(P.concat(Q),['pA','pB','pC','pcen','pD','pE','pF','qE','qF','qG','qH']),r2=pick(P.concat(Q),['qA','qB','qC','qcen','qD','pG','pH']);
+    const p4=phase(sc,'Ergebnis','Ein Chromosom trägt die Abschnitte E–F doppelt (<em>Duplikation</em>), das andere hat sie verloren (<em>Deletion</em>).');
+    const x1=place(p4,r1,500,170),x2=place(p4,r2,500,360);
+    add(sc,'h1',box(170,60),{x:(x1.qE+x1.qF)/2,y:170,o:0});set(p4,'h1',{o:1});
+    add(sc,'h2','<path class="bk" d="M0 -34V34"/>',{x:bnd(x2,r2[4],r2[5]),y:360,o:0});set(p4,'h2',{o:1});
+    add(sc,'t1',txt('Duplikation: E–F doppelt','rlab acc'),{x:x1.pA-40,y:122,o:0});set(p4,'t1',{o:1});
+    add(sc,'t2',txt('Deletion: E–F fehlt','rlab acc'),{x:x2.qA-40,y:312,o:0});set(p4,'t2',{o:1});
+    phase(sc,'Folgen','Die Gameten erhalten entweder die Duplikation oder die Deletion. Beispiel: Duplikation in 17p12 (Gen PMP22) → Charcot-Marie-Tooth-Neuropathie Typ 1A; die reziproke Deletion → HNPP. Genduplikationen sind zugleich Rohmaterial der Evolution.',4);
+  }
+  if(kind==='inv'){
+    const a=chromRow(sc,'a',L9,250,500),xs=lay(a,500),left=xs.aA-40;
+    add(sc,'la',txt('Chromosom (Modell)','rlab'),{x:left,y:208});
+    add(sc,'b1',BK,{x:bnd(xs,a[4],a[5]),y:250,o:0});add(sc,'b2',BK,{x:bnd(xs,a[7],a[8]),y:250,o:0});
+    add(sc,'hv',box(250,60),{x:xs.aF,y:250,o:0});
+    add(sc,'lv',txt('neue Abfolge: D – G F E – H','note acc'),{x:xs.aF,y:302,o:0});
+    const hm=chromRow(sc,'h',L9,400,500);hm.forEach(it=>sc.ids[it.id].init.o=0);
+    add(sc,'lh',txt('normales Homolog','rlab'),{x:left,y:358,o:0});
+    phase(sc,'Ausgangslage','Ein Chromosom mit der Abschnittsfolge A–H. Die Pfeile zeigen die Orientierung der Abschnitte.',3);
+    const p1=phase(sc,'Brüche','Zwei Doppelstrangbrüche im langen Arm: zwischen D/E und zwischen G/H.');set(p1,'b1',{o:1});set(p1,'b2',{o:1});
+    const p2=phase(sc,'Herauslösen','Der Abschnitt E–G wird herausgelöst. Er enthält kein Centromer (parazentrische Inversion).');['aE','aF','aG'].forEach(id=>set(p2,id,{y:150}));
+    const p3=phase(sc,'Drehung','Der Abschnitt dreht sich um 180°.',2.6,1.6);
+    set(p3,'aE',{x:xs.aF,y:92,f:0});set(p3,'aF',{f:0});set(p3,'aG',{x:xs.aF,y:208,f:0});
+    const p4=phase(sc,'Drehung','Die Reihenfolge ist umgekehrt: G – F – E; auch die Orientierung (Pfeile) ist gedreht.',2.6,1.6);
+    set(p4,'aE',{x:xs.aG,y:150,f:-1});set(p4,'aF',{f:-1});set(p4,'aG',{x:xs.aE,y:150,f:-1});
+    const p5=phase(sc,'Wiedereinbau','Der Abschnitt wird in umgekehrter Orientierung wieder eingebaut. Es geht keine Erbinformation verloren: Die Inversion ist <em>balanciert</em>.');
+    ['aE','aF','aG'].forEach(id=>set(p5,id,{y:250}));set(p5,'b1',{o:0});set(p5,'b2',{o:0});set(p5,'hv',{o:1});set(p5,'lv',{o:1});
+    const p6=phase(sc,'Folgen in der Meiose','Neben dem normalen Homolog ist die Genfolge nicht mehr parallel. Zur Paarung muss sich eine Inversionsschleife bilden; ein Crossing-over darin erzeugt unbalancierte (dizentrische bzw. azentrische) Chromatiden.',4.2);
+    hm.forEach(it=>set(p6,it.id,{o:1}));set(p6,'lh',{o:1});
+  }
+  if(kind==='trans'){
+    const A=chromRow(sc,'a',L9,160,500,false,{H:'ABL1'}),B=chromRow(sc,'b',['K','L','|','M','N','O','P'],370,500,true,{N:'BCR'});
+    const xa=lay(A,500),xb=lay(B,500);
+    add(sc,'la',txt('Chromosom 9 (Modell)','rlab'),{x:xa.aA-40,y:104});add(sc,'lb',txt('Chromosom 22 (Modell)','rlab'),{x:xb.bK-40,y:314});
+    add(sc,'ka',BK,{x:bnd(xa,A[7],A[8]),y:160,o:0});add(sc,'kb',BK,{x:bnd(xb,B[4],B[5]),y:370,o:0});
+    const d9=pick(A.concat(B),['aA','aB','aC','acen','aD','aE','aF','aG','bO','bP']),d22=pick(A.concat(B),['bK','bL','bcen','bM','bN','aH']);
+    const f9=lay(d9,500),f22=lay(d22,500);
+    add(sc,'la2',txt('der(9)','rlab acc'),{x:f9.aA-40,y:104,o:0});add(sc,'lb2',txt('der(22) = Philadelphia-Chromosom','rlab acc'),{x:f22.bK-40,y:314,o:0});
+    add(sc,'fu',box(176,64,'hlf'),{x:(f22.bN+f22.aH)/2,y:370,o:0},-1);
+    add(sc,'fl',txt('Fusionsgen BCR-ABL1','note acc'),{x:(f22.bN+f22.aH)/2,y:428,o:0});
+    phase(sc,'Ausgangslage','Zwei nicht-homologe Chromosomen. Markiert sind die Gene ABL1 (Chromosom 9, Bande q34) und BCR (Chromosom 22, Bande q11).',3.4);
+    const p1=phase(sc,'Brüche','Doppelstrangbrüche in beiden Chromosomen: auf Chromosom 22 im BCR-Gen, auf Chromosom 9 vor dem größten Teil von ABL1.');set(p1,'ka',{o:1});set(p1,'kb',{o:1});
+    const p2=phase(sc,'Austausch','Die Endstücke werden zwischen den beiden Chromosomen ausgetauscht (<em>reziproke Translokation</em>).');
+    set(p2,'aH',{x:f22.aH,y:292});set(p2,'bO',{x:f9.bO,y:236});set(p2,'bP',{x:f9.bP,y:236});
+    const p3=phase(sc,'Neuverknüpfung','Es entstehen zwei derivative Chromosomen. Die Gesamtmenge der Erbinformation bleibt gleich: balancierte Translokation.');
+    place(p3,d9,500,160);place(p3,d22,500,370);['ka','kb','la','lb'].forEach(id=>set(p3,id,{o:0}));set(p3,'la2',{o:1});set(p3,'lb2',{o:1});
+    const p4=phase(sc,'Fusionsgen','An der Bruchstelle von der(22) entsteht das Fusionsgen BCR-ABL1. Es codiert eine dauerhaft aktive Tyrosinkinase, die die Zellteilung ständig anregt: chronische myeloische Leukämie (CML).',4.4);
+    set(p4,'fu',{o:1});set(p4,'fl',{o:1});
+  }
+  return sc;
+}
+
+/* ---------- Genmutation ---------- */
+const BCOL={A:'#3a9a5b',T:'#d64550',U:'#d64550',G:'#e9b23a',C:'#3d78c8'};
+const COMP={A:'T',T:'A',G:'C',C:'G'};
+const CODE='FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG';
+const AA3={F:'Phe',L:'Leu',S:'Ser',Y:'Tyr',C:'Cys',W:'Trp',P:'Pro',H:'His',Q:'Gln',R:'Arg',I:'Ile',M:'Met',T:'Thr',N:'Asn',K:'Lys',V:'Val',A:'Ala',D:'Asp',E:'Glu',G:'Gly'};
+const PROP=a=>'AVLIMFWPG'.includes(a)?'hyd':'DE'.includes(a)?'neg':'KRH'.includes(a)?'pos':'pol';
+const PCOL={hyd:'#d4862a',pol:'#2f9e8f',pos:'#4a6fd1',neg:'#c8423b'};
+function transl(seq){const out=[];for(let i=0;i+3<=seq.length;i+=3){const c=seq.substr(i,3),k='TCAG'.indexOf(c[0])*16+'TCAG'.indexOf(c[1])*4+'TCAG'.indexOf(c[2]);out.push({a:CODE[k],ci:i/3});if(CODE[k]==='*')break}return out}
+function align(seq,m){const cols=[];for(let i=0;i<seq.length;i++){
+  if(m.t==='ins'&&i===m.i)cols.push({w:null,m:m.b});
+  if(m.t==='del'&&i>=m.i&&i<m.i+m.n){cols.push({w:seq[i],m:null});continue}
+  if(m.t==='sub'&&i===m.i){cols.push({w:seq[i],m:m.b,sub:true});continue}
+  cols.push({w:seq[i],m:seq[i]})}return cols}
+function foldPos(n,cx,cy){const cols=6,sp=22.5,rows=Math.ceil(n/cols),out=[],my=Math.max(1,(rows-1)/2)*sp;
+  for(let i=0;i<n;i++){const r=Math.floor(i/cols),c=i%cols,cc=r%2?cols-1-c:c,dx=(cc-(cols-1)/2)*sp,dy=(r-(rows-1)/2)*sp,k=1-.2*Math.abs(dx/(sp*2.5))*Math.abs(dy/my);
+    out.push([cx+dx*k+(r%2?5:-5),cy+dy])}return out}
+function misfold(n,cx,cy,seed){let s=seed;const rnd=()=>(s=(s*16807)%2147483647)/2147483647;let x=cx-110,y=cy-25,a=.25;const out=[];
+  for(let i=0;i<n;i++){out.push([x,y]);a+=(rnd()-.5)*1.9;let nx=x+23*Math.cos(a),ny=y+23*Math.sin(a);
+    if(nx<cx-160||nx>cx+165){a=Math.PI-a;nx=x+23*Math.cos(a)}if(ny<cy-78||ny>cy+78){a=-a;ny=y+23*Math.sin(a)}x=nx;y=ny}return out}
+const HBB='ATGGTGCATCTGACTCCTGAGGAGAAGTCTGCCGTT',CFTR='ATCATCTTTGGTGTTTCC';
+const GK={
+ silent:{seq:HBB,gene:'HBB (β-Globin)',mut:{t:'sub',i:20,b:'A'},ml:'Substitution G → A',eff:'none',
+  cMut:'Punktmutation (Substitution): Im Triplett GAG (Glutamat 6 der β-Kette) wird die dritte Base G durch A ersetzt: GAA.',
+  cTl:'Wildtyp und Mutante: GAG und GAA codieren beide Glutamat – der genetische Code ist degeneriert (variable dritte Codonposition).',
+  cFold:'Identische Aminosäuresequenz (Primärstruktur) → identische Faltung.',fW:'native Konformation',fM:'native Konformation',
+  c5:'Die Mutation bleibt auf Proteinebene ohne Folgen (<em>stumme Mutation</em>). Seltene Ausnahmen: veränderte Spleißsignale, Translationseffizienz oder mRNA-Stabilität.',eW:'funktionsfähiges Protein',eM:'funktionsfähiges Protein, unverändert'},
+ missense:{seq:HBB,gene:'HBB (β-Globin)',mut:{t:'sub',i:19,b:'T'},ml:'Substitution A → T',eff:'agg',
+  cMut:'Punktmutation (Substitution): Im Triplett GAG (Glutamat 6) wird A durch T ersetzt: GTG. Dies ist die Mutation der Sichelzellanämie (HbS).',
+  cTl:'Mutante: GUG codiert <em>Valin</em> statt Glutamat. Eine negativ geladene, hydrophile Seitenkette wird durch eine unpolare, hydrophobe ersetzt (Missense-Mutation).',
+  cFold:'Die Faltung der β-Kette bleibt weitgehend erhalten, an der Oberfläche liegt nun jedoch ein hydrophober Bereich (markierter Valin-Rest).',fW:'β-Globin (HbA)',fM:'β-Globin (HbS), Val an der Oberfläche',
+  c5:'Im desoxygenierten Zustand bindet der hydrophobe Valin-Rest an eine hydrophobe Tasche eines Nachbarmoleküls: HbS polymerisiert zu langen Fasern. HbA bleibt gelöst.',eW:'HbA: Moleküle bleiben gelöst',eM:'Desoxy-HbS: Polymerisation zu Fasern',
+  c6:'Die Fasern verformen die Erythrozyten sichelförmig. Folgen: geringere Verformbarkeit, vorzeitiger Abbau (Hämolyse, Anämie) und Gefäßverschlüsse.'},
+ nonsense:{seq:HBB,gene:'HBB (β-Globin)',mut:{t:'sub',i:24,b:'T'},ml:'Substitution A → T',eff:'deg',
+  cMut:'Punktmutation (Substitution): Das Triplett AAG (Lysin) wird zu TAG (Modellbeispiel an dieser Position).',
+  cTl:'Mutante: UAG ist ein <em>Stoppcodon</em>. Die Translation endet vorzeitig (Nonsense-Mutation).',
+  cFold:'Die stark verkürzte Polypeptidkette kann keine native Konformation einnehmen.',fW:'native Konformation',fM:'verkürzte Kette ohne native Faltung',
+  t5:'Qualitätskontrolle',c5:'In der Zelle wird eine solche mRNA meist schon durch den Nonsense-vermittelten mRNA-Abbau (NMD) beseitigt. Entstandene fehlerhafte Polypeptide werden mit Ubiquitin markiert.',eW:'funktionsfähiges β-Globin',eM:'Ubiquitin-Markierung',
+  c6:'Das Proteasom spaltet das markierte Polypeptid in kurze Peptide. Folge: Funktionsverlust (Loss of Function) – bei HBB eine β⁰-Thalassämie.'},
+ frameshift:{seq:HBB,gene:'HBB (β-Globin)',mut:{t:'ins',i:12,b:'A'},ml:'Insertion + A',eff:'deg',
+  cMut:'Insertion: Nach dem vierten Triplett wird ein zusätzliches Nukleotid (A) eingefügt (Modellbeispiel).',
+  cTl:'Ab der Insertion ist das <em>Leseraster verschoben</em>: Es entstehen andere Codons (AAC, UCC) und bald ein vorzeitiges Stoppcodon (UGA).',
+  cFold:'Die Kette ist ab der Mutationsstelle verändert und verkürzt; eine native Faltung ist nicht möglich.',fW:'native Konformation',fM:'veränderte, verkürzte Kette',
+  t5:'Qualitätskontrolle',c5:'Die mRNA unterliegt meist dem Nonsense-vermittelten Abbau (NMD); fehlerhafte Polypeptide werden mit Ubiquitin markiert.',eW:'funktionsfähiges β-Globin',eM:'Ubiquitin-Markierung',
+  c6:'Abbau im Proteasom. Rasterschubmutationen führen in der Regel zum vollständigen Funktionsverlust des Genprodukts.'},
+ inframe:{seq:CFTR,gene:'CFTR (Ausschnitt, Codon 506–511)',mut:{t:'del',i:5,n:3},ml:'Deletion − CTT',eff:'deg',mem:true,
+  cMut:'Deletion von drei Nukleotiden (CTT): Aus ATC ATC TTT wird ATC ATT. Dies ist die Mutation F508del, die häufigste Ursache der Mukoviszidose.',
+  cTl:'Das Leseraster bleibt erhalten. ATT codiert wie ATC Isoleucin; es fehlt genau eine Aminosäure: <em>Phenylalanin 508</em>.',
+  cFold:'Das Fehlen von Phe508 stört die Faltung der Nukleotidbindedomäne 1 (NBD1): Das Protein ist <em>fehlgefaltet</em>.',fW:'CFTR: native Konformation',fM:'CFTR-F508del: fehlgefaltet',
+  t5:'ER-Qualitätskontrolle',c5:'Chaperone im endoplasmatischen Retikulum erkennen die Fehlfaltung. Das Protein wird zurückgehalten und mit Ubiquitin markiert (ER-assoziierte Degradation, ERAD). Der Wildtyp gelangt zur Zellmembran.',eW:'Einbau in die Zellmembran',eM:'Ubiquitin-Markierung',
+  c6:'Abbau im Proteasom: In der apikalen Zellmembran fehlen die Chloridkanäle. Folge: gestörter Chlorid- und Wassertransport, zähes Sekret in Lunge und Pankreas.'}
+};
+function buildGene(kind){
+  const K=GK[kind],sc=Scene('0 0 1000 640');
+  const cols=align(K.seq,K.mut),ms=cols.filter(c=>c.m).map(c=>c.m).join(''),ws=K.seq;
+  const nMax=Math.max(ws.length,ms.length),gf=.3,bw=Math.min(34,840/(nMax+Math.ceil(nMax/3)*gf)),gap=bw*gf;
+  const W=nMax*bw+(Math.ceil(nMax/3)-1)*gap,x0=570-W/2;
+  const xp=k=>x0+k*bw+Math.floor(k/3)*gap+bw/2,cxc=ci=>(xp(3*ci)+xp(3*ci+2))/2;
+  const base=(b,mut,rna)=>`<rect x="${-bw/2+1}" y="-12" width="${bw-2}" height="24" rx="${rna?10:4}" fill="${BCOL[b]}"${mut?' class="mutx"':''}/><text class="bt${b==='G'?' dk':''}" y="4.5">${b}</text>`;
+  const bead=(a,mut)=>`<circle r="12.5" fill="${PCOL[PROP(a)]}"${mut?' class="mutb"':''}/><text class="bdt" y="3.4">${AA3[a]}</text>`;
+  sc.bg='<line class="sep" x1="0" x2="1000" y1="320" y2="320"/>';
+  const trW=transl(ws),trM=transl(ms),fx=300;
+  const wBeads=trW.filter(t=>t.a!=='*'),tailN=Math.max(0,30-wBeads.length);
+  const P0=phase(sc,'Ausgangssequenz',`${K.gene}: Ausschnitt der DNA mit codierendem und codogenem Strang. Oben der Wildtyp, unten dasselbe Allel, an dem gleich die Mutation erfolgt.`,3);
+  const P1=phase(sc,'Mutation',K.cMut,3.8);
+  const P2=phase(sc,'Transkription','Transkription: Die RNA-Polymerase synthetisiert am codogenen Strang die komplementäre mRNA (U statt T). Ihre Basenfolge entspricht dem codierenden Strang.',4,2.8);
+  const P3=phase(sc,'Translation','Translation: Das Ribosom liest die mRNA in Codons; tRNAs liefern die passenden Aminosäuren. '+K.cTl,6.5,5.6);
+  const P4=phase(sc,'Faltung',K.cFold,4.5,2.6);
+  const lanes=[{L:'W',ly:0,seq:ws,tr:trW},{L:'M',ly:320,seq:ms,tr:trM}];
+  lanes.forEach(ln=>{
+    const{L,ly,seq,tr}=ln,yc=ly+72,yt=ly+102,ym=ly+152,yb=ly+212,fy=ly+185;ln.fy=fy;
+    add(sc,L+'lab',`<text class="lane${L==='M'?' acc':''}">${L==='W'?'Wildtyp':'Mutante'}</text>`,{x:20,y:ly+30});
+    const rows=[[yc,'codierend 5′','3′'],[yt,'codogen 3′','5′'],[ym,'mRNA 5′','3′'],[yb,'Polypeptid','']];
+    const fade=[];
+    rows.forEach((r,i)=>{add(sc,L+'r'+i,`<text class="rl" y="4">${r[1]}</text>`,{x:x0-10,y:r[0],o:i<2?1:0});fade.push(L+'r'+i);
+      if(r[2]){add(sc,L+'q'+i,`<text class="rr" y="4">${r[2]}</text>`,{x:x0+W+8,y:r[0],o:i<2?1:0});fade.push(L+'q'+i)}});
+    set(P2,L+'r2',{o:1});set(P2,L+'q2',{o:1});set(P3,L+'r3',{o:1});
+    if(L==='W'){
+      for(let k=0;k<seq.length;k++){add(sc,'Wc'+k,base(seq[k]),{x:xp(k),y:yc});add(sc,'Wt'+k,base(COMP[seq[k]]),{x:xp(k),y:yt});fade.push('Wc'+k,'Wt'+k)}
+    }else{
+      let wi=0,mi=0;
+      cols.forEach((c,j)=>{
+        const mk=(id,b,y,dy)=>{
+          if(c.sub){add(sc,id+'o',b(c.w),{x:xp(wi),y});set(P1,id+'o',{y:y+dy,o:0});add(sc,id,b(c.m,1),{x:xp(wi),y:y+dy,o:0});set(P1,id,{y,o:1});fade.push(id+'o',id)}
+          else if(c.w&&c.m){add(sc,id,b(c.m),{x:xp(wi),y});set(P1,id,{x:xp(mi)});fade.push(id)}
+          else if(c.w){add(sc,id,b(c.w),{x:xp(wi),y});set(P1,id,{y:y+dy,o:0},{dl:0,w:.6});fade.push(id)}
+          else{add(sc,id,b(c.m,1),{x:xp(mi),y:y+dy,o:0});set(P1,id,{y,o:1},{dl:.35,w:.65});fade.push(id)}};
+        mk('Mc'+j,(b,m)=>base(b,m),yc,-40);mk('Mt'+j,(b,m)=>base(COMP[b],m),yt,40);
+        if(c.w)wi++;if(c.m)mi++});
+      const mx=Math.min(880,Math.max(220,xp(K.mut.i)));
+      add(sc,'mlab',`<text class="mlab">${K.ml}</text>`,{x:mx,y:ly+36,o:0});set(P1,'mlab',{o:1});fade.push('mlab');
+    }
+    for(let k=0;k<seq.length;k++){const id=L+'m'+k,b=seq[k]==='T'?'U':seq[k];
+      add(sc,id,base(b,0,1),{x:xp(k),y:yt,o:0,s:.8});set(P2,id,{y:ym,o:1,s:1},{dl:k/seq.length*.78,w:.22});fade.push(id)}
+    const m=tr.length;
+    add(sc,L+'rib','<ellipse cy="-15" rx="34" ry="17" class="rib"/><ellipse cy="13" rx="30" ry="11" class="rib"/>',{x:cxc(0),y:ym,o:0,s:.7},2);
+    set(P2,L+'rib',{o:1,s:1},{dl:.82,w:.18});set(P3,L+'rib',{x:cxc(m-1)},{lin:true});fade.push(L+'rib');
+    const beads=[];
+    tr.forEach((t,j)=>{const dl=(m>1?t.ci/(m-1):0)*.93;
+      if(t.a==='*'){add(sc,L+'stop','<rect x="-27" y="-12" width="54" height="24" rx="12" class="stopb"/><text class="stopt" y="4.2">Stopp</text>',{x:cxc(t.ci),y:ym,o:0},1);set(P3,L+'stop',{y:yb,o:1},{dl,w:.07});fade.push(L+'stop');return}
+      const mut=L==='M'&&K.mut.t!=='del'&&(!trW[j]||trW[j].a!==t.a);
+      const id=L+'b'+j;add(sc,id,bead(t.a,mut),{x:cxc(t.ci),y:ym,o:0,s:.3},1);set(P3,id,{y:yb,o:1,s:1},{dl,w:.07});beads.push({id,a:t.a,mut})});
+    const hasTail=!tr.some(t=>t.a==='*'),tail=[];
+    if(hasTail){const lx=cxc(tr[tr.length-1].ci);for(let j=0;j<tailN;j++){const id=L+'x'+j;add(sc,id,'<circle r="10.5" class="tail"/>',{x:lx,y:yb,o:0,s:.3},1);tail.push(id)}}
+    const ids=beads.map(b=>b.id).concat(tail);ln.ids=ids;ln.beads=beads;
+    sc.chains.push({ids});
+    fade.forEach(id=>set(P4,id,{o:0}));['r3'].forEach(r=>set(P4,L+r,{o:0}));
+    const good=L==='W'||kind==='silent'||kind==='missense';
+    const fp=good?foldPos(ids.length,fx,fy):misfold(ids.length,fx,fy,L==='M'?(kind.length*7919+13):1);ln.fp=fp;
+    ids.forEach((id,j)=>set(P4,id,{x:fp[j][0],y:fp[j][1],o:1,s:1},{dl:j/ids.length*.35,w:.65}));
+    add(sc,L+'f',`<text class="note${good?'':' acc'}">${L==='W'?K.fW:K.fM}</text>`,{x:fx,y:ly+62,o:0});set(P4,L+'f',{o:1});
+  });
+  const[WL,ML]=lanes;
+  const elab=(ln,t,p)=>{add(sc,ln.L+'e',`<text class="note">${t}</text>`,{x:ln.L==='W'?fx:fx,y:ln.ly+298,o:0});set(p,ln.L+'e',{o:1})};
+  if(K.eff==='none'){const P5=phase(sc,'Ergebnis',K.c5,3.5);elab(WL,K.eW,P5);elab(ML,K.eM,P5)}
+  if(K.eff==='agg'){
+    const P5=phase(sc,'Aggregation',K.c5,4.8,2.6),P6=phase(sc,'Zellebene',K.c6,4.2,1.8);
+    const ring=ML.beads.findIndex(b=>b.mut);
+    const clone=(ln,rg)=>{const p=foldPos(ln.ids.length,0,0);return `<polyline class="chain" points="${p.map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join(' ')}"/>`+p.map((q,i)=>{const b=ln.beads[i];return b?`<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="12.5" fill="${PCOL[PROP(b.a)]}"${i===rg?' class="mutb"':''}/>`:`<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="10.5" class="tail"/>`}).join('')};
+    const wfree=[[490,-62,35],[640,52,-70],[790,-40,120]],mfree=[[500,70,50],[650,-62,-80],[800,58,140]];
+    [0,1,2].forEach(i=>{
+      add(sc,'wq'+i,clone(WL,-1),{x:wfree[i][0]+40,y:WL.fy+wfree[i][1],r:wfree[i][2],s:.5,o:0});set(P4,'wq'+i,{x:wfree[i][0],s:.72,o:1},{dl:.55,w:.45});set(P5,'wq'+i,{r:wfree[i][2]+30});
+      add(sc,'mq'+i,clone(ML,ring),{x:mfree[i][0]+40,y:ML.fy+mfree[i][1],r:mfree[i][2],s:.5,o:0});set(P4,'mq'+i,{x:mfree[i][0],s:.72,o:1},{dl:.55,w:.45});
+      set(P5,'mq'+i,{x:fx+118*(i+1),y:ML.fy,r:0},{dl:i*.15,w:.7})});
+    elab(WL,K.eW,P5);elab(ML,K.eM,P5);
+    ['wq','mq'].forEach(q=>[0,1,2].forEach(i=>set(P6,q+i,{})));
+    set(P6,'wq2',{x:700,y:WL.fy+50});
+    add(sc,'Wrbc','<circle r="52" class="rbc"/><circle r="24" class="rbc2"/><text class="note" y="80">Erythrozyt</text>',{x:880,y:WL.fy,s:.6,o:0});set(P6,'Wrbc',{s:1,o:1});
+    add(sc,'Mrbc','<path d="M-64 16C-44-48 44-48 64 16C32-14-32-14-64 16Z" class="rbc"/><text class="note" y="54">Sichelzelle</text>',{x:880,y:ML.fy,s:.6,o:0});set(P6,'Mrbc',{s:1,o:1});
+  }
+  if(K.eff==='deg'){
+    const P5=phase(sc,K.t5,K.c5,4.4,2),P6=phase(sc,'Abbau',K.c6,5.2,4);
+    const px=780,fy=ML.fy;
+    add(sc,'pro','<path d="M-40 -46a40 12 0 0 1 80 0" class="prot"/><path d="M-40 46a40 12 0 0 0 80 0" class="prot"/><rect x="-30" y="-46" width="60" height="92" rx="10" class="prot"/><line x1="-30" x2="30" y1="-23" y2="-23" class="protl"/><line x1="-30" x2="30" class="protl"/><line x1="-30" x2="30" y1="23" y2="23" class="protl"/><text class="note" y="80">Proteasom</text>',{x:px,y:fy,s:.7,o:0},-1);
+    set(P5,'pro',{s:1,o:1});
+    const last=ML.fp[ML.fp.length-1];
+    add(sc,'ub','<circle r="7" class="ub"/><circle cx="13" cy="-6" r="7" class="ub"/><circle cx="26" r="7" class="ub"/><circle cx="39" cy="-6" r="7" class="ub"/>',{x:last[0]+14,y:last[1]-30,s:.4,o:0},2);
+    set(P5,'ub',{s:1,o:1});
+    elab(WL,K.eW,P5);elab(ML,K.eM,P5);
+    ML.ids.forEach((id,j)=>set(P6,id,{x:px+((j*37)%17-8),y:fy+((j*53)%21-10),o:0,s:.5},{dl:j/ML.ids.length*.5,w:.35}));
+    set(P6,'ub',{x:px,y:fy,o:0,s:.5},{dl:0,w:.35});
+    for(let i=0;i<6;i++){add(sc,'fr'+i,'<circle r="5" class="frag"/><circle cx="10" r="5" class="frag"/>'+(i%2?'<circle cx="20" r="5" class="frag"/>':''),{x:px+5,y:fy,o:0,s:.4});
+      set(P6,'fr'+i,{x:868+(i%2)*46,y:fy-62+Math.floor(i/2)*58,o:1,s:1},{dl:.62+i*.05,w:.25})}
+    add(sc,'frl','<text class="note">Peptide</text>',{x:905,y:fy+100,o:0});set(P6,'frl',{o:1},{dl:.85,w:.15});
+    if(K.mem){
+      let m='';for(let y=-120;y<=120;y+=15)m+=`<line x1="-8" x2="8" y1="${y}" y2="${y}" class="lipt"/><circle cx="-14" cy="${y}" r="6" class="lip"/><circle cx="14" cy="${y}" r="6" class="lip"/>`;
+      add(sc,'mem',m+'<text class="note" y="-134">Zellmembran</text>',{x:935,y:WL.fy+8,o:0},-1);set(P5,'mem',{o:1});
+      WL.ids.forEach((id,j)=>set(P6,id,{x:WL.fp[j][0]+520,y:WL.fp[j][1]},{dl:.1,w:.6}));
+      set(P6,'Wf',{x:fx+520,y:WL.ly+42},{dl:.1,w:.6});
+    }
+  }
+  return sc;
+}
+
+/* ---------- Inhalte ---------- */
+const TABS={
+ genome:{t:'Genommutation',s:'Anzahl der Chromosomen',build:buildGenome,kinds:[['ndj1','Non-Disjunction Meiose I'],['ndj2','Non-Disjunction Meiose II'],['poly','Polyploidie'],['normal','Vergleich: normale Meiose']]},
+ chrom:{t:'Chromosomenmutation',s:'Struktur der Chromosomen',build:buildChrom,kinds:[['del','Deletion'],['dup','Duplikation'],['inv','Inversion'],['trans','Translokation']]},
+ gene:{t:'Genmutation',s:'Basensequenz eines Gens',build:buildGene,kinds:[['silent','Stumme Mutation'],['missense','Missense (Sichelzellanämie)'],['nonsense','Nonsense'],['frameshift','Rasterschub'],['inframe','Deletion im Leseraster (Mukoviszidose)']]}
+};
+const INFO={
+ normal:['Normale Meiose (Vergleich)','Die Meiose halbiert den Chromosomensatz: Aus einer diploiden Zelle (2n) entstehen vier haploide Gameten (n).','Meiose I trennt die homologen Chromosomen (Reduktionsteilung), Meiose II die Schwesterchromatiden (Äquationsteilung).','Mensch: 2n = 46 Chromosomen, Gameten n = 23.','Die Befruchtung stellt den diploiden Chromosomensatz wieder her: euploide Zygote (2n).'],
+ ndj1:['Aneuploidie durch Non-Disjunction in Meiose I','Genommutationen verändern die Anzahl der Chromosomen. Bei einer Aneuploidie ist ein einzelnes Chromosom zu viel oder zu wenig vorhanden (2n+1, 2n−1).','In der Anaphase I werden die homologen Chromosomen eines Paares nicht getrennt. Alle vier Gameten sind betroffen: zwei mit n+1, zwei mit n−1 Chromosomen.','Trisomie 21 (Down-Syndrom; 47,XX,+21 bzw. 47,XY,+21): überwiegend durch Non-Disjunction in der mütterlichen Meiose I; das Risiko steigt mit dem Alter der Mutter. Weitere Beispiele: Klinefelter-Syndrom (47,XXY), Turner-Syndrom (45,X).','Gendosiseffekt: Die Gene des überzähligen Chromosoms werden etwa 1,5-fach exprimiert; das Mengenverhältnis vieler Genprodukte ist gestört. Autosomale Monosomien sind beim Menschen nicht lebensfähig; nur die Trisomien 13, 18 und 21 sind mit einer Lebendgeburt vereinbar.'],
+ ndj2:['Aneuploidie durch Non-Disjunction in Meiose II','Genommutation mit Veränderung der Anzahl einzelner Chromosomen (Aneuploidie).','Die Homologen werden in Meiose I korrekt getrennt, in der Anaphase II bleiben jedoch zwei Schwesterchromatiden verbunden. Nur eine Tochterzelle ist betroffen: zwei normale Gameten, je einer mit n+1 und n−1.','XYY-Syndrom (47,XYY): entsteht durch Non-Disjunction der Y-Chromatiden in der väterlichen Meiose II. Auch ein Teil der Trisomie-21-Fälle geht auf Meiose II zurück.','Aneuploidie mit Gendosiseffekt wie bei Meiose-I-Fehlern. Unterschied: Die beiden überzähligen Kopien stammen von einem Homolog und sind – abgesehen von Crossing-over-Bereichen – identisch.'],
+ poly:['Polyploidie','Polyploidie ist die Vervielfachung ganzer Chromosomensätze (3n, 4n, 6n …), also eine Form der Euploidie.','Unterbleibt die Zellteilung in der Meiose (Restitution), entstehen unreduzierte, diploide Gameten. Verschmilzt ein solcher Gamet mit einem normalen, ist die Zygote triploid. Experimentell hemmt Colchicin die Polymerisation von Tubulin und damit den Spindelapparat.','Mensch: Triploidie (69,XXX, 69,XXY oder 69,XYY), meist durch Dispermie oder einen unreduzierten Gameten; nicht lebensfähig und eine häufige Ursache von Fehlgeburten. Pflanzen: Kulturweizen ist hexaploid (6n), die Gartenerdbeere oktoploid (8n), Kulturbananen sind triploid und daher samenlos.','Bei Pflanzen oft größere Zellen und Organe (Gigaswuchs), deshalb züchterisch genutzt. Ungeradzahlige Polyploidie stört die Paarung der Homologen in der Meiose und führt zu Sterilität.'],
+ del:['Deletion','Chromosomenmutationen verändern die Struktur von Chromosomen. Bei einer Deletion geht ein Chromosomenabschnitt verloren.','Nach einem Doppelstrangbruch wird das Fragment ohne Centromer nicht auf die Tochterzellen verteilt. Terminale Deletion: Das Endstück fehlt (eine Bruchstelle). Interstitielle Deletion: Ein innerer Abschnitt fehlt (zwei Bruchstellen).','Cri-du-Chat-Syndrom (Katzenschrei-Syndrom): Deletion am kurzen Arm von Chromosom 5 (5p−). Typisch sind ein hohes, katzenartiges Schreien im Säuglingsalter, Mikrozephalie und eine Entwicklungsverzögerung.','Die betroffenen Gene liegen nur noch in einer Kopie vor (Hemizygotie). Reicht deren Genproduktmenge nicht aus, entsteht ein Phänotyp (Haploinsuffizienz). Zudem werden rezessive Allele auf dem intakten Homolog wirksam.'],
+ dup:['Duplikation','Ein Chromosomenabschnitt liegt doppelt vor.','Häufige Ursache ist ungleiches Crossing-over: Die Homologen paaren sich versetzt, etwa an repetitiven Sequenzen. Der Austausch erzeugt ein Chromosom mit Duplikation und eines mit der entsprechenden Deletion.','Charcot-Marie-Tooth-Neuropathie Typ 1A: Duplikation in 17p12 mit dem Gen PMP22 (drei statt zwei Kopien). Die reziproke Deletion verursacht HNPP (hereditäre Neuropathie mit Neigung zu Druckläsionen).','Gendosiseffekt durch erhöhte Genproduktmenge. Evolutionär bedeutsam: Duplizierte Gene können durch weitere Mutationen neue Funktionen erwerben (z. B. Globin-Genfamilie, Opsin-Gene).'],
+ inv:['Inversion','Ein Chromosomenabschnitt wird nach zwei Brüchen um 180° gedreht wieder eingebaut.','Parazentrische Inversion: Der Abschnitt enthält das Centromer nicht (wie in der Animation). Perizentrische Inversion: Das Centromer liegt im invertierten Abschnitt.','inv(9)(p12q13): perizentrische Inversion von Chromosom 9, eine häufige Normvariante ohne Krankheitswert.','Meist balanciert und phänotypisch unauffällig, sofern kein Gen an einer Bruchstelle zerstört oder durch Positionseffekte fehlreguliert wird. In der Meiose bildet sich eine Inversionsschleife; Crossing-over darin führt zu unbalancierten Gameten und verminderter Fruchtbarkeit.'],
+ trans:['Translokation','Chromosomenabschnitte werden auf ein nicht-homologes Chromosom verlagert.','Reziproke Translokation: Nach Brüchen in zwei Chromosomen werden die Endstücke ausgetauscht. Robertson-Translokation: Zwei akrozentrische Chromosomen verschmelzen im Bereich der Centromere.','Philadelphia-Chromosom, t(9;22)(q34;q11): Fusionsgen BCR-ABL1 bei chronischer myeloischer Leukämie (somatische Mutation; Therapie z. B. mit dem Tyrosinkinase-Hemmer Imatinib). Robertson-Translokation zwischen Chromosom 14 und 21: Ursache der familiären Trisomie 21.','Träger balancierter Translokationen sind meist gesund, bilden aber teilweise unbalancierte Gameten (Fehlgeburten, Trisomien). Fusionsgene oder fehlregulierte Gene an den Bruchstellen können Krebs auslösen.'],
+ silent:['Stumme (synonyme) Mutation','Genmutationen verändern die Basensequenz eines einzelnen Gens. Punktmutationen betreffen ein einzelnes Nukleotid.','Substitution, meist an der dritten Codonposition: Das neue Codon codiert dieselbe Aminosäure, da der genetische Code degeneriert ist.','Modell am β-Globin-Gen (HBB): GAG → GAA, beide codieren Glutamat.','Primärstruktur und Faltung bleiben unverändert. Selten wirkt eine synonyme Mutation über Spleißsignale, die Codon-Usage (Translationsgeschwindigkeit) oder die mRNA-Stabilität.'],
+ missense:['Missense-Mutation','Eine Substitution führt zum Einbau einer anderen Aminosäure.','HBB c.20A>T: GAG → GTG, Glutamat → Valin an Position 6 der β-Kette (p.Glu6Val; nach HGVS-Zählung mit Start-Methionin p.Glu7Val).','Sichelzellanämie (HbS), autosomal-rezessiv. Heterozygote Anlageträger sind teilweise vor schwerer Malaria tropica geschützt (Heterozygotenvorteil).','Bei HbS keine globale Fehlfaltung: Die neue hydrophobe Oberfläche vermittelt die Polymerisation von Desoxy-HbS. Andere Missense-Mutationen destabilisieren dagegen die Faltung oder verändern das aktive Zentrum; entscheidend sind Art (konservativ oder nicht-konservativ) und Position des Austauschs.'],
+ nonsense:['Nonsense-Mutation','Eine Substitution erzeugt ein vorzeitiges Stoppcodon (UAA, UAG oder UGA).','In der Animation als Modell: AAG (Lysin) → TAG. Die Translation bricht vorzeitig ab. Häufig wird die mRNA bereits durch den Nonsense-vermittelten mRNA-Abbau (NMD) beseitigt.','β⁰-Thalassämie, z. B. durch die Nonsense-Mutation im Codon 39 des HBB-Gens (CAG → TAG): Es wird kein funktionsfähiges β-Globin gebildet.','Verkürztes, meist funktionsloses Polypeptid, das abgebaut wird: Funktionsverlust (Loss of Function).'],
+ frameshift:['Rasterschubmutation','Insertion oder Deletion einer Anzahl von Nukleotiden, die kein Vielfaches von drei ist.','In der Animation als Modell: Insertion eines A nach dem vierten Codon. Alle folgenden Codons werden verschoben gelesen: AAC (Asn), UCC (Ser), UGA (Stopp).','Viele β-Thalassämie-Allele sind Rasterschubmutationen, ebenso die häufigste Tay-Sachs-Mutation im HEXA-Gen (Insertion von vier Nukleotiden).','Veränderte Aminosäuresequenz ab der Mutationsstelle und meist ein vorzeitiger Kettenabbruch: in der Regel vollständiger Funktionsverlust.'],
+ inframe:['Deletion im Leseraster: CFTR-F508del','Fehlen drei Nukleotide (oder ein Vielfaches davon), bleibt das Leseraster erhalten: Es fehlt eine Aminosäure, der Rest der Sequenz ist unverändert.','CFTR c.1521_1523delCTT: ATC ATC TTT → ATC ATT. Isoleucin 507 bleibt erhalten (ATT ist synonym zu ATC), Phenylalanin 508 fehlt (p.Phe508del).','Mukoviszidose (Cystische Fibrose), autosomal-rezessiv; F508del ist das häufigste krankheitsverursachende CFTR-Allel.','Fehlfaltung der Nukleotidbindedomäne 1 → Erkennung durch die Qualitätskontrolle im ER, Ubiquitinierung und Abbau im Proteasom (ERAD). Die Chloridkanäle fehlen in der apikalen Membran. CFTR-Korrektoren (z. B. Elexacaftor, Tezacaftor) verbessern Faltung und Transport, Potentiatoren (Ivacaftor) die Kanalöffnung.']
+};
+const LEG={
+ genome:[['#1f4e79','großes Chromosom, mütterlich'],['#8cbde6','großes Chromosom, väterlich'],['#a4243b','kleines Chromosom, mütterlich'],['#f2a0aa','kleines Chromosom, väterlich'],['#2f8f5b','Chromosomen des Partnergameten']],
+ chrom:[['#ece4d4','helle Bande'],['#85715a','dunkle Bande'],['#cfe0ef','zweites, nicht-homologes Chromosom'],['var(--mute)','Centromer'],['var(--acc)','Bruchstelle / Veränderung']],
+ gene:[['#3a9a5b','Adenin (A)'],['#d64550','Thymin (T) / Uracil (U)'],['#e9b23a','Guanin (G)'],['#3d78c8','Cytosin (C)'],['#d4862a','Aminosäure unpolar'],['#2f9e8f','polar, ungeladen'],['#4a6fd1','basisch (+)'],['#c8423b','sauer (−)'],['var(--tail)','weitere Aminosäuren (vereinfacht)'],['var(--acc)','veränderte Base / Aminosäure']]
+};
+
+/* ---------- Oberfläche ---------- */
+let tab='gene',kind='missense';
+try{const s=JSON.parse(localStorage.getItem('mut-sim')||'null');if(s&&TABS[s.tab]&&TABS[s.tab].kinds.some(k=>k[0]===s.kind)){tab=s.tab;kind=s.kind}}catch(e){}
+const tabsEl=$('#tabs'),chipsEl=$('#chips'),stepsEl=$('#steps'),capEl=$('#cap'),bPlay=$('#bPlay');
+function drawTabs(){tabsEl.innerHTML=Object.entries(TABS).map(([k,t])=>`<button class="tab" role="tab" data-t="${k}" aria-selected="${k===tab}">${t.t}<small>${t.s}</small></button>`).join('');
+  chipsEl.innerHTML=TABS[tab].kinds.map(([k,l])=>`<button class="chip" data-k="${k}" aria-pressed="${k===kind}">${l}</button>`).join('')}
+function show(){
+  drawTabs();try{localStorage.setItem('mut-sim',JSON.stringify({tab,kind}))}catch(e){}
+  load(TABS[tab].build(kind));T=0;playing=false;stopAt=null;curPhase=-1;
+  stepsEl.innerHTML=cur.phases.map((p,i)=>`<button class="step" data-i="${i}">${i+1} ${p.title}</button>`).join('');
+  render();syncBtn();
+  const d=INFO[kind];
+  $('#info').innerHTML=`<h2>${d[0]}</h2><h3>Definition</h3><p>${d[1]}</p><h3>Mechanismus</h3><p>${d[2]}</p><h3>Beispiel</h3><p>${d[3]}</p><h3>Mögliche Auswirkungen</h3><p>${d[4]}</p>`;
+  $('#legend').innerHTML=LEG[tab].map(([c,l])=>`<span><i style="background:${c}"></i>${l}</span>`).join('');
+}
+function caption(){const p=cur.phases[curPhase];capEl.innerHTML=`<b>Schritt ${curPhase+1}/${cur.phases.length} · ${p.title}.</b> ${p.cap}`;
+  [...stepsEl.children].forEach((b,i)=>{b.classList.toggle('on',i===curPhase);b.classList.toggle('done',i<curPhase)});
+  const on=stepsEl.children[curPhase];if(on)stepsEl.scrollTo({left:on.offsetLeft-stepsEl.clientWidth/2+on.clientWidth/2,behavior:'smooth'})}
+function syncBtn(){bPlay.textContent=playing&&stopAt==null?'Pause':'Abspielen'}
+function playPhase(i){const p=cur.phases[i];T=p.t0;stopAt=p.t0+p.d-.001;playing=true;syncBtn();render()}
+function next(){const i=idxAt(T),ph=cur.phases[i];if(i<cur.phases.length-1)playPhase(i+1);else if(T<ph.t0+ph.d-.01)playPhase(i)}
+function prev(){const i=idxAt(T);playing=false;stopAt=null;if(i===0)T=0;else{const p=cur.phases[i-1];T=p.t0+p.d-.001}syncBtn();render()}
+function toggle(){if(playing&&stopAt==null){playing=false}else{if(T>=cur.total-.01)T=0;playing=true;stopAt=null}syncBtn()}
+tabsEl.addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(!b||b.dataset.t===tab)return;tab=b.dataset.t;kind=TABS[tab].kinds[0][0];show()});
+chipsEl.addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(!b)return;kind=b.dataset.k;show()});
+stepsEl.addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b)playPhase(+b.dataset.i)});
+bPlay.addEventListener('click',toggle);$('#bNext').addEventListener('click',next);$('#bPrev').addEventListener('click',prev);
+$('#bReset').addEventListener('click',()=>{T=0;playing=false;stopAt=null;syncBtn();render()});
+document.querySelectorAll('[data-sp]').forEach(b=>b.addEventListener('click',()=>{speed=+b.dataset.sp;document.querySelectorAll('[data-sp]').forEach(x=>x.setAttribute('aria-pressed',x===b))}));
+document.addEventListener('keydown',e=>{if(e.target.closest('button,input'))return;if(e.key===' '){e.preventDefault();toggle()}else if(e.key==='ArrowRight')next();else if(e.key==='ArrowLeft')prev()});
+show();requestAnimationFrame(tick);
+}
+</script>
+</body>
+</html>
