@@ -57,6 +57,7 @@ git clone https://github.com/makro5652/animationen.git
 | Mitose im Zellzyklus | [`mitose-red.html`](mitose-red.html) |
 | Meiose und Keimzellbildung | [`meiose.html`](meiose.html) |
 | Stammbaumanalyse | [`stammbaumanalyse.html`](stammbaumanalyse.html) |
+| Stammbaumanalyse – Selbstlernkurs (3 Niveaus, geführte Fälle, Training, Quiz) | [`stammbaum-selbstlernkurs.html`](stammbaum-selbstlernkurs.html) |
 | DNA-Baukasten | [`DNA-Baukasten.html`](DNA-Baukasten.html) |
 | DNA-Replikation | [`dns-replikation.html`](dns-replikation.html) |
 | Genexpression (vom Gen zum Protein) | [`genexpression.html`](genexpression.html) |
