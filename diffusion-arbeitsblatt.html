@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Arbeitsblatt Diffusion – differenziert (Realschule/Gymnasium)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* Digitales Arbeitsblatt zur Animation diffusion.html
+   Niveau: R = Realschule, G = Gymnasium (Umschalter oben); Eingaben werden lokal im Browser gespeichert. */
+:root{color-scheme:light;--bg:#fff;--ink:#13232c;--mute:#55666f;--line:#d6e0e4;--card:#f3f7f8;--pri:#0e5e6f;--acc:#c2185b;--onpri:#fff;
+--ok:#1b7f3b;--okbg:#e6f4ea;--bad:#b3261e;--badbg:#fdeceb;--merk:#fff6e0;--merkst:#e0b44c;--text:#f8fbfc}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#0d151b;--ink:#e6eef2;--mute:#9fb2bc;--line:#24363f;--card:#13212a;--pri:#5cc0d2;--acc:#ff5c9a;--onpri:#0d151b;
+--ok:#6fd08c;--okbg:#14301f;--bad:#ff8a80;--badbg:#3a1714;--merk:#2a2414;--merkst:#8a6d22;--text:#101b22}}
+:root[data-theme=dark]{color-scheme:dark;--bg:#0d151b;--ink:#e6eef2;--mute:#9fb2bc;--line:#24363f;--card:#13212a;--pri:#5cc0d2;--acc:#ff5c9a;--onpri:#0d151b;
+--ok:#6fd08c;--okbg:#14301f;--bad:#ff8a80;--badbg:#3a1714;--merk:#2a2414;--merkst:#8a6d22;--text:#101b22}
+*{box-sizing:border-box;min-width:0}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:78px}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 'Atkinson Hyperlegible',system-ui,-apple-system,sans-serif;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+body[data-niveau=G] .only-R,body[data-niveau=R] .only-G{display:none!important}
+.wrap{max-width:980px;margin:0 auto;padding:clamp(16px,3vw,30px) max(4vw,14px) 60px}
+h1{font-size:clamp(28px,3.6vw,40px);line-height:1.08;margin:0 0 4px}
+.sub{color:var(--mute);margin:0 0 14px}
+h2{font-size:26px;line-height:1.2;margin:0 0 4px}
+h3{font-size:19px;margin:22px 0 8px}
+.top{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.seg{display:inline-flex;border:2px solid var(--line);border-radius:999px;padding:3px;background:var(--card)}
+.seg button{min-height:44px;border:0;background:transparent;color:var(--ink);border-radius:999px;font:inherit;font-weight:700;padding:4px 18px;cursor:pointer}
+.seg button.on{background:var(--pri);color:var(--onpri)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;min-width:48px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;font:inherit;font-weight:700;padding:6px 16px;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--pri);border-color:var(--pri);color:var(--onpri)}
+.btn.small{min-height:42px;font-size:15px;padding:4px 12px}
+.btn:focus-visible,.seg button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+label.name{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:4px 12px;border:1px solid var(--line);border-radius:12px}
+label.name input{font:inherit;border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--bg);color:var(--ink);width:200px}
+nav.toc{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);margin:16px calc(-1*max(4vw,14px)) 0;padding:8px max(4vw,14px);display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+nav.toc a{flex:none;min-height:42px;display:inline-flex;align-items:center;padding:4px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);text-decoration:none;font-weight:700;font-size:15px}
+section.st{margin-top:30px;padding-top:6px}
+.kicker{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--pri)}
+.hint{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:12px 0}
+.text{background:var(--text);border:1px solid var(--line);border-left:6px solid var(--pri);border-radius:12px;padding:16px 20px;margin:12px 0}
+.text h4{margin:0 0 8px;font-size:19px}
+.text p{margin:0 0 10px}
+.text p:last-child{margin-bottom:0}
+.text .zeile{counter-increment:z}
+.merk{background:var(--merk);border-left:5px solid var(--merkst);border-radius:8px;padding:10px 14px;margin:12px 0}
+.w{border-bottom:2px dotted var(--pri);cursor:help;position:relative}
+.w:hover::after,.w:focus::after{content:attr(data-tip);position:absolute;left:0;top:calc(100% + 6px);z-index:10;width:max-content;max-width:min(300px,80vw);background:var(--ink);color:var(--bg);font-size:14.5px;line-height:1.4;font-weight:400;padding:8px 10px;border-radius:8px;white-space:normal}
+.task{border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:14px 0;background:var(--bg)}
+.task>.q{margin:0 0 10px}
+.task>.q b.nr{display:inline-block;min-width:2.6em;color:var(--pri)}
+.op{font-weight:700}
+.afb{float:right;font-size:12.5px;color:var(--mute);border:1px solid var(--line);border-radius:999px;padding:0 8px;margin-left:8px}
+.anim{margin:6px 0 10px}
+textarea{width:100%;min-height:96px;font:inherit;line-height:1.5;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--card);color:var(--ink);resize:vertical}
+select{font:inherit;min-height:42px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:4px 8px;max-width:100%}
+input.num,input.val{font:inherit;width:6.5em;min-height:42px;border:1px solid var(--line);border-radius:8px;padding:4px 8px;background:var(--card);color:var(--ink);text-align:right}
+.mc label{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:10px;margin:6px 0;cursor:pointer;min-height:48px}
+.mc input{width:22px;height:22px;flex:none;margin-top:3px;accent-color:var(--pri)}
+.rf{width:100%;border-collapse:collapse}
+.mcrow{display:flex;gap:6px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
+.mcrow label{margin:0;min-height:44px;align-items:center;padding:6px 10px}
+.rf td{padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+.rf td.c{text-align:center;white-space:nowrap;width:1%}
+.rf input{width:24px;height:24px;accent-color:var(--pri)}
+table.tb{border-collapse:collapse;width:100%;margin:6px 0;font-variant-numeric:tabular-nums}
+table.tb th,table.tb td{border:1px solid var(--line);padding:6px 8px;text-align:center}
+table.tb th{background:var(--card);font-size:15px}
+.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.gap{display:inline-block;margin:2px 0}
+.ok{background:var(--okbg)!important;border-color:var(--ok)!important}
+.bad{background:var(--badbg)!important;border-color:var(--bad)!important}
+.fb{font-weight:700;font-size:14.5px;margin-left:6px}
+.fb.ok-t{color:var(--ok)}.fb.bad-t{color:var(--bad)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.res{font-weight:700}
+.sol{margin-top:10px;border:1px dashed var(--pri);border-radius:10px;padding:10px 14px;background:var(--card)}
+.sol p,.sol ul{margin:0 0 6px}
+.sol .t{font-weight:700;color:var(--pri);display:block;margin-bottom:4px}
+.msg{color:var(--bad);font-weight:700;font-size:15px}
+details.help{margin-top:8px}
+details.help summary{cursor:pointer;font-weight:700;color:var(--pri);min-height:40px;display:flex;align-items:center}
+details.help ul{margin:4px 0 0;padding-left:22px}
+details.wort{margin:14px 0;border:1px solid var(--line);border-radius:12px;padding:6px 14px;background:var(--card)}
+details.wort summary{cursor:pointer;font-weight:700;min-height:42px;display:flex;align-items:center}
+dl.ws{margin:4px 0 8px}
+dl.ws dt{font-weight:700;margin-top:6px}
+dl.ws dd{margin:0 0 0 12px;color:var(--mute)}
+.crit{margin-top:10px}
+.crit label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.crit input{width:22px;height:22px;flex:none;margin-top:3px;accent-color:var(--ok)}
+.score{font-size:22px;font-weight:700;padding:14px 18px;border-radius:12px;border:2px solid var(--pri);background:var(--card);margin-top:14px}
+.score small{display:block;font-size:15px;font-weight:400;color:var(--mute)}
+.pts{font-size:13px;color:var(--mute);font-weight:700;margin-left:6px}
+footer{margin-top:40px;color:var(--mute);font-size:14px;border-top:1px solid var(--line);padding-top:12px}
+@media print{
+ nav.toc,.top .btn,.seg,.row .btn,.btn.solbtn,.anim,details.help summary::marker{display:none!important}
+ body{font-size:12pt;background:#fff;color:#000}
+ .task,.text,.hint{break-inside:avoid}
+ textarea{border:1px solid #999;background:#fff;overflow:visible}
+ .sol[hidden]{display:none!important}
+ .w{border:0}
+}
+</style>
+</head>
+<body data-niveau="G">
+<div class="wrap">
+<header>
+ <span class="kicker">Digitales Arbeitsblatt · Chemie/Biologie · Klasse 7–10</span>
+ <h1>Diffusion – vom Becherglas zum Teilchen</h1>
+ <p class="sub">Zur Animation <a href="diffusion.html" target="_blank" rel="noopener">Diffusion</a>. Bearbeite die Stationen nacheinander und schreibe am Ende den Abschlusstest.</p>
+ <div class="top">
+  <div class="seg" role="radiogroup" aria-label="Niveau">
+   <button data-niv="R" role="radio">Realschule</button><button data-niv="G" role="radio" class="on">Gymnasium</button>
+  </div>
+  <label class="name">Name: <input id="name" autocomplete="off"></label>
+  <a class="btn pri" href="diffusion.html" target="_blank" rel="noopener">Animation öffnen</a>
+  <button class="btn" id="printBtn">Drucken / PDF</button>
+  <button class="btn" id="clearBtn">Alle Eingaben löschen</button>
+ </div>
+</header>
+
+<nav class="toc" aria-label="Inhalt">
+ <a href="#einstieg">Einstieg</a><a href="#s1">1 · Stoffebene</a><a href="#s2">2 · Teilchenebene</a><a href="#s3">3 · Oberfläche</a><a href="#test">Abschlusstest</a>
+</nav>
+
+<div class="hint">
+ <b>So arbeitest du:</b> Lies zuerst den Text. Bearbeite dann die Aufgaben. Öffne die Animation mit den Knöpfen <i>Animation: …</i> in einem zweiten Fenster (auf dem iPad: Split View). Unterstrichene Wörter kannst du antippen – dann erscheint eine Erklärung. Deine Eingaben werden auf diesem Gerät gespeichert.
+ <span class="only-R">Bei vielen Aufgaben findest du unter <i>Hilfe</i> Satzanfänge.</span>
+</div>
+
+<!-- ============================ EINSTIEG ============================ -->
+<section class="st" id="einstieg">
+ <span class="kicker">Einstieg</span>
+ <h2>Ein Duft erreicht die Wohnungstür</h2>
+ <div class="text">
+  <p>Du kommst nach Hause. Schon an der Wohnungstür riechst du: Heute gibt es Chapati. Die Küche liegt am anderen Ende der Wohnung. Die Fenster sind geschlossen, es gibt keinen Luftzug.</p>
+ </div>
+ <div class="task">
+  <p class="q"><b class="nr">E</b><span class="only-R"><span class="op">Notiere</span> eine Vermutung: Wie gelangt der Duft von der Küche bis zur Tür?</span><span class="only-G">Stelle eine <span class="op">Hypothese</span> auf, wie der Duft ohne Luftzug von der Küche bis zur Tür gelangt.</span></p>
+  <textarea placeholder="Meine Vermutung: …"></textarea>
+  <p style="margin:6px 0 0;color:var(--mute);font-size:15px">Deine Vermutung überprüfst du am Ende von Station 2.</p>
+ </div>
+</section>
+
+<!-- ============================ STATION 1 ============================ -->
+<section class="st" id="s1">
+ <span class="kicker">Station 1</span>
+ <h2>Diffusion auf der Stoffebene</h2>
+
+ <div class="text only-R">
+  <h4>Farbe ohne Rühren</h4>
+  <p>Man legt einen <span class="w" tabindex="0" data-tip="fester Stoff, dessen Teilchen regelmäßig angeordnet sind">Kristall</span> Kaliumpermanganat auf den Boden eines Glases mit Wasser. Kaliumpermanganat ist ein violetter Stoff. Der Kristall <span class="w" tabindex="0" data-tip="ein fester Stoff verteilt sich im Wasser und ist danach nicht mehr als Feststoff sichtbar">löst sich</span> langsam auf.</p>
+  <p>Um den Kristall herum wird das Wasser dunkelviolett. Nach einiger Zeit ist auch das Wasser weiter oben violett. Niemand hat gerührt. Am Ende ist das Wasser überall gleich stark gefärbt.</p>
+  <p>Diesen Vorgang nennt man <b>Diffusion</b>. Diffusion bedeutet: Stoffe durchmischen sich von selbst, ohne Rühren oder Schütteln.</p>
+  <p>Diffusion kennst du aus dem Alltag: Ein Teebeutel färbt das Wasser in der Tasse. Der Duft von frischem Brot verteilt sich in der Küche.</p>
+  <p>Wo die Farbe dunkel ist, ist viel Farbstoff im Wasser. Man sagt: Die <span class="w" tabindex="0" data-tip="wie viel von einem Stoff in einem bestimmten Volumen enthalten ist">Konzentration</span> ist hoch. Wo die Farbe hell ist, ist die Konzentration niedrig.</p>
+  <p>Die <span class="w" tabindex="0" data-tip="wie warm oder kalt etwas ist; Einheit: Grad Celsius (°C)">Temperatur</span> spielt eine Rolle: In warmem Wasser läuft die Diffusion schneller ab als in kaltem Wasser.</p>
+ </div>
+
+ <div class="text only-G">
+  <h4>Diffusion – ein Phänomen auf der Stoffebene</h4>
+  <p>Legt man einen Kristall Kaliumpermanganat (KMnO<sub>4</sub>) auf den Boden eines Becherglases mit Wasser, löst er sich allmählich. In der Umgebung des Kristalls entsteht eine konzentrierte, tiefviolette Lösung. Ohne dass gerührt wird, breitet sich die Färbung im Laufe der Zeit im gesamten Wasser aus, bis die Lösung überall gleich stark gefärbt ist. Diesen Vorgang bezeichnet man als <b>Diffusion</b> (lat. <i>diffundere</i>: ausbreiten, ausgießen).</p>
+  <p>Beschreibt man nur das, was mit bloßem Auge beobachtbar ist – Farbe, Ausbreitung, Dauer –, betrachtet man den Vorgang auf der <b>Stoffebene</b>. Die Erklärung des Vorgangs gelingt erst auf der <b>Teilchenebene</b> (Station 2).</p>
+  <p>Eine zentrale Größe ist die <b>Konzentration</b>. Sie gibt an, welche Stoffmenge (oder Masse) eines gelösten Stoffes in einem bestimmten Volumen der Lösung enthalten ist. Je intensiver die Violettfärbung, desto höher ist die Konzentration der Permanganat-Ionen. Zwischen der Umgebung des Kristalls und dem übrigen Wasser besteht ein <span class="w" tabindex="0" data-tip="räumlicher Unterschied der Konzentration zwischen zwei Orten">Konzentrationsgefälle</span>. Die Diffusion führt zum Ausgleich dieses Gefälles; sie endet makroskopisch, wenn die Konzentration überall gleich ist.</p>
+  <p>Die Geschwindigkeit der Diffusion hängt unter anderem von der Temperatur ab: Mit steigender Temperatur nimmt sie zu. In Flüssigkeiten spielt außerdem die <span class="w" tabindex="0" data-tip="Zähflüssigkeit; Wasser ist bei 60 °C deutlich weniger zähflüssig als bei 10 °C">Viskosität</span> eine Rolle, die bei Wasser mit steigender Temperatur deutlich abnimmt.</p>
+  <p>In realen Versuchen wird die Lösung häufig schneller durchmischt, als es durch Diffusion allein möglich wäre. Ursache sind Strömungen (<span class="w" tabindex="0" data-tip="Strömung in einer Flüssigkeit oder einem Gas, zum Beispiel durch Temperatur- oder Dichteunterschiede">Konvektion</span>), etwa durch Temperatur- oder Dichteunterschiede. Diese Strömungen sind keine Diffusion.</p>
+ </div>
+
+ <details class="wort"><summary>Wortspeicher Station 1</summary>
+  <dl class="ws">
+   <dt>die Diffusion, –</dt><dd>selbstständige Durchmischung von Stoffen ohne Rühren oder Schütteln</dd>
+   <dt>der Kristall, die Kristalle</dt><dd>fester Stoff mit regelmäßig angeordneten Teilchen</dd>
+   <dt>die Konzentration, die Konzentrationen</dt><dd>Anteil eines gelösten Stoffes in einem bestimmten Volumen</dd>
+   <dt>die Lösung, die Lösungen</dt><dd>Gemisch aus gelöstem Stoff und Lösungsmittel (hier Wasser)</dd>
+   <dt>die Beobachtung, die Beobachtungen</dt><dd>das, was man mit den Sinnen wahrnimmt, ohne es zu erklären</dd>
+   <dt class="only-G">das Konzentrationsgefälle, die Konzentrationsgefälle</dt><dd class="only-G">Unterschied der Konzentration zwischen zwei Orten</dd>
+  </dl>
+ </details>
+
+ <!-- R-Aufgaben -->
+ <div class="only-R">
+  <div class="task">
+   <p class="q"><b class="nr">1.1</b><span class="op">Nenne</span> zwei Beispiele für Diffusion aus deinem Alltag.</p>
+   <textarea></textarea>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Zum Beispiel: Ein Teebeutel färbt das Wasser. Der Duft von Essen oder Parfüm verteilt sich im Raum. Zucker im Tee verteilt sich auch ohne Rühren (sehr langsam).</p></div>
+  </div>
+  <div class="task chk">
+   <p class="q"><b class="nr">1.2</b>Kreuze an: Was ist Diffusion?</p>
+   <div class="mc" data-ans="b">
+    <label><input type="radio" name="r12" value="a"> Stoffe werden durch Rühren gemischt.</label>
+    <label><input type="radio" name="r12" value="c"> Ein Stoff wird beim Abkühlen fest.</label>
+    <label><input type="radio" name="r12" value="b"> Stoffe durchmischen sich von selbst, ohne Rühren oder Schütteln.</label>
+    <label><input type="radio" name="r12" value="d"> Ein Stoff verdampft beim Erhitzen.</label>
+   </div>
+   <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">1.3</b>Öffne die Animation (Reiter 1) und starte sie. <span class="op">Beschreibe</span>, was du in Glas A (10 °C) und in Glas B (60 °C) beobachtest.</p>
+   <div class="anim"><a class="btn small" href="diffusion.html#stoffebene" target="_blank" rel="noopener">Animation: Stoffebene</a></div>
+   <textarea></textarea>
+   <details class="help"><summary>Hilfe: Satzanfänge</summary><ul><li>Am Anfang ist die Farbe nur …</li><li>Mit der Zeit breitet sich die Farbe …</li><li>In Glas B geht das …, weil das Wasser … ist.</li><li>Am Ende ist das Wasser …</li></ul></details>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Am Anfang ist die violette Farbe nur am Kristall. Mit der Zeit breitet sich die Farbe nach oben und zur Seite aus, ohne dass gerührt wird. In Glas B (60 °C) geht das schneller als in Glas A (10 °C). Am Ende ist das Wasser in beiden Gläsern überall gleich hell violett gefärbt.</p></div>
+  </div>
+  <div class="task chk">
+   <p class="q"><b class="nr">1.4</b>Ergänze die Je-desto-Aussage.</p>
+   <p>Je <select class="gap" data-ans="höher"><option value="">…</option><option>niedriger</option><option>höher</option></select> die Temperatur, desto <select class="gap" data-ans="schneller"><option value="">…</option><option>langsamer</option><option>schneller</option></select> verläuft die Diffusion.</p>
+   <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
+  </div>
+  <div class="task chk">
+   <p class="q"><b class="nr">1.5</b>Schalte in der Animation die <i>Lupe</i> ein. Tippe einmal direkt neben den Kristall und einmal weit oben ins Wasser. Ergänze.</p>
+   <p>Direkt am Kristall sind <select class="gap" data-ans="viele"><option value="">…</option><option>wenige</option><option>viele</option></select> Farbstoffteilchen. Weit oben sind <select class="gap" data-ans="wenige"><option value="">…</option><option>viele</option><option>wenige</option></select> Farbstoffteilchen. Die Konzentration ist am Kristall <select class="gap" data-ans="hoch"><option value="">…</option><option>niedrig</option><option>hoch</option></select>.</p>
+   <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
+  </div>
+  <div class="task chk">
+   <p class="q"><b class="nr">1.6</b>Kreuze an: Welche Aussage ist fachlich richtig formuliert?</p>
+   <div class="mc" data-ans="c">
+    <label><input type="radio" name="r16" value="a"> Die Farbstoffteilchen wollen sich im ganzen Wasser verteilen.</label>
+    <label><input type="radio" name="r16" value="b"> Der Kristall schickt seine Teilchen nach oben.</label>
+    <label><input type="radio" name="r16" value="c"> Die Farbstoffteilchen verteilen sich durch ihre ständige, ungeordnete Bewegung.</label>
+   </div>
+   <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
+  </div>
+ </div>
+
+ <!-- G-Aufgaben -->
+ <div class="only-G">
+  <div class="task">
+   <p class="q"><b class="nr">1.1</b><span class="afb">AFB II</span>Öffne die Animation (Reiter 1), starte sie aber noch nicht. Stelle eine <span class="op">Hypothese</span> auf, in welchem Glas (10 °C oder 60 °C) die Lösung früher gleichmäßig gefärbt ist, und <span class="op">begründe</span> sie.</p>
+   <div class="anim"><a class="btn small" href="diffusion.html#stoffebene" target="_blank" rel="noopener">Animation: Stoffebene</a></div>
+   <textarea></textarea>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Hypothese: Im Glas mit 60 °C ist die Lösung früher gleichmäßig gefärbt. Begründung: Bei höherer Temperatur bewegen sich die Teilchen im Mittel schneller; zudem ist warmes Wasser weniger zähflüssig. Beides beschleunigt die Diffusion.</p></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">1.2</b><span class="afb">AFB I/II</span>Starte die Animation. <span class="op">Beschreibe</span> deine Beobachtungen in beiden Gläsern und <span class="op">prüfe</span> deine Hypothese.</p>
+   <textarea></textarea>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Der Kristall löst sich; um ihn entsteht eine tiefviolette Zone. Die Färbung breitet sich ohne Rühren halbkreisförmig nach oben und zur Seite aus; der Farbübergang ist fließend. In Glas B (60 °C) löst sich der Kristall schneller, und die Lösung ist deutlich früher gleichmäßig gefärbt als in Glas A (10 °C). Die Hypothese wird bestätigt (im Modell). Endzustand: in beiden Gläsern gleiche, hellviolette Färbung.</p></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">1.3</b><span class="afb">AFB II</span>Schalte die <i>Lupe</i> ein und untersuche drei Stellen im selben Glas (am Kristall, in der Mitte, oben). <span class="op">Vergleiche</span> die Anzahl der Farbstoffteilchen und <span class="op">erkläre</span> damit den Begriff Konzentrationsgefälle.</p>
+   <textarea></textarea>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Am Kristall befinden sich in der Lupe viele Farbstoffteilchen zwischen den Wasserteilchen, in der Mitte weniger, oben (zu Beginn) keine oder nur einzelne. Die Anzahl der Farbstoffteilchen pro Volumen – die Konzentration – nimmt also vom Kristall nach oben ab. Diesen räumlichen Unterschied der Konzentration nennt man Konzentrationsgefälle. Mit der Zeit wird das Gefälle kleiner, am Ende ist die Anzahl überall etwa gleich.</p></div>
+  </div>
+  <div class="task chk">
+   <p class="q"><b class="nr">1.4</b><span class="afb">AFB I</span><span class="op">Ordne</span> die Aussagen der Stoffebene oder der Teilchenebene <span class="op">zu</span>.</p>
+   <table class="rf">
+    <tr><td>Die Lösung ist am Boden dunkler gefärbt als oben.</td><td class="c"><select class="gap" data-ans="S"><option value="">…</option><option value="T">Teilchenebene</option><option value="S">Stoffebene</option></select></td></tr>
+    <tr><td>Permanganat-Ionen bewegen sich ungeordnet zwischen den Wassermolekülen.</td><td class="c"><select class="gap" data-ans="T"><option value="">…</option><option value="S">Stoffebene</option><option value="T">Teilchenebene</option></select></td></tr>
+    <tr><td>Der Kristall wird kleiner und verschwindet.</td><td class="c"><select class="gap" data-ans="S"><option value="">…</option><option value="T">Teilchenebene</option><option value="S">Stoffebene</option></select></td></tr>
+    <tr><td>Bei jedem Zusammenstoß ändert sich die Bewegungsrichtung eines Teilchens.</td><td class="c"><select class="gap" data-ans="T"><option value="">…</option><option value="T">Teilchenebene</option><option value="S">Stoffebene</option></select></td></tr>
+    <tr><td>Nach mehreren Tagen ist die Lösung überall gleich gefärbt.</td><td class="c"><select class="gap" data-ans="S"><option value="">…</option><option value="S">Stoffebene</option><option value="T">Teilchenebene</option></select></td></tr>
+   </table>
+   <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">1.5</b><span class="afb">AFB II</span><span class="op">Erläutere</span>, warum die Lösung im realen Versuch meist schneller gleichmäßig gefärbt ist als in der Simulation.</p>
+   <textarea></textarea>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Die Simulation berechnet ausschließlich Diffusion. Im realen Becherglas entstehen zusätzlich Strömungen (Konvektion), z. B. weil die Lösung am Kristall eine höhere Dichte hat oder weil das Glas an einer Seite wärmer ist (Raumluft, Hand, Sonnenlicht). Diese Strömungen transportieren die Lösung über größere Strecken deutlich schneller als die Diffusion allein.</p></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">1.6</b><span class="afb">AFB III</span>Eine Mitschülerin sagt: „Die Farbstoffteilchen wollen sich gleichmäßig im Wasser verteilen.“ <span class="op">Beurteile</span> diese Aussage aus fachlicher Sicht und formuliere eine fachlich angemessene Alternative.</p>
+   <textarea></textarea>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Die Aussage ist fachlich unangemessen: Sie vermenschlicht Teilchen (Anthropomorphismus). Teilchen haben keinen Willen und kein Ziel. Die gleichmäßige Verteilung ist die Folge der ständigen, ungeordneten Teilchenbewegung: Aus Bereichen mit vielen Farbstoffteilchen gelangen rein statistisch mehr Teilchen in Bereiche mit wenigen Teilchen als umgekehrt. Alternative: „Durch die ungeordnete Bewegung der Teilchen kommt es zu einer Nettobewegung vom Ort höherer zum Ort niedrigerer Konzentration, bis die Farbstoffteilchen gleichmäßig verteilt sind.“</p></div>
+  </div>
+ </div>
+</section>
+
+<!-- ============================ STATION 2 ============================ -->
+<section class="st" id="s2">
+ <span class="kicker">Station 2</span>
+ <h2>Diffusion auf der Teilchenebene</h2>
+
+ <div class="text only-R">
+  <h4>Teilchen in ständiger Bewegung</h4>
+  <p>Alle Stoffe bestehen aus sehr kleinen <span class="w" tabindex="0" data-tip="kleinste Bausteine eines Stoffes; man kann sie nicht sehen">Teilchen</span>. Man kann sie nicht sehen, auch nicht mit einem Lichtmikroskop.</p>
+  <p>Die Teilchen bewegen sich ständig. In Gasen und Flüssigkeiten bewegen sie sich frei durcheinander. In Feststoffen schwingen sie nur um einen festen Platz.</p>
+  <p>In einer Flüssigkeit stoßen die Teilchen sehr oft zusammen. Bei jedem <span class="w" tabindex="0" data-tip="zwei Teilchen berühren sich und ändern dabei ihre Richtung">Zusammenstoß</span> ändern sie ihre Richtung. Deshalb bewegt sich ein Teilchen auf einem <b>Zickzackweg</b>.</p>
+  <p>Stell dir vor: Links im Gefäß sind viele Farbstoffteilchen, rechts keine. Alle Teilchen bewegen sich zufällig. Deshalb gelangen mehr Farbstoffteilchen von links nach rechts als von rechts nach links – einfach, weil links mehr Farbstoffteilchen sind. Diesen Überschuss nennt man <b>Nettobewegung</b>.</p>
+  <p>Am Ende sind die Farbstoffteilchen gleichmäßig verteilt. Die Teilchen bewegen sich weiter. Jetzt gelangen aber gleich viele Teilchen in beide Richtungen. Die Verteilung ändert sich nicht mehr.</p>
+  <p>Je höher die Temperatur, desto schneller bewegen sich die Teilchen. Deshalb verläuft die Diffusion in warmem Wasser schneller.</p>
+ </div>
+
+ <div class="text only-G">
+  <h4>Brownsche Bewegung und statistische Deutung der Diffusion</h4>
+  <p>1827 beobachtete der Botaniker Robert Brown unter dem Mikroskop, dass sich winzige Partikel aus Pollenkörnern in Wasser ständig zitternd und ungeordnet bewegen. Erst 1905 erklärte Albert Einstein diese <b>Brownsche Bewegung</b> quantitativ: Die sichtbaren Partikel werden fortwährend von den unsichtbaren, sich ungeordnet bewegenden Wassermolekülen angestoßen.</p>
+  <p>Nach dem Teilchenmodell befinden sich alle Teilchen eines Stoffes in ständiger, ungeordneter Bewegung. In Flüssigkeiten liegen die Teilchen dicht beieinander; ein Teilchen stößt daher sehr häufig mit Nachbarteilchen zusammen und ändert jedes Mal seine Bewegungsrichtung. Es legt einen Zickzackweg zurück (Zufallsbewegung). Die mittlere kinetische Energie der Teilchen ist proportional zur absoluten Temperatur: Mit steigender Temperatur bewegen sich die Teilchen im Mittel schneller.</p>
+  <p>Die Diffusion lässt sich statistisch deuten. Betrachtet man eine gedachte Fläche zwischen zwei Bereichen, so ist die Anzahl der Teilchen, die diese Fläche pro Zeiteinheit von links nach rechts passieren, proportional zur Teilchenanzahl links – und umgekehrt. Ist links die Konzentration höher, überwiegen die Übergänge von links nach rechts: Es resultiert eine <b>Nettobewegung</b> vom Ort höherer zum Ort niedrigerer Konzentration. Dafür ist keine gerichtete Kraft erforderlich.</p>
+  <p>Ist die Konzentration überall gleich, finden in beide Richtungen im Mittel gleich viele Übergänge statt. Die Teilchenbewegung geht weiter, die Verteilung ändert sich aber makroskopisch nicht mehr: Es liegt ein <b>dynamisches Gleichgewicht</b> vor.</p>
+  <p>Die Diffusionsgeschwindigkeit hängt von der Temperatur, von Größe und Masse der diffundierenden Teilchen und vom Medium ab. In Gasen verläuft die Diffusion wesentlich schneller als in Flüssigkeiten, weil die Teilchen dort größere Abstände haben und seltener zusammenstoßen.</p>
+ </div>
+
+ <details class="wort"><summary>Wortspeicher Station 2</summary>
+  <dl class="ws">
+   <dt>das Teilchen, die Teilchen</dt><dd>kleinster Baustein eines Stoffes, nicht mit dem Auge sichtbar</dd>
+   <dt>der Zusammenstoß, die Zusammenstöße</dt><dd>zwei Teilchen berühren sich und ändern ihre Bewegungsrichtung</dd>
+   <dt>ungeordnet</dt><dd>ohne feste Richtung, zufällig</dd>
+   <dt>die Nettobewegung, –</dt><dd>Unterschied zwischen den Teilchen, die in die eine und in die andere Richtung gelangen</dd>
+   <dt>die Trennwand, die Trennwände</dt><dd>Wand, die ein Gefäß in zwei Bereiche teilt</dd>
+   <dt class="only-G">das dynamische Gleichgewicht, die dynamischen Gleichgewichte</dt><dd class="only-G">Zustand, in dem Vorgänge in beide Richtungen gleich häufig ablaufen, sodass sich nichts mehr sichtbar ändert</dd>
+  </dl>
+ </details>
+
+ <!-- R-Aufgaben -->
+ <div class="only-R">
+  <div class="task chk">
+   <p class="q"><b class="nr">2.1</b>Öffne Reiter 2 und starte die Animation. Die Trennwand bleibt zunächst geschlossen. Kreuze an: Die Teilchen …</p>
+   <div class="anim"><a class="btn small" href="diffusion.html#teilchenebene" target="_blank" rel="noopener">Animation: Teilchenebene</a></div>
+   <div class="mc" data-ans="b">
+    <label><input type="radio" name="r21" value="a"> … stehen still.</label>
+    <label><input type="radio" name="r21" value="c"> … bewegen sich alle in dieselbe Richtung.</label>
+    <label><input type="radio" name="r21" value="b"> … bewegen sich ständig und ungeordnet.</label>
+   </div>
+   <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">2.2</b>Entferne die Trennwand. Notiere in der Tabelle, wie viele Farbstoffteilchen links und rechts sind. <span class="op">Beschreibe</span> danach, wie sich die Anzahl rechts verändert.</p>
+   <div class="tblwrap"><table class="tb"><tr><th>Zeit nach dem Entfernen</th><th>0 s</th><th>ca. 10 s</th><th>ca. 30 s</th><th>ca. 60 s</th><th>ca. 2 min</th></tr>
+    <tr><th>links</th><td>80</td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td></tr>
+    <tr><th>rechts</th><td>0</td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td></tr></table></div>
+   <textarea></textarea>
+   <details class="help"><summary>Hilfe: Satzanfänge</summary><ul><li>Am Anfang sind rechts …</li><li>Die Anzahl rechts nimmt zuerst schnell / langsam …</li><li>Am Ende sind links und rechts …</li></ul></details>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Am Anfang sind rechts keine Farbstoffteilchen. Die Anzahl rechts nimmt zuerst schnell zu, später immer langsamer. Am Ende sind links und rechts etwa gleich viele Farbstoffteilchen (je ca. 40). Die Werte schwanken etwas, weil die Bewegung zufällig ist.</p></div>
+  </div>
+  <div class="task chk">
+   <p class="q"><b class="nr">2.3</b>Kreuze an: Warum gelangen am Anfang mehr Farbstoffteilchen nach rechts als nach links?</p>
+   <div class="mc" data-ans="c">
+    <label><input type="radio" name="r23" value="a"> Eine Kraft zieht die Farbstoffteilchen nach rechts.</label>
+    <label><input type="radio" name="r23" value="b"> Die Farbstoffteilchen bewegen sich nur nach rechts.</label>
+    <label><input type="radio" name="r23" value="c"> Links sind mehr Farbstoffteilchen. Deshalb gelangen durch die zufällige Bewegung mehr Teilchen nach rechts als nach links.</label>
+    <label><input type="radio" name="r23" value="d"> Rechts ist es wärmer.</label>
+   </div>
+   <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">2.4</b>Setze in der Animation einen Haken bei <i>Ein Teilchen verfolgen</i>. <span class="op">Beschreibe</span> den Weg des markierten Teilchens.</p>
+   <textarea></textarea>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Das Teilchen bewegt sich auf einem Zickzackweg. Es ändert sehr oft seine Richtung, weil es mit anderen Teilchen zusammenstößt. Es bewegt sich nicht gerade in eine bestimmte Richtung.</p></div>
+  </div>
+  <div class="task chk">
+   <p class="q"><b class="nr">2.5</b>Ergänze den Lückentext.</p>
+   <p>Bei der Diffusion findet eine Nettobewegung vom Ort <select class="gap" data-ans="hoher"><option value="">…</option><option>gleicher</option><option>niedriger</option><option>hoher</option></select> Konzentration zum Ort <select class="gap" data-ans="niedriger"><option value="">…</option><option>hoher</option><option>gleicher</option><option>niedriger</option></select> Konzentration statt. Am Ende sind die Teilchen <select class="gap" data-ans="gleichmäßig"><option value="">…</option><option>gleichmäßig</option><option>nur links</option><option>nur rechts</option></select> verteilt. Die Teilchen bewegen sich danach <select class="gap" data-ans="weiter"><option value="">…</option><option>nicht mehr</option><option>weiter</option></select>.</p>
+   <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">2.6</b>Zurück zum Einstieg: <span class="op">Erkläre</span> jetzt mit dem Teilchenmodell, wie der Chapati-Duft zur Wohnungstür gelangt.</p>
+   <textarea></textarea>
+   <details class="help"><summary>Hilfe: Satzanfänge</summary><ul><li>Der Duft besteht aus …</li><li>Die Duftteilchen und die Luftteilchen bewegen sich …</li><li>In der Küche sind viele Duftteilchen, an der Tür …</li><li>Deshalb gelangen mehr Duftteilchen …</li></ul></details>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Der Duft besteht aus kleinen Duftteilchen. Die Duftteilchen und die Luftteilchen bewegen sich ständig und ungeordnet und stoßen zusammen. In der Küche sind viele Duftteilchen, an der Tür zuerst keine. Deshalb gelangen mehr Duftteilchen von der Küche in Richtung Tür als umgekehrt. Nach einiger Zeit sind Duftteilchen auch an der Tür, und man riecht den Duft.</p></div>
+  </div>
+ </div>
+
+ <!-- G-Aufgaben -->
+ <div class="only-G">
+  <div class="task">
+   <p class="q"><b class="nr">2.1</b><span class="afb">AFB I</span>Öffne Reiter 2. Starte die Animation, entferne die Trennwand und <span class="op">protokolliere</span> die Messwerte.</p>
+   <div class="anim"><a class="btn small" href="diffusion.html#teilchenebene" target="_blank" rel="noopener">Animation: Teilchenebene</a></div>
+   <div class="tblwrap"><table class="tb"><tr><th>Zeit nach dem Entfernen</th><th>ca. 5 s</th><th>ca. 30 s</th><th>ca. 60 s</th><th>ca. 2 min</th><th>ca. 3 min</th></tr>
+    <tr><th>Farbstoffteilchen rechts</th><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td></tr>
+    <tr><th>Übergänge links → rechts (5 s)</th><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td></tr>
+    <tr><th>Übergänge rechts → links (5 s)</th><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td></tr></table></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">2.2</b><span class="afb">AFB II</span><span class="op">Erkläre</span> mithilfe deiner Messwerte, warum die Nettobewegung mit der Zeit abnimmt.</p>
+   <textarea></textarea>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Direkt nach dem Entfernen der Trennwand befinden sich fast alle Farbstoffteilchen links. Die Zahl der Übergänge pro Zeiteinheit ist proportional zur Teilchenanzahl auf der jeweiligen Seite; daher überwiegen die Übergänge links → rechts deutlich (große Nettobewegung). Mit zunehmender Zahl an Teilchen rechts steigen die Übergänge rechts → links, während die Übergänge links → rechts abnehmen. Die Differenz – die Nettobewegung – wird kleiner und geht gegen null, sobald die Konzentrationen gleich sind. Einzelwerte schwanken zufällig.</p></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">2.3</b><span class="afb">AFB II</span><span class="op">Erläutere</span> den Begriff dynamisches Gleichgewicht am Beispiel der Animation.</p>
+   <textarea></textarea>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Nach einigen Minuten befinden sich links und rechts im Mittel gleich viele Farbstoffteilchen (je ca. 40). Die Teilchen bewegen sich weiterhin, und es finden weiter Übergänge in beide Richtungen statt (dynamisch). Da beide Übergangsraten im Mittel gleich groß sind, ändert sich die Verteilung nicht mehr (Gleichgewicht). Kleine Schwankungen um den Mittelwert sind Folge der Zufallsbewegung.</p></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">2.4</b><span class="afb">AFB II</span>Setze einen Haken bei <i>Ein Teilchen verfolgen</i> und blende die Wasserteilchen aus. <span class="op">Beschreibe</span> den Weg des Teilchens und <span class="op">vergleiche</span> die Bewegung der Farbstoffteilchen mit der der Wasserteilchen. <span class="op">Erkläre</span> den Unterschied (Hinweise zum Modell beachten).</p>
+   <textarea></textarea>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Das markierte Teilchen bewegt sich auf einem unregelmäßigen Zickzackweg (Zufallsbewegung); jede Richtungsänderung entspricht einem Zusammenstoß. Die Farbstoffteilchen bewegen sich im Mittel langsamer als die Wasserteilchen. Im Modell haben sie die vierfache Masse; bei gleicher mittlerer kinetischer Energie (E = ½·m·v²) ist ihre mittlere Geschwindigkeit daher halb so groß.</p></div>
+  </div>
+  <div class="task chk">
+   <p class="q"><b class="nr">2.5</b><span class="afb">AFB I/II</span>Entscheide, ob die Aussagen richtig oder falsch sind.</p>
+   <table class="rf">
+    <tr><td>Die Nettobewegung wird durch eine Kraft verursacht, die vom Konzentrationsgefälle ausgeht.</td><td class="c"><div class="mc mcrow" data-ans="f"><label><input type="radio" name="g25a" value="r">richtig</label><label><input type="radio" name="g25a" value="f">falsch</label></div></td></tr>
+    <tr><td>Im dynamischen Gleichgewicht finden keine Übergänge mehr statt.</td><td class="c"><div class="mc mcrow" data-ans="f"><label><input type="radio" name="g25b" value="r">richtig</label><label><input type="radio" name="g25b" value="f">falsch</label></div></td></tr>
+    <tr><td>Mit steigender Temperatur nimmt die mittlere Geschwindigkeit der Teilchen zu.</td><td class="c"><div class="mc mcrow" data-ans="r"><label><input type="radio" name="g25c" value="r">richtig</label><label><input type="radio" name="g25c" value="f">falsch</label></div></td></tr>
+    <tr><td>In Gasen verläuft die Diffusion langsamer als in Flüssigkeiten.</td><td class="c"><div class="mc mcrow" data-ans="f"><label><input type="radio" name="g25d" value="r">richtig</label><label><input type="radio" name="g25d" value="f">falsch</label></div></td></tr>
+   </table>
+   <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">2.6</b><span class="afb">AFB II</span>Zurück zum Einstieg: <span class="op">Erkläre</span> auf der Teilchenebene, wie der Duft zur Tür gelangt, und <span class="op">begründe</span>, warum sich der Duft in einem warmen Raum schneller ausbreitet. Prüfe deine Hypothese vom Anfang.</p>
+   <textarea></textarea>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Die Duftstoffe gelangen als Teilchen in die Luft. Duft- und Luftteilchen bewegen sich ständig ungeordnet und stoßen zusammen. Da in der Küche die Konzentration der Duftteilchen hoch und an der Tür zunächst null ist, resultiert eine Nettobewegung von der Küche zur Tür (Diffusion). In einem warmen Raum bewegen sich die Teilchen im Mittel schneller, daher verläuft die Diffusion schneller. (In einer realen Wohnung tragen auch Luftströmungen bei.)</p></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">2.7</b><span class="afb">AFB III</span><span class="op">Beurteile</span> das Teilchenmodell der Animation, indem du zwei Grenzen des Modells nennst und jeweils begründest, ob sie die Aussage zur Diffusion einschränken.</p>
+   <textarea></textarea>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><ul><li>Zweidimensional statt dreidimensional – das Prinzip (Zufallsbewegung, Nettobewegung) bleibt gleich, Zahlenwerte sind nicht übertragbar.</li><li>Teilchen liegen in Flüssigkeiten real viel dichter; Abstände und Geschwindigkeiten sind nicht maßstabsgetreu – qualitative Aussage bleibt gültig.</li><li>Teilchen als harte Kreise ohne Anziehungskräfte und ohne innere Struktur (z. B. Ionen, Hydrathülle) – vereinfacht, für die Grundidee unerheblich.</li><li>Temperatureffekt überhöht; Teilchenanzahl sehr klein, daher starke Schwankungen.</li></ul></div>
+  </div>
+ </div>
+</section>
+
+<!-- ============================ STATION 3 ============================ -->
+<section class="st" id="s3">
+ <span class="kicker">Station 3</span>
+ <h2>Oberfläche und Diffusionsgeschwindigkeit</h2>
+
+ <div class="text only-R">
+  <h4>Klein ist schneller</h4>
+  <p>Stoffe gelangen durch Flächen in einen Körper hinein oder aus ihm heraus. Ein Beispiel: Sauerstoff gelangt durch die dünne Wand der Lungenbläschen ins Blut. Diese Fläche heißt <b>Austauschfläche</b> oder <b>Kontaktfläche</b>.</p>
+  <p>Es gilt: Je größer die Kontaktfläche ist, desto mehr Teilchen gelangen pro <span class="w" tabindex="0" data-tip="eine bestimmte Zeitspanne, zum Beispiel eine Sekunde">Zeiteinheit</span> hindurch.</p>
+  <p>Bei einem Würfel mit der Kantenlänge a gilt: Oberfläche <b>A = 6 · a²</b> (sechs gleiche Quadrate), Volumen <b>V = a³</b>. Beispiel: Ein Würfel mit a = 1 cm hat A = 6 cm² und V = 1 cm³. Auf 1 cm³ Volumen kommen also 6 cm² Oberfläche. Man schreibt: A/V = 6 cm⁻¹ (lies: 6 pro Zentimeter).</p>
+  <p>Kleine Würfel haben im Verhältnis zu ihrem Volumen mehr Oberfläche als große Würfel. Ein Farbstoff dringt in alle Würfel gleich tief ein. Ein kleiner Würfel ist deshalb schneller vollständig gefärbt.</p>
+  <p>In der Natur gibt es viele große Austauschflächen: die Lungenbläschen in der Lunge, die Darmzotten im Dünndarm und die Wurzelhaare der Pflanzen. Auch Zellen sind sehr klein. So können Stoffe durch Diffusion schnell genug ins Zellinnere gelangen.</p>
+ </div>
+
+ <div class="text only-G">
+  <h4>Oberfläche, Volumen und das Fick’sche Gesetz</h4>
+  <p>Stoffaustausch zwischen einem Körper und seiner Umgebung erfolgt stets über eine Fläche, die <b>Austauschfläche</b>. Quantitativ beschreibt dies das <b>1. Fick’sche Diffusionsgesetz</b> (Adolf Fick, 1855): Der Stoffstrom J (diffundierende Stoffmenge pro Zeit) ist proportional zur Austauschfläche A und zum Konzentrationsgefälle Δc/Δx:</p>
+  <p style="text-align:center;font-size:19px"><b>J = − D · A · Δc / Δx</b></p>
+  <p>D ist der Diffusionskoeffizient; er hängt vom Stoff, vom Medium und von der Temperatur ab. Das Minuszeichen zeigt an, dass der Netto-Stoffstrom in Richtung abnehmender Konzentration verläuft. Eine Verdopplung der Fläche verdoppelt also bei sonst gleichen Bedingungen den Stoffstrom; eine Verdopplung der Strecke Δx halbiert ihn.</p>
+  <p>Für einen Würfel der Kantenlänge a gilt A = 6a² und V = a³, also <b>A/V = 6/a</b>. Mit abnehmender Größe nimmt das <b>Oberfläche-Volumen-Verhältnis</b> zu. Hinzu kommt: Die Eindringtiefe eines diffundierenden Stoffes wächst nicht proportional zur Zeit, sondern nur etwa mit der Wurzel der Zeit (x ~ √(D·t)). Für die doppelte Strecke benötigt die Diffusion daher etwa die vierfache Zeit. Die Zeit, bis ein Körper vollständig durchdrungen ist, wächst folglich etwa mit dem Quadrat seiner Ausdehnung.</p>
+  <p>Für Lebewesen hat dies weitreichende Folgen: Der Stoffbedarf einer Zelle wächst mit ihrem Volumen, die Aufnahme erfolgt über ihre Oberfläche. Diffusion ist nur über kurze Strecken effektiv. Zellen bleiben daher klein, und Organe des Stoffaustauschs besitzen eine stark vergrößerte Oberfläche bei geringer Diffusionsstrecke (Lungenbläschen, Darmzotten und Mikrovilli, Wurzelhaare, Kiemenblättchen). Große Vielzeller benötigen zusätzlich Transportsysteme wie den Blutkreislauf oder die Leitbündel der Pflanzen, die Stoffe über große Entfernungen durch Strömung befördern.</p>
+ </div>
+
+ <details class="wort"><summary>Wortspeicher Station 3</summary>
+  <dl class="ws">
+   <dt>die Oberfläche, die Oberflächen</dt><dd>Summe aller Außenflächen eines Körpers; Würfel: A = 6 · a²</dd>
+   <dt>das Volumen, die Volumina</dt><dd>Rauminhalt eines Körpers; Würfel: V = a³</dd>
+   <dt>die Kantenlänge, die Kantenlängen</dt><dd>Länge einer Würfelkante (a)</dd>
+   <dt>die Austauschfläche, die Austauschflächen</dt><dd>Fläche, durch die Stoffe in einen Körper hinein oder heraus gelangen</dd>
+   <dt>das Verhältnis, die Verhältnisse</dt><dd>Vergleich zweier Größen durch Teilen, hier A : V</dd>
+   <dt>das Lungenbläschen, die Lungenbläschen</dt><dd>sehr kleine Bläschen in der Lunge, in denen der Gasaustausch stattfindet</dd>
+   <dt>die Darmzotte, die Darmzotten</dt><dd>fingerförmige Ausstülpung der Dünndarmwand</dd>
+   <dt class="only-G">der Stoffstrom, die Stoffströme</dt><dd class="only-G">Stoffmenge, die pro Zeiteinheit durch eine Fläche gelangt</dd>
+  </dl>
+ </details>
+
+ <!-- R-Aufgaben -->
+ <div class="only-R">
+  <div class="task chk">
+   <p class="q"><b class="nr">3.1</b>Öffne Reiter 3, Variante A. Starte die Animation und beobachte das Diagramm. Kreuze an.</p>
+   <div class="anim"><a class="btn small" href="diffusion.html#kontaktflaeche" target="_blank" rel="noopener">Animation: Kontaktfläche</a></div>
+   <div class="mc" data-ans="a">
+    <label><input type="radio" name="r31" value="b"> In beiden Kammern geht der Ausgleich gleich schnell.</label>
+    <label><input type="radio" name="r31" value="a"> In der Kammer mit der großen Öffnung sind schneller 50 % der Farbstoffteilchen rechts.</label>
+    <label><input type="radio" name="r31" value="c"> In der Kammer mit der kleinen Öffnung gelangen nie Teilchen nach rechts.</label>
+   </div>
+   <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
+  </div>
+  <div class="task chk">
+   <p class="q"><b class="nr">3.2</b>Ergänze die Je-desto-Aussage.</p>
+   <p>Je <select class="gap" data-ans="größer"><option value="">…</option><option>kleiner</option><option>größer</option></select> die Kontaktfläche, desto <select class="gap" data-ans="mehr"><option value="">…</option><option>weniger</option><option>mehr</option></select> Teilchen gelangen pro Zeiteinheit hindurch.</p>
+   <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
+  </div>
+  <div class="task chk">
+   <p class="q"><b class="nr">3.3</b><span class="op">Berechne</span> Oberfläche, Volumen und das Verhältnis A/V. Die erste Zeile ist ein Beispiel. Formeln: A = 6 · a², V = a³.</p>
+   <div class="tblwrap"><table class="tb"><tr><th>Kantenlänge a</th><th>Oberfläche A in cm²</th><th>Volumen V in cm³</th><th>A/V in cm⁻¹</th></tr>
+    <tr><td>1 cm</td><td>6</td><td>1</td><td>6</td></tr>
+    <tr><td>2 cm</td><td><input class="num" data-ans="24" inputmode="decimal"></td><td><input class="num" data-ans="8" inputmode="decimal"></td><td><input class="num" data-ans="3" inputmode="decimal"></td></tr>
+    <tr><td>3 cm</td><td><input class="num" data-ans="54" inputmode="decimal"></td><td><input class="num" data-ans="27" inputmode="decimal"></td><td><input class="num" data-ans="2" inputmode="decimal"></td></tr></table></div>
+   <details class="help"><summary>Hilfe: Rechenweg für a = 2 cm</summary><ul><li>A = 6 · 2 cm · 2 cm = 6 · 4 cm² = …</li><li>V = 2 cm · 2 cm · 2 cm = …</li><li>A/V = A geteilt durch V</li></ul></details>
+   <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">3.4</b>Öffne Reiter 3, Variante B, und starte den Würfelversuch. <span class="op">Nenne</span> den Würfel, der zuerst vollständig gefärbt ist, und <span class="op">erkläre</span> mit deiner Tabelle aus 3.3.</p>
+   <div class="anim"><a class="btn small" href="diffusion.html#wuerfel" target="_blank" rel="noopener">Animation: Würfelversuch</a></div>
+   <textarea></textarea>
+   <details class="help"><summary>Hilfe: Satzanfänge</summary><ul><li>Zuerst vollständig gefärbt ist der Würfel mit …</li><li>Die Farbe dringt in alle Würfel …</li><li>Der kleine Würfel hat im Verhältnis zu seinem Volumen …</li></ul></details>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Zuerst vollständig gefärbt ist der Würfel mit a = 1 cm. Die Farbe dringt in alle Würfel gleich tief ein. Der kleine Würfel hat im Verhältnis zu seinem Volumen die größte Oberfläche (A/V = 6 cm⁻¹, beim großen Würfel nur 2 cm⁻¹). Außerdem ist der Weg bis zur Mitte am kürzesten. Deshalb ist er am schnellsten durchgefärbt.</p></div>
+  </div>
+  <div class="task chk">
+   <p class="q"><b class="nr">3.5</b><span class="op">Ordne</span> die Austauschflächen dem richtigen Organ <span class="op">zu</span>.</p>
+   <table class="rf">
+    <tr><td>Lungenbläschen</td><td class="c"><select class="gap" data-ans="Lunge"><option value="">…</option><option>Pflanzenwurzel</option><option>Dünndarm</option><option>Lunge</option></select></td></tr>
+    <tr><td>Darmzotten</td><td class="c"><select class="gap" data-ans="Dünndarm"><option value="">…</option><option>Lunge</option><option>Pflanzenwurzel</option><option>Dünndarm</option></select></td></tr>
+    <tr><td>Wurzelhaare</td><td class="c"><select class="gap" data-ans="Pflanzenwurzel"><option value="">…</option><option>Dünndarm</option><option>Lunge</option><option>Pflanzenwurzel</option></select></td></tr>
+   </table>
+   <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
+  </div>
+ </div>
+
+ <!-- G-Aufgaben -->
+ <div class="only-G">
+  <div class="task">
+   <p class="q"><b class="nr">3.1</b><span class="afb">AFB II</span>Öffne Reiter 3, Variante A. Stelle vor dem Start eine <span class="op">Hypothese</span> zum Verlauf der beiden Kurven auf. Starte dann die Simulation und <span class="op">prüfe</span> deine Hypothese. Variiere anschließend die Öffnungen.</p>
+   <div class="anim"><a class="btn small" href="diffusion.html#kontaktflaeche" target="_blank" rel="noopener">Animation: Kontaktfläche</a></div>
+   <textarea></textarea>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Hypothese: In Kammer 2 (große Öffnung) steigt der Anteil der Farbstoffteilchen rechts schneller an, weil pro Zeiteinheit mehr Teilchen die Öffnung passieren können; beide Kurven nähern sich langfristig 50 %. Beobachtung: Die Kurve von Kammer 2 steigt deutlich steiler und erreicht die 50 %-Linie früher; Kammer 1 steigt nur langsam. Bei gleichen Öffnungen verlaufen beide Kurven (bis auf Zufallsschwankungen) gleich. Die Hypothese wird bestätigt; dies entspricht der Proportionalität J ~ A.</p></div>
+  </div>
+  <div class="task chk">
+   <p class="q"><b class="nr">3.2</b><span class="afb">AFB I/II</span><span class="op">Berechne</span> Oberfläche, Volumen und A/V. <span class="op">Leite</span> anschließend eine allgemeine Formel für A/V <span class="op">ab</span>.</p>
+   <div class="tblwrap"><table class="tb"><tr><th>a in cm</th><th>A in cm²</th><th>V in cm³</th><th>A/V in cm⁻¹</th></tr>
+    <tr><td>0,5</td><td><input class="num" data-ans="1.5" inputmode="decimal"></td><td><input class="num" data-ans="0.125" data-tol="0.002" inputmode="decimal"></td><td><input class="num" data-ans="12" inputmode="decimal"></td></tr>
+    <tr><td>1</td><td><input class="num" data-ans="6" inputmode="decimal"></td><td><input class="num" data-ans="1" inputmode="decimal"></td><td><input class="num" data-ans="6" inputmode="decimal"></td></tr>
+    <tr><td>2</td><td><input class="num" data-ans="24" inputmode="decimal"></td><td><input class="num" data-ans="8" inputmode="decimal"></td><td><input class="num" data-ans="3" inputmode="decimal"></td></tr>
+    <tr><td>3</td><td><input class="num" data-ans="54" inputmode="decimal"></td><td><input class="num" data-ans="27" inputmode="decimal"></td><td><input class="num" data-ans="2" inputmode="decimal"></td></tr>
+    <tr><td>4</td><td><input class="num" data-ans="96" inputmode="decimal"></td><td><input class="num" data-ans="64" inputmode="decimal"></td><td><input class="num" data-ans="1.5" inputmode="decimal"></td></tr></table></div>
+   <p>Allgemein gilt für einen Würfel: A/V = <select class="gap" data-ans="6/a"><option value="">…</option><option>6 · a</option><option>a/6</option><option>6/a²</option><option>6/a</option></select></p>
+   <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
+  </div>
+  <div class="task chk">
+   <p class="q"><b class="nr">3.3</b><span class="afb">AFB II</span>Öffne Variante B (drei Würfelgrößen) und lies in der Tabelle die Zeiten bis 90 % Aufnahme ab. <span class="op">Berechne</span> die Verhältnisse und <span class="op">leite</span> den Zusammenhang <span class="op">ab</span>.</p>
+   <div class="anim"><a class="btn small" href="diffusion.html#wuerfel" target="_blank" rel="noopener">Animation: Würfelversuch</a></div>
+   <div class="tblwrap"><table class="tb"><tr><th>a</th><th>t<sub>90</sub> in min (ablesen)</th><th>t<sub>90</sub>(a) : t<sub>90</sub>(1 cm)</th></tr>
+    <tr><td>1 cm</td><td><input class="num" data-ans="7.1" data-tol="0.15" inputmode="decimal"></td><td>1</td></tr>
+    <tr><td>2 cm</td><td><input class="num" data-ans="28.3" data-tol="0.3" inputmode="decimal"></td><td><input class="num" data-ans="4" data-tol="0.15" inputmode="decimal"></td></tr>
+    <tr><td>3 cm</td><td><input class="num" data-ans="63.7" data-tol="0.5" inputmode="decimal"></td><td><input class="num" data-ans="9" data-tol="0.25" inputmode="decimal"></td></tr></table></div>
+   <p>Die Zeit bis zur vollständigen Durchdringung wächst etwa <select class="gap" data-ans="q"><option value="">…</option><option value="l">proportional zur Kantenlänge a</option><option value="k">mit a³ (wie das Volumen)</option><option value="q">mit dem Quadrat der Kantenlänge (a²)</option><option value="w">mit √a</option></select>.</p>
+   <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">3.4</b><span class="afb">AFB II</span>Wähle in Variante B den Versuch <i>Gleiches Volumen</i>. <span class="op">Vergleiche</span> einen Würfel (a = 2 cm) mit acht Würfeln (a = 1 cm) und <span class="op">erkläre</span> das Ergebnis.</p>
+   <textarea></textarea>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Beide Proben haben das gleiche Gesamtvolumen (8 cm³). Die acht kleinen Würfel haben zusammen die doppelte Oberfläche (48 cm² statt 24 cm²), A/V = 6 cm⁻¹ statt 3 cm⁻¹. Zudem ist die maximale Diffusionsstrecke zur Würfelmitte halbiert (0,5 cm statt 1 cm). Die kleinen Würfel sind daher schneller gefärbt (t₉₀ ≈ 7 min statt ≈ 28 min, Modellwerte). Durch Zerteilen wird die Austauschfläche vergrößert und die Diffusionsstrecke verkürzt.</p></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">3.5</b><span class="afb">AFB III</span><span class="op">Begründe</span>, warum Zellen nicht beliebig groß werden können und warum große Vielzeller Transportsysteme benötigen.</p>
+   <textarea></textarea>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Der Stoffbedarf einer Zelle (z. B. Sauerstoff, Glucose) wächst mit ihrem Volumen (~a³), die Aufnahme erfolgt jedoch über die Oberfläche (~a²). Mit zunehmender Größe sinkt das A/V-Verhältnis (~1/a), sodass die Versorgung pro Volumen schlechter wird. Zudem wächst die Diffusionszeit mit dem Quadrat der Strecke; über große Distanzen ist Diffusion zu langsam. Zellen teilen sich daher, statt immer größer zu werden. Große Vielzeller haben Zellen, die weit von der Körperoberfläche entfernt liegen; Diffusion allein reicht nicht aus. Transportsysteme (Blutkreislauf, Leitbündel) befördern Stoffe durch Strömung über große Strecken; Diffusion findet dann nur noch über kurze Strecken statt (z. B. Kapillare → Zelle).</p></div>
+  </div>
+  <div class="task chk">
+   <p class="q"><b class="nr">3.6</b><span class="afb">AFB I</span><span class="op">Ordne</span> den Strukturen ihre Funktion <span class="op">zu</span>.</p>
+   <table class="rf">
+    <tr><td>Lungenbläschen</td><td class="c"><select class="gap" data-ans="a"><option value="">…</option><option value="c">Aufnahme von Wasser und Mineralstoffen</option><option value="b">Aufnahme von Nährstoffen</option><option value="d">Gasaustausch im Wasser</option><option value="a">Gasaustausch zwischen Luft und Blut</option></select></td></tr>
+    <tr><td>Darmzotten</td><td class="c"><select class="gap" data-ans="b"><option value="">…</option><option value="d">Gasaustausch im Wasser</option><option value="a">Gasaustausch zwischen Luft und Blut</option><option value="c">Aufnahme von Wasser und Mineralstoffen</option><option value="b">Aufnahme von Nährstoffen</option></select></td></tr>
+    <tr><td>Wurzelhaare</td><td class="c"><select class="gap" data-ans="c"><option value="">…</option><option value="a">Gasaustausch zwischen Luft und Blut</option><option value="d">Gasaustausch im Wasser</option><option value="b">Aufnahme von Nährstoffen</option><option value="c">Aufnahme von Wasser und Mineralstoffen</option></select></td></tr>
+    <tr><td>Kiemenblättchen</td><td class="c"><select class="gap" data-ans="d"><option value="">…</option><option value="b">Aufnahme von Nährstoffen</option><option value="c">Aufnahme von Wasser und Mineralstoffen</option><option value="a">Gasaustausch zwischen Luft und Blut</option><option value="d">Gasaustausch im Wasser</option></select></td></tr>
+   </table>
+   <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
+  </div>
+ </div>
+</section>
+
+<!-- ============================ ABSCHLUSSTEST ============================ -->
+<section class="st" id="test">
+ <span class="kicker">Abschlusstest</span>
+ <h2>Teste dein Wissen</h2>
+ <div class="hint">Bearbeite alle Aufgaben ohne Hilfe der Texte. Klicke am Ende auf <i>Test auswerten</i>. Bei den offenen Aufgaben vergleichst du deine Antwort danach mit den Kriterien und hakst ab, was du erfüllt hast.</div>
+
+ <!-- ---------- R-Test ---------- -->
+ <div class="only-R tst">
+  <div class="task"><p class="q"><b class="nr">T1</b>Was versteht man unter Diffusion?<span class="pts">1 P.</span></p>
+   <div class="mc" data-ans="c">
+    <label><input type="radio" name="tr1" value="a"> das Auflösen eines Feststoffes in Wasser</label>
+    <label><input type="radio" name="tr1" value="b"> das Mischen von Stoffen durch Rühren</label>
+    <label><input type="radio" name="tr1" value="c"> die selbstständige Durchmischung von Stoffen durch die Bewegung der Teilchen</label>
+    <label><input type="radio" name="tr1" value="d"> das Verdunsten einer Flüssigkeit</label>
+   </div></div>
+  <div class="task"><p class="q"><b class="nr">T2</b>Richtig oder falsch?<span class="pts">4 P.</span></p>
+   <table class="rf">
+    <tr><td>In warmem Wasser verläuft die Diffusion schneller als in kaltem Wasser.</td><td class="c"><div class="mc mcrow" data-ans="r"><label><input type="radio" name="tr2a" value="r">richtig</label><label><input type="radio" name="tr2a" value="f">falsch</label></div></td></tr>
+    <tr><td>Wenn die Teilchen gleichmäßig verteilt sind, bewegen sie sich nicht mehr.</td><td class="c"><div class="mc mcrow" data-ans="f"><label><input type="radio" name="tr2b" value="r">richtig</label><label><input type="radio" name="tr2b" value="f">falsch</label></div></td></tr>
+    <tr><td>Ein Teilchen bewegt sich in einer Flüssigkeit auf einem Zickzackweg.</td><td class="c"><div class="mc mcrow" data-ans="r"><label><input type="radio" name="tr2c" value="r">richtig</label><label><input type="radio" name="tr2c" value="f">falsch</label></div></td></tr>
+    <tr><td>Eine Kraft zieht die Teilchen zum Ort niedriger Konzentration.</td><td class="c"><div class="mc mcrow" data-ans="f"><label><input type="radio" name="tr2d" value="r">richtig</label><label><input type="radio" name="tr2d" value="f">falsch</label></div></td></tr>
+   </table></div>
+  <div class="task"><p class="q"><b class="nr">T3</b>Ergänze den Lückentext.<span class="pts">4 P.</span></p>
+   <p>Bei der Diffusion gelangen insgesamt mehr Teilchen vom Ort <select class="gap" data-ans="hoher"><option value="">…</option><option>niedriger</option><option>hoher</option></select> Konzentration zum Ort <select class="gap" data-ans="niedriger"><option value="">…</option><option>hoher</option><option>niedriger</option></select> Konzentration. Je höher die <select class="gap" data-ans="Temperatur"><option value="">…</option><option>Masse</option><option>Kontaktfläche</option><option>Temperatur</option><option>Farbe</option></select>, desto schneller bewegen sich die Teilchen. Je größer die <select class="gap" data-ans="Kontaktfläche"><option value="">…</option><option>Temperatur</option><option>Farbe</option><option>Masse</option><option>Kontaktfläche</option></select>, desto mehr Teilchen gelangen pro Zeiteinheit hindurch.</p></div>
+  <div class="task"><p class="q"><b class="nr">T4</b>Berechne für einen Würfel mit a = 4 cm.<span class="pts">3 P.</span></p>
+   <p>A = <input class="num" data-ans="96" inputmode="decimal"> cm² &nbsp; V = <input class="num" data-ans="64" inputmode="decimal"> cm³ &nbsp; A/V = <input class="num" data-ans="1.5" inputmode="decimal"> cm⁻¹</p></div>
+  <div class="task"><p class="q"><b class="nr">T5</b>Drei Agarwürfel (1 cm, 2 cm, 3 cm) liegen in Farbstofflösung. Welcher ist zuerst vollständig gefärbt?<span class="pts">1 P.</span></p>
+   <div class="mc" data-ans="a">
+    <label><input type="radio" name="tr5" value="c"> der Würfel mit a = 3 cm</label>
+    <label><input type="radio" name="tr5" value="b"> der Würfel mit a = 2 cm</label>
+    <label><input type="radio" name="tr5" value="a"> der Würfel mit a = 1 cm</label>
+    <label><input type="radio" name="tr5" value="d"> alle gleichzeitig</label>
+   </div></div>
+  <div class="task"><p class="q"><b class="nr">T6</b>Ordne die Austauschflächen zu.<span class="pts">3 P.</span></p>
+   <table class="rf">
+    <tr><td>Darmzotten</td><td class="c"><select class="gap" data-ans="Dünndarm"><option value="">…</option><option>Lunge</option><option>Pflanzenwurzel</option><option>Dünndarm</option></select></td></tr>
+    <tr><td>Wurzelhaare</td><td class="c"><select class="gap" data-ans="Pflanzenwurzel"><option value="">…</option><option>Dünndarm</option><option>Pflanzenwurzel</option><option>Lunge</option></select></td></tr>
+    <tr><td>Lungenbläschen</td><td class="c"><select class="gap" data-ans="Lunge"><option value="">…</option><option>Pflanzenwurzel</option><option>Lunge</option><option>Dünndarm</option></select></td></tr>
+   </table></div>
+  <div class="task open-t"><p class="q"><b class="nr">T7</b><span class="op">Erkläre</span> mit dem Teilchenmodell, warum man ein Parfüm nach kurzer Zeit im ganzen Raum riecht.<span class="pts">4 P.</span></p>
+   <textarea></textarea>
+   <div class="crit" hidden><b>Kriterien – hake ab, was in deiner Antwort steht:</b>
+    <label><input type="checkbox" data-pts="1"> Das Parfüm besteht aus kleinen (Duft-)Teilchen.</label>
+    <label><input type="checkbox" data-pts="1"> Die Teilchen bewegen sich ständig und ungeordnet.</label>
+    <label><input type="checkbox" data-pts="1"> Am Parfüm ist die Konzentration der Duftteilchen hoch, im übrigen Raum niedrig.</label>
+    <label><input type="checkbox" data-pts="1"> Deshalb gelangen mehr Duftteilchen in den Raum als zurück, bis sie überall verteilt sind.</label>
+   </div></div>
+ </div>
+
+ <!-- ---------- G-Test ---------- -->
+ <div class="only-G tst">
+  <div class="task"><p class="q"><b class="nr">T1</b>Welche Aussage beschreibt Diffusion fachlich korrekt?<span class="pts">1 P.</span></p>
+   <div class="mc" data-ans="d">
+    <label><input type="radio" name="tg1" value="a"> gerichtete Bewegung von Teilchen entlang einer Kraft zum Ort niedriger Konzentration</label>
+    <label><input type="radio" name="tg1" value="b"> Durchmischung von Stoffen durch Strömungen in Flüssigkeiten und Gasen</label>
+    <label><input type="radio" name="tg1" value="c"> Lösen eines Feststoffes unter Bildung einer gesättigten Lösung</label>
+    <label><input type="radio" name="tg1" value="d"> Nettobewegung von Teilchen vom Ort höherer zum Ort niedrigerer Konzentration infolge ihrer ungeordneten Eigenbewegung</label>
+   </div></div>
+  <div class="task"><p class="q"><b class="nr">T2</b>Richtig oder falsch?<span class="pts">5 P.</span></p>
+   <table class="rf">
+    <tr><td>Im dynamischen Gleichgewicht ist die Zahl der Übergänge in beide Richtungen im Mittel gleich.</td><td class="c"><div class="mc mcrow" data-ans="r"><label><input type="radio" name="tg2a" value="r">richtig</label><label><input type="radio" name="tg2a" value="f">falsch</label></div></td></tr>
+    <tr><td>Ein Würfel mit doppelter Kantenlänge hat das doppelte A/V-Verhältnis.</td><td class="c"><div class="mc mcrow" data-ans="f"><label><input type="radio" name="tg2b" value="r">richtig</label><label><input type="radio" name="tg2b" value="f">falsch</label></div></td></tr>
+    <tr><td>Nach dem Fick’schen Gesetz ist der Stoffstrom proportional zur Austauschfläche.</td><td class="c"><div class="mc mcrow" data-ans="r"><label><input type="radio" name="tg2c" value="r">richtig</label><label><input type="radio" name="tg2c" value="f">falsch</label></div></td></tr>
+    <tr><td>Konvektion ist eine besonders schnelle Form der Diffusion.</td><td class="c"><div class="mc mcrow" data-ans="f"><label><input type="radio" name="tg2d" value="r">richtig</label><label><input type="radio" name="tg2d" value="f">falsch</label></div></td></tr>
+    <tr><td>Schwerere Teilchen bewegen sich bei gleicher Temperatur im Mittel langsamer als leichtere.</td><td class="c"><div class="mc mcrow" data-ans="r"><label><input type="radio" name="tg2e" value="r">richtig</label><label><input type="radio" name="tg2e" value="f">falsch</label></div></td></tr>
+   </table></div>
+  <div class="task"><p class="q"><b class="nr">T3</b>Ergänze den Lückentext.<span class="pts">4 P.</span></p>
+   <p>Ursache der Diffusion ist die ungeordnete <select class="gap" data-ans="Teilchenbewegung"><option value="">…</option><option>Konvektion</option><option>Anziehungskraft</option><option>Teilchenbewegung</option></select>. Besteht ein <select class="gap" data-ans="Konzentrationsgefälle"><option value="">…</option><option>Temperaturgleichgewicht</option><option>Konzentrationsgefälle</option><option>Volumen</option></select>, kommt es zu einer Nettobewegung. Ist die Konzentration überall gleich, liegt ein <select class="gap" data-ans="dynamisches Gleichgewicht"><option value="">…</option><option>statischer Zustand</option><option>dynamisches Gleichgewicht</option><option>Konzentrationsgefälle</option></select> vor. Organe des Stoffaustauschs besitzen ein großes <select class="gap" data-ans="Oberfläche-Volumen-Verhältnis"><option value="">…</option><option>Volumen</option><option>Oberfläche-Volumen-Verhältnis</option><option>Gewicht</option></select>.</p></div>
+  <div class="task"><p class="q"><b class="nr">T4</b>Berechne das A/V-Verhältnis eines Würfels mit a = 0,25 cm.<span class="pts">1 P.</span></p>
+   <p>A/V = <input class="num" data-ans="24" inputmode="decimal"> cm⁻¹</p></div>
+  <div class="task"><p class="q"><b class="nr">T5</b>Ein Agarwürfel mit a = 1 cm ist nach etwa 7 min zu 90 % durchgefärbt. Nach welcher Zeit ist ein Würfel mit a = 4 cm unter gleichen Bedingungen etwa zu 90 % durchgefärbt?<span class="pts">1 P.</span></p>
+   <div class="mc" data-ans="c">
+    <label><input type="radio" name="tg5" value="a"> nach etwa 28 min</label>
+    <label><input type="radio" name="tg5" value="b"> nach etwa 14 min</label>
+    <label><input type="radio" name="tg5" value="c"> nach etwa 112 min</label>
+    <label><input type="radio" name="tg5" value="d"> nach etwa 448 min</label>
+   </div></div>
+  <div class="task"><p class="q"><b class="nr">T6</b>Ordne Struktur und Funktion zu.<span class="pts">4 P.</span></p>
+   <table class="rf">
+    <tr><td>Kiemenblättchen</td><td class="c"><select class="gap" data-ans="d"><option value="">…</option><option value="b">Aufnahme von Nährstoffen</option><option value="a">Gasaustausch zwischen Luft und Blut</option><option value="d">Gasaustausch im Wasser</option><option value="c">Aufnahme von Wasser und Mineralstoffen</option></select></td></tr>
+    <tr><td>Darmzotten</td><td class="c"><select class="gap" data-ans="b"><option value="">…</option><option value="c">Aufnahme von Wasser und Mineralstoffen</option><option value="d">Gasaustausch im Wasser</option><option value="b">Aufnahme von Nährstoffen</option><option value="a">Gasaustausch zwischen Luft und Blut</option></select></td></tr>
+    <tr><td>Lungenbläschen</td><td class="c"><select class="gap" data-ans="a"><option value="">…</option><option value="d">Gasaustausch im Wasser</option><option value="c">Aufnahme von Wasser und Mineralstoffen</option><option value="a">Gasaustausch zwischen Luft und Blut</option><option value="b">Aufnahme von Nährstoffen</option></select></td></tr>
+    <tr><td>Wurzelhaare</td><td class="c"><select class="gap" data-ans="c"><option value="">…</option><option value="a">Gasaustausch zwischen Luft und Blut</option><option value="c">Aufnahme von Wasser und Mineralstoffen</option><option value="b">Aufnahme von Nährstoffen</option><option value="d">Gasaustausch im Wasser</option></select></td></tr>
+   </table></div>
+  <div class="task open-t"><p class="q"><b class="nr">T7</b><span class="afb">AFB II</span><span class="op">Erkläre</span> auf der Teilchenebene, warum sich ein Kaliumpermanganat-Kristall in warmem Wasser schneller gleichmäßig verteilt als in kaltem Wasser.<span class="pts">3 P.</span></p>
+   <textarea></textarea>
+   <div class="crit" hidden><b>Kriterien – hake ab, was in deiner Antwort steht:</b>
+    <label><input type="checkbox" data-pts="1"> Ungeordnete Teilchenbewegung führt zur Nettobewegung vom Ort hoher zum Ort niedriger Konzentration.</label>
+    <label><input type="checkbox" data-pts="1"> Bei höherer Temperatur ist die mittlere Geschwindigkeit (kinetische Energie) der Teilchen größer.</label>
+    <label><input type="checkbox" data-pts="1"> Dadurch werden pro Zeiteinheit größere Strecken zurückgelegt / mehr Teilchen gelangen in Bereiche niedriger Konzentration (ggf. geringere Viskosität).</label>
+   </div></div>
+  <div class="task open-t"><p class="q"><b class="nr">T8</b><span class="afb">AFB III</span>Amöben sind Einzeller, die Sauerstoff nur durch Diffusion über ihre Zellmembran aufnehmen. <span class="op">Begründe</span>, warum es keine Amöben mit einem Durchmesser von 10 cm gibt.<span class="pts">4 P.</span></p>
+   <textarea></textarea>
+   <div class="crit" hidden><b>Kriterien – hake ab, was in deiner Antwort steht:</b>
+    <label><input type="checkbox" data-pts="1"> Der Sauerstoffbedarf wächst mit dem Volumen, die Aufnahme erfolgt über die Oberfläche.</label>
+    <label><input type="checkbox" data-pts="1"> Mit zunehmender Größe sinkt das A/V-Verhältnis.</label>
+    <label><input type="checkbox" data-pts="1"> Die Diffusionsstrecke ins Zellinnere wäre sehr groß; die Diffusionszeit wächst etwa mit dem Quadrat der Strecke.</label>
+    <label><input type="checkbox" data-pts="1"> Schlussfolgerung: Das Zellinnere würde nicht ausreichend schnell mit Sauerstoff versorgt.</label>
+   </div></div>
+ </div>
+
+ <div class="row"><button class="btn pri" id="testBtn">Test auswerten</button><button class="btn" id="testReset">Test zurücksetzen</button></div>
+ <div class="score" id="score" hidden></div>
+</section>
+
+<footer>Digitales Arbeitsblatt zur Animation <a href="diffusion.html">Diffusion</a> · Deutsche Schule Nairobi · Die Lösungsvorschläge erscheinen erst, wenn eine eigene Antwort eingegeben wurde.</footer>
+</div>
+
+<script>
+'use strict';
+const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
+const KEY='diffAB_v1:';
+const store=(k,v)=>{try{localStorage.setItem(KEY+k,v)}catch(e){}};
+const load=k=>{try{return localStorage.getItem(KEY+k)}catch(e){return null}};
+
+/* ---------- Niveau ---------- */
+let NIV=load('niv')||'G';
+function setNiv(n){NIV=n;document.body.dataset.niveau=n;store('niv',n);
+ $$('.seg button').forEach(b=>{b.classList.toggle('on',b.dataset.niv===n);b.setAttribute('aria-checked',b.dataset.niv===n);});updateScore();}
+$$('.seg button').forEach(b=>b.onclick=()=>setNiv(b.dataset.niv));
+const active=el=>{const r=el.closest('.only-R,.only-G');return !r||r.classList.contains('only-'+NIV);};
+
+/* ---------- Speichern aller Eingaben ---------- */
+let fi=0;
+$$('input,select,textarea').forEach(el=>{
+ if(el.type==='radio'){const k='r:'+el.name;if(load(k)===el.value)el.checked=true;el.addEventListener('change',()=>store(k,el.value));return;}
+ const k=el.id?('id:'+el.id):('f'+(fi++));el.dataset.k=k;const v=load(k);
+ if(el.type==='checkbox'){if(v==='1')el.checked=true;el.addEventListener('change',()=>{store(k,el.checked?'1':'0');updateScore();});return;}
+ if(v!=null)el.value=v;el.addEventListener('input',()=>store(k,el.value));el.addEventListener('change',()=>store(k,el.value));});
+$('#clearBtn').onclick=()=>{if(!confirm('Wirklich alle Eingaben auf diesem Gerät löschen?'))return;
+ try{Object.keys(localStorage).filter(k=>k.startsWith(KEY)&&k!==KEY+'niv').forEach(k=>localStorage.removeItem(k));}catch(e){}location.reload();};
+$('#printBtn').onclick=()=>window.print();
+window.addEventListener('beforeprint',()=>$$('textarea').forEach(t=>{t.style.height='auto';t.style.height=(t.scrollHeight+4)+'px';}));
+
+/* ---------- Bewertbare Elemente ---------- */
+const gradables=root=>Array.from(root.querySelectorAll('select[data-ans],input.num[data-ans],.mc[data-ans]'));
+function evalEl(el){
+ if(el.matches('select'))return el.value===el.dataset.ans;
+ if(el.matches('input.num')){const v=parseFloat(String(el.value).replace(',','.').replace(/\s/g,''));if(isNaN(v))return false;
+  const a=parseFloat(el.dataset.ans),tol=el.dataset.tol?parseFloat(el.dataset.tol):Math.max(0.011,Math.abs(a)*0.005);return Math.abs(v-a)<=tol;}
+ const c=el.querySelector('input:checked');return !!c&&c.value===el.dataset.ans;}
+function fbFor(el){let f=el._fb;if(!f){f=document.createElement('span');f.className='fb';el._fb=f;
+  if(el.matches('.mc')){if(el.classList.contains('mcrow'))el.appendChild(f);else el.after(f);}else el.after(f);}return f;}
+function mark(el){const ok=evalEl(el);const tgt=el.matches('.mc')?(el.querySelector('input:checked')?.closest('label')||el):el;
+ el.querySelectorAll&&el.matches('.mc')&&el.querySelectorAll('label').forEach(l=>l.classList.remove('ok','bad'));
+ el.classList.remove('ok','bad');tgt.classList.add(ok?'ok':'bad');
+ const f=fbFor(el);f.textContent=ok?'richtig':'falsch';f.className='fb '+(ok?'ok-t':'bad-t');return ok;}
+function unmark(el){el.classList.remove('ok','bad');if(el.matches('.mc'))el.querySelectorAll('label').forEach(l=>l.classList.remove('ok','bad'));if(el._fb){el._fb.textContent='';}}
+$$('.chk').forEach(box=>{const btn=box.querySelector('.chkbtn'),res=box.querySelector('.res');
+ btn.onclick=()=>{const g=gradables(box);let n=0;g.forEach(el=>{if(mark(el))n++;});res.textContent=n+' von '+g.length+' richtig';};
+ box.addEventListener('change',()=>{gradables(box).forEach(unmark);res.textContent='';});
+ box.addEventListener('input',e=>{if(e.target.matches('input.num')){unmark(e.target);res.textContent='';}});});
+
+/* ---------- Lösungsvorschläge erst nach eigener Antwort ---------- */
+$$('.solbtn').forEach(btn=>{const task=btn.closest('.task'),sol=task.querySelector('.sol'),ta=task.querySelector('textarea');
+ btn.onclick=()=>{if(!sol.hidden){sol.hidden=true;btn.textContent='Lösungsvorschlag';return;}
+  if(ta&&ta.value.trim().length<15){let m=task.querySelector('.msg');if(!m){m=document.createElement('span');m.className='msg';btn.after(m);}m.textContent='Schreibe zuerst eine eigene Antwort.';return;}
+  task.querySelector('.msg')?.remove();sol.hidden=false;btn.textContent='Lösungsvorschlag ausblenden';};});
+
+/* ---------- Abschlusstest ---------- */
+let tested=load('tested:'+NIV)==='1';
+function testRoot(){return document.querySelector('.tst.only-'+NIV);}
+function updateScore(){const root=testRoot();const sc=$('#score');tested=load('tested:'+NIV)==='1';
+ $$('.tst').forEach(t=>{const on=t===root&&tested;t.querySelectorAll('.crit').forEach(c=>c.hidden=!on);
+  if(t!==root||!tested){gradables(t).forEach(unmark);}});
+ $$('.tst').forEach(t=>t.querySelectorAll('input,select,textarea').forEach(el=>{if(el.closest('.crit'))return;const lock=t===root&&tested;if(el.tagName==='TEXTAREA')el.readOnly=lock;else el.disabled=lock;}));
+ if(!tested){sc.hidden=true;return;}
+ const g=gradables(root);let auto=0;g.forEach(el=>{if(mark(el))auto++;});
+ let crit=0,critMax=0;root.querySelectorAll('.crit input').forEach(c=>{critMax+=+c.dataset.pts;if(c.checked)crit+=+c.dataset.pts;});
+ const tot=auto+crit,max=g.length+critMax,p=Math.round(100*tot/max);
+ sc.hidden=false;sc.innerHTML=`Ergebnis${$('#name').value?' für '+esc($('#name').value):''}: ${tot} von ${max} Punkten (${p} %)`+
+  `<small>Automatisch ausgewertet: ${auto} von ${g.length} Punkten · Offene Aufgaben (Selbsteinschätzung): ${crit} von ${critMax} Punkten. `+
+  `Die Antworten sind jetzt gesperrt. Hake bei den offenen Aufgaben die erfüllten Kriterien ab – das Ergebnis aktualisiert sich.</small>`;}
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+$('#testBtn').onclick=()=>{store('tested:'+NIV,'1');updateScore();$('#score').scrollIntoView({block:'center'});};
+$('#testReset').onclick=()=>{const root=testRoot();
+ store('tested:'+NIV,'0');updateScore();
+ root.querySelectorAll('input,select,textarea').forEach(el=>{if(el.type==='radio'){el.checked=false;store('r:'+el.name,'');}else if(el.type==='checkbox'){el.checked=false;store(el.dataset.k,'0');}else{el.value='';store(el.dataset.k,'');}});
+ store('tested:'+NIV,'0');updateScore();};
+$$('.tst').forEach(t=>t.addEventListener('change',e=>{if(load('tested:'+NIV)==='1'&&!e.target.closest('.crit'))updateScore();}));
+
+setNiv(NIV);
+</script>
+</body>
+</html>
