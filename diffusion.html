@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Diffusion – Stoffebene, Teilchenebene und Oberfläche</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: sachlich, präzise, schülerverständlich (DaF/DaZ-sensibel, kurze Sätze)
+   IDEA: ein Phänomen auf zwei Ebenen – Becherglas (Stoffebene) und Teilchenmodell – plus Oberflächeneinfluss
+   COLOUR and TYPE: Weiß bzw. Nachtblau, Petrol als Leitfarbe, Violett für den Farbstoff; Atkinson Hyperlegible
+   LAYOUT: Titel, drei Reiter; Bühne mit Steuerung, Erläuterungen rechts ab 1100px, sonst darunter */
+:root{color-scheme:light;--bg:#fff;--ink:#13232c;--mute:#55666f;--line:#d6e0e4;--card:#f3f7f8;--pri:#0e5e6f;--acc:#c2185b;--onpri:#fff;
+--box:#eef6f9;--boxst:#9fb8c2;--water:#86bcd6;--waterst:#4f8fae;--dye:#7b1fa2;--dyest:#3f0b57;--wall:#37474f;--c3:#b26a00;--merk:#fff6e0;--merkst:#e0b44c}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#0d151b;--ink:#e6eef2;--mute:#9fb2bc;--line:#24363f;--card:#13212a;--pri:#5cc0d2;--acc:#ff5c9a;--onpri:#0d151b;
+--box:#142630;--boxst:#3b5561;--water:#4f8fae;--waterst:#86bcd6;--dye:#c46ee6;--dyest:#f1d0ff;--wall:#b0bec5;--c3:#ffb74d;--merk:#2a2414;--merkst:#8a6d22}}
+:root[data-theme=dark]{color-scheme:dark;--bg:#0d151b;--ink:#e6eef2;--mute:#9fb2bc;--line:#24363f;--card:#13212a;--pri:#5cc0d2;--acc:#ff5c9a;--onpri:#0d151b;
+--box:#142630;--boxst:#3b5561;--water:#4f8fae;--waterst:#86bcd6;--dye:#c46ee6;--dyest:#f1d0ff;--wall:#b0bec5;--c3:#ffb74d;--merk:#2a2414;--merkst:#8a6d22}
+*{box-sizing:border-box;min-width:0}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 'Atkinson Hyperlegible',system-ui,-apple-system,sans-serif;overflow-x:clip;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:1440px;margin:0 auto;padding:clamp(18px,3vw,34px) max(3.5vw,14px) 40px;padding-left:max(3.5vw,14px,env(safe-area-inset-left));padding-right:max(3.5vw,14px,env(safe-area-inset-right))}
+header{display:flex;gap:16px;align-items:flex-start;justify-content:space-between}
+h1{font-size:clamp(28px,3.6vw,42px);line-height:1.06;margin:0 0 6px;text-wrap:balance}
+.sub{color:var(--mute);margin:0;max-width:75ch}
+.themebtn{flex:none;min-height:48px;min-width:48px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;font:inherit;font-weight:700;cursor:pointer;padding:6px 12px}
+.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:18px 0 12px}
+.tab{min-height:62px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;font:inherit;font-weight:700;font-size:17px;cursor:pointer;padding:8px 12px;text-align:left}
+.tab small{display:block;font-weight:400;color:var(--mute);font-size:13px;line-height:1.3}
+.tab[aria-selected=true]{border-color:var(--pri);background:var(--pri);color:var(--onpri)}
+.tab[aria-selected=true] small{color:var(--onpri);opacity:.85}
+.seg{display:inline-flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.seg button{min-height:48px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;font:inherit;font-weight:700;padding:6px 16px;cursor:pointer}
+.seg button[aria-pressed=true]{border-color:var(--pri);background:var(--pri);color:var(--onpri)}
+.layout{display:grid;gap:18px}
+@media (min-width:1100px){.layout{grid-template-columns:minmax(0,1fr) 370px;align-items:start}}
+.stage{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px}
+canvas{display:block;width:100%;height:auto;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.stage+.stage{margin-top:10px}
+.ctrl{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.btn{min-height:48px;min-width:48px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;font:inherit;font-weight:700;padding:6px 16px;cursor:pointer}
+.btn.pri{background:var(--pri);border-color:var(--pri);color:var(--onpri)}
+.btn[aria-pressed=true]{border-color:var(--acc);box-shadow:inset 0 0 0 2px var(--acc)}
+.btn:focus-visible,.tab:focus-visible,.seg button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+label.f{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:4px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+select{font:inherit;min-height:40px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:4px 8px}
+input[type=range]{width:150px;height:40px;accent-color:var(--pri)}
+input[type=checkbox]{width:24px;height:24px;accent-color:var(--pri)}
+output{font-variant-numeric:tabular-nums;font-weight:700;min-width:5ch}
+.stats{margin-top:10px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);font-variant-numeric:tabular-nums}
+.stats b{color:var(--pri)}
+.info{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.info h2{font-size:21px;margin:0 0 8px;line-height:1.2}
+.info h3{font-size:17px;margin:16px 0 6px}
+.info p{margin:0 0 10px}
+.info ol,.info ul{margin:0 0 10px;padding-left:22px}
+.info li{margin-bottom:4px}
+.merk{background:var(--merk);border-left:5px solid var(--merkst);border-radius:8px;padding:10px 12px;margin:10px 0}
+details.modell,details.wort{margin-top:12px;border-top:1px solid var(--line);padding-top:8px}
+details.modell summary,details.wort summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;align-items:center}
+details.modell p{font-size:14.5px;color:var(--mute)}
+dl.ws{margin:6px 0 0;font-size:15px}
+dl.ws dt{font-weight:700;margin-top:6px}
+dl.ws dd{margin:0 0 0 12px;color:var(--mute)}
+table.av{width:100%;border-collapse:collapse;margin-top:10px;font-variant-numeric:tabular-nums;font-size:15px;background:var(--bg);border-radius:12px;overflow:hidden}
+table.av th,table.av td{padding:8px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+table.av th:first-child,table.av td:first-child{text-align:left}
+table.av th{font-size:13.5px;color:var(--mute);font-weight:700}
+.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sw{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:6px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <h1>Diffusion</h1>
+    <p class="sub">Die selbstständige Durchmischung von Stoffen – beobachtet auf der Stoffebene, erklärt auf der Teilchenebene, und der Einfluss der Oberfläche auf die Geschwindigkeit.</p>
+  </div>
+  <button class="themebtn" id="themeBtn" aria-label="Hell- oder Dunkelmodus umschalten">Hell/Dunkel</button>
+</header>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" aria-selected="true" aria-controls="p0" id="tab0">1 · Stoffebene<small>Kaliumpermanganat im Becherglas</small></button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="p1" id="tab1">2 · Teilchenebene<small>Teilchenbewegung und Konzentrationsausgleich</small></button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="p2" id="tab2">3 · Oberfläche<small>Kontaktfläche und Würfelversuch</small></button>
+</div>
+
+<!-- ================= TAB 1: STOFFEBENE ================= -->
+<section class="panel" id="p0" role="tabpanel" aria-labelledby="tab0">
+ <div class="layout">
+  <div>
+   <div class="stage"><canvas id="cv1" aria-label="Zwei Bechergläser mit Wasser, in denen sich violetter Farbstoff ausbreitet"></canvas></div>
+   <div class="ctrl">
+     <button class="btn pri" id="b1Play">Start</button>
+     <button class="btn" id="b1Reset">Neu starten</button>
+     <label class="f">Glas A <select id="s1A"></select></label>
+     <label class="f">Glas B <select id="s1B"></select></label>
+     <label class="f">Zeitraffer <input type="range" id="r1Speed" min="1" max="24" value="6"><output id="o1Speed"></output></label>
+     <button class="btn" id="b1Lens" aria-pressed="false">Lupe: Teilchenebene</button>
+   </div>
+  </div>
+  <aside class="info">
+   <h2>Beobachtung auf der Stoffebene</h2>
+   <p>Am Boden jedes Becherglases liegt ein Kristall <b>Kaliumpermanganat</b>. Der Kristall löst sich. Ohne Rühren breitet sich die violette Farbe langsam im ganzen Wasser aus.</p>
+   <p>Am Ende ist die Lösung überall gleich stark gefärbt. In warmem Wasser verläuft die Ausbreitung schneller als in kaltem Wasser.</p>
+   <div class="merk"><b>Merksatz:</b> Die <b>Diffusion</b> ist die selbstständige Durchmischung von Stoffen ohne Rühren oder Schütteln. Die Ursache ist die ständige, ungeordnete Bewegung der Teilchen.</div>
+   <h3>Lupe</h3>
+   <p>Schalte die Lupe ein und tippe ins Wasser (Finger oder Maus bewegen). Die Lupe zeigt modellhaft, wie viele Farbstoffteilchen sich an dieser Stelle zwischen den Wasserteilchen befinden.</p>
+   <h3>Arbeitsaufträge</h3>
+   <ol>
+     <li>Beschreibe die Ausbreitung der Farbe in Glas A und Glas B.</li>
+     <li>Vergleiche die Lupe direkt am Kristall und weit oben im Glas. Erkläre den Unterschied mit dem Begriff <i>Konzentration</i>.</li>
+     <li>Formuliere eine Je-desto-Aussage zum Einfluss der Temperatur.</li>
+   </ol>
+   <details class="wort"><summary>Wortspeicher</summary>
+    <dl class="ws">
+     <dt>die Diffusion, –</dt><dd>selbstständige Durchmischung von Stoffen durch Teilchenbewegung</dd>
+     <dt>die Konzentration, die Konzentrationen</dt><dd>Anteil eines gelösten Stoffes in einem bestimmten Volumen</dd>
+     <dt>der Kristall, die Kristalle</dt><dd>Feststoff, dessen Teilchen regelmäßig angeordnet sind</dd>
+     <dt>die Lösung, die Lösungen</dt><dd>Gemisch aus einem gelösten Stoff und einem Lösungsmittel (hier Wasser)</dd>
+     <dt>der Zeitraffer, die Zeitraffer</dt><dd>Darstellung, in der ein langer Vorgang schneller abläuft</dd>
+    </dl>
+   </details>
+   <details class="modell"><summary>Hinweise zum Modell</summary>
+    <p>Gezeigt wird reine Diffusion in einem senkrechten Schnitt durch das Becherglas (6 cm × 7 cm), berechnet mit der Diffusionsgleichung. Der Kristall hält die Lösung in seiner Umgebung gesättigt, bis die vorgegebene Stoffmenge gelöst ist.</p>
+    <p>Diffusionskoeffizient von Permanganat bei 20 °C als Näherungswert D ≈ 1,6·10⁻⁵ cm²/s; die Temperaturabhängigkeit folgt der Stokes-Einstein-Beziehung D ∝ T/η mit der Viskosität η von Wasser (bei 60 °C etwa dreimal so groß wie bei 10 °C).</p>
+    <p>Im Realversuch geht die Durchmischung meist deutlich schneller, weil zusätzlich Strömungen (Konvektion) durch Temperatur- und Dichteunterschiede auftreten. Die Lupe ist ein qualitatives Modell; die Teilchenanzahl ist proportional zur berechneten Konzentration.</p>
+   </details>
+  </aside>
+ </div>
+</section>
+
+<!-- ================= TAB 2: TEILCHENEBENE ================= -->
+<section class="panel" id="p1" role="tabpanel" aria-labelledby="tab1" hidden>
+ <div class="layout">
+  <div>
+   <div class="stage"><canvas id="cv2" aria-label="Teilchenmodell: Wasserteilchen und Farbstoffteilchen in einem Gefäß mit Trennwand"></canvas></div>
+   <div class="ctrl">
+     <button class="btn pri" id="b2Play">Start</button>
+     <button class="btn" id="b2Wall">Trennwand entfernen</button>
+     <button class="btn" id="b2Reset">Neu starten</button>
+     <label class="f">Temperatur <input type="range" id="r2Temp" min="0" max="80" value="20"><output id="o2Temp"></output></label>
+     <label class="f"><input type="checkbox" id="c2Water" checked> Wasserteilchen</label>
+     <label class="f"><input type="checkbox" id="c2Track"> Ein Teilchen verfolgen</label>
+   </div>
+   <div class="stats" id="st2"></div>
+  </div>
+  <aside class="info">
+   <h2>Erklärung auf der Teilchenebene</h2>
+   <p>Alle Teilchen bewegen sich ständig und ungeordnet. Sie stoßen zusammen und ändern dabei zufällig ihre Bewegungsrichtung. Ein einzelnes Teilchen bewegt sich deshalb auf einem Zickzackweg.</p>
+   <p>Nach dem Entfernen der Trennwand gelangen zunächst mehr Farbstoffteilchen von links nach rechts als von rechts nach links, weil sich links mehr Farbstoffteilchen befinden. Keine Kraft zieht die Teilchen nach rechts: Die Ursache ist allein der <b>Konzentrationsunterschied</b>.</p>
+   <div class="merk"><b>Merksatz:</b> Bei der Diffusion findet eine <b>Nettobewegung</b> von Teilchen vom Ort höherer Konzentration zum Ort niedrigerer Konzentration statt, bis die Konzentration überall gleich ist.</div>
+   <p>Auch danach bewegen sich die Teilchen weiter. In beide Richtungen gelangen jetzt im Mittel gleich viele Teilchen. Die Verteilung bleibt deshalb gleich (<b>dynamisches Gleichgewicht</b>).</p>
+   <p>Je höher die Temperatur, desto höher ist die mittlere Geschwindigkeit der Teilchen und desto schneller verläuft die Diffusion.</p>
+   <h3>Arbeitsaufträge</h3>
+   <ol>
+     <li>Lies die Übergänge in den letzten 5 s direkt nach dem Entfernen der Trennwand ab und nach etwa einer Minute. Vergleiche.</li>
+     <li>Erkläre, warum die Farbstoffteilchen am Ende gleichmäßig verteilt sind, obwohl sie sich weiter bewegen.</li>
+     <li>Verfolge ein Teilchen und beschreibe seinen Weg.</li>
+   </ol>
+   <details class="wort"><summary>Wortspeicher</summary>
+    <dl class="ws">
+     <dt>das Teilchen, die Teilchen</dt><dd>sehr kleiner Baustein eines Stoffes, nicht mit dem Auge sichtbar</dd>
+     <dt>der Zusammenstoß, die Zusammenstöße</dt><dd>Berührung zweier Teilchen, nach der sie ihre Richtung ändern</dd>
+     <dt>der Konzentrationsunterschied, die Konzentrationsunterschiede</dt><dd>an zwei Orten ist unterschiedlich viel Stoff im gleichen Volumen</dd>
+     <dt>die Nettobewegung, –</dt><dd>Differenz der Teilchen, die in die eine und in die andere Richtung gelangen</dd>
+     <dt>das Gleichgewicht, die Gleichgewichte</dt><dd>Zustand, in dem sich die Verteilung nicht mehr ändert</dd>
+    </dl>
+   </details>
+   <details class="modell"><summary>Hinweise zum Modell</summary>
+    <p>Zweidimensionales Modell mit elastischen Stößen; Teilchen sind als Kreise dargestellt. In Flüssigkeiten liegen die Teilchen in Wirklichkeit viel dichter beieinander. Farbstoffteilchen haben im Modell die vierfache Masse der Wasserteilchen und bewegen sich daher im Mittel langsamer.</p>
+    <p>Die Änderung der Geschwindigkeit mit der Temperatur ist zur Verdeutlichung stark überhöht (real gilt für die mittlere Geschwindigkeit v ∝ √T).</p>
+   </details>
+  </aside>
+ </div>
+</section>
+
+<!-- ================= TAB 3: OBERFLÄCHE ================= -->
+<section class="panel" id="p2" role="tabpanel" aria-labelledby="tab2" hidden>
+ <div class="seg" role="group" aria-label="Variante wählen">
+   <button id="m3A" aria-pressed="true">A · Kontaktfläche (Teilchenebene)</button>
+   <button id="m3B" aria-pressed="false">B · Würfelversuch (Oberfläche und Volumen)</button>
+ </div>
+ <div class="layout">
+  <div>
+   <!-- Variante A -->
+   <div id="v3A">
+    <div class="stage"><canvas id="cv3a" aria-label="Zwei Kammern mit unterschiedlich großer Öffnung in der Trennwand"></canvas></div>
+    <div class="ctrl">
+      <button class="btn pri" id="b3aPlay">Start</button>
+      <button class="btn" id="b3aReset">Neu starten</button>
+      <label class="f">Öffnung Kammer 1 <input type="range" id="r3g1" min="20" max="280" value="40"><output id="o3g1"></output></label>
+      <label class="f">Öffnung Kammer 2 <input type="range" id="r3g2" min="20" max="280" value="200"><output id="o3g2"></output></label>
+    </div>
+    <div class="stage"><canvas id="cv3ag" aria-label="Diagramm: Anteil der Farbstoffteilchen in der rechten Hälfte gegen die Zeit"></canvas></div>
+    <div class="stats" id="st3a"></div>
+   </div>
+   <!-- Variante B -->
+   <div id="v3B" hidden>
+    <div class="stage"><canvas id="cv3b" aria-label="Querschnitte durch Agarwürfel, in die Farbstoff eindringt"></canvas></div>
+    <div class="ctrl">
+      <button class="btn pri" id="b3bPlay">Start</button>
+      <button class="btn" id="b3bReset">Neu starten</button>
+      <label class="f">Versuch <select id="s3mode"><option value="1">Drei Würfelgrößen (1, 2, 3 cm)</option><option value="2">Gleiches Volumen: 1 Würfel oder 8 Würfel</option></select></label>
+      <label class="f">Zeitraffer <input type="range" id="r3bSpeed" min="1" max="10" value="3"><output id="o3bSpeed"></output></label>
+    </div>
+    <div class="tblwrap"><table class="av" id="tb3b"></table></div>
+    <div class="stage" style="margin-top:10px"><canvas id="cv3bg" aria-label="Diagramm: Farbstoffaufnahme gegen die Zeit"></canvas></div>
+   </div>
+  </div>
+  <aside class="info">
+   <div id="i3A">
+    <h2>Kontaktfläche und Diffusionsgeschwindigkeit</h2>
+    <p>Beide Kammern haben am Anfang die gleiche Verteilung: Farbstoffteilchen nur links, Wasserteilchen überall. Nur die <b>Öffnung</b> in der Trennwand ist unterschiedlich groß. Sie ist die <b>Kontaktfläche</b> zwischen beiden Hälften.</p>
+    <p>Die Öffnung ist in Prozent der Wandhöhe angegeben. Durch eine große Öffnung gelangen pro Zeiteinheit mehr Teilchen als durch eine kleine Öffnung. Der Konzentrationsausgleich ist deshalb schneller erreicht. Das Ziel ist in beiden Kammern gleich: 50 % der Farbstoffteilchen rechts.</p>
+    <div class="merk"><b>Merksatz:</b> Je größer die Austauschfläche, desto mehr Teilchen diffundieren pro Zeiteinheit hindurch und desto schneller verläuft der Konzentrationsausgleich.</div>
+    <p style="font-size:14.5px;color:var(--mute)">Für Fortgeschrittene (1. Fick’sches Gesetz): Der Stoffstrom ist proportional zur Fläche A und zum Konzentrationsgefälle: J = −D · A · Δc/Δx.</p>
+    <h3>Arbeitsaufträge</h3>
+    <ol>
+      <li>Vergleiche den Verlauf der beiden Kurven im Diagramm.</li>
+      <li>Stelle beide Öffnungen gleich groß ein. Beschreibe und erkläre das Ergebnis.</li>
+      <li>Erkläre, warum der Endzustand (50 %) nicht von der Größe der Öffnung abhängt.</li>
+    </ol>
+    <details class="wort"><summary>Wortspeicher</summary>
+     <dl class="ws">
+      <dt>die Kontaktfläche, die Kontaktflächen</dt><dd>Fläche, an der zwei Bereiche sich berühren und Teilchen austauschen können</dd>
+      <dt>die Austauschfläche, die Austauschflächen</dt><dd>anderes Wort für Kontaktfläche, oft in der Biologie</dd>
+      <dt>die Öffnung, die Öffnungen</dt><dd>Lücke in einer Wand, durch die Teilchen gelangen können</dd>
+      <dt>die Zeiteinheit, die Zeiteinheiten</dt><dd>festgelegte Zeitspanne, zum Beispiel eine Sekunde</dd>
+     </dl>
+    </details>
+    <details class="modell"><summary>Hinweise zum Modell</summary>
+     <p>Gleiches Teilchenmodell wie in Reiter 2. Beide Kammern starten mit identischen Anfangspositionen und -geschwindigkeiten. Die Simulation läuft hier dreimal so schnell wie in Reiter 2. Wegen der Zufälligkeit der Teilchenbewegung schwanken die Kurven; der Unterschied zwischen kleiner und großer Öffnung ist trotzdem deutlich.</p>
+    </details>
+   </div>
+   <div id="i3B" hidden>
+    <h2>Würfelversuch: Oberfläche und Volumen</h2>
+    <p>Würfel aus farblosem Agar liegen in einer violetten Farbstofflösung. Der Farbstoff gelangt durch die Oberfläche in die Würfel. Gezeigt wird jeweils ein Schnitt durch die Mitte eines Würfels.</p>
+    <p><b>Beobachtung:</b> Die Farbe dringt in alle Würfel gleich tief ein. Kleine Würfel sind deshalb früher vollständig gefärbt.</p>
+    <p><b>Erklärung:</b> Kleine Würfel haben im Verhältnis zu ihrem Volumen eine größere Oberfläche (größeres <b>A/V-Verhältnis</b>). Zerteilt man einen Würfel, bleibt das Volumen gleich, aber die Oberfläche wird größer.</p>
+    <div class="merk"><b>Merksatz:</b> Je größer das Verhältnis von Oberfläche zu Volumen, desto schneller wird ein Körper durch Diffusion vollständig mit einem Stoff versorgt.</div>
+    <h3>Bezug zur Biologie</h3>
+    <ul>
+      <li>Zellen sind sehr klein. Nur so reicht die Diffusion für die Versorgung des ganzen Zellinneren aus.</li>
+      <li>Oberflächenvergrößerung: Lungenbläschen, Darmzotten im Dünndarm, Wurzelhaare, Kiemenblättchen.</li>
+    </ul>
+    <h3>Arbeitsaufträge</h3>
+    <ol>
+      <li>Berechne Oberfläche, Volumen und A/V-Verhältnis für einen Würfel mit a = 4 cm.</li>
+      <li>Vergleiche die Zeiten bis 90 % in der Tabelle mit dem A/V-Verhältnis.</li>
+      <li>Erkläre, warum ein Lebewesen aus vielen kleinen Zellen besteht und nicht aus einer einzigen großen Zelle.</li>
+    </ol>
+    <details class="wort"><summary>Wortspeicher</summary>
+     <dl class="ws">
+      <dt>die Oberfläche, die Oberflächen</dt><dd>Summe aller Außenflächen eines Körpers; Würfel: A = 6 · a²</dd>
+      <dt>das Volumen, die Volumina</dt><dd>Rauminhalt eines Körpers; Würfel: V = a³</dd>
+      <dt>die Kantenlänge, die Kantenlängen</dt><dd>Länge einer Würfelkante (a)</dd>
+      <dt>das Verhältnis, die Verhältnisse</dt><dd>Vergleich zweier Größen durch Teilen (hier A : V)</dd>
+      <dt>der Agar, –</dt><dd>durchsichtiges Gel aus Algen, in das Stoffe eindringen können</dd>
+     </dl>
+    </details>
+    <details class="modell"><summary>Hinweise zum Modell</summary>
+     <p>Berechnet wird die exakte Lösung der Diffusionsgleichung für einen Würfel, dessen Oberfläche dauerhaft die Konzentration der Außenlösung hat (Produktansatz aus drei eindimensionalen Lösungen). Die Farbintensität entspricht der Konzentration. Die <i>Farbstoffaufnahme</i> ist die mittlere Konzentration im Würfel, bezogen auf die Konzentration der Außenlösung (100 % = Würfel überall so konzentriert wie die Lösung).</p>
+     <p>Der Diffusionskoeffizient (D = 0,008 cm²/min) ist so gewählt, dass die Zeiten in der Größenordnung eines Schulversuchs liegen; die Zeitangaben sind daher modellhaft. Im häufig verwendeten Schulversuch mit Phenolphthalein-Agar (mit Natronlauge) in Säure kommt zusätzlich eine Neutralisationsreaktion hinzu; die Farbgrenze ist dort schärfer.</p>
+    </details>
+   </div>
+  </aside>
+ </div>
+</section>
+</div>
+
+<script>
+'use strict';
+const $=s=>document.getElementById(s);
+const C={};
+function readColors(){const s=getComputedStyle(document.documentElement);
+ ['bg','ink','mute','line','card','pri','acc','box','boxst','water','waterst','dye','dyest','wall','c3'].forEach(k=>C[k]=s.getPropertyValue('--'+k).trim());}
+readColors();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',readColors);
+$('themeBtn').onclick=()=>{const r=document.documentElement;const dark=getComputedStyle(r).colorScheme.includes('dark');
+ r.setAttribute('data-theme',dark?'light':'dark');readColors();};
+
+/* ---------- Canvas-Helfer (logische Koordinaten, hochauflösend) ---------- */
+function makeView(id,LW,LH){const cv=$(id);const v={cv,ctx:cv.getContext('2d'),LW,LH,s:1};
+ cv.style.aspectRatio=LW+' / '+LH;
+ const fit=()=>{const w=cv.clientWidth;if(!w)return;const dpr=Math.min(window.devicePixelRatio||1,2);
+  const W=Math.round(w*dpr),H=Math.round(w*LH/LW*dpr);if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}v.s=cv.width/LW;};
+ new ResizeObserver(fit).observe(cv);fit();v.fit=fit;return v;}
+function begin(v){v.fit();const c=v.ctx;c.setTransform(v.s,0,0,v.s,0,0);c.clearRect(0,0,v.LW,v.LH);return c;}
+function toLogical(v,e){const r=v.cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*v.LW,y:(e.clientY-r.top)/r.height*v.LH};}
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+const fmt=(x,d=0)=>x.toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d});
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+function gauss(r){let u=0,v=0;while(u===0)u=r();while(v===0)v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function setPlay(btn,on){btn.textContent=on?'Pause':'Start';}
+
+/* ---------- Diagramm-Helfer ---------- */
+function niceStep(max,n){const raw=max/n;const p=Math.pow(10,Math.floor(Math.log10(raw)));const f=raw/p;return (f<1.5?1:f<3?2:f<7?5:10)*p;}
+function drawGraph(v,o){const c=begin(v);const L=70,R=20,T=34,B=52;const w=v.LW-L-R,h=v.LH-T-B;
+ c.font='15px "Atkinson Hyperlegible",sans-serif';c.lineWidth=1;
+ const X=x=>L+x/o.xmax*w,Y=y=>T+h-y/o.ymax*h;
+ c.strokeStyle=C.line;c.fillStyle=C.mute;c.textAlign='right';c.textBaseline='middle';
+ for(let y=0;y<=o.ymax+1e-9;y+=o.ystep){c.beginPath();c.moveTo(L,Y(y));c.lineTo(L+w,Y(y));c.stroke();c.fillText(fmt(y)+(o.yunit||''),L-8,Y(y));}
+ const xs=niceStep(o.xmax,8);c.textAlign='center';c.textBaseline='top';
+ for(let x=0;x<=o.xmax+1e-9;x+=xs){c.beginPath();c.moveTo(X(x),T+h);c.lineTo(X(x),T+h+5);c.stroke();c.fillText(fmt(x),X(x),T+h+8);}
+ c.strokeStyle=C.ink;c.lineWidth=1.5;c.beginPath();c.moveTo(L,T);c.lineTo(L,T+h);c.lineTo(L+w,T+h);c.stroke();
+ c.fillStyle=C.ink;c.textAlign='center';c.fillText(o.xlabel,L+w/2,T+h+28);
+ c.save();c.translate(16,T+h/2);c.rotate(-Math.PI/2);c.textBaseline='middle';c.fillText(o.ylabel,0,0);c.restore();
+ if(o.eq!=null){c.setLineDash([6,6]);c.strokeStyle=C.mute;c.lineWidth=1.5;c.beginPath();c.moveTo(L,Y(o.eq));c.lineTo(L+w,Y(o.eq));c.stroke();c.setLineDash([]);
+  c.fillStyle=C.mute;c.textAlign='right';c.textBaseline='bottom';c.fillText(o.eqLabel||'',L+w-4,Y(o.eq)-3);}
+ c.save();c.beginPath();c.rect(L,T-4,w,h+8);c.clip();
+ for(const s of o.series){ if(s.ghost&&s.ghost.length){c.strokeStyle=s.color;c.globalAlpha=.25;c.lineWidth=2;c.beginPath();s.ghost.forEach((p,i)=>i?c.lineTo(X(p[0]),Y(p[1])):c.moveTo(X(p[0]),Y(p[1])));c.stroke();c.globalAlpha=1;}
+  if(s.pts.length){c.strokeStyle=s.color;c.lineWidth=3;c.lineJoin='round';c.beginPath();s.pts.forEach((p,i)=>i?c.lineTo(X(p[0]),Y(p[1])):c.moveTo(X(p[0]),Y(p[1])));c.stroke();
+   const p=s.pts[s.pts.length-1];c.fillStyle=s.color;c.beginPath();c.arc(X(p[0]),Y(p[1]),5,0,7);c.fill();}}
+ c.restore();
+ // Legende
+ c.textAlign='left';c.textBaseline='middle';let lx=L+10;
+ for(const s of o.series){c.fillStyle=s.color;c.fillRect(lx,12,22,5);c.fillStyle=C.ink;c.fillText(s.label,lx+28,15);lx+=c.measureText(s.label).width+52;}
+}
+
+/* =====================================================================
+   TAB 1 – STOFFEBENE: Diffusionsgleichung im Becherglas-Schnitt
+   ===================================================================== */
+const ETA={0:1.792,10:1.306,20:1.002,30:0.797,40:0.653,50:0.547,60:0.467,70:0.404,80:0.355}; // mPa·s, Wasser
+const D20=1.6e-5; // cm²/s, Näherung Permanganat
+const DofT=T=>D20*((T+273.15)/293.15)*(ETA[20]/ETA[T]);
+const T1={NX:72,NY:84,dx:1/12,t:0,run:false,b:[],v:null,lens:{on:false,x:250,y:430,p:[]}};
+const BW=300,BH=350; // 50 px/cm
+const BX=[95,505],BY=140;
+const CS=5,SRC_R=3; // Sättigungskonzentration (relativ), Radius des Kristalls in Zellen
+const MTOT=1130; // gelöste Stoffmenge (Zelleinheiten) -> Endkonzentration ~0.19
+['s1A','s1B'].forEach((id,k)=>{const s=$(id);Object.keys(ETA).forEach(T=>{if(+T>0){const o=document.createElement('option');o.value=T;o.textContent=T+' °C';s.appendChild(o);}});s.value=k?'60':'10';});
+function t1Init(){const {NX,NY}=T1;T1.t=0;T1.b=[0,1].map(k=>{const c=new Float32Array(NX*NY),n=new Float32Array(NX*NY);const src=[];
+  const ci=NX/2-0.5;for(let j=NY-SRC_R;j<NY;j++)for(let i=0;i<NX;i++){const dx=i-ci,dy=j-(NY-0.5);if(dx*dx+dy*dy<=SRC_R*SRC_R+1)src.push(j*NX+i);}
+  return{c,n,src,diss:0,T:+$(k?'s1B':'s1A').value};});
+ T1.off=document.createElement('canvas');T1.off.width=NX;T1.off.height=NY;T1.img=T1.off.getContext('2d').createImageData(NX,NY);}
+function t1Diffuse(b,dt){const {NX,NY,dx}=T1;const a=DofT(b.T)*dt/(dx*dx);const c=b.c,n=b.n;
+ for(let j=0;j<NY;j++){const jm=(j>0?j-1:0)*NX,jp=(j<NY-1?j+1:NY-1)*NX,jr=j*NX;
+  for(let i=0;i<NX;i++){const im=i>0?i-1:0,ip=i<NX-1?i+1:NX-1,k=jr+i;n[k]=c[k]+a*(c[jr+im]+c[jr+ip]+c[jm+i]+c[jp+i]-4*c[k]);}}
+ b.c=n;b.n=c;
+ if(b.diss<MTOT){for(const k of b.src){const add=CS-b.c[k];if(add>0){b.c[k]=CS;b.diss+=add;}}}}
+function t1Step(dtReal){const hps=+$('r1Speed').value;let tm=dtReal*hps*3600;
+ const Dmax=Math.max(DofT(T1.b[0].T),DofT(T1.b[1].T));const hmax=0.22*T1.dx*T1.dx/Dmax;const n=Math.ceil(tm/hmax);const h=tm/n;
+ for(let s=0;s<n;s++){T1.b.forEach(b=>t1Diffuse(b,h));}T1.t+=tm;}
+function t1Color(c){const f=1-Math.exp(-2.3*c);
+ // Wasser (hell) -> rosaviolett -> tiefviolett
+ let r,g,b;if(f<0.6){const u=f/0.6;r=232+(176-232)*u;g=242+(70-242)*u;b=247+(184-247)*u;}else{const u=(f-0.6)/0.4;r=176+(70-176)*u;g=70+(8-70)*u;b=184+(92-184)*u;}return[r,g,b];}
+function t1SampleC(p){for(let k=0;k<2;k++){const x0=BX[k];if(p.x>=x0&&p.x<x0+BW&&p.y>=BY&&p.y<BY+BH){const i=Math.floor((p.x-x0)/BW*T1.NX),j=Math.floor((p.y-BY)/BH*T1.NY);return T1.b[k].c[j*T1.NX+i];}}return null;}
+function t1Draw(){const v=T1.v,c=begin(v);const {NX,NY}=T1;c.font='17px "Atkinson Hyperlegible",sans-serif';
+ const h=T1.t/3600,d=Math.floor(h/24),hh=Math.floor(h%24),mm=Math.floor((h*60)%60);
+ c.fillStyle=C.ink;c.textAlign='center';c.textBaseline='top';c.font='700 19px "Atkinson Hyperlegible",sans-serif';
+ c.fillText('Modellzeit: '+(d?d+' d ':'')+hh+' h '+String(mm).padStart(2,'0')+' min',450,10);
+ T1.b.forEach((b,k)=>{const x0=BX[k];const d=T1.img.data;
+  for(let q=0;q<NX*NY;q++){const col=t1Color(b.c[q]);d[4*q]=col[0];d[4*q+1]=col[1];d[4*q+2]=col[2];d[4*q+3]=255;}
+  T1.off.getContext('2d').putImageData(T1.img,0,0);
+  c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';c.drawImage(T1.off,x0,BY,BW,BH);
+  // Kristall
+  const rem=Math.max(0,1-b.diss/MTOT);if(rem>0.001){const s=18*Math.sqrt(rem)+3;c.fillStyle='#3a0650';c.beginPath();
+   const cx=x0+BW/2,cy=BY+BH;c.moveTo(cx-s,cy);c.lineTo(cx-s*0.6,cy-s*0.8);c.lineTo(cx+s*0.2,cy-s);c.lineTo(cx+s,cy-s*0.45);c.lineTo(cx+s*0.8,cy);c.closePath();c.fill();}
+  // Becherglas
+  c.strokeStyle=C.ink;c.lineWidth=4;c.lineJoin='round';c.beginPath();c.moveTo(x0-6,BY-60);c.lineTo(x0-6,BY+BH+2);c.arcTo(x0-6,BY+BH+6,x0+10,BY+BH+6,10);
+  c.lineTo(x0+BW-10,BY+BH+6);c.arcTo(x0+BW+6,BY+BH+6,x0+BW+6,BY+BH-10,10);c.lineTo(x0+BW+6,BY-60);c.stroke();
+  c.beginPath();c.moveTo(x0-6,BY-60);c.lineTo(x0-16,BY-68);c.stroke();
+  c.strokeStyle=C.waterst;c.lineWidth=2;c.beginPath();c.moveTo(x0-4,BY);c.lineTo(x0+BW+4,BY);c.stroke();
+  c.fillStyle=C.ink;c.font='700 18px "Atkinson Hyperlegible",sans-serif';c.textAlign='center';c.fillText('Glas '+(k?'B':'A')+' · '+b.T+' °C',x0+BW/2,BY-48);
+  c.font='14px "Atkinson Hyperlegible",sans-serif';c.fillStyle=C.mute;c.fillText(rem>0.001?'Kristall löst sich ('+fmt(100*(1-rem))+' %)':'Kristall vollständig gelöst',x0+BW/2,BY-24);
+ });
+ // Maßstab
+ c.strokeStyle=C.mute;c.lineWidth=2;c.beginPath();c.moveTo(BX[0],BY+BH+30);c.lineTo(BX[0]+50,BY+BH+30);c.stroke();
+ c.fillStyle=C.mute;c.font='14px "Atkinson Hyperlegible",sans-serif';c.textAlign='left';c.textBaseline='middle';c.fillText('1 cm',BX[0]+58,BY+BH+30);
+ if(T1.lens.on)t1DrawLens(c);}
+function t1DrawLens(c){const L=T1.lens;const p={x:L.x,y:L.y};const conc=t1SampleC(p);const R=74;
+ let lx=Math.min(Math.max(p.x+(p.x<450?130:-130),R+6),900-R-6),ly=Math.min(Math.max(p.y-60,R+40),540-R-6);
+ c.strokeStyle=C.ink;c.lineWidth=2;c.beginPath();c.arc(p.x,p.y,10,0,7);c.stroke();
+ const dx=lx-p.x,dy=ly-p.y,dd=Math.hypot(dx,dy)||1;c.beginPath();c.moveTo(p.x+dx/dd*10,p.y+dy/dd*10);c.lineTo(lx-dx/dd*R,ly-dy/dd*R);c.stroke();
+ c.save();c.beginPath();c.arc(lx,ly,R,0,7);c.fillStyle=C.box;c.fill();c.clip();
+ if(conc!=null){const nD=Math.min(23,Math.round(conc*4.6));
+  L.p.forEach((q,i)=>{q.x+=gauss(Math.random)*0.035;q.y+=gauss(Math.random)*0.035;const r=Math.hypot(q.x,q.y);if(r>0.93){q.x*=0.9/r;q.y*=0.9/r;}
+   const isD=i<nD;c.beginPath();c.arc(lx+q.x*R,ly+q.y*R,isD?7.5:5,0,7);c.fillStyle=isD?C.dye:C.water;c.fill();if(isD){c.strokeStyle=C.dyest;c.lineWidth=1.2;c.stroke();}});}
+ c.restore();c.strokeStyle=C.ink;c.lineWidth=4;c.beginPath();c.arc(lx,ly,R,0,7);c.stroke();
+ c.fillStyle=C.ink;c.font='700 13px "Atkinson Hyperlegible",sans-serif';c.textAlign='center';c.textBaseline='top';
+ c.fillText(conc==null?'Lupe ins Wasser ziehen':'Teilchenebene (Modell)',lx,ly+R+5);}
+for(let i=0;i<46;i++){let x,y;do{x=Math.random()*2-1;y=Math.random()*2-1;}while(x*x+y*y>0.8);T1.lens.p.push({x,y});}
+function t1Frame(dt){if(T1.run)t1Step(dt);t1Draw();}
+T1.v=makeView('cv1',900,540);t1Init();
+$('o1Speed').textContent=$('r1Speed').value+' h/s';
+$('r1Speed').oninput=e=>$('o1Speed').textContent=e.target.value+' h/s';
+$('b1Play').onclick=()=>{T1.run=!T1.run;setPlay($('b1Play'),T1.run);};
+$('b1Reset').onclick=()=>{t1Init();};
+$('s1A').onchange=e=>T1.b[0].T=+e.target.value;$('s1B').onchange=e=>T1.b[1].T=+e.target.value;
+$('b1Lens').onclick=()=>{T1.lens.on=!T1.lens.on;$('b1Lens').setAttribute('aria-pressed',T1.lens.on);T1.v.cv.style.touchAction=T1.lens.on?'none':'pan-y';};
+T1.v.cv.addEventListener('pointerdown',e=>{if(!T1.lens.on)return;const p=toLogical(T1.v,e);T1.lens.x=p.x;T1.lens.y=p.y;});
+T1.v.cv.addEventListener('pointermove',e=>{if(!T1.lens.on)return;if(e.pointerType==='mouse'||e.buttons){const p=toLogical(T1.v,e);T1.lens.x=p.x;T1.lens.y=p.y;}});
+
+/* =====================================================================
+   TEILCHENMODELL (Tab 2 und Tab 3A): harte Scheiben, elastische Stöße
+   ===================================================================== */
+const RW=5,RD=7,MD=4,V0=62,WT=3;
+function boxInit(W,H,nW,nD,gap,seed){const rnd=mulberry32(seed);const N=nW+nD;
+ const b={W,H,N,nD,x:new Float32Array(N),y:new Float32Array(N),vx:new Float32Array(N),vy:new Float32Array(N),r:new Float32Array(N),m:new Float32Array(N),
+  side:new Uint8Array(N),wallOn:true,gap,t:0,ev:[],trail:[],speedF:1,next:new Int32Array(N),head:null};
+ const mid=W/2;let placed=0;
+ const place=(i,rad,xmin,xmax)=>{for(let a=0;a<6000;a++){const x=xmin+rad+rnd()*(xmax-xmin-2*rad),y=rad+rnd()*(H-2*rad);
+   if(Math.abs(x-mid)<rad+WT+1)continue;let ok=true;for(let j=0;j<placed;j++){const dx=b.x[j]-x,dy=b.y[j]-y,q=b.r[j]+rad+0.5;if(dx*dx+dy*dy<q*q){ok=false;break;}}
+   if(ok){b.x[i]=x;b.y[i]=y;return;}}b.x[i]=xmin+rad;b.y[i]=rad;};
+ for(let i=0;i<N;i++){const d=i<nD;b.r[i]=d?RD:RW;b.m[i]=d?MD:1;place(i,b.r[i],0,d?mid:W);placed++;
+  const s=V0/Math.sqrt(b.m[i]);b.vx[i]=gauss(rnd)*s;b.vy[i]=gauss(rnd)*s;b.side[i]=b.x[i]<mid?0:1;}
+ return b;}
+function boxClone(b){const o=Object.assign({},b);['x','y','vx','vy','r','m','side'].forEach(k=>o[k]=b[k].slice());o.next=new Int32Array(b.N);o.head=null;o.ev=[];o.trail=[];return o;}
+function boxMove(b,h){const {W,H,N}=b,mid=W/2;
+ for(let i=0;i<N;i++){const r=b.r[i];const px=b.x[i];let x=px+b.vx[i]*h,y=b.y[i]+b.vy[i]*h;
+  if(x<r){x=r;b.vx[i]=Math.abs(b.vx[i]);}else if(x>W-r){x=W-r;b.vx[i]=-Math.abs(b.vx[i]);}
+  if(y<r){y=r;b.vy[i]=Math.abs(b.vy[i]);}else if(y>H-r){y=H-r;b.vy[i]=-Math.abs(b.vy[i]);}
+  if(b.wallOn){const inGap=b.gap>0&&Math.abs(y-H/2)<b.gap/2-r*0.5;
+   if(!inGap){const lim=WT+r;if(Math.abs(x-mid)<lim){if(px<mid){x=mid-lim;if(b.vx[i]>0)b.vx[i]=-b.vx[i];}else{x=mid+lim;if(b.vx[i]<0)b.vx[i]=-b.vx[i];}}}}
+  b.x[i]=x;b.y[i]=y;}}
+function boxCollide(b){const cs=16,gw=Math.ceil(b.W/cs),gh=Math.ceil(b.H/cs);
+ if(!b.head||b.head.length!==gw*gh)b.head=new Int32Array(gw*gh);const head=b.head,next=b.next;head.fill(-1);
+ const {x,y,vx,vy,r,m,N}=b;
+ for(let i=0;i<N;i++){const cx=Math.min(gw-1,Math.max(0,(x[i]/cs)|0)),cy=Math.min(gh-1,Math.max(0,(y[i]/cs)|0));const k=cy*gw+cx;next[i]=head[k];head[k]=i;}
+ for(let i=0;i<N;i++){const cx=Math.min(gw-1,Math.max(0,(x[i]/cs)|0)),cy=Math.min(gh-1,Math.max(0,(y[i]/cs)|0));
+  for(let oy=-1;oy<=1;oy++){const yy=cy+oy;if(yy<0||yy>=gh)continue;
+   for(let ox=-1;ox<=1;ox++){const xx=cx+ox;if(xx<0||xx>=gw)continue;
+    for(let j=head[yy*gw+xx];j!==-1;j=next[j]){if(j<=i)continue;
+     const dx=x[j]-x[i],dy=y[j]-y[i],q=r[i]+r[j],d2=dx*dx+dy*dy;if(d2>=q*q||d2<1e-9)continue;
+     const d=Math.sqrt(d2),nx=dx/d,ny=dy/d,mi=m[i],mj=m[j],mt=mi+mj,ov=q-d;
+     x[i]-=nx*ov*mj/mt;y[i]-=ny*ov*mj/mt;x[j]+=nx*ov*mi/mt;y[j]+=ny*ov*mi/mt;
+     const vr=(vx[j]-vx[i])*nx+(vy[j]-vy[i])*ny;
+     if(vr<0){const J=2*vr/(1/mi+1/mj);vx[i]+=J*nx/mi;vy[i]+=J*ny/mi;vx[j]-=J*nx/mj;vy[j]-=J*ny/mj;}}}}}}
+function boxThermo(b){let ke=0;for(let i=0;i<b.N;i++)ke+=0.5*b.m[i]*(b.vx[i]*b.vx[i]+b.vy[i]*b.vy[i]);
+ const target=b.N*V0*V0*b.speedF*b.speedF;if(ke<=0)return;const f=1+(Math.sqrt(target/ke)-1)*0.08;
+ for(let i=0;i<b.N;i++){b.vx[i]*=f;b.vy[i]*=f;}}
+function boxStep(b,dt){const sub=Math.max(1,Math.ceil(dt*b.speedF*130));const h=dt/sub;const mid=b.W/2;
+ for(let s=0;s<sub;s++){boxMove(b,h);boxCollide(b);b.t+=h;
+  for(let i=0;i<b.nD;i++){const sd=b.x[i]<mid?0:1;if(sd!==b.side[i]){b.ev.push({t:b.t,d:sd?1:-1});b.side[i]=sd;}}}
+ boxThermo(b);while(b.ev.length&&b.ev[0].t<b.t-5)b.ev.shift();
+ if(b.track){b.trail.push(b.x[0],b.y[0]);if(b.trail.length>1600)b.trail.splice(0,2);}}
+function boxCounts(b){let R=0;for(let i=0;i<b.nD;i++)if(b.side[i])R++;let lr=0,rl=0;for(const e of b.ev){if(e.d>0)lr++;else rl++;}return{L:b.nD-R,R,lr,rl};}
+function boxDraw(c,b,ox,oy,o={}){c.save();c.translate(ox,oy);
+ c.fillStyle=C.box;c.fillRect(0,0,b.W,b.H);
+ const {x,y,r,N,nD}=b;
+ if(o.water!==false){c.fillStyle=C.water;c.beginPath();for(let i=nD;i<N;i++){c.moveTo(x[i]+r[i],y[i]);c.arc(x[i],y[i],r[i],0,6.2832);}c.fill();}
+ c.fillStyle=C.dye;c.strokeStyle=C.dyest;c.lineWidth=1.2;c.beginPath();for(let i=0;i<nD;i++){c.moveTo(x[i]+r[i],y[i]);c.arc(x[i],y[i],r[i],0,6.2832);}c.fill();c.stroke();
+ if(b.track&&b.trail.length>2){c.strokeStyle=C.acc;c.lineWidth=2;c.lineJoin='round';c.beginPath();c.moveTo(b.trail[0],b.trail[1]);for(let k=2;k<b.trail.length;k+=2)c.lineTo(b.trail[k],b.trail[k+1]);c.stroke();
+  c.fillStyle=C.acc;c.strokeStyle=C.ink;c.lineWidth=2;c.beginPath();c.arc(x[0],y[0],r[0]+2,0,7);c.fill();c.stroke();}
+ const mid=b.W/2;
+ if(b.wallOn){c.fillStyle=C.wall;if(b.gap>0){const g0=b.H/2-b.gap/2,g1=b.H/2+b.gap/2;c.fillRect(mid-WT,0,2*WT,g0);c.fillRect(mid-WT,g1,2*WT,b.H-g1);}else c.fillRect(mid-WT,0,2*WT,b.H);}
+ else{c.setLineDash([6,8]);c.strokeStyle=C.mute;c.lineWidth=1.5;c.beginPath();c.moveTo(mid,0);c.lineTo(mid,b.H);c.stroke();c.setLineDash([]);}
+ c.strokeStyle=C.boxst;c.lineWidth=2;c.strokeRect(0,0,b.W,b.H);c.restore();}
+
+/* =====================================================================
+   TAB 2 – TEILCHENEBENE
+   ===================================================================== */
+const T2={run:false,b:null,v:null,seed:7};
+function t2Init(){T2.b=boxInit(900,400,1000,80,0,T2.seed++);T2.b.speedF=t2Speed();T2.b.track=$('c2Track').checked;$('b2Wall').textContent='Trennwand entfernen';}
+function t2Speed(){return 0.5+(+$('r2Temp').value)/40;}
+function t2Frame(dt){const b=T2.b;if(T2.run)boxStep(b,dt);
+ const c=begin(T2.v);boxDraw(c,b,0,0,{water:$('c2Water').checked});
+ // Verteilung
+ const nb=12,cnt=new Array(nb).fill(0);for(let i=0;i<b.nD;i++)cnt[Math.min(nb-1,Math.floor(b.x[i]/b.W*nb))]++;
+ const y0=450,hh=100,bw=b.W/nb,maxC=b.nD/3.5;c.fillStyle=C.ink;c.font='700 15px "Atkinson Hyperlegible",sans-serif';c.textAlign='left';c.textBaseline='top';
+ c.fillText('Verteilung der Farbstoffteilchen (Anzahl je Abschnitt)',0,y0-38);
+ c.strokeStyle=C.line;c.lineWidth=1;c.beginPath();c.moveTo(0,y0+hh);c.lineTo(900,y0+hh);c.stroke();
+ const eq=b.nD/nb;c.setLineDash([5,6]);c.strokeStyle=C.mute;c.beginPath();c.moveTo(0,y0+hh-eq/maxC*hh);c.lineTo(900,y0+hh-eq/maxC*hh);c.stroke();c.setLineDash([]);
+ c.fillStyle=C.mute;c.font='13px "Atkinson Hyperlegible",sans-serif';c.textAlign='right';c.textBaseline='bottom';c.fillText('gleichmäßige Verteilung',898,y0+hh-eq/maxC*hh-2);
+ for(let k=0;k<nb;k++){const hk=Math.min(hh,cnt[k]/maxC*hh);c.fillStyle=C.dye;c.globalAlpha=.85;c.fillRect(k*bw+6,y0+hh-hk,bw-12,hk);c.globalAlpha=1;
+  c.fillStyle=C.ink;c.textAlign='center';c.textBaseline='bottom';c.font='13px "Atkinson Hyperlegible",sans-serif';c.fillText(cnt[k],k*bw+bw/2,y0+hh-hk-2);}
+ const s=boxCounts(b);const net=s.lr-s.rl;
+ $('st2').innerHTML=`Farbstoffteilchen: links <b>${s.L}</b> · rechts <b>${s.R}</b><br>Übergänge in den letzten 5 s: links → rechts <b>${s.lr}</b> · rechts → links <b>${s.rl}</b> · Netto <b>${net>0?'+':''}${net}</b> ${b.wallOn?'(Trennwand geschlossen)':''}`;}
+T2.v=makeView('cv2',900,560);t2Init();
+$('o2Temp').textContent=$('r2Temp').value+' °C';
+$('r2Temp').oninput=e=>{$('o2Temp').textContent=e.target.value+' °C';T2.b.speedF=t2Speed();};
+$('b2Play').onclick=()=>{T2.run=!T2.run;setPlay($('b2Play'),T2.run);};
+$('b2Wall').onclick=()=>{const b=T2.b;b.wallOn=!b.wallOn;$('b2Wall').textContent=b.wallOn?'Trennwand entfernen':'Trennwand einsetzen';
+ if(!T2.run){T2.run=true;setPlay($('b2Play'),true);}};
+$('b2Reset').onclick=()=>{t2Init();};
+$('c2Track').onchange=e=>{T2.b.track=e.target.checked;T2.b.trail=[];};
+
+/* =====================================================================
+   TAB 3A – KONTAKTFLÄCHE
+   ===================================================================== */
+const gp=g=>Math.round(g/3)+' %';
+const T3A={run:false,b:[],v:null,vg:null,ser:[[],[]],lastS:0,seed:101};
+function t3aInit(){const b1=boxInit(430,300,200,70,+$('r3g1').value,T3A.seed++);const b2=boxClone(b1);b2.gap=+$('r3g2').value;
+ T3A.b=[b1,b2];T3A.ser=[[[0,0]],[[0,0]]];T3A.lastS=0;}
+function t3aFrame(dt){if(T3A.run){T3A.b.forEach(b=>boxStep(b,3*dt));const t=T3A.b[0].t;
+  if(t-T3A.lastS>=0.25){T3A.lastS=t;T3A.b.forEach((b,k)=>T3A.ser[k].push([t,100*boxCounts(b).R/b.nD]));}}
+ const c=begin(T3A.v);c.font='700 17px "Atkinson Hyperlegible",sans-serif';c.textBaseline='top';
+ T3A.b.forEach((b,k)=>{const ox=k?470:0;c.fillStyle=k?C.acc:C.pri;c.textAlign='left';
+  c.fillText('Kammer '+(k+1)+': Öffnung '+gp(b.gap),ox,4);const s=boxCounts(b);
+  c.fillStyle=C.mute;c.font='14px "Atkinson Hyperlegible",sans-serif';c.textAlign='right';c.fillText('rechts: '+s.R+' von '+b.nD,ox+430,7);c.font='700 17px "Atkinson Hyperlegible",sans-serif';
+  boxDraw(c,b,ox,32);});
+ const t=T3A.b[0].t;const xmax=Math.max(30,Math.ceil(t/15)*15);
+ drawGraph(T3A.vg,{xmax,ymax:60,ystep:10,yunit:' %',xlabel:'Zeit in s',ylabel:'Farbstoffteilchen rechts',eq:50,eqLabel:'Gleichverteilung (50 %)',
+  series:[{pts:T3A.ser[0],color:C.pri,label:'Kammer 1 (Öffnung '+gp(T3A.b[0].gap)+')'},{pts:T3A.ser[1],color:C.acc,label:'Kammer 2 (Öffnung '+gp(T3A.b[1].gap)+')'}]});
+ const s1=boxCounts(T3A.b[0]),s2=boxCounts(T3A.b[1]);
+ $('st3a').innerHTML=`Übergänge links → rechts in den letzten 5 s: Kammer 1 <b>${s1.lr}</b> · Kammer 2 <b>${s2.lr}</b><br>Öffnungsverhältnis Kammer 2 : Kammer 1 = <b>${fmt(T3A.b[1].gap/T3A.b[0].gap,1)}</b> : 1`;}
+T3A.v=makeView('cv3a',900,336);T3A.vg=makeView('cv3ag',900,300);t3aInit();
+const g3=()=>{$('o3g1').textContent=gp($('r3g1').value);$('o3g2').textContent=gp($('r3g2').value);};g3();
+$('r3g1').oninput=e=>{T3A.b[0].gap=+e.target.value;g3();};
+$('r3g2').oninput=e=>{T3A.b[1].gap=+e.target.value;g3();};
+$('b3aPlay').onclick=()=>{T3A.run=!T3A.run;setPlay($('b3aPlay'),T3A.run);};
+$('b3aReset').onclick=()=>{t3aInit();};
+
+/* =====================================================================
+   TAB 3B – WÜRFELVERSUCH (exakte Lösung, Produktansatz)
+   c(x,y,z,t) = 1 − θ(x)·θ(y)·θ(z), θ = 1D-Lösung für eine Platte der Dicke a
+   ===================================================================== */
+const DC=0.008; // cm²/min
+function erf(x){const s=x<0?-1:1;x=Math.abs(x);const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y;}
+function theta(x,a,t){if(t<=0)return(x<=0||x>=a)?0:1;const tau=DC*t/(a*a);
+ if(tau<0.02){const s=2*Math.sqrt(DC*t);return erf(x/s)*erf((a-x)/s);}
+ let s=0;for(let n=1;n<200;n+=2){const e=Math.exp(-n*n*Math.PI*Math.PI*tau);if(e<1e-7)break;s+=4/(n*Math.PI)*Math.sin(n*Math.PI*x/a)*e;}return s;}
+function thetaMean(a,t){if(t<=0)return 1;const tau=DC*t/(a*a);if(tau<0.02)return 1-4*Math.sqrt(tau/Math.PI);
+ let s=0;for(let n=1;n<200;n+=2){const e=Math.exp(-n*n*Math.PI*Math.PI*tau);if(e<1e-9)break;s+=8/(n*n*Math.PI*Math.PI)*e;}return s;}
+const uptake=(a,t)=>1-Math.pow(thetaMean(a,t),3);
+function tFor(a,f){let lo=0,hi=1000;for(let k=0;k<60;k++){const m=(lo+hi)/2;if(uptake(a,m)<f)lo=m;else hi=m;}return hi;}
+const T3B={run:false,t:0,v:null,vg:null,mode:1,res:56,off:null,lastTbl:0};
+function t3bSetup(){T3B.mode=+$('s3mode').value;T3B.t=0;
+ T3B.items=T3B.mode===1?[{a:1,n:1,label:'Würfel 1 cm',col:'pri'},{a:2,n:1,label:'Würfel 2 cm',col:'acc'},{a:3,n:1,label:'Würfel 3 cm',col:'c3'}]
+  :[{a:2,n:1,label:'1 Würfel à 2 cm',col:'acc'},{a:1,n:8,label:'8 Würfel à 1 cm',col:'pri'}];
+ const amax=Math.max(...T3B.items.map(i=>i.a));T3B.tmax=Math.ceil(tFor(amax,0.97)/5)*5;
+ T3B.items.forEach(it=>{it.t90=tFor(it.a,0.9);it.ghost=[];for(let k=0;k<=200;k++){const t=T3B.tmax*k/200;it.ghost.push([t,100*uptake(it.a,t)]);}it.pts=[[0,0]];});
+ T3B.lastTbl=-1;}
+function t3bCross(a){const R=T3B.res;if(!T3B.off){T3B.off=document.createElement('canvas');T3B.off.width=R;T3B.off.height=R;T3B.img=T3B.off.getContext('2d').createImageData(R,R);}
+ const th=new Float32Array(R);for(let i=0;i<R;i++)th[i]=theta((i+0.5)/R*a,a,T3B.t);const tz=theta(a/2,a,T3B.t);const d=T3B.img.data;
+ for(let j=0;j<R;j++)for(let i=0;i<R;i++){const c=1-th[i]*th[j]*tz;const f=Math.pow(Math.max(0,Math.min(1,c)),0.85);const q=4*(j*R+i);
+  d[q]=246+(112-246)*f;d[q+1]=240+(28-240)*f;d[q+2]=214+(150-214)*f;d[q+3]=255;}
+ T3B.off.getContext('2d').putImageData(T3B.img,0,0);return T3B.off;}
+function t3bDrawCube(c,x,y,a,px,label,col){const s=a*px;const img=t3bCross(a);c.imageSmoothingEnabled=true;c.drawImage(img,x,y-s,s,s);
+ c.strokeStyle=C.ink;c.lineWidth=2;c.strokeRect(x,y-s,s,s);}
+function t3bFrame(dt){if(T3B.run){T3B.t=Math.min(T3B.tmax,T3B.t+dt*(+$('r3bSpeed').value));if(T3B.t>=T3B.tmax){T3B.run=false;setPlay($('b3bPlay'),false);}}
+ const t=T3B.t;T3B.items.forEach(it=>{const last=it.pts[it.pts.length-1];if(t>last[0]+T3B.tmax/300||t<last[0])it.pts.push([t,100*uptake(it.a,t)]);if(t<last[0])it.pts=[[0,0]];});
+ const v=T3B.v,c=begin(v);const px=72;
+ // Lösung
+ c.fillStyle='rgb(214,176,232)';rr(c,10,40,880,300,16);c.fill();
+ c.fillStyle='#3d1052';c.font='14px "Atkinson Hyperlegible",sans-serif';c.textAlign='left';c.textBaseline='top';c.fillText('Farbstofflösung · Schnitt durch die Würfelmitte',24,50);
+ c.fillStyle=C.ink;c.font='700 19px "Atkinson Hyperlegible",sans-serif';c.textAlign='center';c.fillText('Modellzeit: '+fmt(t,1)+' min',450,8);
+ const base=300;c.font='700 16px "Atkinson Hyperlegible",sans-serif';c.textBaseline='top';
+ if(T3B.mode===1){let x=(900-(6*px+2*70))/2;T3B.items.forEach(it=>{t3bDrawCube(c,x,base,it.a,px);c.fillStyle='#2a0a3a';c.fillText('a = '+it.a+' cm',x+it.a*px/2,base+8);x+=it.a*px+70;});}
+ else{const big=T3B.items[0];let x=120;t3bDrawCube(c,x,base,2,px);c.fillStyle='#2a0a3a';c.fillText('1 Würfel, a = 2 cm',x+px,base+8);
+  const x0=430,g=14;for(let k=0;k<8;k++){const cx=x0+(k%4)*(px+g),cy=base-(k<4?px+g:0);t3bDrawCube(c,cx,cy,1,px);}
+  c.fillText('8 Würfel, a = 1 cm (gleiches Gesamtvolumen)',x0+2*(px+g)-g/2,base+8);}
+ // Maßstab
+ c.strokeStyle='#2a0a3a';c.lineWidth=2;c.beginPath();c.moveTo(800,base+20);c.lineTo(800+px,base+20);c.stroke();c.font='13px "Atkinson Hyperlegible",sans-serif';c.fillStyle='#2a0a3a';c.fillText('1 cm',800+px/2,base+24);
+ drawGraph(T3B.vg,{xmax:T3B.tmax,ymax:100,ystep:20,yunit:' %',xlabel:'Zeit in min',ylabel:'Farbstoffaufnahme',
+  series:T3B.items.map(it=>({pts:it.pts,ghost:it.ghost,color:C[it.col],label:it.label}))});
+ if(performance.now()-T3B.lastTbl>150){T3B.lastTbl=performance.now();t3bTable();}}
+function t3bTable(){const rows=T3B.items.map(it=>{const A=6*it.a*it.a*it.n,V=Math.pow(it.a,3)*it.n;
+  return `<tr><td><span class="sw" style="background:${C[it.col]}"></span>${it.label}</td><td>${fmt(A)} cm²</td><td>${fmt(V)} cm³</td><td><b>${fmt(A/V,2)}</b> cm⁻¹</td><td>${fmt(100*uptake(it.a,T3B.t))} %</td><td>${fmt(it.t90,1)} min</td></tr>`;}).join('');
+ $('tb3b').innerHTML=`<thead><tr><th>Probe</th><th>Oberfläche A</th><th>Volumen V</th><th>A/V</th><th>Aufnahme</th><th>Zeit bis 90 % Aufnahme</th></tr></thead><tbody>${rows}</tbody>`;}
+T3B.v=makeView('cv3b',900,350);T3B.vg=makeView('cv3bg',900,300);t3bSetup();
+$('o3bSpeed').textContent=$('r3bSpeed').value+' min/s';
+$('r3bSpeed').oninput=e=>$('o3bSpeed').textContent=e.target.value+' min/s';
+$('b3bPlay').onclick=()=>{if(T3B.t>=T3B.tmax)t3bSetup();T3B.run=!T3B.run;setPlay($('b3bPlay'),T3B.run);};
+$('b3bReset').onclick=()=>{t3bSetup();T3B.run=false;setPlay($('b3bPlay'),false);};
+$('s3mode').onchange=()=>{t3bSetup();T3B.run=false;setPlay($('b3bPlay'),false);};
+
+/* ---------- Reiter ---------- */
+let active=0,sub3='A';
+document.querySelectorAll('.tab').forEach((t,k)=>t.onclick=()=>{active=k;
+ document.querySelectorAll('.tab').forEach((u,j)=>u.setAttribute('aria-selected',j===k));
+ document.querySelectorAll('.panel').forEach((p,j)=>p.hidden=j!==k);});
+function setSub(m){sub3=m;$('m3A').setAttribute('aria-pressed',m==='A');$('m3B').setAttribute('aria-pressed',m==='B');
+ $('v3A').hidden=$('i3A').hidden=m!=='A';$('v3B').hidden=$('i3B').hidden=m!=='B';}
+$('m3A').onclick=()=>setSub('A');$('m3B').onclick=()=>setSub('B');
+
+let last=performance.now();
+function loop(now){const dt=Math.min(0.05,Math.max(0,(now-last)/1000));last=now;
+ try{if(active===0)t1Frame(dt);else if(active===1)t2Frame(dt);else if(sub3==='A')t3aFrame(dt);else t3bFrame(dt);}catch(e){console.error(e);}
+ requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

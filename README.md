@@ -24,6 +24,7 @@ git clone https://github.com/makro5652/animationen.git
 | Reaktionsgleichungen ausgleichen | [`reaktionsgleichungen.html`](reaktionsgleichungen.html) |
 | Strukturformel-Editor | [`strukturformel-editor.html`](strukturformel-editor.html) |
 | Teilchen- und Gitter-Simulation | [`Teilchenmodell_Anziehung.html`](Teilchenmodell_Anziehung.html) |
+| Diffusion: Stoffebene, Teilchenebene, Kontaktfläche und Oberfläche-Volumen-Verhältnis | [`diffusion.html`](diffusion.html) |
 | Schalenmodell | [`schalenmodell.html`](schalenmodell.html) |
 | Bindungslabor | [`Bindungslabor.html`](Bindungslabor.html) |
 | Ionen-Puzzle: Verhältnisformeln von Salzen (Atom- und Molekül-Ionen) | [`ionen-puzzle.html`](ionen-puzzle.html) |
