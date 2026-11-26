@@ -56,6 +56,7 @@ git clone https://github.com/makro5652/animationen.git
 | Membranfluss und Vesikeltransport | [`Membranfluss.html`](Membranfluss.html) |
 | Mitose im Zellzyklus | [`mitose-red.html`](mitose-red.html) |
 | Meiose und Keimzellbildung | [`meiose.html`](meiose.html) |
+| Mendelsche Regeln – Arbeitsblatt-App mit Kreuzungsquadraten und PDF-Export | [`mendel-regeln.html`](mendel-regeln.html) |
 | Stammbaumanalyse | [`stammbaumanalyse.html`](stammbaumanalyse.html) |
 | Stammbaumanalyse – Selbstlernkurs (3 Niveaus, geführte Fälle, Training, Quiz) | [`stammbaum-selbstlernkurs.html`](stammbaum-selbstlernkurs.html) |
 | DNA-Baukasten | [`DNA-Baukasten.html`](DNA-Baukasten.html) |

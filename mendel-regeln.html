@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Die Mendelschen Regeln – Arbeitsblatt-App</title>
+<meta name="description" content="Digitales Arbeitsblatt zu den Mendelschen Regeln: Kreuzungsquadrate, Uniformitäts-, Spaltungs- und Unabhängigkeitsregel, Kreuzungslabor mit Simulation, Aufgabenauswahl und PDF-Export – differenziert für Realschule und Gymnasium.">
+<style>
+:root{
+  --bg:#F4F5F0; --surface:#FFFFFF; --sunk:#EBEDE6; --ink:#1C2430; --muted:#5A6472; --line:#D3D8CE;
+  --accent:#2E7D46; --accent-soft:#E2F0E5; --on-accent:#fff;
+  --aff:#2B3443; --hl:#D98A00; --hl-soft:#FCEFD3; --ok:#1E7A4C; --ok-soft:#DFF2E7; --bad:#B4372B; --bad-soft:#F8E2DE;
+  --lvR:#0F7C86; --lvG:#2D5FB8; --lvO:#7A47A8;
+  --lv:var(--lvR);
+  --r:12px; --shadow:0 1px 2px rgba(20,30,40,.06),0 4px 14px rgba(20,30,40,.05);
+  --sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+body[data-level="G"]{--lv:var(--lvG)} body[data-level="O"]{--lv:var(--lvO)}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55;-webkit-tap-highlight-color:transparent}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer;touch-action:manipulation}
+:focus-visible{outline:3px solid var(--lv);outline-offset:2px}
+sub{font-size:.7em;line-height:0}
+h1,h2,h3,h4{line-height:1.2;margin:0;text-wrap:balance}
+h2{font-size:1.55rem} h3{font-size:1.18rem} h4{font-size:1.02rem}
+p{margin:0}
+.muted{color:var(--muted)}
+
+/* Kopf */
+.top{position:sticky;top:0;z-index:30;background:rgba(244,245,240,.94);backdrop-filter:saturate(1.4) blur(8px);-webkit-backdrop-filter:saturate(1.4) blur(8px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+.bar{max-width:1160px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:10px 16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 220px}
+.brand a{color:var(--muted);text-decoration:none;font-size:.85rem;white-space:nowrap}
+.brand h1{font-size:1.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.levels{display:flex;background:var(--sunk);border-radius:999px;padding:3px;gap:2px}
+.levels button{border:0;background:transparent;border-radius:999px;padding:8px 14px;min-height:40px;font-weight:600;font-size:.92rem;color:var(--muted)}
+.levels button[aria-pressed="true"]{background:var(--surface);color:var(--lv);box-shadow:var(--shadow)}
+.pts{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-weight:700;min-height:40px;font-variant-numeric:tabular-nums}
+.pts .star{color:var(--hl)}
+.iconbtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;min-height:40px;padding:6px 14px;font-weight:600;font-size:.92rem}
+nav.tabs{max-width:1160px;margin:0 auto;display:flex;gap:4px;padding:0 12px 8px;overflow-x:auto;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs button{flex:0 0 auto;border:1px solid transparent;background:transparent;border-radius:10px;padding:8px 14px;min-height:44px;font-weight:600;color:var(--muted);white-space:nowrap}
+nav.tabs button .n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--sunk);font-size:.8rem;margin-right:6px}
+nav.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);border-color:var(--line);box-shadow:var(--shadow)}
+nav.tabs button[aria-selected="true"] .n{background:var(--lv);color:#fff}
+nav.tabs button .chk{color:var(--ok);margin-left:6px}
+
+main{max-width:1160px;margin:0 auto;padding:20px 16px calc(60px + env(safe-area-inset-bottom))}
+.lvbadge{display:inline-block;font-size:.74rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:var(--lv);border-radius:6px;padding:2px 8px;vertical-align:middle}
+.eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--lv);margin-bottom:4px}
+.section-head{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
+.section-head p{max-width:72ch;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
+.stack{display:flex;flex-direction:column;gap:16px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:860px){.grid2,.grid3{grid-template-columns:1fr}}
+.card h3{margin-bottom:8px}
+.card p+p{margin-top:8px}
+ul.clean{margin:6px 0 0;padding-left:1.2em} ul.clean li{margin:4px 0}
+.note{border-left:4px solid var(--lv);background:color-mix(in srgb,var(--lv) 7%,white);padding:10px 14px;border-radius:0 10px 10px 0}
+.warn{border-left:4px solid var(--hl);background:var(--hl-soft);padding:10px 14px;border-radius:0 10px 10px 0}
+.proof{border-left:4px solid var(--ok);background:var(--ok-soft);padding:10px 14px;border-radius:0 10px 10px 0}
+.merke{border:2px solid var(--lv);border-radius:12px;padding:12px 16px;background:var(--surface)}
+.merke b.t{display:block;color:var(--lv);font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+
+/* Buttons */
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 16px;min-height:46px;font-weight:600}
+.btn:hover{border-color:var(--lv)}
+.btn.primary{background:var(--lv);border-color:var(--lv);color:#fff}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.45;cursor:default}
+.btnrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.chip{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;min-height:44px;font-weight:600}
+.chip[aria-pressed="true"]{border-color:var(--lv);background:color-mix(in srgb,var(--lv) 12%,white);color:var(--lv)}
+.chip.ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+.chip.bad{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
+.opt{display:block;width:100%;text-align:left;border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:12px 14px;min-height:48px;margin:8px 0}
+.opt[aria-pressed="true"]{border-color:var(--lv);background:color-mix(in srgb,var(--lv) 9%,white)}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.fb{margin-top:12px;padding:12px 14px;border-radius:10px;display:none}
+.fb.show{display:block}
+.fb.ok{background:var(--ok-soft);border:1px solid color-mix(in srgb,var(--ok) 40%,white)}
+.fb.bad{background:var(--bad-soft);border:1px solid color-mix(in srgb,var(--bad) 40%,white)}
+.fb.info{background:var(--hl-soft);border:1px solid color-mix(in srgb,var(--hl) 40%,white)}
+.fb b.v{display:block;margin-bottom:2px}
+
+/* Stammbaum */
+.ped{width:100%;height:auto;display:block;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.pedwrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:8px;overflow-x:auto}
+.pedwrap.grid-bg{background-image:linear-gradient(var(--sunk) 1px,transparent 1px),linear-gradient(90deg,var(--sunk) 1px,transparent 1px);background-size:22px 22px}
+.ped .ln{stroke:var(--ink);stroke-width:2;fill:none}
+.ped .sym{stroke:var(--ink);stroke-width:2.2;fill:#fff}
+.ped .sym.aff{fill:var(--aff)}
+.ped .num{font-size:14px;fill:var(--muted);font-family:var(--sans)}
+.ped .gt{font-size:15px;fill:var(--ink);font-family:var(--sans);font-weight:600}
+.ped .gt.ok{fill:var(--ok)} .ped .gt.bad{fill:var(--bad)} .ped .gt.q{fill:var(--lv)}
+.ped .genl{font-size:14px;fill:var(--muted);font-weight:700;font-family:var(--sans)}
+.ped .ring{fill:none;stroke-width:4}
+.ped .ring.hl{stroke:var(--hl)} .ped .ring.ok{stroke:var(--ok)} .ped .ring.bad{stroke:var(--bad)} .ped .ring.sel{stroke:var(--lv);stroke-dasharray:6 4}
+.ped .hit{fill:transparent;cursor:pointer}
+.ped .tapme .sym{filter:drop-shadow(0 0 0 transparent)}
+.ped .carrier{fill:var(--ink)}
+.ped .arrow{stroke:var(--hl);stroke-width:3;fill:var(--hl)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.86rem;color:var(--muted);margin-top:6px;align-items:center}
+.legend svg{vertical-align:middle;margin-right:4px}
+
+/* Schritte */
+.steps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.steps span{height:8px;flex:1 1 20px;border-radius:4px;background:var(--sunk)}
+.steps span.done{background:var(--ok)} .steps span.cur{background:var(--lv)} .steps span.miss{background:var(--hl)}
+.wiz{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.wiz{grid-template-columns:1fr}}
+@media (orientation:portrait) and (max-width:1100px){.wiz{grid-template-columns:1fr}}
+.wiz .side{position:sticky;top:130px}
+.wiz.wide{grid-template-columns:minmax(0,2.1fr) minmax(0,1fr)}
+@media (orientation:portrait) and (max-width:1100px){.wiz.wide{grid-template-columns:1fr}}
+@media (max-width:900px){.wiz .side{position:static}}
+.qtitle{font-weight:700;font-size:1.06rem;margin-bottom:8px}
+.tapprompt{display:inline-flex;align-items:center;gap:8px;background:var(--hl-soft);border:1px dashed var(--hl);border-radius:10px;padding:8px 12px;margin-top:10px;font-weight:600}
+.sheet{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;background:var(--sunk)}
+.sheet .btnrow{margin-top:8px}
+
+/* Tabellen */
+table.t{border-collapse:collapse;width:100%;font-size:.95rem}
+table.t th,table.t td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+table.t th{background:var(--sunk);font-weight:700;width:28%}
+.punnett{border-collapse:collapse;margin:8px 0}
+.punnett td,.punnett th{border:1px solid var(--line);width:78px;height:54px;text-align:center;font-weight:600}
+.punnett th{background:var(--sunk)}
+.punnett td.aff{background:var(--aff);color:#fff}
+.punnett td.car{background:var(--hl-soft)}
+.sel{min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--surface)}
+
+/* Unterreiter */
+.subtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.subtabs button{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;min-height:44px;font-weight:600}
+.subtabs button[aria-selected="true"]{border-color:var(--lv);color:#fff;background:var(--lv)}
+
+/* Fortschritt */
+.meter{height:10px;border-radius:5px;background:var(--sunk);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--lv);border-radius:5px;transition:width .4s}
+.kpi{display:flex;gap:12px;flex-wrap:wrap}
+.kpi div{flex:1 1 140px;background:var(--sunk);border-radius:10px;padding:10px 14px}
+.kpi b{display:block;font-size:1.5rem;font-variant-numeric:tabular-nums}
+.pathcard{display:flex;gap:14px;align-items:flex-start;text-align:left;width:100%;border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:14px;box-shadow:var(--shadow)}
+.pathcard .n{flex:0 0 36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--lv);color:#fff;font-weight:700}
+.pathcard small{display:block;color:var(--muted)}
+
+/* Lückentext */
+.gap{display:inline-block;min-width:8em;margin:2px 4px}
+.gap.ok{border-color:var(--ok);background:var(--ok-soft)} .gap.bad{border-color:var(--bad);background:var(--bad-soft)}
+.cloze p{margin:10px 0;line-height:2.1}
+
+/* Wortspeicher */
+.drawer{position:fixed;inset:0;z-index:60;display:none}
+.drawer.open{display:block}
+.drawer .scrim{position:absolute;inset:0;background:rgba(20,25,35,.35)}
+.drawer .panel{position:absolute;right:0;top:0;bottom:0;width:min(460px,100%);background:var(--surface);padding:calc(16px + env(safe-area-inset-top)) 18px 24px;overflow-y:auto;box-shadow:-10px 0 30px rgba(0,0,0,.15)}
+.drawer .panel h2{margin-bottom:6px}
+dl.ws{margin:12px 0 0}
+dl.ws dt{font-weight:700;margin-top:12px} dl.ws dt span{font-weight:400;color:var(--muted)}
+dl.ws dd{margin:2px 0 0}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(30px);background:var(--ink);color:#fff;border-radius:999px;padding:10px 18px;font-weight:700;opacity:0;transition:.25s;z-index:80;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.mini{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.mini .pedwrap{flex:0 0 auto;width:150px;padding:4px}
+.tfrow{display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:12px;align-items:center;border-top:1px solid var(--line);padding:10px 0}
+@media (max-width:640px){.tfrow{grid-template-columns:110px minmax(0,1fr)}.tfrow .btnrow{grid-column:1/-1}}
+.optgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:640px){.optgrid{grid-template-columns:1fr}}
+.pedopt{border:2px solid var(--line);border-radius:12px;background:var(--surface);padding:6px;text-align:left}
+.pedopt[aria-pressed="true"]{border-color:var(--lv)}
+.pedopt.ok{border-color:var(--ok);background:var(--ok-soft)} .pedopt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.pedopt .lab{font-weight:700;padding:2px 6px}
+.flow{display:flex;flex-direction:column;gap:0}
+.flow .fs{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.flow .fs:first-child{border-top:0}
+.flow .fs .k{width:44px;height:44px;border-radius:12px;background:var(--lv);color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.1rem}
+.arrowto{font-weight:700;color:var(--ok)}
+.bars .row{display:grid;grid-template-columns:minmax(120px,210px) minmax(0,1fr) 54px;gap:10px;align-items:center;margin:6px 0;font-size:.95rem}
+.quizhead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.big{font-size:2.6rem;font-weight:800;font-variant-numeric:tabular-nums;color:var(--lv)}
+footer{max-width:1160px;margin:0 auto;padding:0 16px 40px;color:var(--muted);font-size:.88rem;display:flex;gap:12px;flex-wrap:wrap;justify-content:space-between}
+footer button{border:0;background:none;color:var(--muted);text-decoration:underline;min-height:44px;padding:0}
+@media (max-width:560px){body{font-size:16px}.brand h1{font-size:1rem}.levels button{padding:8px 10px}}
+@media print{.top,nav.tabs,footer,.toast{display:none}}
+.navlink{flex:0 0 auto;align-self:center;margin-left:auto;padding:8px 14px;min-height:44px;display:inline-flex;align-items:center;border-radius:10px;font-weight:700;color:var(--ok);text-decoration:none;border:1px solid color-mix(in srgb,var(--ok) 40%,white);background:var(--ok-soft);white-space:nowrap}
+.punnett{border-collapse:collapse;margin:8px 0}
+.punnett th,.punnett td{border:1px solid var(--line);text-align:center;font-weight:600;padding:0}
+.punnett th{background:var(--sunk);min-width:70px;height:46px;padding:4px 6px}
+.punnett th.corner{font-size:.78rem;font-weight:600;color:var(--muted)}
+.punnett.show td{width:84px;height:66px;vertical-align:middle}
+.punnett.show td span,.punnett .cell span{display:block;font-size:.95rem}
+.punnett.di th{min-width:58px} .punnett.di.show td{width:66px;height:56px} .punnett.di td span{font-size:.82rem}
+.punnett td svg{display:block;margin:2px auto 0}
+.cell{width:84px;min-height:66px;border:0;background:#fff;padding:4px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.punnett.di .cell{width:66px;min-height:56px}
+.cell .q{color:var(--lv);font-size:1.3rem}
+.cell.selc{outline:3px dashed var(--lv);outline-offset:-3px}
+.cell.okc{background:var(--ok-soft)} .cell.badc{background:var(--bad-soft)}
+.punnett .sel{min-height:40px;padding:2px 4px}
+.gen{display:inline-flex;align-items:center;gap:8px;margin:4px 14px 4px 0;vertical-align:middle}
+.gen .glab{font-weight:800;color:var(--lv);min-width:22px}
+.gen small{color:var(--muted)}
+input.sel.ok{border-color:var(--ok);background:var(--ok-soft)} input.sel.bad{border-color:var(--bad);background:var(--bad-soft)}
+.rsel.ok,.gap.ok{border-color:var(--ok);background:var(--ok-soft)} .rsel.bad,.gap.bad{border-color:var(--bad);background:var(--bad-soft)}
+#print{display:none}
+@media print{
+  @page{size:A4;margin:14mm 14mm 14mm 8mm}
+  body{background:#fff}
+  body>*:not(#print){display:none!important}
+  #print{display:block;padding-left:13mm;font-family:Aptos,"Aptos",Calibri,"Segoe UI",Arial,sans-serif;font-size:11pt;color:#000;line-height:1.4}
+  #print::before{content:"";position:fixed;left:4mm;top:0;bottom:0;border-left:1px dashed #000}
+  .phead{width:100%;border-collapse:collapse;margin-bottom:8px}
+  .phead td{border:1px solid #000;padding:5px 7px;background:#d9d9d9;font-weight:600;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .phead td:nth-child(3){width:38%}
+  .phead tr.dark td{background:#000;color:#fff;font-weight:700}
+  .pintro{font-size:9.5pt;margin:0 0 8px}
+  .ptask{break-inside:auto;margin:12px 0 4px}
+  .ptask h3{font-size:12pt;margin:0 0 4px;break-after:avoid}
+  .ptask h4{font-size:11pt;margin:8px 0 2px}
+  .ptask p{margin:4px 0}
+  .pgrid,.tt,#print .punnett{border-collapse:collapse;margin:6px 0 8px;break-inside:avoid}
+  .pgrid th,.pgrid td{border:1px solid #000;width:26mm;height:15mm;text-align:center;font-weight:700}
+  .pgrid.di th,.pgrid.di td{width:19mm;height:12mm;font-size:10pt}
+  .pgrid th,.tt th,#print .punnett th{background:#d9d9d9;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #print .punnett th,#print .punnett td{border:1px solid #000}
+  #print .punnett td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .tt{width:100%} .tt th,.tt td{border:1px solid #000;padding:4px 6px;text-align:left;vertical-align:top;font-size:10pt} .tt td{height:9mm}
+  .two{display:flex;gap:10mm}
+  .lines div{border-bottom:1px solid #000;height:8.5mm}
+  .cl{line-height:2}
+  .wl{font-style:italic}
+  .sol{break-before:page}
+  .pfoot{margin-top:10mm;font-size:8.5pt;border-top:1px solid #000;padding-top:3px}
+}
+
+</style>
+</head>
+<body data-level="R">
+<header class="top">
+  <div class="bar">
+    <div class="brand"><a href="index.html" aria-label="Zur Übersicht">← Übersicht</a><h1>Mendelsche Regeln · Arbeitsblatt</h1></div>
+    <div class="levels" role="group" aria-label="Niveau wählen">
+      <button data-lv="R" aria-pressed="true">Realschule</button><button data-lv="G" aria-pressed="false">Gymnasium</button>
+    </div>
+    <button class="iconbtn" id="wsbtn">Wortspeicher</button>
+    <div class="pts" title="Punkte"><span class="star">★</span><span id="pts">0</span></div>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Kapitel"></nav>
+</header>
+<main></main>
+<footer><span>Klassische Genetik nach Gregor Mendel. Fortschritt wird nur auf diesem Gerät gespeichert. · <a href="stammbaum-selbstlernkurs.html" style="color:inherit">Weiter: Stammbaumanalyse</a></span><span><button id="reset">Fortschritt zurücksetzen</button></span></footer>
+<div class="drawer" id="drawer"><div class="scrim"></div><div class="panel"><div class="btnrow" style="justify-content:flex-end"><button class="btn close">Schließen</button></div><div class="body"></div></div></div>
+<div id="print"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+/* ================= Zustand ================= */
+const KEY = 'mendel-regeln-v1';
+const S = (() => { let s = null; try { s = JSON.parse(localStorage.getItem(KEY)); } catch (e) {} return Object.assign({ level: 'R', points: 0, done: {}, tab: 'start', ws: null }, s || {}); })();
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+function award(key, pts) { if (!pts || S.done[key] !== undefined) return 0; S.done[key] = pts; S.points += pts; save(); updateHeader(); toast('+' + pts + ' Punkte'); return pts; }
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+let toastT; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 1600); }
+const LVN = { R: 'Realschule', G: 'Gymnasium' };
+
+/* ================= Beispiele ================= */
+const EX = {
+  farbe:  { name: 'Erbse: Samenfarbe', org: 'Erbse', trait: 'Samenfarbe', inh: 'dom', al: ['G', 'g'], ph: ['gelb', 'grün'], icon: 'pea', mendel: [6022, 2001], plural: 'Samen' },
+  form:   { name: 'Erbse: Samenform', org: 'Erbse', trait: 'Samenform', inh: 'dom', al: ['R', 'r'], ph: ['rund', 'kantig'], icon: 'pea', mendel: [5474, 1850], plural: 'Samen' },
+  bluete: { name: 'Erbse: Blütenfarbe', org: 'Erbse', trait: 'Blütenfarbe', inh: 'dom', al: ['A', 'a'], ph: ['violett', 'weiß'], icon: 'flower', mendel: [705, 224], plural: 'Pflanzen' },
+  meer:   { name: 'Meerschweinchen: Fellfarbe', org: 'Meerschweinchen', trait: 'Fellfarbe', inh: 'dom', al: ['B', 'b'], ph: ['schwarz', 'braun'], icon: 'pig', plural: 'Tiere' },
+  fell:   { name: 'Meerschweinchen: Fellstruktur', org: 'Meerschweinchen', trait: 'Fellstruktur', inh: 'dom', al: ['R', 'r'], ph: ['rau (Wirbelhaar)', 'glatt'], icon: 'pig', plural: 'Tiere' },
+  wunder: { name: 'Wunderblume: Blütenfarbe (intermediär)', org: 'Wunderblume', trait: 'Blütenfarbe', inh: 'int', al: ['R', 'W'], ph: ['rot', 'rosa', 'weiß'], icon: 'flower', plural: 'Pflanzen' }
+};
+const DI = {
+  erbse: { name: 'Erbse: Samenfarbe und Samenform', genes: ['farbe', 'form'], mendel: [315, 101, 108, 32] }, // gelb-rund, gelb-kantig, grün-rund, grün-kantig
+  meerdi: { name: 'Meerschweinchen: Fellfarbe und Fellstruktur', genes: ['meer', 'fell'] }
+};
+const MONO_LIST = ['farbe', 'form', 'bluete', 'meer'];
+const COL = { gelb: '#E9C935', 'grün': '#6FA33A', violett: '#8A5AB8', 'weiß': '#FFFFFF', rot: '#D23B3B', rosa: '#F3A0BE', schwarz: '#262626', braun: '#8A5A2E' };
+
+/* ================= Genetik ================= */
+function norm1(e, a, b) { return a === e.al[0] ? a + b : b === e.al[0] ? b + a : a + b; }
+function ph1(e, g) { if (e.inh === 'int') return g === e.al[0] + e.al[0] ? e.ph[0] : g === e.al[1] + e.al[1] ? e.ph[2] : e.ph[1]; return g.indexOf(e.al[0]) >= 0 ? e.ph[0] : e.ph[1]; }
+function genes(sys) { return DI[sys] ? DI[sys].genes.map(k => EX[k]) : [EX[sys]]; }
+function sysName(sys) { return DI[sys] ? DI[sys].name : EX[sys].name; }
+function gametes(sys, g) {
+  const gs = genes(sys);
+  if (gs.length === 1) return [g[0], g[1]];
+  return [g[0] + g[2], g[0] + g[3], g[1] + g[2], g[1] + g[3]];
+}
+function child(sys, a, b) { const gs = genes(sys); return gs.map((e, i) => norm1(e, a[i], b[i])).join(''); }
+function pheno(sys, g) { const gs = genes(sys); return gs.map((e, i) => ph1(e, g.slice(2 * i, 2 * i + 2))).join(', '); }
+function allGenos(sys) {
+  const gs = genes(sys), one = e => [e.al[0] + e.al[0], e.al[0] + e.al[1], e.al[1] + e.al[1]];
+  if (gs.length === 1) return one(gs[0]);
+  const r = []; one(gs[0]).forEach(a => one(gs[1]).forEach(b => r.push(a + b))); return r;
+}
+function phenoList(sys) {
+  const gs = genes(sys);
+  if (gs.length === 1) return gs[0].inh === 'int' ? gs[0].ph.slice() : gs[0].ph.slice();
+  const r = []; gs[0].ph.forEach(a => gs[1].ph.forEach(b => r.push(a + ', ' + b))); return r;
+}
+function cross(sys, g1, g2) {
+  const ga = gametes(sys, g1), gb = gametes(sys, g2), cells = [];
+  gb.forEach(b => ga.forEach(a => cells.push(child(sys, a, b))));
+  const gc = {}, pc = {}; cells.forEach(c => { gc[c] = (gc[c] || 0) + 1; const p = pheno(sys, c); pc[p] = (pc[p] || 0) + 1; });
+  return { ga, gb, cells, gc, pc };
+}
+function ratio(counts, order) {
+  const v = order.map(k => counts[k] || 0).filter(x => x > 0);
+  const g = v.reduce((a, b) => { while (b) [a, b] = [b, a % b]; return a; });
+  if (v.length === 1) return 'alle gleich (uniform)';
+  return v.map(x => x / g).join(' : ');
+}
+function homDom(sys) { return genes(sys).map(e => e.al[0] + e.al[0]).join(''); }
+function homRec(sys) { return genes(sys).map(e => e.al[1] + e.al[1]).join(''); }
+function het(sys) { return genes(sys).map(e => e.al[0] + e.al[1]).join(''); }
+
+/* ================= Zeichnungen ================= */
+function pea(color, wrinkled, s) {
+  s = s || 34; const c = s / 2, r = s * .4;
+  const fill = color || '#D8C48E';
+  if (!wrinkled) return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}"><circle cx="${c}" cy="${c}" r="${r}" fill="${fill}" stroke="#1C2430" stroke-width="1.6"/><ellipse cx="${c - r * .35}" cy="${c - r * .35}" rx="${r * .25}" ry="${r * .16}" fill="#fff" opacity=".55"/></svg>`;
+  let pts = []; for (let i = 0; i < 14; i++) { const ang = i / 14 * Math.PI * 2, rr = i % 2 ? r * .78 : r; pts.push((c + rr * Math.cos(ang)).toFixed(1) + ',' + (c + rr * Math.sin(ang)).toFixed(1)); }
+  return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}"><polygon points="${pts.join(' ')}" fill="${fill}" stroke="#1C2430" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+}
+function flower(color, s) {
+  s = s || 34; const c = s / 2, r = s * .2; let p = '';
+  for (let i = 0; i < 5; i++) { const a = i / 5 * Math.PI * 2 - Math.PI / 2; p += `<circle cx="${(c + r * 1.05 * Math.cos(a)).toFixed(1)}" cy="${(c + r * 1.05 * Math.sin(a)).toFixed(1)}" r="${r}" fill="${color}" stroke="#1C2430" stroke-width="1.3"/>`; }
+  return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}">${p}<circle cx="${c}" cy="${c}" r="${r * .55}" fill="#F2C94C" stroke="#1C2430" stroke-width="1"/></svg>`;
+}
+function pig(color, rough, s) {
+  s = s || 40; const w = s, h = s * .7;
+  const tufts = rough ? [[.3, .22], [.5, .16], [.7, .22], [.4, .5], [.62, .5]].map(([x, y]) => `<path d="M${w * x - 4} ${h * y + 3} l4 -6 l4 6" fill="none" stroke="${color === COL.schwarz ? '#bbb' : '#3b2614'}" stroke-width="1.6"/>`).join('') : '';
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><ellipse cx="${w * .48}" cy="${h * .55}" rx="${w * .38}" ry="${h * .36}" fill="${color}" stroke="#1C2430" stroke-width="1.5"/><circle cx="${w * .82}" cy="${h * .45}" r="${h * .24}" fill="${color}" stroke="#1C2430" stroke-width="1.5"/><ellipse cx="${w * .78}" cy="${h * .2}" rx="${w * .07}" ry="${h * .1}" fill="${color}" stroke="#1C2430" stroke-width="1.3"/><circle cx="${w * .88}" cy="${h * .42}" r="1.8" fill="${color === COL.schwarz ? '#fff' : '#111'}"/>${tufts}</svg>`;
+}
+function icon(sys, g, s) {
+  const gs = genes(sys), keys = DI[sys] ? DI[sys].genes : [sys];
+  const p = gs.map((e, i) => ph1(e, g.slice(2 * i, 2 * i + 2)));
+  const get = k => p[keys.indexOf(k)];
+  if (keys.indexOf('farbe') >= 0 || keys.indexOf('form') >= 0) return pea(get('farbe') ? COL[get('farbe')] : null, get('form') === 'kantig', s);
+  if (keys.indexOf('meer') >= 0 || keys.indexOf('fell') >= 0) return pig(get('meer') ? COL[get('meer')] : '#B98B5A', get('fell') && get('fell') !== 'glatt', s);
+  return flower(COL[p[0]], s);
+}
+
+/* ================= Bausteine ================= */
+function mcBlock(el, cfg) {
+  const order = cfg.noShuffle ? cfg.opts.map((_, i) => i) : shuffle(cfg.opts.map((_, i) => i));
+  const corr = Array.isArray(cfg.a) ? cfg.a : [cfg.a]; let tries = 0;
+  el.innerHTML = `${cfg.q ? `<div class="qtitle">${cfg.q}</div>` : ''}${cfg.multi ? '<p class="muted" style="font-size:.9rem">Mehrere Antworten können richtig sein.</p>' : ''}
+    <div>${order.map(i => `<button class="opt" data-i="${i}" aria-pressed="false">${cfg.opts[i]}</button>`).join('')}</div>
+    <div class="btnrow"><button class="btn primary chk">Prüfen</button></div><div class="fb"></div>`;
+  const fb = $('.fb', el), chk = $('.chk', el);
+  $$('.opt', el).forEach(b => b.onclick = () => { if (el.dataset.locked) return; if (!cfg.multi) $$('.opt', el).forEach(x => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', cfg.multi && b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); });
+  chk.onclick = () => {
+    if (el.dataset.locked) { delete el.dataset.locked; chk.textContent = 'Prüfen'; $$('.opt', el).forEach(x => { x.classList.remove('ok', 'bad'); x.setAttribute('aria-pressed', 'false'); }); fb.className = 'fb'; return; }
+    const sel = $$('.opt', el).filter(b => b.getAttribute('aria-pressed') === 'true').map(b => +b.dataset.i);
+    if (!sel.length) { fb.className = 'fb show info'; fb.innerHTML = 'Wähle zuerst eine Antwort aus.'; return; }
+    const right = sel.length === corr.length && sel.every(i => corr.indexOf(i) >= 0);
+    $$('.opt', el).forEach(b => { const i = +b.dataset.i; if (corr.indexOf(i) >= 0) b.classList.add('ok'); else if (sel.indexOf(i) >= 0) b.classList.add('bad'); });
+    if (right && tries === 0 && cfg.key) award(cfg.key, cfg.pts || 2); tries++;
+    fb.className = 'fb show ' + (right ? 'ok' : 'bad'); fb.innerHTML = `<b class="v">${right ? 'Richtig.' : 'Falsch.'}</b>${cfg.ex || ''}`;
+    el.dataset.locked = 1; chk.textContent = 'Nochmal';
+  };
+}
+/* Kreuzungsquadrat zum Ausfüllen */
+function punnettTask(el, cfg) {
+  // cfg: sys, g1, g2, gamGiven, key, pts, onDone
+  const sys = cfg.sys, X = cross(sys, cfg.g1, cfg.g2), n = X.ga.length;
+  const gamOpts = Array.from(new Set(gametes(sys, het(sys)).concat(gametes(sys, homDom(sys))).concat(gametes(sys, homRec(sys)))));
+  const ans = {}, gA = {}, gB = {}; let sel = null, checked = false;
+  const di = n === 4;
+  const draw = () => {
+    const opts = allGenos(sys);
+    let h = `<div class="ptask"><p class="muted" style="font-size:.92rem">${cfg.gamGiven ? 'Die Keimzellen sind eingetragen.' : 'Trage zuerst die Keimzellen der Eltern ein (Auswahlfelder).'} Tippe dann eine Zelle an und wähle den Genotyp des Nachkommen.</p>
+      <div style="overflow-x:auto"><table class="punnett ${di ? 'di' : ''}"><tr><th class="corner">♀ \\ ♂<br><small>${cfg.g2} \\ ${cfg.g1}</small></th>`;
+    X.ga.forEach((a, i) => h += `<th>${cfg.gamGiven ? a : `<select class="sel gsel" data-s="a" data-i="${i}"><option value="">?</option>${gamOpts.map(o => `<option ${gA[i] === o ? 'selected' : ''}>${o}</option>`).join('')}</select>`}</th>`);
+    h += '</tr>';
+    X.gb.forEach((b, j) => {
+      h += `<tr><th>${cfg.gamGiven ? b : `<select class="sel gsel" data-s="b" data-i="${j}"><option value="">?</option>${gamOpts.map(o => `<option ${gB[j] === o ? 'selected' : ''}>${o}</option>`).join('')}</select>`}</th>`;
+      X.ga.forEach((a, i) => {
+        const k = j * n + i, v = ans[k], cls = checked ? (v === X.cells[k] ? 'okc' : 'badc') : sel === k ? 'selc' : '';
+        h += `<td><button class="cell ${cls}" data-k="${k}">${v ? `${icon(sys, v, di ? 22 : 28)}<span>${v}</span>` : '<span class="q">?</span>'}</button></td>`;
+      });
+      h += '</tr>';
+    });
+    h += `</table></div>`;
+    if (sel !== null && !checked) h += `<div class="sheet">Zelle wählen: <div class="btnrow">${opts.map(o => `<button class="chip gch" data-g="${o}" aria-pressed="${ans[sel] === o}">${o}</button>`).join('')}</div></div>`;
+    const filled = Object.keys(ans).length, gfill = cfg.gamGiven || (Object.keys(gA).length === n && Object.keys(gB).length === n);
+    h += `<div class="btnrow" style="margin-top:10px">${checked ? '<button class="btn again">Neu ausfüllen</button><button class="btn solv">Lösung eintragen</button>' : `<button class="btn primary pchk" ${filled < n * n || !gfill ? 'disabled' : ''}>Prüfen</button>`}</div><div class="fb"></div>`;
+    el.innerHTML = h;
+    $$('.gsel', el).forEach(s => s.onchange = () => { (s.dataset.s === 'a' ? gA : gB)[+s.dataset.i] = s.value; if (!s.value) delete (s.dataset.s === 'a' ? gA : gB)[+s.dataset.i]; draw(); });
+    $$('.cell', el).forEach(c => c.onclick = () => { if (checked) return; sel = +c.dataset.k; draw(); });
+    $$('.gch', el).forEach(c => c.onclick = () => { ans[sel] = c.dataset.g; const nx = Array.from({ length: n * n }, (_, k) => k).find(k => !ans[k]); sel = nx === undefined ? null : nx; draw(); });
+    const pc = $('.pchk', el); if (pc) pc.onclick = () => {
+      checked = true; sel = null;
+      let ok = 0; X.cells.forEach((c, k) => { if (ans[k] === c) ok++; });
+      // Keimzellen: Reihenfolge egal, Menge muss stimmen
+      const same = (u, v) => u.slice().sort().join() === v.slice().sort().join();
+      const gamOk = cfg.gamGiven || (same(Object.values(gA), X.ga) && same(Object.values(gB), X.gb));
+      // Zellen gegen die vom Lernenden gewählten Keimzellen prüfen (wenn Keimzellen richtig, aber andere Reihenfolge)
+      if (!cfg.gamGiven && gamOk) { ok = 0; X.gb.forEach((_, j) => X.ga.forEach((_, i) => { if (ans[j * n + i] === child(sys, gA[i], gB[j])) ok++; })); }
+      const all = ok === n * n && gamOk;
+      if (all && cfg.key) award(cfg.key, cfg.pts || 3);
+      draw();
+      if (!cfg.gamGiven && gamOk) $$('.cell', el).forEach(c => { const k = +c.dataset.k, i = k % n, j = Math.floor(k / n); c.classList.remove('okc', 'badc'); c.classList.add(ans[k] === child(sys, gA[i], gB[j]) ? 'okc' : 'badc'); });
+      const fb = $('.fb', el); fb.className = 'fb show ' + (all ? 'ok' : 'bad');
+      fb.innerHTML = `<b class="v">${all ? 'Richtig ausgefüllt.' : 'Noch nicht ganz.'}</b>${gamOk ? '' : 'Die Keimzellen stimmen nicht. Jede Keimzelle erhält von jedem Gen nur <b>ein</b> Allel. '}${ok} von ${n * n} Zellen richtig.` + summaryHTML(sys, X);
+      if (cfg.onDone) cfg.onDone(all);
+    };
+    const ag = $('.again', el); if (ag) ag.onclick = () => { checked = false; Object.keys(ans).forEach(k => delete ans[k]); draw(); };
+    const sv = $('.solv', el); if (sv) sv.onclick = () => { X.ga.forEach((a, i) => gA[i] = a); X.gb.forEach((b, j) => gB[j] = b); X.cells.forEach((c, k) => ans[k] = c); draw(); const fb = $('.fb', el); fb.className = 'fb show info'; fb.innerHTML = '<b class="v">Lösung eingetragen.</b>' + summaryHTML(sys, X); };
+  };
+  draw();
+}
+function summaryHTML(sys, X) {
+  const go = allGenos(sys).filter(g => X.gc[g]), po = phenoList(sys).filter(p => X.pc[p]);
+  return `<div style="margin-top:8px"><b>Genotypen:</b> ${go.map(g => `${g} (${X.gc[g]})`).join(', ')} → ${ratio(X.gc, go)}<br><b>Phänotypen:</b> ${po.map(p => `${p} (${X.pc[p]})`).join(', ')} → ${ratio(X.pc, po)}</div>`;
+}
+/* fertiges Kreuzungsschema (Anzeige) */
+function schemaHTML(sys, g1, g2, opt) {
+  opt = opt || {}; const X = cross(sys, g1, g2), n = X.ga.length, di = n === 4;
+  let h = `<table class="punnett show ${di ? 'di' : ''}"><tr><th class="corner">♀ \\ ♂</th>${X.ga.map(a => `<th>${a}</th>`).join('')}</tr>`;
+  X.gb.forEach((b, j) => { h += `<tr><th>${b}</th>${X.ga.map((a, i) => { const c = X.cells[j * n + i]; return `<td>${icon(sys, c, di ? 22 : 28)}<span>${c}</span></td>`; }).join('')}</tr>`; });
+  return h + '</table>' + (opt.sum === false ? '' : summaryHTML(sys, X));
+}
+function genLine(sys, g, label) { return `<div class="gen"><span class="glab">${label}</span>${icon(sys, g, 34)}<span><b>${g}</b><br><small>${pheno(sys, g)}</small></span></div>`; }
+
+/* ================= Kopf & Navigation ================= */
+const TABS = [['start', 'Start'], ['basics', 'Grundbegriffe'], ['rules', 'Mendelsche Regeln'], ['lab', 'Kreuzungslabor'], ['ws', 'Arbeitsblatt']];
+function updateHeader() {
+  $('#pts').textContent = S.points; document.body.dataset.level = S.level;
+  $$('.levels button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lv === S.level));
+  $$('nav.tabs button[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === S.tab));
+}
+function go(t) { S.tab = t; save(); updateHeader(); render(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+function setLevel(l) { S.level = l; save(); updateHeader(); render(); }
+function render() { ({ start: pgStart, basics: pgBasics, rules: pgRules, lab: pgLab, ws: pgWS })[S.tab]($('main')); }
+
+/* ---------- Start ---------- */
+function pgStart(m) {
+  m.innerHTML = `<div class="section-head"><div class="eyebrow">Biologie · Klassische Genetik · Arbeitsblatt-App</div><h2>Die Mendelschen Regeln</h2>
+    <p>Gregor Mendel fand mit Kreuzungsversuchen an Erbsen heraus, nach welchen Regeln Merkmale vererbt werden. In dieser App lernst du die drei Mendelschen Regeln, übst Kreuzungsquadrate und stellst dir dein eigenes Arbeitsblatt zusammen – digital und als PDF zum Ausdrucken.</p></div>
+    <div class="card"><h3>1. Wähle dein Niveau</h3><div class="grid2" style="margin-top:10px">${['R', 'G'].map(l => `<button class="pathcard lvpick" data-lv="${l}" style="${l === S.level ? 'border-color:var(--lv);border-width:2px' : ''}"><span class="n" style="background:var(--lv${l})">${l}</span><span><b>${LVN[l]}</b><small>${l === 'R' ? 'Keimzellen sind vorgegeben, viele Hilfen, Wortspeicher. Regeln 1–3 und intermediärer Erbgang.' : 'Keimzellen selbst bilden, Rückkreuzung, Erklärung über die Meiose, Grenzen der Regeln (Genkopplung).'}</small></span></button>`).join('')}</div></div>
+    <h3 style="margin:22px 0 10px">2. Lernpfad</h3>
+    <div class="grid2">${[['basics', 'Grundbegriffe', 'Gen, Allel, dominant, rezessiv, Genotyp, Phänotyp – und wer Mendel war'], ['rules', 'Mendelsche Regeln', 'Uniformitätsregel, Spaltungsregel, Unabhängigkeitsregel mit Beispielen'], ['lab', 'Kreuzungslabor', 'Eltern wählen, Kreuzungsquadrat ansehen, viele Nachkommen simulieren'], ['ws', 'Arbeitsblatt', 'Aufgaben auswählen, digital bearbeiten und als PDF ausdrucken']].map(([t, n, d], i) => `<button class="pathcard" data-go="${t}"><span class="n">${i + 1}</span><span><b>${n}</b><small>${d}</small></span></button>`).join('')}</div>
+    <a class="pathcard" href="stammbaum-selbstlernkurs.html" style="margin-top:16px;text-decoration:none;color:inherit"><span class="n" style="background:var(--ok)">→</span><span><b>Danach: Stammbaumanalyse</b><small>Beim Menschen gibt es keine Kreuzungsversuche. Wie man trotzdem Erbgänge erkennt, lernst du im Selbstlernkurs Stammbaumanalyse.</small></span></a>
+    <div class="note" style="margin-top:18px"><b>So arbeitest du:</b> Bearbeite die Reiter von links nach rechts. Punkte gibt es für Aufgaben, die beim ersten Versuch stimmen. Unbekannte Wörter findest du im <b>Wortspeicher</b> oben.</div>`;
+  $$('.lvpick', m).forEach(b => b.onclick = () => setLevel(b.dataset.lv));
+  $$('[data-go]', m).forEach(b => b.onclick = () => go(b.dataset.go));
+}
+
+/* ---------- Grundbegriffe ---------- */
+const TERMS = [
+  ['Gen', 'Abschnitt der DNA, der die Information für ein Merkmal enthält (z. B. für die Samenfarbe).'],
+  ['Allel', 'eine Variante (Form) eines Gens, z. B. G für gelbe und g für grüne Samen. Jede Körperzelle enthält von jedem Gen zwei Allele – eines von der Mutter, eines vom Vater.'],
+  ['dominant', 'Das Allel bestimmt das Merkmal schon, wenn es nur einmal vorhanden ist. Man schreibt es mit einem Großbuchstaben (G).'],
+  ['rezessiv', 'Das Allel prägt sich nur aus, wenn kein dominantes Allel vorhanden ist. Kleinbuchstabe (g).'],
+  ['intermediär', 'Keines der beiden Allele ist dominant. Mischerbige zeigen eine Zwischenform, z. B. rosa Blüten bei der Wunderblume.'],
+  ['homozygot (reinerbig)', 'zwei gleiche Allele: GG oder gg.'],
+  ['heterozygot (mischerbig)', 'zwei verschiedene Allele: Gg.'],
+  ['Genotyp', 'die Allele, die ein Lebewesen für ein Merkmal besitzt (GG, Gg oder gg).'],
+  ['Phänotyp', 'das Erscheinungsbild, z. B. gelbe Samen.'],
+  ['P, F₁, F₂', 'Parentalgeneration (Eltern), 1. und 2. Filialgeneration (Tochtergenerationen).'],
+  ['Keimzelle (Gamet)', 'Eizelle oder Pollen-/Spermienzelle. Sie enthält von jedem Gen nur ein Allel.'],
+  ['Kreuzungsquadrat', 'Tabelle, in der man die Keimzellen beider Eltern kombiniert, um die Genotypen der Nachkommen zu erhalten.'],
+  ['monohybrid / dihybrid', 'Die Eltern unterscheiden sich in einem Merkmal bzw. in zwei Merkmalen.']
+];
+function pgBasics(m) {
+  const g = S.level === 'G';
+  m.innerHTML = `<div class="section-head"><div class="eyebrow">Grundlagen</div><h2>Grundbegriffe der Vererbung</h2><p>Diese Begriffe brauchst du für jedes Kreuzungsschema.</p></div>
+    <div class="grid2"><div class="card"><h3>Gregor Mendel (1822–1884)</h3>
+      <p>Gregor Mendel war Augustinermönch im Kloster in Brünn (heute Brno, Tschechien). Von 1856 bis 1863 kreuzte er im Klostergarten tausende Erbsenpflanzen und zählte die Nachkommen genau aus. 1866 veröffentlichte er seine Ergebnisse. Erst um 1900 wurden sie wiederentdeckt und als Grundlage der Genetik erkannt.</p>
+      <h4 style="margin-top:12px">Warum Erbsen?</h4><ul class="clean"><li>Es gibt Sorten mit deutlich unterscheidbaren Merkmalen (z. B. gelbe oder grüne Samen).</li><li>Erbsen bestäuben sich normalerweise selbst. So erhielt Mendel <b>reinerbige Linien</b>; für Kreuzungen bestäubte er gezielt von Hand.</li><li>Sie haben viele Nachkommen und eine kurze Generationsdauer.</li>${g ? '<li>Mendel arbeitete <b>quantitativ</b>: Er zählte, berechnete Verhältnisse und prüfte sie durch weitere Kreuzungen – damals neu in der Biologie.</li>' : ''}</ul></div>
+      <div class="card"><h3>So schreibt man ein Kreuzungsschema</h3><ol class="clean" style="padding-left:1.3em"><li>Allele festlegen: dominant = Großbuchstabe, rezessiv = Kleinbuchstabe.</li><li>Genotypen der Eltern (P) aufschreiben, z. B. GG × gg.</li><li>Keimzellen bilden: Jede Keimzelle erhält <b>ein</b> Allel jedes Gens.</li><li>Keimzellen im Kreuzungsquadrat kombinieren.</li><li>Genotypen und Phänotypen auszählen und als Verhältnis angeben.</li></ol>
+      <div style="margin-top:10px">${schemaHTML('farbe', 'Gg', 'Gg')}</div></div></div>
+    <div class="card" style="margin-top:16px"><h3>Begriffe</h3><dl class="ws">${TERMS.map(t => `<dt>${t[0]}</dt><dd>${t[1]}</dd>`).join('')}</dl></div>
+    <div class="grid2" style="margin-top:16px"><div class="card" id="b1"></div><div class="card" id="b2"></div></div>`;
+  mcBlock($('#b1'), { q: 'Eine Erbse hat den Genotyp Gg. Welche Aussage stimmt?', opts: ['Sie ist heterozygot und hat gelbe Samen.', 'Sie ist homozygot und hat gelbe Samen.', 'Sie ist heterozygot und hat grüne Samen.', 'Sie ist homozygot und hat grüne Samen.'], a: 0, ex: 'Zwei verschiedene Allele = heterozygot; G (gelb) ist dominant.', key: 'b:1' });
+  mcBlock($('#b2'), { q: 'Welche Keimzellen bildet eine Pflanze mit dem Genotyp Gg?', opts: ['G und g', 'nur Gg', 'nur G', 'GG und gg'], a: 0, ex: 'Jede Keimzelle erhält nur ein Allel: Die Hälfte der Keimzellen trägt G, die andere Hälfte g.', key: 'b:2' });
+}
+
+/* ---------- Regeln ---------- */
+function pgRules(m) {
+  const g = S.level === 'G';
+  m.innerHTML = `<div class="section-head"><div class="eyebrow">Die drei Regeln</div><h2>Die Mendelschen Regeln</h2><p>Mendel kreuzte zuerst reinerbige Elternpflanzen (P) und dann deren Nachkommen (F₁) untereinander. Daraus leitete er drei Regeln ab.</p></div>
+    <div class="subtabs" id="rsub">${[['r1', '1. Uniformitätsregel'], ['r2', '2. Spaltungsregel'], ['r3', '3. Unabhängigkeitsregel'], ['ri', 'Intermediärer Erbgang']].concat(g ? [['rr', 'Rückkreuzung'], ['rg', 'Grenzen der Regeln']] : []).map(([k, n]) => `<button data-r="${k}" aria-selected="false">${n}</button>`).join('')}</div>
+    <div id="rbody"></div>`;
+  const show = k => { $$('#rsub button').forEach(b => b.setAttribute('aria-selected', b.dataset.r === k)); rule(k, $('#rbody'), g); S.rule = k; save(); };
+  $$('#rsub button').forEach(b => b.onclick = () => show(b.dataset.r));
+  show(S.rule && $(`#rsub [data-r="${S.rule}"]`) ? S.rule : 'r1');
+}
+function rule(k, el, g) {
+  const R = {
+    r1: { t: '1. Mendelsche Regel: Uniformitätsregel', merk: 'Kreuzt man zwei <b>reinerbige</b> Eltern, die sich in einem Merkmal unterscheiden, so sind alle Nachkommen der F₁-Generation <b>gleich (uniform)</b> – im Genotyp und im Phänotyp.' + (g ? ' Das gilt auch, wenn man die Rollen von Pollen- und Eizellspender tauscht (reziproke Kreuzung).' : ''),
+      body: `${genLine('farbe', 'GG', 'P')}${genLine('farbe', 'gg', '×')}<p style="margin:8px 0">Keimzellen: nur <b>G</b> bzw. nur <b>g</b> → alle F₁: <b>Gg</b>, gelb.</p>${schemaHTML('farbe', 'GG', 'gg')}`,
+      ex: 'Das Allel für grüne Samen ist in der F₁ nicht verloren – es ist nur nicht sichtbar, weil G dominant ist.' },
+    r2: { t: '2. Mendelsche Regel: Spaltungsregel', merk: 'Kreuzt man die mischerbigen F₁-Nachkommen untereinander, so <b>spaltet</b> sich die F₂-Generation auf: Im Phänotyp im Verhältnis <b>3 : 1</b>, im Genotyp im Verhältnis <b>1 : 2 : 1</b> (GG : Gg : gg).',
+      body: `${genLine('farbe', 'Gg', 'F₁')}${genLine('farbe', 'Gg', '×')}${schemaHTML('farbe', 'Gg', 'Gg')}<div class="note" style="margin-top:10px"><b>Mendels Zahlen (F₂):</b> 6022 gelbe und 2001 grüne Samen → 6022 : 2001 ≈ <b>3,01 : 1</b>. Je mehr Nachkommen gezählt werden, desto näher liegt das Ergebnis am erwarteten Verhältnis.</div>`,
+      ex: 'Das rezessive Merkmal (grün) taucht in der F₂ wieder auf – bei einem Viertel der Nachkommen.' + (g ? ' Erklärung: In der Meiose werden die beiden Allele auf verschiedene Keimzellen verteilt (Trennung der homologen Chromosomen).' : '') },
+    r3: { t: '3. Mendelsche Regel: Unabhängigkeitsregel (Neukombinationsregel)', merk: 'Unterscheiden sich die Eltern in <b>zwei</b> Merkmalen, werden die Allele der beiden Gene <b>unabhängig voneinander</b> vererbt. In der F₂ treten auch <b>neue Merkmalskombinationen</b> auf; der Phänotyp spaltet im Verhältnis <b>9 : 3 : 3 : 1</b>.',
+      body: `${genLine('erbse', 'GGRR', 'P')}${genLine('erbse', 'ggrr', '×')}<p style="margin:8px 0">F₁: alle <b>GgRr</b> (gelb, rund). Jede F₁-Pflanze bildet vier Sorten Keimzellen: <b>GR, Gr, gR, gr</b> – je ¼.</p><div style="overflow-x:auto">${schemaHTML('erbse', 'GgRr', 'GgRr')}</div><div class="note" style="margin-top:10px"><b>Mendels Zahlen:</b> 315 gelb-rund, 101 gelb-kantig, 108 grün-rund, 32 grün-kantig (zusammen 556) – das entspricht etwa 9 : 3 : 3 : 1.</div>`,
+      ex: 'Neu kombiniert sind gelb-kantig und grün-rund: Diese Kombinationen gab es bei den Eltern nicht. Züchter nutzen das, um gewünschte Merkmale zu kombinieren.' + (g ? ' Erklärung: In der Meiose I ordnen sich die homologen Chromosomenpaare zufällig und unabhängig voneinander an – vorausgesetzt, die Gene liegen auf verschiedenen Chromosomen.' : '') },
+    ri: { t: 'Intermediärer Erbgang', merk: 'Ist keines der beiden Allele dominant, zeigen die Mischerbigen eine <b>Zwischenform</b>. Die Regeln 1 und 2 gelten trotzdem: F₁ ist uniform, in der F₂ spaltet auch der Phänotyp im Verhältnis <b>1 : 2 : 1</b>.',
+      body: `<p>Wunderblume (<i>Mirabilis jalapa</i>): rot (RR) × weiß (WW). Beide Allele werden mit Großbuchstaben geschrieben, weil keines dominant ist.</p>${genLine('wunder', 'RR', 'P')}${genLine('wunder', 'WW', '×')}<p style="margin:8px 0">F₁: alle <b>RW</b>, rosa.</p>${schemaHTML('wunder', 'RW', 'RW')}`,
+      ex: 'Beim intermediären Erbgang kann man den Genotyp direkt am Phänotyp ablesen.' },
+    rr: { t: 'Rückkreuzung (Testkreuzung)', merk: 'Ein Lebewesen mit dominantem Phänotyp kann homozygot (BB) oder heterozygot (Bb) sein. Man kreuzt es mit einem <b>homozygot rezessiven</b> Partner (bb). Sind alle Nachkommen dominant, war es <b>BB</b>; treten dominante und rezessive Nachkommen etwa <b>1 : 1</b> auf, war es <b>Bb</b>.',
+      body: `<div class="grid2"><div><b>Fall 1: BB × bb</b>${schemaHTML('meer', 'BB', 'bb')}</div><div><b>Fall 2: Bb × bb</b>${schemaHTML('meer', 'Bb', 'bb')}</div></div>`,
+      ex: 'Der rezessive Partner bildet nur Keimzellen mit b. Deshalb sieht man an den Nachkommen direkt, welche Keimzellen der getestete Elternteil bildet.' },
+    rg: { t: 'Grenzen der Mendelschen Regeln', merk: 'Die Unabhängigkeitsregel gilt nur für Gene, die auf <b>verschiedenen Chromosomen</b> (oder sehr weit voneinander entfernt auf demselben Chromosom) liegen.',
+      body: `<ul class="clean"><li><b>Genkopplung:</b> Gene auf demselben Chromosom werden meist gemeinsam vererbt. Nur durch <b>Crossing-over</b> in der Meiose entstehen neue Kombinationen – umso häufiger, je weiter die Gene auseinanderliegen.</li><li><b>Statistik:</b> Die Verhältnisse sind Wahrscheinlichkeiten. Bei wenigen Nachkommen weichen die Zahlen stark ab (siehe Kreuzungslabor: Simulation).</li><li><b>Weitere Abweichungen:</b> Viele Merkmale werden von mehreren Genen beeinflusst (polygen) oder von der Umwelt mitbestimmt; manche Allele sind gonosomal (geschlechtsgebunden).</li><li>Mendel hatte Glück: Die sieben von ihm untersuchten Merkmale zeigen alle einen einfachen dominant-rezessiven Erbgang.</li></ul>`,
+      ex: '' }
+  }[k];
+  el.innerHTML = `<div class="grid2"><div class="card"><h3>${R.t}</h3><div class="merke" style="margin-top:10px"><b class="t">Merke</b>${R.merk}</div><p style="margin-top:10px">${R.ex}</p></div><div class="card">${R.body}</div></div><div class="card" style="margin-top:16px" id="rq"></div>`;
+  const Q = {
+    r1: { q: 'Reinerbige violett blühende Erbsen (AA) werden mit reinerbig weiß blühenden (aa) gekreuzt. Wie sieht die F₁ aus?', opts: ['alle violett (Aa)', '3/4 violett, 1/4 weiß', 'alle weiß', 'die Hälfte violett, die Hälfte weiß'], a: 0, ex: 'Uniformitätsregel: Alle F₁-Pflanzen sind Aa und blühen violett.' },
+    r2: { q: 'Zwei schwarze, mischerbige Meerschweinchen (Bb × Bb) haben 12 Junge. Wie viele braune Junge erwartet man?', opts: ['etwa 3', 'etwa 6', 'keines', 'etwa 9'], a: 0, ex: '1/4 der Nachkommen sind bb (braun): 12 · 1/4 = 3. In echten Würfen kann die Zahl zufällig abweichen.' },
+    r3: { q: 'Wie viele verschiedene Keimzellsorten bildet eine Pflanze mit dem Genotyp GgRr?', opts: ['4', '2', '1', '16'], a: 0, ex: 'GR, Gr, gR, gr – jede Kombination aus einem Allel pro Gen.' },
+    ri: { q: 'Zwei rosa Wunderblumen (RW × RW) werden gekreuzt. Welches Verhältnis erwartest du im Phänotyp?', opts: ['1 rot : 2 rosa : 1 weiß', '3 rosa : 1 weiß', 'alle rosa', '3 rot : 1 weiß'], a: 0, ex: 'Beim intermediären Erbgang entspricht das Phänotypverhältnis dem Genotypverhältnis.' },
+    rr: { q: 'Ein schwarzes Meerschweinchen wird mit einem braunen (bb) gekreuzt. Von 8 Jungen sind 4 braun. Welchen Genotyp hat das schwarze Tier?', opts: ['Bb', 'BB', 'bb', 'nicht bestimmbar'], a: 0, ex: 'Braune Junge (bb) haben von beiden Eltern ein b erhalten – das schwarze Tier muss Bb sein.' },
+    rg: { q: 'Zwei Gene liegen eng benachbart auf demselben Chromosom. Was erwartest du in der F₂ einer dihybriden Kreuzung?', opts: ['Kaum Neukombinationen – keine 9 : 3 : 3 : 1-Aufspaltung', 'genau 9 : 3 : 3 : 1', 'alle Nachkommen gleich', '1 : 1 : 1 : 1'], a: 0, ex: 'Gekoppelte Gene werden meist gemeinsam vererbt; Neukombinationen entstehen nur durch seltenes Crossing-over.' }
+  }[k];
+  mcBlock($('#rq'), Object.assign({ key: 'rule:' + k, pts: 2 }, Q));
+}
+
+/* ---------- Kreuzungslabor ---------- */
+let LAB = { sys: 'farbe', g1: 'Gg', g2: 'Gg' };
+function pgLab(m) {
+  const sysList = MONO_LIST.concat(['wunder', 'erbse', 'meer2']);
+  if (!genesOK(LAB.sys)) LAB = { sys: 'farbe', g1: 'Gg', g2: 'Gg' };
+  const all = allGenos(LAB.sys);
+  m.innerHTML = `<div class="section-head"><div class="eyebrow">Experimentieren</div><h2>Kreuzungslabor</h2><p>Wähle ein Beispiel und die Genotypen der Eltern. Das Kreuzungsquadrat zeigt die erwarteten Nachkommen. Mit der Simulation erzeugst du zufällig echte Nachkommen – wie Mendel beim Auszählen.</p></div>
+    <div class="card"><div class="btnrow"><label>Beispiel <select class="sel" id="lsys">${[...MONO_LIST, 'wunder'].map(k => `<option value="${k}" ${k === LAB.sys ? 'selected' : ''}>${EX[k].name}</option>`).join('')}${Object.keys(DI).map(k => `<option value="${k}" ${k === LAB.sys ? 'selected' : ''}>${DI[k].name} (dihybrid)</option>`).join('')}</select></label></div>
+      <div class="btnrow" style="margin-top:10px"><label>Elternteil 1 <select class="sel" id="lg1">${all.map(g => `<option ${g === LAB.g1 ? 'selected' : ''}>${g}</option>`).join('')}</select></label><label>Elternteil 2 <select class="sel" id="lg2">${all.map(g => `<option ${g === LAB.g2 ? 'selected' : ''}>${g}</option>`).join('')}</select></label></div>
+      <div class="btnrow" style="margin-top:10px"><span class="muted">Schnellwahl:</span><button class="chip" data-q="p">P: reinerbig × reinerbig</button><button class="chip" data-q="f">F₁ × F₁</button>${S.level === 'G' ? '<button class="chip" data-q="r">Rückkreuzung</button>' : ''}</div></div>
+    <div class="grid2" style="margin-top:16px"><div class="card"><h3>Eltern</h3><div class="pair">${genLine(LAB.sys, LAB.g1, '♂')}${genLine(LAB.sys, LAB.g2, '♀')}</div><p style="margin:10px 0 6px"><b>Keimzellen:</b> ♂ ${uniq(gametes(LAB.sys, LAB.g1)).join(', ')} · ♀ ${uniq(gametes(LAB.sys, LAB.g2)).join(', ')}</p><div style="overflow-x:auto">${schemaHTML(LAB.sys, LAB.g1, LAB.g2)}</div></div>
+      <div class="card"><h3>Simulation: Nachkommen zählen</h3><p class="muted" style="font-size:.92rem">Jeder Nachkomme erhält zufällig eine Keimzelle von jedem Elternteil.</p>
+        <div class="btnrow" style="margin-top:8px">${[10, 100, 1000, 8000].map(n => `<button class="btn" data-n="${n}">${n.toLocaleString('de-DE')}</button>`).join('')}</div><div id="simout" style="margin-top:12px"></div></div></div>`;
+  $('#lsys').onchange = e => { const s = e.target.value; LAB = { sys: s, g1: het(s), g2: het(s) }; pgLab(m); };
+  $('#lg1').onchange = e => { LAB.g1 = e.target.value; pgLab(m); };
+  $('#lg2').onchange = e => { LAB.g2 = e.target.value; pgLab(m); };
+  $$('[data-q]', m).forEach(b => b.onclick = () => { const s = LAB.sys; if (b.dataset.q === 'p') { LAB.g1 = homDom(s); LAB.g2 = homRec(s); } else if (b.dataset.q === 'f') { LAB.g1 = LAB.g2 = het(s); } else { LAB.g1 = het(s); LAB.g2 = homRec(s); } pgLab(m); });
+  $$('[data-n]', m).forEach(b => b.onclick = () => simulate(+b.dataset.n));
+}
+function genesOK(s) { return !!(EX[s] || DI[s]); }
+function uniq(a) { return Array.from(new Set(a)); }
+function simulate(n) {
+  const sys = LAB.sys, ga = gametes(sys, LAB.g1), gb = gametes(sys, LAB.g2), cnt = {};
+  for (let i = 0; i < n; i++) { const c = child(sys, ga[Math.floor(Math.random() * ga.length)], gb[Math.floor(Math.random() * gb.length)]); const p = pheno(sys, c); cnt[p] = (cnt[p] || 0) + 1; }
+  const X = cross(sys, LAB.g1, LAB.g2), order = phenoList(sys).filter(p => X.pc[p]), tot = X.cells.length;
+  const minP = Math.min(...order.map(p => cnt[p] || 0)) || 1;
+  $('#simout').innerHTML = `<div class="bars">${order.map(p => { const c = cnt[p] || 0; return `<div class="row"><span>${p}</span><div class="meter"><i style="width:${100 * c / n}%"></i></div><span style="text-align:right">${c}</span></div>`; }).join('')}</div>
+    <p style="margin-top:8px">Beobachtet: <b>${order.map(p => ((cnt[p] || 0) / minP).toFixed(2).replace('.', ',')).join(' : ')}</b><br>Erwartet: <b>${ratio(X.pc, order)}</b> (${order.map(p => Math.round(100 * X.pc[p] / tot) + ' %').join(' / ')})</p>
+    <p class="muted" style="font-size:.9rem;margin-top:6px">Wiederhole die Simulation mehrmals: Bei 10 Nachkommen schwanken die Zahlen stark, bei 8000 kaum noch.</p>`;
+}
+
+/* ================= Arbeitsblatt ================= */
+const TASKS = {
+  uni:   { n: 'Uniformitätsregel (1. Regel)', lv: 'RG' },
+  spalt: { n: 'Spaltungsregel (2. Regel)', lv: 'RG' },
+  zahlen:{ n: 'Mendels Zahlen auswerten', lv: 'RG' },
+  inter: { n: 'Intermediärer Erbgang (Wunderblume)', lv: 'RG' },
+  unab:  { n: 'Unabhängigkeitsregel (3. Regel, dihybrid)', lv: 'RG' },
+  rueck: { n: 'Rückkreuzung (Testkreuzung)', lv: 'G' },
+  regel: { n: 'Regeln zuordnen', lv: 'RG' },
+  luecke:{ n: 'Lückentext: Fachbegriffe', lv: 'RG' }
+};
+const WS_GLOSS = [
+  ['das Allel', 'die Allele', 'eine Variante eines Gens'],
+  ['die Keimzelle', 'die Keimzellen', 'Ei- oder Pollenzelle; sie enthält von jedem Gen nur ein Allel'],
+  ['dominant', '–', 'Das Allel bestimmt das Merkmal schon, wenn es einmal vorhanden ist.'],
+  ['der Phänotyp', 'die Phänotypen', 'das Erscheinungsbild'],
+  ['homozygot (reinerbig)', '–', 'zwei gleiche Allele, z. B. GG'],
+  ['die Kreuzung', 'die Kreuzungen', 'gezielte Paarung zweier Lebewesen'],
+  ['rezessiv', '–', 'Das Allel prägt sich nur aus, wenn kein dominantes Allel vorhanden ist.'],
+  ['der Genotyp', 'die Genotypen', 'die Allele eines Lebewesens für ein Merkmal'],
+  ['heterozygot (mischerbig)', '–', 'zwei verschiedene Allele, z. B. Gg'],
+  ['das Verhältnis', 'die Verhältnisse', 'Vergleich zweier Anzahlen, z. B. 3 : 1'],
+  ['der Nachkomme', 'die Nachkommen', 'Kind; bei Pflanzen: neue Pflanze aus einem Samen']
+];
+function wsDefaults(lv) { return { lv, ex: 'farbe', di: 'erbse', tasks: Object.keys(TASKS).filter(k => TASKS[k].lv.indexOf(lv) >= 0 && k !== 'rueck' || (lv === 'G' && k === 'rueck')), sol: false, gloss: true }; }
+function pgWS(m) {
+  if (!S.ws || S.ws.lv !== S.level) S.ws = wsDefaults(S.level);
+  const W = S.ws, lv = S.level;
+  m.innerHTML = `<div class="section-head"><div class="eyebrow">Mein Arbeitsblatt</div><h2>Arbeitsblatt zusammenstellen</h2><p>Wähle Beispiele und Aufgaben aus. Bearbeite das Arbeitsblatt hier digital – oder erzeuge daraus ein PDF zum Ausdrucken und Mitschreiben.</p></div>
+    <div class="card"><div class="grid2">
+      <div><h4>1. Beispiel für die Regeln 1 und 2</h4><div class="btnrow" style="margin-top:8px">${MONO_LIST.map(k => `<button class="chip" data-ex="${k}" aria-pressed="${W.ex === k}">${EX[k].name}</button>`).join('')}</div>
+        <h4 style="margin-top:14px">2. Beispiel für die 3. Regel</h4><div class="btnrow" style="margin-top:8px">${Object.keys(DI).map(k => `<button class="chip" data-di="${k}" aria-pressed="${W.di === k}">${DI[k].name}</button>`).join('')}</div></div>
+      <div><h4>3. Aufgaben</h4><div class="btnrow" style="margin-top:8px">${Object.keys(TASKS).filter(k => TASKS[k].lv.indexOf(lv) >= 0).map(k => `<button class="chip" data-t="${k}" aria-pressed="${W.tasks.indexOf(k) >= 0}">${TASKS[k].n}</button>`).join('')}</div>
+        <h4 style="margin-top:14px">4. PDF-Optionen</h4><div class="btnrow" style="margin-top:8px"><button class="chip" data-o="gloss" aria-pressed="${W.gloss}">Wortspeicher</button><button class="chip" data-o="sol" aria-pressed="${W.sol}">Lösungsseite anhängen</button></div></div></div>
+      <div class="btnrow" style="margin-top:16px"><button class="btn primary" id="wsprint">PDF erstellen / drucken</button><span class="muted" style="font-size:.9rem">Im Druckdialog „Als PDF sichern“ wählen (iPad: Teilen → Drucken → mit zwei Fingern aufziehen → Teilen → In Dateien sichern).</span></div></div>
+    <div id="wsdo" class="stack" style="margin-top:18px"></div>`;
+  $$('[data-ex]', m).forEach(b => b.onclick = () => { W.ex = b.dataset.ex; save(); pgWS(m); });
+  $$('[data-di]', m).forEach(b => b.onclick = () => { W.di = b.dataset.di; save(); pgWS(m); });
+  $$('[data-t]', m).forEach(b => b.onclick = () => { const k = b.dataset.t, i = W.tasks.indexOf(k); i >= 0 ? W.tasks.splice(i, 1) : W.tasks.push(k); W.tasks.sort((a, c) => Object.keys(TASKS).indexOf(a) - Object.keys(TASKS).indexOf(c)); save(); pgWS(m); });
+  $$('[data-o]', m).forEach(b => b.onclick = () => { W[b.dataset.o] = !W[b.dataset.o]; save(); pgWS(m); });
+  $('#wsprint').onclick = () => { buildPrint(W); setTimeout(() => window.print(), 80); };
+  const host = $('#wsdo');
+  if (!W.tasks.length) { host.innerHTML = '<div class="note">Wähle mindestens eine Aufgabe aus.</div>'; return; }
+  W.tasks.forEach((k, i) => { const d = document.createElement('div'); d.className = 'card'; host.appendChild(d); digitalTask(k, i + 1, d, W); });
+}
+function taskText(k, W) {
+  const e = EX[W.ex], A = e.al[0], a = e.al[1], G = S.level === 'G' || W.lv === 'G';
+  const D = DI[W.di], d1 = EX[D.genes[0]], d2 = EX[D.genes[1]];
+  const mz = e.mendel ? e : EX.farbe;
+  return {
+    uni: { h: 'Die Uniformitätsregel', t: `Bei der Art ${e.org} ist das Merkmal <b>${e.trait}</b> erblich. Das Allel ${A} (${e.ph[0]}) ist dominant über das Allel ${a} (${e.ph[1]}). Eine reinerbige ${e.ph[0]}e Linie (${A}${A}) wird mit einer reinerbigen ${e.ph[1]}en Linie (${a}${a}) gekreuzt.`,
+      parts: [`${G ? 'Bilde die Keimzellen der Eltern und f' : 'F'}ülle das Kreuzungsquadrat aus.`, 'Beschreibe Genotyp und Phänotyp der F₁-Generation.', 'Nenne die Mendelsche Regel, die hier gilt, und formuliere sie.'] },
+    spalt: { h: 'Die Spaltungsregel', t: `Zwei Nachkommen aus der F₁ (${A}${a}, ${e.ph[0]}) werden miteinander gekreuzt.`,
+      parts: [`${G ? 'Bilde die Keimzellen und f' : 'F'}ülle das Kreuzungsquadrat aus.`, 'Gib das Verhältnis der Genotypen und das Verhältnis der Phänotypen in der F₂ an.', `${G ? 'Erkläre, warum das Merkmal „' + e.ph[1] + '“ in der F₂ wieder auftritt.' : 'Wie viele der Nachkommen sind ' + e.ph[1] + '? Gib den Anteil in Prozent an.'}`] },
+    zahlen: { h: 'Mendels Zahlen auswerten', t: `Mendel zählte in der F₂ (${mz.trait}): <b>${mz.mendel[0]} ${mz.ph[0]}</b> und <b>${mz.mendel[1]} ${mz.ph[1]}</b> ${mz.plural}.`,
+      parts: ['Berechne das Zahlenverhältnis (dominant : rezessiv) auf zwei Nachkommastellen.', 'Vergleiche mit dem erwarteten Verhältnis und begründe die Abweichung.'] },
+    inter: { h: 'Der intermediäre Erbgang', t: 'Bei der Wunderblume wird eine rot blühende (RR) mit einer weiß blühenden Pflanze (WW) gekreuzt. Alle F₁-Pflanzen blühen rosa. Anschließend werden zwei F₁-Pflanzen miteinander gekreuzt.',
+      parts: ['Fülle das Kreuzungsquadrat für die Kreuzung F₁ × F₁ (RW × RW) aus.', 'Gib das Phänotypverhältnis der F₂ an.', 'Erkläre den Unterschied zum dominant-rezessiven Erbgang.'] },
+    unab: { h: 'Die Unabhängigkeitsregel', t: `${D.name}: ${d1.al[0]} = ${d1.ph[0]}, ${d1.al[1]} = ${d1.ph[1]}; ${d2.al[0]} = ${d2.ph[0]}, ${d2.al[1]} = ${d2.ph[1]}. Reinerbige Eltern ${homDom(W.di)} × ${homRec(W.di)} haben eine einheitliche F₁ (${het(W.di)}). Zwei F₁-Nachkommen werden gekreuzt.`,
+      parts: [`${G ? 'Gib alle Keimzellen an, die ein F₁-Nachkomme bilden kann.' : 'Die Keimzellen der F₁ sind: ' + gametes(W.di, het(W.di)).join(', ') + '.'} Zähle im Kreuzungsquadrat, wie viele Nachkommen welchen Phänotyp haben.`, 'Gib das Phänotypverhältnis an.', 'Nenne die neu kombinierten Phänotypen und formuliere die 3. Mendelsche Regel.'] },
+    rueck: { h: 'Die Rückkreuzung', t: 'Ein Züchter besitzt ein schwarzes Meerschweinchen und möchte wissen, ob es reinerbig ist (B = schwarz, b = braun). Er kreuzt es mit einem braunen Tier.',
+      parts: ['Erkläre, warum der Partner braun sein muss.', 'Stelle für beide möglichen Genotypen des schwarzen Tieres ein Kreuzungsquadrat auf.', 'Unter 10 Jungen sind 4 braune. Bestimme den Genotyp des schwarzen Tieres.'] },
+    regel: { h: 'Regeln zuordnen', t: 'Ordne jeder Beobachtung die passende Mendelsche Regel zu.', parts: [] },
+    luecke: { h: 'Fachbegriffe', t: 'Ergänze die Lücken mit den Wörtern aus der Wortliste.', parts: [] }
+  }[k];
+}
+const REGEL_ITEMS = [
+  ['Alle Nachkommen zweier reinerbiger Eltern sehen gleich aus.', 0],
+  ['In der F₂ tritt das rezessive Merkmal bei einem Viertel der Nachkommen wieder auf.', 1],
+  ['In der F₂ entstehen gelb-kantige Erbsen, obwohl kein Elternteil so aussah.', 2],
+  ['Die F₁-Generation einer Kreuzung GG × gg besteht nur aus Gg.', 0],
+  ['Kreuzt man F₁-Pflanzen untereinander, ergibt sich das Verhältnis 3 : 1.', 1],
+  ['Die Samenfarbe wird unabhängig von der Samenform vererbt.', 2]
+];
+const RULES3 = ['Uniformitätsregel', 'Spaltungsregel', 'Unabhängigkeitsregel'];
+const LUECKE = [
+  ['Varianten eines Gens nennt man', 'Allele', '.'],
+  ['Ein Lebewesen mit zwei gleichen Allelen (GG) ist', 'homozygot', '.'],
+  ['Ein Lebewesen mit zwei verschiedenen Allelen (Gg) ist', 'heterozygot', '.'],
+  ['Das Erscheinungsbild eines Lebewesens heißt', 'Phänotyp', '.'],
+  ['Ein Allel, das sich schon bei einfachem Vorkommen ausprägt, ist', 'dominant', '.'],
+  ['Jede Keimzelle enthält von jedem Gen nur', 'ein', 'Allel.'],
+  ['Zeigt der Mischling eine Zwischenform, spricht man von einem', 'intermediären', 'Erbgang.']
+];
+const LUECKE_WORDS = ['Phänotyp', 'intermediären', 'Allele', 'dominant', 'heterozygot', 'ein', 'homozygot', 'Genotyp', 'rezessiv', 'zwei'];
+
+function digitalTask(k, nr, el, W) {
+  const T = taskText(k, W), e = EX[W.ex], A = e.al[0], a = e.al[1], G = S.level === 'G', key = `ws:${k}:${W.ex}:${W.di}:${S.level}`;
+  el.innerHTML = `<div class="eyebrow">Aufgabe ${nr}</div><h3>${T.h}</h3><p style="margin-top:6px">${T.t}</p><div class="tparts stack" style="margin-top:12px"></div>`;
+  const parts = $('.tparts', el);
+  const add = (html) => { const d = document.createElement('div'); d.innerHTML = html; parts.appendChild(d); return d; };
+  if (k === 'uni' || k === 'spalt' || k === 'inter') {
+    const sys = k === 'inter' ? 'wunder' : W.ex, g1 = k === 'uni' ? homDom(sys) : het(sys), g2 = k === 'uni' ? homRec(sys) : het(sys);
+    const d = add(`<b>a)</b> ${T.parts[0]}<div class="pt" style="margin-top:8px"></div>`);
+    punnettTask($('.pt', d), { sys, g1, g2, gamGiven: !G, key: key + ':a', pts: 3 });
+    const d2 = add('<div class="q"></div>'), ee = EX[sys];
+    if (k === 'uni') mcBlock($('.q', d2), { q: '<b>b)</b> Wie sieht die F₁ aus?', opts: [`alle ${A}${a}, ${e.ph[0]}`, `alle ${A}${A}, ${e.ph[0]}`, `${A}${A} : ${A}${a} : ${a}${a} = 1 : 2 : 1`, `alle ${a}${a}, ${e.ph[1]}`], a: 0, ex: 'Jedes Kind erhält von einem Elternteil ' + A + ' und vom anderen ' + a + '. Alle F₁-Nachkommen sind gleich (uniform).', key: key + ':b' });
+    if (k === 'spalt') mcBlock($('.q', d2), { q: '<b>b)</b> Welche Verhältnisse gelten für die F₂?', opts: ['Genotypen 1 : 2 : 1, Phänotypen 3 : 1', 'Genotypen 3 : 1, Phänotypen 1 : 2 : 1', 'Genotypen 1 : 1, Phänotypen 1 : 1', 'Genotypen 9 : 3 : 3 : 1, Phänotypen 3 : 1'], a: 0, ex: `${A}${A} : ${A}${a} : ${a}${a} = 1 : 2 : 1; ${e.ph[0]} : ${e.ph[1]} = 3 : 1 (25 % ${e.ph[1]}).`, key: key + ':b' });
+    if (k === 'inter') mcBlock($('.q', d2), { q: '<b>b)</b> Welches Phänotypverhältnis zeigt die F₂?', opts: ['1 rot : 2 rosa : 1 weiß', '3 rot : 1 weiß', '3 rosa : 1 weiß', 'alle rosa'], a: 0, ex: 'Beim intermediären Erbgang ist der Mischling (RW) rosa; das Phänotypverhältnis entspricht dem Genotypverhältnis.', key: key + ':b' });
+    const d3 = add('<div class="q"></div>');
+    if (k === 'uni') mcBlock($('.q', d3), { q: '<b>c)</b> Welche Regel gilt hier?', opts: ['Uniformitätsregel', 'Spaltungsregel', 'Unabhängigkeitsregel'], a: 0, noShuffle: true, ex: 'Kreuzt man reinerbige Eltern, die sich in einem Merkmal unterscheiden, sind alle F₁-Nachkommen gleich.', key: key + ':c' });
+    if (k === 'spalt') mcBlock($('.q', d3), G ? { q: '<b>c)</b> Warum tritt das rezessive Merkmal in der F₂ wieder auf?', opts: ['Die F₁ trägt das rezessive Allel verdeckt; in der Meiose werden die Allele getrennt, und zwei Keimzellen mit ' + a + ' können zusammentreffen.', 'Es entsteht durch eine Mutation neu.', 'Das dominante Allel geht in der F₁ verloren.', 'Die Umwelt verändert die Farbe.'], a: 0, ex: 'Die Allele werden bei der Keimzellbildung getrennt (Spaltung); ' + a + a + ' entsteht mit 1/4.', key: key + ':c' } : { q: `<b>c)</b> Welcher Anteil der F₂ ist ${e.ph[1]}?`, opts: ['25 %', '50 %', '75 %', '0 %'], a: 0, ex: `1 von 4 Feldern (${a}${a}) = 25 %.`, key: key + ':c' });
+    if (k === 'inter') mcBlock($('.q', d3), { q: '<b>c)</b> Was unterscheidet den intermediären vom dominant-rezessiven Erbgang?', opts: ['Der Mischling zeigt eine Zwischenform; man erkennt den Genotyp am Phänotyp.', 'Die F₁ ist nicht uniform.', 'Die Spaltungsregel gilt nicht.', 'Es gibt nur zwei Genotypen.'], a: 0, ex: 'Uniformitäts- und Spaltungsregel gelten weiterhin; nur der Phänotyp des Mischlings unterscheidet sich.', key: key + ':c' });
+  }
+  if (k === 'zahlen') {
+    const mz = e.mendel ? e : EX.farbe, r = mz.mendel[0] / mz.mendel[1];
+    const d = add(`<b>a)</b> ${T.parts[0]}<div class="btnrow" style="margin-top:8px"><input class="sel" type="text" inputmode="decimal" placeholder="z. B. 2,95" style="width:120px" id="zin-${nr}"> <span>: 1</span><button class="btn primary">Prüfen</button></div><div class="fb"></div>`);
+    $('button', d).onclick = () => {
+      const v = parseFloat($('input', d).value.replace(',', '.')), ok = Math.abs(v - r) < .015, fb = $('.fb', d);
+      if (ok) award(key + ':a', 3);
+      fb.className = 'fb show ' + (ok ? 'ok' : 'bad'); fb.innerHTML = ok ? `<b class="v">Richtig.</b>${mz.mendel[0]} : ${mz.mendel[1]} = ${r.toFixed(2).replace('.', ',')} : 1.` : `<b class="v">Noch nicht.</b>Teile die größere Zahl durch die kleinere: ${mz.mendel[0]} ÷ ${mz.mendel[1]}.`;
+    };
+    const d2 = add('<div class="q"></div>');
+    mcBlock($('.q', d2), { q: '<b>b)</b> Warum weicht Mendels Ergebnis etwas von 3 : 1 ab?', opts: ['Die Verteilung der Allele auf die Keimzellen ist zufällig; 3 : 1 ist ein Erwartungswert.', 'Mendel hat sich verzählt.', 'Das Allel für ' + mz.ph[1] + ' ist dominant.', 'Die Spaltungsregel gilt nur für Tiere.'], a: 0, ex: 'Wie beim Würfeln: Je mehr Nachkommen, desto genauer nähert sich das Ergebnis dem erwarteten Verhältnis (Gesetz der großen Zahlen). Probiere es im Kreuzungslabor aus.', key: key + ':b' });
+  }
+  if (k === 'unab') {
+    const sys = W.di, X = cross(sys, het(sys), het(sys)), order = phenoList(sys);
+    const gamD = add(`<b>a)</b> ${G ? 'Welche Keimzellen bildet ein F₁-Nachkomme? Wähle alle aus.' : 'Die Keimzellen sind vorgegeben. Zähle im Kreuzungsquadrat die Phänotypen aus.'}<div class="gq" style="margin-top:8px"></div>`);
+    const grid = add(`<div class="gridhost" ${G ? 'hidden' : ''}><div style="overflow-x:auto">${schemaHTML(sys, het(sys), het(sys), { sum: false })}</div>
+      <div class="btnrow" style="margin-top:10px">${order.map((p, i) => `<label style="display:flex;flex-direction:column;font-size:.9rem">${p}<input class="sel cnt" data-p="${i}" type="number" inputmode="numeric" min="0" max="16" style="width:90px"></label>`).join('')}<button class="btn primary ccheck">Prüfen</button></div><div class="fb cfb"></div></div>`);
+    if (G) {
+      const all = ['GR', 'Gr', 'gR', 'gr', 'Gg', 'Rr', 'GG', 'rr'].map(x => x.replace(/G/g, EX[DI[sys].genes[0]].al[0]).replace(/g/g, EX[DI[sys].genes[0]].al[1]).replace(/R/g, EX[DI[sys].genes[1]].al[0]).replace(/r/g, EX[DI[sys].genes[1]].al[1]));
+      // eindeutig machen für Meerschweinchen (B/b, R/r) – Ersatz oben nimmt G→B
+      const corr = uniq(gametes(sys, het(sys)));
+      const opts = uniq(all);
+      mcBlock($('.gq', gamD), { opts, multi: true, a: opts.map((o, i) => corr.indexOf(o) >= 0 ? i : -1).filter(i => i >= 0), ex: 'Jede Keimzelle enthält von jedem Gen genau ein Allel: ' + corr.join(', ') + '.', key: key + ':a' });
+      const show = document.createElement('button'); show.className = 'btn'; show.style.marginTop = '8px'; show.textContent = 'Weiter zum Kreuzungsquadrat'; show.onclick = () => { $('.gridhost', grid).hidden = false; show.remove(); }; gamD.appendChild(show);
+    }
+    $('.ccheck', grid).onclick = () => {
+      let ok = true; $$('.cnt', grid).forEach(inp => { const r = (+inp.value) === (X.pc[order[+inp.dataset.p]] || 0); inp.classList.toggle('ok', r); inp.classList.toggle('bad', !r); if (!r) ok = false; });
+      if (ok) award(key + ':b', 4);
+      const fb = $('.cfb', grid); fb.className = 'fb show ' + (ok ? 'ok' : 'bad'); fb.innerHTML = ok ? `<b class="v">Richtig.</b>${order.map(p => X.pc[p]).join(' : ')} – das ist das Verhältnis <b>9 : 3 : 3 : 1</b>.` : '<b class="v">Noch nicht.</b>Zähle jedes Feld genau einmal. Ein Großbuchstabe genügt für das dominante Merkmal.';
+    };
+    const d3 = add('<div class="q"></div>');
+    mcBlock($('.q', d3), { q: '<b>c)</b> Welche Phänotypen sind <b>neu kombiniert</b>?', multi: true, opts: order, a: [1, 2], noShuffle: true, ex: `Die Eltern waren ${order[0]} und ${order[3]}. Neu sind ${order[1]} und ${order[2]}. Das zeigt die Unabhängigkeitsregel: Die beiden Gene werden unabhängig voneinander vererbt.`, key: key + ':c' });
+  }
+  if (k === 'rueck') {
+    const d = add('<div class="q"></div>');
+    mcBlock($('.q', d), { q: '<b>a)</b> Warum kreuzt man mit einem braunen (bb) Tier?', opts: ['Es bildet nur Keimzellen mit b; so zeigt sich jedes Allel des schwarzen Tieres im Phänotyp der Jungen.', 'Braune Tiere haben mehr Junge.', 'Weil b dominant ist.', 'Damit alle Jungen schwarz sind.'], a: 0, ex: 'Das ist das Prinzip der Testkreuzung.', key: key + ':a' });
+    const d2 = add(`<b>b)</b> Kreuzungsquadrat für Bb × bb:<div class="pt" style="margin-top:8px"></div>`);
+    punnettTask($('.pt', d2), { sys: 'meer', g1: 'Bb', g2: 'bb', gamGiven: false, key: key + ':b', pts: 3 });
+    const d3 = add('<div class="q"></div>');
+    mcBlock($('.q', d3), { q: '<b>c)</b> Unter 10 Jungen sind 4 braune. Welchen Genotyp hat das schwarze Tier?', opts: ['Bb', 'BB', 'bb'], a: 0, ex: 'Braune Junge (bb) brauchen ein b vom schwarzen Elternteil. Bei BB × bb wären alle Jungen schwarz (Bb).', key: key + ':c' });
+  }
+  if (k === 'regel') {
+    const d = add(REGEL_ITEMS.map((it, i) => `<div class="tfrow" style="grid-template-columns:minmax(0,1fr) auto"><span>${i + 1}. ${it[0]}</span><select class="sel rsel" data-i="${i}"><option value="">…</option>${RULES3.map((r, j) => `<option value="${j}">${r}</option>`).join('')}</select></div>`).join('') + '<div class="btnrow" style="margin-top:10px"><button class="btn primary">Prüfen</button></div><div class="fb"></div>');
+    $('button', d).onclick = () => { let ok = 0; $$('.rsel', d).forEach(s => { const r = s.value !== '' && +s.value === REGEL_ITEMS[+s.dataset.i][1]; s.classList.toggle('ok', r); s.classList.toggle('bad', !r); if (r) ok++; }); if (ok === REGEL_ITEMS.length) award(key, 4); const fb = $('.fb', d); fb.className = 'fb show ' + (ok === REGEL_ITEMS.length ? 'ok' : 'bad'); fb.innerHTML = `<b class="v">${ok} von ${REGEL_ITEMS.length} richtig.</b>`; };
+  }
+  if (k === 'luecke') {
+    const d = add(`<p class="muted">Wortliste: <i>${LUECKE_WORDS.join(' · ')}</i></p>` + LUECKE.map((it, i) => `<p style="margin:10px 0;line-height:2.1">${i + 1}. ${it[0]} <select class="sel gap" data-i="${i}"><option value="">…</option>${LUECKE_WORDS.map(w => `<option>${w}</option>`).join('')}</select> ${it[2]}</p>`).join('') + '<div class="btnrow"><button class="btn primary">Prüfen</button></div><div class="fb"></div>');
+    $('button', d).onclick = () => { let ok = 0; $$('.gap', d).forEach(s => { const r = s.value === LUECKE[+s.dataset.i][1]; s.classList.toggle('ok', r); s.classList.toggle('bad', !r); if (r) ok++; }); if (ok === LUECKE.length) award(key, 4); const fb = $('.fb', d); fb.className = 'fb show ' + (ok === LUECKE.length ? 'ok' : 'bad'); fb.innerHTML = `<b class="v">${ok} von ${LUECKE.length} richtig.</b>`; };
+  }
+}
+
+/* ---------- Druckfassung (PDF) ---------- */
+function emptyGrid(sys, g1, g2, fillGam) {
+  const X = cross(sys, g1, g2), n = X.ga.length;
+  let h = `<table class="pgrid ${n === 4 ? 'di' : ''}"><tr><th>♀ \\ ♂</th>${X.ga.map(a => `<th>${fillGam ? a : ''}</th>`).join('')}</tr>`;
+  X.gb.forEach(b => { h += `<tr><th>${fillGam ? b : ''}</th>${X.ga.map(() => '<td></td>').join('')}</tr>`; });
+  return h + '</table>';
+}
+function lines(n) { return '<div class="lines">' + '<div></div>'.repeat(n) + '</div>'; }
+function buildPrint(W) {
+  const lv = S.level, G = lv === 'G', e = EX[W.ex];
+  let h = `<div class="ph"><table class="phead"><tr><td>Biologie</td><td>Klasse:</td><td>Name:</td><td>Datum:</td></tr><tr class="dark"><td>AB</td><td colspan="3">Die Mendelschen Regeln – ${e.name.replace('Erbse: ', 'Erbse, ')} (${LVN[lv]})</td></tr></table></div>`;
+  h += `<p class="pintro">Bearbeite die Aufgaben. Die digitale Fassung mit Kreuzungslabor findest du unter <b>makro5652.github.io/animationen/mendel-regeln.html</b>.</p>`;
+  W.tasks.forEach((k, i) => {
+    const T = taskText(k, W);
+    h += `<section class="ptask"><h3>Aufgabe ${i + 1}: ${T.h}</h3><p>${T.t}</p>`;
+    const L = 'abcdef';
+    if (k === 'uni' || k === 'spalt' || k === 'inter') {
+      const sys = k === 'inter' ? 'wunder' : W.ex, g1 = k === 'uni' ? homDom(sys) : het(sys), g2 = k === 'uni' ? homRec(sys) : het(sys);
+      h += `<p><b>a)</b> ${T.parts[0]}</p>${emptyGrid(sys, g1, g2, !G)}<p><b>b)</b> ${T.parts[1]}</p>${lines(2)}<p><b>c)</b> ${T.parts[2]}</p>${lines(3)}`;
+    } else if (k === 'zahlen') {
+      h += `<p><b>a)</b> ${T.parts[0]}</p>${lines(2)}<p><b>b)</b> ${T.parts[1]}</p>${lines(3)}`;
+    } else if (k === 'unab') {
+      h += `<p><b>a)</b> ${T.parts[0]}</p>${G ? lines(1) : ''}${emptyGrid(W.di, het(W.di), het(W.di), !G)}<p><b>b)</b> ${T.parts[1]}</p>${lines(1)}<p><b>c)</b> ${T.parts[2]}</p>${lines(3)}`;
+    } else if (k === 'rueck') {
+      h += `<p><b>a)</b> ${T.parts[0]}</p>${lines(2)}<p><b>b)</b> ${T.parts[1]}</p><div class="two">${emptyGrid('meer', 'BB', 'bb', false)}${emptyGrid('meer', 'Bb', 'bb', false)}</div><p><b>c)</b> ${T.parts[2]}</p>${lines(2)}`;
+    } else if (k === 'regel') {
+      h += `<table class="tt"><tr><th>Beobachtung</th><th style="width:34%">Regel</th></tr>${REGEL_ITEMS.map((it, j) => `<tr><td>${j + 1}. ${it[0]}</td><td></td></tr>`).join('')}</table>`;
+    } else if (k === 'luecke') {
+      h += `<p class="wl">Wortliste: ${LUECKE_WORDS.join(' · ')}</p>${LUECKE.map((it, j) => `<p class="cl">${j + 1}. ${it[0]} ____________________ ${it[2]}</p>`).join('')}`;
+    }
+    h += '</section>';
+  });
+  if (W.gloss) h += `<section class="ptask"><h3>Wortspeicher</h3><table class="tt"><tr><th>Wort</th><th>Plural</th><th>Erklärung</th></tr>${WS_GLOSS.map(g => `<tr><td>${g[0]}</td><td>${g[1]}</td><td>${g[2]}</td></tr>`).join('')}</table></section>`;
+  if (W.sol) {
+    h += `<section class="ptask sol"><h3>Lösungen</h3>`;
+    W.tasks.forEach((k, i) => {
+      h += `<h4>Aufgabe ${i + 1}</h4>`;
+      if (k === 'uni' || k === 'spalt' || k === 'inter') { const sys = k === 'inter' ? 'wunder' : W.ex; h += schemaHTML(sys, k === 'uni' ? homDom(sys) : het(sys), k === 'uni' ? homRec(sys) : het(sys)); }
+      if (k === 'uni') h += '<p>F₁ uniform: alle heterozygot und mit dominantem Phänotyp. Uniformitätsregel.</p>';
+      if (k === 'spalt') h += '<p>Das rezessive Allel liegt in der F₁ verdeckt vor; bei der Keimzellbildung werden die Allele getrennt; 1/4 der F₂ ist homozygot rezessiv (25 %).</p>';
+      if (k === 'inter') h += '<p>Mischlinge zeigen eine Zwischenform; Phänotyp 1 : 2 : 1 entspricht dem Genotyp.</p>';
+      if (k === 'zahlen') { const mz = e.mendel ? e : EX.farbe; h += `<p>${mz.mendel[0]} : ${mz.mendel[1]} = ${(mz.mendel[0] / mz.mendel[1]).toFixed(2).replace('.', ',')} : 1 ≈ 3 : 1. Abweichung durch Zufall bei der Keimzellbildung und Befruchtung.</p>`; }
+      if (k === 'unab') h += `<p>Keimzellen: ${gametes(W.di, het(W.di)).join(', ')}.</p>` + schemaHTML(W.di, het(W.di), het(W.di)) + '<p>Neu kombiniert: die beiden mittleren Phänotypen. Unabhängigkeitsregel.</p>';
+      if (k === 'rueck') h += '<p>a) bb bildet nur Keimzellen mit b. b) BB × bb: alle Bb (schwarz); Bb × bb: 1 Bb : 1 bb. c) Bb, da braune Junge auftreten.</p>';
+      if (k === 'regel') h += '<p>' + REGEL_ITEMS.map((it, j) => `${j + 1}. ${RULES3[it[1]]}`).join(' · ') + '</p>';
+      if (k === 'luecke') h += '<p>' + LUECKE.map((it, j) => `${j + 1}. ${it[1]}`).join(' · ') + '</p>';
+    });
+    h += '</section>';
+  }
+  h += `<div class="pfoot">Mendelsche Regeln · ${LVN[lv]} · Weiter mit: Stammbaumanalyse (makro5652.github.io/animationen/stammbaum-selbstlernkurs.html)</div>`;
+  $('#print').innerHTML = h;
+}
+
+/* ================= Start ================= */
+function init() {
+  $('nav.tabs').innerHTML = TABS.map(([k, n], i) => `<button role="tab" data-tab="${k}">${i ? `<span class="n">${i}</span>` : ''}${n}</button>`).join('') + '<a class="navlink" href="stammbaum-selbstlernkurs.html">Weiter: Stammbaumanalyse →</a>';
+  $$('nav.tabs button').forEach(b => b.onclick = () => go(b.dataset.tab));
+  $$('.levels button').forEach(b => b.onclick = () => setLevel(b.dataset.lv));
+  $('#wsbtn').onclick = () => { $('#drawer .body').innerHTML = `<h2>Wortspeicher</h2><dl class="ws">${WS_GLOSS.map(g => `<dt>${g[0]} <span>· ${g[1]}</span></dt><dd>${g[2]}</dd>`).join('')}</dl>`; $('#drawer').classList.add('open'); };
+  $$('#drawer .scrim, #drawer .close').forEach(x => x.onclick = () => $('#drawer').classList.remove('open'));
+  $('#reset').onclick = () => { if (confirm('Alle Punkte und Fortschritte auf diesem Gerät löschen?')) { try { localStorage.removeItem(KEY); } catch (e) {} location.reload(); } };
+  if (S.level !== 'R' && S.level !== 'G') S.level = 'R';
+  updateHeader(); render();
+}
+init();
+
+</script>
+</body>
+</html>

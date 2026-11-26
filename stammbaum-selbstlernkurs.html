@@ -1098,6 +1098,7 @@ function pgStart(m) {
       ['train', 'Training', 'Unbegrenzt neue, zufällige Stammbäume analysieren', 'train:'],
       ['quiz', 'Quiz', 'Teste dich: 12 Fragen, Punkte und Kompetenzprofil', 'quiz:']
     ].map(([t, n, d, pre], i) => `<button class="pathcard" data-go="${t}"><span class="n">${i + 1}</span><span><b>${n}</b><small>${d}</small><small style="margin-top:4px">${doneCount(pre)} Aufgaben gelöst</small></span></button>`).join('')}</div>
+    <a class="pathcard" href="mendel-regeln.html" style="margin-top:16px;text-decoration:none;color:inherit"><span class="n" style="background:var(--ok)">←</span><span><b>Vorher: Die Mendelschen Regeln</b><small>Dominant, rezessiv, Genotyp und Kreuzungsquadrat sind dir noch nicht sicher? Wiederhole sie in der Arbeitsblatt-App zu den Mendelschen Regeln.</small></span></a>
     <div class="note" style="margin-top:18px"><b>So arbeitest du:</b> Bearbeite die Reiter von links nach rechts. Tippe in den Stammbäumen direkt auf die Personen. Punkte gibt es für Antworten, die beim ersten Versuch stimmen. ${lv !== 'O' ? 'Unbekannte Wörter findest du oben im <b>Wortspeicher</b>.' : ''}</div>`;
   $$('.lvpick', m).forEach(b => b.onclick = () => setLevel(b.dataset.lv));
   $$('[data-go]', m).forEach(b => b.onclick = () => go(b.dataset.go));
