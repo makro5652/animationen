@@ -25,7 +25,11 @@ header{display:flex;gap:16px;align-items:flex-start;justify-content:space-betwee
 h1{font-size:clamp(28px,3.6vw,42px);line-height:1.06;margin:0 0 6px;text-wrap:balance}
 .sub{color:var(--mute);margin:0;max-width:75ch}
 .themebtn{flex:none;min-height:48px;min-width:48px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;font:inherit;font-weight:700;cursor:pointer;padding:6px 12px}
-.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:18px 0 12px}
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:18px 0 12px}
+@media (max-width:760px){.tabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.die{width:56px;height:56px;border:2px solid var(--ink);border-radius:12px;background:var(--bg);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:7px;gap:2px;flex:none}
+.die span{border-radius:50%}
+.die span.pip{background:var(--ink)}
 .tab{min-height:62px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;font:inherit;font-weight:700;font-size:17px;cursor:pointer;padding:8px 12px;text-align:left}
 .tab small{display:block;font-weight:400;color:var(--mute);font-size:13px;line-height:1.3}
 .tab[aria-selected=true]{border-color:var(--pri);background:var(--pri);color:var(--onpri)}
@@ -86,7 +90,8 @@ table.av th{font-size:13.5px;color:var(--mute);font-weight:700}
 <div class="tabs" role="tablist">
   <button class="tab" role="tab" aria-selected="true" aria-controls="p0" id="tab0">1 · Stoffebene<small>Kaliumpermanganat im Becherglas</small></button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="p1" id="tab1">2 · Teilchenebene<small>Teilchenbewegung und Konzentrationsausgleich</small></button>
-  <button class="tab" role="tab" aria-selected="false" aria-controls="p2" id="tab2">3 · Oberfläche<small>Kontaktfläche und Würfelversuch</small></button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="pZ" id="tabZ">3 · Zufallsweg<small>Würfelspiel auf Sechseckfeldern</small></button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="p2" id="tab2">4 · Oberfläche<small>Kontaktfläche und Würfelversuch</small></button>
 </div>
 
 <!-- ================= TAB 1: STOFFEBENE ================= -->
@@ -179,7 +184,85 @@ table.av th{font-size:13.5px;color:var(--mute);font-weight:700}
  </div>
 </section>
 
-<!-- ================= TAB 3: OBERFLÄCHE ================= -->
+<!-- ================= TAB 3: ZUFALLSWEG (WÜRFELSPIEL) ================= -->
+<section class="panel" id="pZ" role="tabpanel" aria-labelledby="tabZ" hidden>
+ <div class="seg" role="group" aria-label="Variante wählen">
+   <button id="mZA" aria-pressed="true">A · Eine Spielfigur (Würfelspiel)</button>
+   <button id="mZB" aria-pressed="false">B · Viele Spielfiguren (Tropfen)</button>
+ </div>
+ <div class="layout">
+  <div>
+   <div id="vZA">
+    <div class="stage"><canvas id="cvZ" aria-label="Sechseckiges Spielfeld mit Spielfigur und ihrem Weg"></canvas></div>
+    <div class="ctrl">
+      <div class="die" id="die" role="img" aria-label="Würfel"></div>
+      <button class="btn pri" id="bZRoll">Würfeln</button>
+      <button class="btn zn" data-n="10">10 ×</button><button class="btn zn" data-n="20">20 ×</button><button class="btn zn" data-n="100">100 ×</button>
+      <label class="f">Tempo <select id="sZSpeed"><option value="500">langsam</option><option value="130" selected>schnell</option><option value="0">sofort</option></select></label>
+      <button class="btn" id="bZReset">Neue Runde</button>
+      <label class="f"><input type="checkbox" id="cZRose" checked> Richtungen anzeigen</label>
+    </div>
+    <div class="stats" id="stZ"></div>
+    <div class="stage" style="margin-top:10px"><canvas id="cvZh" aria-label="Häufigkeit der gewürfelten Augenzahlen"></canvas></div>
+   </div>
+   <div id="vZB" hidden>
+    <div class="stage"><canvas id="cvZB" aria-label="Spielfeld mit vielen Spielfiguren, die vom selben Startfeld aus würfeln"></canvas></div>
+    <div class="ctrl">
+      <button class="btn pri" id="bZBPlay">Start</button>
+      <button class="btn" id="bZBReset">Neu starten</button>
+      <label class="f">Spielfiguren <select id="sZBN"><option>30</option><option selected>100</option><option>500</option><option>2000</option></select></label>
+      <label class="f">Würfe je Figur <select id="sZBT"><option>10</option><option>20</option><option>50</option><option selected>100</option><option>200</option></select></label>
+      <label class="f">Tempo <select id="sZBSpeed"><option value="3">langsam</option><option value="12" selected>mittel</option><option value="60">schnell</option></select></label>
+    </div>
+    <div class="stats" id="stZB"></div>
+    <div class="stage" style="margin-top:10px"><canvas id="cvZBg" aria-label="Diagramm: mittlerer Abstand vom Start gegen die Anzahl der Würfe"></canvas></div>
+   </div>
+  </div>
+  <aside class="info">
+   <div id="iZA">
+    <h2>Das Würfelspiel: ein Zufallsweg</h2>
+    <p><b>Spielregeln:</b> Tippe vor dem ersten Wurf auf ein Feld. Dort beginnt die Spielfigur (S). Bei jedem Wurf zeigt die Augenzahl die Richtung, in die die Figur ein Feld weiterzieht (siehe Zahlen um die Figur).</p>
+    <p>Würfle 10-, 20- oder 100-mal. Notiere, wie weit die Figur am Ende vom Startfeld entfernt ist. Starte dann eine <i>neue Runde</i> und vergleiche.</p>
+    <p><b>Beobachtung:</b> Jede Runde endet an einer anderen Stelle. Manchmal kommt die Figur weit, manchmal landet sie fast wieder am Start. Der Weg ist ein Zickzackweg.</p>
+    <div class="merk"><b>Vergleich mit den Teilchen:</b> Die Spielfigur entspricht einem Farbstoffteilchen. Jeder Wurf entspricht einem Zusammenstoß mit einem Wasserteilchen: Danach bewegt sich das Teilchen in eine zufällige neue Richtung. Die Anzahl der Würfe entspricht der Zeit.</div>
+    <h3>Richtungen</h3>
+    <p>1 = rechts oben · 2 = rechts · 3 = rechts unten · 4 = links unten · 5 = links · 6 = links oben</p>
+    <p>Der <b>Abstand</b> wird in Feldern gezählt: Er ist die kleinste Anzahl an Schritten zurück zum Startfeld.</p>
+    <details class="wort"><summary>Wortspeicher</summary>
+     <dl class="ws">
+      <dt>der Zufall, die Zufälle</dt><dd>etwas, das man nicht vorhersagen kann</dd>
+      <dt>der Zufallsweg, die Zufallswege</dt><dd>Weg, bei dem jede neue Richtung zufällig bestimmt wird</dd>
+      <dt>die Augenzahl, die Augenzahlen</dt><dd>Zahl, die der Würfel nach dem Wurf oben zeigt</dd>
+      <dt>der Abstand, die Abstände</dt><dd>Entfernung zwischen zwei Orten, hier in Feldern gezählt</dd>
+      <dt>die Runde, die Runden</dt><dd>ein Durchgang des Spiels vom Start bis zum letzten Wurf</dd>
+     </dl>
+    </details>
+    <details class="modell"><summary>Hinweise zum Modell</summary>
+     <p>Im Modell sind alle Schritte gleich lang, es gibt nur sechs Richtungen, und die Spielfigur stößt nicht mit anderen Figuren zusammen. Echte Teilchen bewegen sich im Raum (dreidimensional), mit unterschiedlichen Geschwindigkeiten und Weglängen zwischen zwei Stößen. Das Grundprinzip – zufällige Richtungsänderung nach jedem Stoß – ist aber dasselbe.</p>
+     <p>Die Augenzahlen werden mit dem Zufallsgenerator des Browsers erzeugt; jede Augenzahl ist gleich wahrscheinlich.</p>
+    </details>
+   </div>
+   <div id="iZB" hidden>
+    <h2>Viele Spielfiguren: ein Tropfen Farbstoff</h2>
+    <p>Alle Spielfiguren starten auf demselben Feld – wie viele Farbstoffteilchen in einem Tropfen. Jede Figur würfelt unabhängig von den anderen.</p>
+    <p>Keine Figur zieht gezielt nach außen. Trotzdem verteilen sich die Figuren immer weiter über das Spielfeld. Am Startfeld ist die „Konzentration“ hoch, außen niedrig. Weil es viel mehr Möglichkeiten gibt, sich vom Start zu entfernen, als genau dorthin zurückzukehren, entsteht eine <b>Nettobewegung</b> nach außen.</p>
+    <div class="merk"><b>Merksatz:</b> Der mittlere Abstand vom Start wächst nicht proportional zur Anzahl der Würfe, sondern ungefähr mit der Wurzel: mittlerer Abstand ≈ √(Anzahl der Würfe). Für den doppelten Abstand braucht man etwa die vierfache Anzahl an Würfen (also die vierfache Zeit).</div>
+    <p>Das erklärt, warum Diffusion über kurze Strecken schnell, über lange Strecken aber sehr langsam ist (vgl. Würfelversuch in Reiter 4).</p>
+    <h3>Arbeitsaufträge</h3>
+    <ol>
+      <li>Beschreibe die Verteilung der Figuren nach 0, 10, 50 und 100 Würfen.</li>
+      <li>Lies den mittleren Abstand nach 25 und nach 100 Würfen ab. Vergleiche mit √25 und √100.</li>
+      <li>Erkläre, warum sich die Figuren nach außen verteilen, obwohl jede Richtung gleich wahrscheinlich ist.</li>
+    </ol>
+    <details class="modell"><summary>Hinweise zum Modell</summary>
+     <p>Für sehr viele Würfe gilt bei diesem Spielfeld: mittlerer Abstand (in Feldern) ≈ 0,97 · √n. Die mittlere quadratische Entfernung (Luftlinie, in Feldabständen) beträgt genau n – das ist die Grundlage der Diffusionsgleichung (x² ~ D · t). Mit wenigen Figuren schwanken die Werte stärker.</p>
+    </details>
+   </div>
+  </aside>
+ </div>
+</section>
+
+<!-- ================= TAB 4: OBERFLÄCHE ================= -->
 <section class="panel" id="p2" role="tabpanel" aria-labelledby="tab2" hidden>
  <div class="seg" role="group" aria-label="Variante wählen">
    <button id="m3A" aria-pressed="true">A · Kontaktfläche (Teilchenebene)</button>
@@ -560,6 +643,113 @@ $('b3bPlay').onclick=()=>{if(T3B.t>=T3B.tmax)t3bSetup();T3B.run=!T3B.run;setPlay
 $('b3bReset').onclick=()=>{t3bSetup();T3B.run=false;setPlay($('b3bPlay'),false);};
 $('s3mode').onchange=()=>{t3bSetup();T3B.run=false;setPlay($('b3bPlay'),false);};
 
+/* =====================================================================
+   TAB 3 – ZUFALLSWEG (Würfelspiel auf Sechseckfeldern, axiale Koordinaten)
+   ===================================================================== */
+const SQ3=Math.sqrt(3);
+const DIRS=[null,[1,-1],[1,0],[0,1],[-1,1],[-1,0],[0,-1]]; // 1 rechts oben, 2 rechts, 3 rechts unten, 4 links unten, 5 links, 6 links oben
+const hexDist=(q,r)=>(Math.abs(q)+Math.abs(r)+Math.abs(q+r))/2;
+const roll=()=>{try{const a=new Uint32Array(1);let v;do{crypto.getRandomValues(a);v=a[0];}while(v>=4294967292);return 1+v%6;}catch(e){return 1+Math.floor(Math.random()*6);}};
+function hexLayout(LW,LH,Rv,cx,cy){const size=Math.min((LW-20)/(SQ3*(2*Rv+1)),(LH-20)/(3*Rv+2));return{size,cx,cy,
+ px:(q,r)=>[cx+size*SQ3*(q+r/2),cy+size*1.5*r]};}
+function hexPath(c,x,y,s){c.beginPath();for(let k=0;k<6;k++){const a=Math.PI/180*(60*k-30);const X=x+s*Math.cos(a),Y=y+s*Math.sin(a);k?c.lineTo(X,Y):c.moveTo(X,Y);}c.closePath();}
+function pixToHex(L,x,y){const X=x-L.cx,Y=y-L.cy;let q=(SQ3/3*X-Y/3)/L.size,r=(2/3*Y)/L.size,s=-q-r;
+ let rq=Math.round(q),rr_=Math.round(r),rs=Math.round(s);const dq=Math.abs(rq-q),dr=Math.abs(rr_-r),ds=Math.abs(rs-s);
+ if(dq>dr&&dq>ds)rq=-rr_-rs;else if(dr>ds)rr_=-rq-rs;return[rq,rr_];}
+function dieFace(el,n){const P={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]}[n]||[];
+ el.innerHTML=Array.from({length:9},(_,i)=>`<span class="${P.includes(i)?'pip':''}"></span>`).join('');el.setAttribute('aria-label','Würfel zeigt '+(n||'nichts'));}
+
+const RB=9;
+const ZA={v:null,vh:null,start:[0,0],pos:[0,0],path:[[0,0]],rolls:[],queue:0,acc:0,anim:0,face:0,lastDir:0,rounds:[],freq:[0,0,0,0,0,0,0],visits:new Map(),L:null};
+function zaReset(save){if(save&&ZA.rolls.length){const d=hexDist(ZA.pos[0]-ZA.start[0],ZA.pos[1]-ZA.start[1]);ZA.rounds.push({n:ZA.rolls.length,d});if(ZA.rounds.length>12)ZA.rounds.shift();}
+ ZA.pos=[...ZA.start];ZA.path=[[...ZA.start]];ZA.rolls=[];ZA.queue=0;ZA.lastDir=0;ZA.face=0;ZA.visits=new Map([[ZA.start.join(','),1]]);dieFace($('die'),0);}
+function zaStep(n){const d=DIRS[n];ZA.pos=[ZA.pos[0]+d[0],ZA.pos[1]+d[1]];ZA.path.push([...ZA.pos]);ZA.rolls.push(n);ZA.freq[n]++;ZA.lastDir=n;
+ const k=ZA.pos.join(',');ZA.visits.set(k,(ZA.visits.get(k)||0)+1);}
+function zaFrame(dt){const sp=+$('sZSpeed').value;
+ if(ZA.queue>0){if(sp===0){while(ZA.queue>0){const n=roll();zaStep(n);ZA.face=n;ZA.queue--;}dieFace($('die'),ZA.face);}
+  else{ZA.acc+=dt*1000;if(sp>=400&&ZA.acc<sp*0.7){if(Math.random()<0.35)dieFace($('die'),1+Math.floor(Math.random()*6));}
+   if(ZA.acc>=sp){ZA.acc=0;const n=roll();zaStep(n);ZA.face=n;dieFace($('die'),n);ZA.queue--;}}}
+ zaDraw();}
+function zaDraw(){const v=ZA.v,c=begin(v);let maxD=0;for(const p of ZA.path)maxD=Math.max(maxD,hexDist(p[0],p[1]));
+ const Rv=Math.max(RB,maxD+1);const L=hexLayout(v.LW,v.LH,Rv,v.LW/2,v.LH/2);ZA.L=L;const s=L.size;
+ c.lineWidth=1;
+ for(let q=-Rv;q<=Rv;q++)for(let r=Math.max(-Rv,-q-Rv);r<=Math.min(Rv,-q+Rv);r++){const [x,y]=L.px(q,r);hexPath(c,x,y,s*0.97);
+  const vis=ZA.visits.get(q+','+r)||0;c.fillStyle=C.box;c.fill();if(vis){c.globalAlpha=Math.min(0.85,0.25+0.15*vis);c.fillStyle=C.water;c.fill();c.globalAlpha=1;}
+  c.strokeStyle=C.boxst;c.stroke();}
+ // Start
+ {const [x,y]=L.px(...ZA.start);hexPath(c,x,y,s*0.97);c.fillStyle=C.pri;c.globalAlpha=.35;c.fill();c.globalAlpha=1;c.strokeStyle=C.pri;c.lineWidth=3;c.stroke();
+  c.fillStyle=C.ink;c.font='700 '+Math.round(s*0.8)+'px "Atkinson Hyperlegible",sans-serif';c.textAlign='center';c.textBaseline='middle';if(ZA.path.length<2||ZA.pos.join()!==ZA.start.join())c.fillText('S',x,y);}
+ // Weg
+ if(ZA.path.length>1){c.strokeStyle=C.acc;c.lineWidth=Math.max(2,s*0.16);c.lineJoin='round';c.lineCap='round';c.beginPath();
+  ZA.path.forEach((p,i)=>{const [x,y]=L.px(p[0],p[1]);i?c.lineTo(x,y):c.moveTo(x,y);});c.stroke();}
+ // Richtungsrose
+ const [fx,fy]=L.px(...ZA.pos);
+ if($('cZRose').checked){c.font='700 '+Math.round(s*0.75)+'px "Atkinson Hyperlegible",sans-serif';c.textAlign='center';c.textBaseline='middle';
+  for(let n=1;n<=6;n++){const [x,y]=L.px(ZA.pos[0]+DIRS[n][0],ZA.pos[1]+DIRS[n][1]);c.fillStyle=C.bg;c.globalAlpha=.85;c.beginPath();c.arc(x,y,s*0.5,0,7);c.fill();c.globalAlpha=1;
+   c.strokeStyle=C.mute;c.lineWidth=1.5;c.stroke();c.fillStyle=C.ink;c.fillText(n,x,y+1);}}
+ // Figur
+ c.fillStyle=C.dye;c.strokeStyle=C.dyest;c.lineWidth=2.5;c.beginPath();c.arc(fx,fy,s*0.55,0,7);c.fill();c.stroke();
+ // Kopfzeile
+ const d=hexDist(ZA.pos[0]-ZA.start[0],ZA.pos[1]-ZA.start[1]);
+ c.font='700 18px "Atkinson Hyperlegible",sans-serif';c.textAlign='left';c.textBaseline='top';c.fillStyle=C.ink;c.fillText('Würfe: '+ZA.rolls.length,10,8);
+ c.textAlign='right';c.fillText('Abstand vom Start: '+d+(d===1?' Feld':' Felder'),v.LW-10,8);
+ if(!ZA.rolls.length){c.textAlign='center';c.textBaseline='bottom';c.font='15px "Atkinson Hyperlegible",sans-serif';c.fillStyle=C.mute;c.fillText('Tippe auf ein Feld, um das Startfeld festzulegen.',v.LW/2,v.LH-6);}
+ // Statistik
+ const last=ZA.rolls.slice(-30).join(' ');
+ const rounds=ZA.rounds.map((r,i)=>`R${i+1}: ${r.n} Würfe → <b>${r.d}</b>`).join(' · ');
+ $('stZ').innerHTML=`Letzte Würfe: <span style="letter-spacing:.06em">${last||'–'}</span>${ZA.rolls.length>30?' …':''}<br>Abgeschlossene Runden (Abstand am Ende): ${rounds||'noch keine – nach dem Würfeln auf <i>Neue Runde</i> tippen'}`;
+ zaHist();}
+function zaHist(){const v=ZA.vh,c=begin(v);const tot=ZA.freq.reduce((a,b)=>a+b,0);const mx=Math.max(5,...ZA.freq);
+ c.font='700 15px "Atkinson Hyperlegible",sans-serif';c.fillStyle=C.ink;c.textAlign='left';c.textBaseline='top';c.fillText('Häufigkeit der Augenzahlen (alle Würfe dieser Sitzung: '+tot+')',10,6);
+ const x0=60,w=(v.LW-80)/6,y0=v.LH-30,h=v.LH-70;
+ for(let n=1;n<=6;n++){const hh=ZA.freq[n]/mx*h;c.fillStyle=C.pri;c.globalAlpha=.8;c.fillRect(x0+(n-1)*w+w*0.15,y0-hh,w*0.7,hh);c.globalAlpha=1;
+  c.fillStyle=C.ink;c.textAlign='center';c.textBaseline='top';c.font='700 15px "Atkinson Hyperlegible",sans-serif';c.fillText(n,x0+(n-.5)*w,y0+6);
+  c.textBaseline='bottom';c.font='14px "Atkinson Hyperlegible",sans-serif';c.fillText(ZA.freq[n]+(tot?' ('+Math.round(100*ZA.freq[n]/tot)+' %)':''),x0+(n-.5)*w,y0-hh-2);}
+ if(tot){const e=tot/6/mx*h;c.setLineDash([6,6]);c.strokeStyle=C.mute;c.beginPath();c.moveTo(x0,y0-e);c.lineTo(v.LW-20,y0-e);c.stroke();c.setLineDash([]);
+  c.fillStyle=C.mute;c.textAlign='left';c.textBaseline='bottom';c.fillText('erwartet: je 1/6',x0-50,y0-e-2);}
+ c.strokeStyle=C.line;c.beginPath();c.moveTo(x0,y0);c.lineTo(v.LW-20,y0);c.stroke();}
+ZA.v=makeView('cvZ',900,620);ZA.vh=makeView('cvZh',900,190);zaReset(false);
+$('bZRoll').onclick=()=>{ZA.queue+=1;ZA.acc=+$('sZSpeed').value;if(+$('sZSpeed').value>=400)ZA.acc=0;};
+document.querySelectorAll('.zn').forEach(b=>b.onclick=()=>{ZA.queue+=+b.dataset.n;});
+$('bZReset').onclick=()=>zaReset(true);
+ZA.v.cv.addEventListener('pointerdown',e=>{if(ZA.rolls.length||ZA.queue||!ZA.L)return;const p=toLogical(ZA.v,e);const h=pixToHex(ZA.L,p.x,p.y);
+ if(hexDist(h[0],h[1])<=RB){ZA.start=h;zaReset(false);}});
+
+/* ---------- Variante B: viele Spielfiguren ---------- */
+const ZB={v:null,vg:null,N:100,T:100,q:null,r:null,steps:0,run:false,acc:0,ser:[],jit:null};
+function zbInit(){ZB.N=+$('sZBN').value;ZB.T=+$('sZBT').value;ZB.q=new Int16Array(ZB.N);ZB.r=new Int16Array(ZB.N);ZB.steps=0;ZB.ser=[[0,0]];ZB.acc=0;
+ ZB.jit=Array.from({length:ZB.N},()=>{const a=Math.random()*6.283,d=Math.sqrt(Math.random())*0.6;return[Math.cos(a)*d,Math.sin(a)*d];});}
+function zbStep(){for(let i=0;i<ZB.N;i++){const d=DIRS[roll()];ZB.q[i]+=d[0];ZB.r[i]+=d[1];}ZB.steps++;
+ let s=0;for(let i=0;i<ZB.N;i++)s+=hexDist(ZB.q[i],ZB.r[i]);ZB.ser.push([ZB.steps,s/ZB.N]);}
+function zbFrame(dt){if(ZB.run&&ZB.steps<ZB.T){ZB.acc+=dt*(+$('sZBSpeed').value);while(ZB.acc>=1&&ZB.steps<ZB.T){zbStep();ZB.acc-=1;}
+  if(ZB.steps>=ZB.T){ZB.run=false;setPlay($('bZBPlay'),false);}}
+ const v=ZB.v,c=begin(v);const cnt=new Map();let maxD=0,sum=0,atStart=0,maxC=1;
+ for(let i=0;i<ZB.N;i++){const k=ZB.q[i]+','+ZB.r[i];const n=(cnt.get(k)||0)+1;cnt.set(k,n);if(n>maxC)maxC=n;const d=hexDist(ZB.q[i],ZB.r[i]);maxD=Math.max(maxD,d);sum+=d;if(d===0)atStart++;}
+ const Rv=Math.max(8,Math.ceil(Math.sqrt(ZB.T)*2.2),maxD+1);const L=hexLayout(v.LW,v.LH,Rv,v.LW/2,v.LH/2);const s=L.size;
+ const ref=Math.max(3,ZB.N/12);
+ for(let q=-Rv;q<=Rv;q++)for(let r=Math.max(-Rv,-q-Rv);r<=Math.min(Rv,-q+Rv);r++){const [x,y]=L.px(q,r);hexPath(c,x,y,s*0.97);c.fillStyle=C.box;c.fill();
+  const n=cnt.get(q+','+r)||0;if(n){c.globalAlpha=Math.min(1,0.15+0.85*n/ref);c.fillStyle=C.dye;c.fill();c.globalAlpha=1;}
+  if(s>5){c.strokeStyle=C.boxst;c.lineWidth=0.8;c.stroke();}}
+ {const [x,y]=L.px(0,0);hexPath(c,x,y,s*0.97);c.strokeStyle=C.pri;c.lineWidth=3;c.stroke();}
+ if(ZB.N<=100&&s>5){c.fillStyle=C.dye;c.strokeStyle=C.dyest;c.lineWidth=1;for(let i=0;i<ZB.N;i++){const [x,y]=L.px(ZB.q[i],ZB.r[i]);c.beginPath();c.arc(x+ZB.jit[i][0]*s,y+ZB.jit[i][1]*s,Math.max(2.5,s*0.24),0,7);c.fill();c.stroke();}}
+ const mean=sum/ZB.N;
+ if(ZB.steps>0){c.setLineDash([8,7]);c.strokeStyle=C.acc;c.lineWidth=2.5;c.beginPath();c.arc(v.LW/2,v.LH/2,mean*s*SQ3,0,7);c.stroke();c.setLineDash([]);}
+ c.font='700 18px "Atkinson Hyperlegible",sans-serif';c.fillStyle=C.ink;c.textAlign='left';c.textBaseline='top';c.fillText('Würfe je Figur: '+ZB.steps+' von '+ZB.T,10,8);
+ c.textAlign='right';c.fillStyle=C.acc;c.fillText('--- mittlerer Abstand',v.LW-10,8);
+ $('stZB').innerHTML=`Figuren: <b>${ZB.N}</b> · noch auf dem Startfeld: <b>${atStart}</b> · mittlerer Abstand: <b>${fmt(mean,1)}</b> Felder · √(Würfe) = <b>${fmt(Math.sqrt(ZB.steps),1)}</b> · größter Abstand: <b>${maxD}</b> Felder`;
+ const sq=[];for(let k=0;k<=60;k++){const n=ZB.T*k/60;sq.push([n,Math.sqrt(n)]);}
+ const ymax=Math.max(4,Math.ceil(Math.sqrt(ZB.T)*1.25/2)*2);
+ drawGraph(ZB.vg,{xmax:ZB.T,ymax,ystep:ymax<=8?1:2,xlabel:'Anzahl der Würfe',ylabel:'mittl. Abstand (Felder)',
+  series:[{pts:ZB.ser,color:C.acc,label:'gemessen'},{pts:sq,color:C.mute,label:'√(Anzahl der Würfe)'}]});}
+ZB.v=makeView('cvZB',900,620);ZB.vg=makeView('cvZBg',900,300);zbInit();
+$('bZBPlay').onclick=()=>{if(ZB.steps>=ZB.T)zbInit();ZB.run=!ZB.run;setPlay($('bZBPlay'),ZB.run);};
+$('bZBReset').onclick=()=>{zbInit();ZB.run=false;setPlay($('bZBPlay'),false);};
+['sZBN','sZBT'].forEach(id=>$(id).onchange=()=>{zbInit();ZB.run=false;setPlay($('bZBPlay'),false);});
+let subZ='A';
+function setSubZ(m){subZ=m;$('mZA').setAttribute('aria-pressed',m==='A');$('mZB').setAttribute('aria-pressed',m==='B');
+ $('vZA').hidden=$('iZA').hidden=m!=='A';$('vZB').hidden=$('iZB').hidden=m!=='B';}
+$('mZA').onclick=()=>setSubZ('A');$('mZB').onclick=()=>setSubZ('B');
+
 /* ---------- Reiter ---------- */
 let active=0,sub3='A';
 document.querySelectorAll('.tab').forEach((t,k)=>t.onclick=()=>{active=k;
@@ -569,13 +759,13 @@ function setSub(m){sub3=m;$('m3A').setAttribute('aria-pressed',m==='A');$('m3B')
  $('v3A').hidden=$('i3A').hidden=m!=='A';$('v3B').hidden=$('i3B').hidden=m!=='B';}
 $('m3A').onclick=()=>setSub('A');$('m3B').onclick=()=>setSub('B');
 /* Direktlinks aus dem Arbeitsblatt: #stoffebene, #teilchenebene, #kontaktflaeche, #wuerfel */
-function fromHash(){const h=location.hash.slice(1);const m={stoffebene:[0],teilchenebene:[1],kontaktflaeche:[2,'A'],wuerfel:[2,'B']}[h];if(!m)return;
- document.querySelectorAll('.tab')[m[0]].click();if(m[1])setSub(m[1]);}
+function fromHash(){const h=location.hash.slice(1);const m={stoffebene:[0],teilchenebene:[1],zufallsweg:[2,'A'],tropfen:[2,'B'],kontaktflaeche:[3,'A'],wuerfel:[3,'B']}[h];if(!m)return;
+ document.querySelectorAll('.tab')[m[0]].click();if(m[1]){if(m[0]===2)setSubZ(m[1]);else setSub(m[1]);}}
 window.addEventListener('hashchange',fromHash);fromHash();
 
 let last=performance.now();
 function loop(now){const dt=Math.min(0.05,Math.max(0,(now-last)/1000));last=now;
- try{if(active===0)t1Frame(dt);else if(active===1)t2Frame(dt);else if(sub3==='A')t3aFrame(dt);else t3bFrame(dt);}catch(e){console.error(e);}
+ try{if(active===0)t1Frame(dt);else if(active===1)t2Frame(dt);else if(active===2){if(subZ==='A')zaFrame(dt);else zbFrame(dt);}else if(sub3==='A')t3aFrame(dt);else t3bFrame(dt);}catch(e){console.error(e);}
  requestAnimationFrame(loop);}
 requestAnimationFrame(loop);
 </script>

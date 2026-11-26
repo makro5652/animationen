@@ -122,7 +122,7 @@ footer{margin-top:40px;color:var(--mute);font-size:14px;border-top:1px solid var
 </header>
 
 <nav class="toc" aria-label="Inhalt">
- <a href="#einstieg">Einstieg</a><a href="#s1">1 · Stoffebene</a><a href="#s2">2 · Teilchenebene</a><a href="#s3">3 · Oberfläche</a><a href="#test">Abschlusstest</a>
+ <a href="#einstieg">Einstieg</a><a href="#s1">1 · Stoffebene</a><a href="#s2">2 · Teilchenebene</a><a href="#s3">3 · Zufallsweg</a><a href="#s4">4 · Oberfläche</a><a href="#test">Abschlusstest</a>
 </nav>
 
 <div class="hint">
@@ -416,6 +416,151 @@ footer{margin-top:40px;color:var(--mute);font-size:14px;border-top:1px solid var
 <!-- ============================ STATION 3 ============================ -->
 <section class="st" id="s3">
  <span class="kicker">Station 3</span>
+ <h2>Diffusion auswürfeln: der Zufallsweg</h2>
+
+ <div class="text only-R">
+  <h4>Ein Spiel mit dem Zufall</h4>
+  <p>Ein Farbstoffteilchen im Wasser stößt ständig mit Wasserteilchen zusammen. Nach jedem Zusammenstoß bewegt es sich in eine neue Richtung. Welche Richtung das ist, kann niemand vorhersagen. Sie ist <span class="w" tabindex="0" data-tip="nicht vorhersagbar; jede Möglichkeit kann eintreten">zufällig</span>.</p>
+  <p>Diese Bewegung kann man mit einem Würfelspiel nachspielen. Das Spielfeld besteht aus Sechsecken. Jedes Feld hat sechs Nachbarfelder. Ein Würfel hat sechs Augenzahlen. Jede Augenzahl steht für eine Richtung.</p>
+  <p>So spielt man: Man stellt die Spielfigur auf ein Startfeld. Man würfelt und zieht die Figur ein Feld in die gewürfelte Richtung. Das wiederholt man 10-, 20- oder 100-mal. Danach zählt man, wie weit die Figur vom Startfeld entfernt ist.</p>
+  <p>Die Spielfigur ist das Teilchen. Jeder Wurf ist ein Zusammenstoß. Die Anzahl der Würfe steht für die Zeit.</p>
+  <p>Wenn viele Spielfiguren auf demselben Feld starten, ist das wie ein Tropfen Farbstoff im Wasser. Jede Figur würfelt für sich. Mit der Zeit verteilen sich die Figuren auf dem ganzen Spielfeld.</p>
+ </div>
+
+ <div class="text only-G">
+  <h4>Der Zufallsweg als Modell der Diffusion</h4>
+  <p>Die Bewegung eines gelösten Teilchens in einer Flüssigkeit lässt sich mit dem Modell des <b>Zufallswegs</b> (engl. <i>random walk</i>) beschreiben: Zwischen zwei Zusammenstößen legt das Teilchen eine kurze Strecke zurück; die Richtung nach jedem Stoß ist zufällig und unabhängig von allen vorherigen Richtungen.</p>
+  <p>Ein einfaches Spielmodell nutzt ein Feld aus Sechsecken und einen Würfel: Jede der sechs Augenzahlen legt eine der sechs Richtungen zu den Nachbarfeldern fest; jede Richtung tritt mit der Wahrscheinlichkeit 1/6 auf. Jeder Wurf entspricht einem Stoß, die Anzahl der Würfe n der Zeit.</p>
+  <p>Den Weg eines einzelnen Teilchens kann man nicht vorhersagen. Für sehr viele Teilchen lassen sich aber genaue statistische Aussagen treffen. Da sich die Schritte in alle Richtungen im Mittel aufheben, ist die mittlere Verschiebung (mit Richtung) null. Der mittlere <i>Abstand</i> vom Start wächst dennoch – allerdings nicht proportional zu n, sondern nur mit der Wurzel: Für das mittlere Abstandsquadrat gilt ⟨d²⟩ = n · l² (l: Schrittlänge), also d ≈ √n · l.</p>
+  <p>Überträgt man dies auf die Diffusion (n ~ t), wächst die typische Diffusionsstrecke mit √t. Albert Einstein und Marian Smoluchowski leiteten 1905/1906 daraus den Zusammenhang zwischen Diffusionskoeffizient und mittlerem Verschiebungsquadrat ab (in einer Dimension: ⟨x²⟩ = 2 · D · t). Folge: Für die doppelte Strecke wird die vierfache Zeit benötigt.</p>
+  <p>Starten viele Figuren auf demselben Feld, entspricht dies einer hohen Anfangskonzentration an einem Ort. Die Verteilung der Figuren verbreitert sich mit der Zeit: Aus dem Startfeld gelangen mehr Figuren heraus als hinein – eine Nettobewegung vom Ort hoher zum Ort niedriger Konzentration, ohne dass eine Figur eine Vorzugsrichtung hat.</p>
+ </div>
+
+ <div class="hint"><b>Auch auf Papier:</b> Druckt das Spielfeld aus und würfelt mit einem echten Würfel. Vergleicht eure Ergebnisse danach mit der App.
+  <div class="row"><button class="btn small" id="paperBtn">Spielfeld zum Ausdrucken</button></div></div>
+
+ <details class="wort"><summary>Wortspeicher Station 3</summary>
+  <dl class="ws">
+   <dt>der Zufall, die Zufälle</dt><dd>etwas, das man nicht vorhersagen kann</dd>
+   <dt>der Zufallsweg, die Zufallswege</dt><dd>Weg, bei dem jede neue Richtung zufällig bestimmt wird</dd>
+   <dt>die Augenzahl, die Augenzahlen</dt><dd>Zahl, die der Würfel nach dem Wurf oben zeigt</dd>
+   <dt>das Sechseck, die Sechsecke</dt><dd>Fläche mit sechs Ecken und sechs Seiten</dd>
+   <dt>der Abstand, die Abstände</dt><dd>Entfernung zwischen zwei Orten, hier in Feldern gezählt</dd>
+   <dt>der Mittelwert, die Mittelwerte</dt><dd>Summe aller Werte geteilt durch die Anzahl der Werte</dd>
+   <dt class="only-G">die Wahrscheinlichkeit, die Wahrscheinlichkeiten</dt><dd class="only-G">Maß dafür, wie oft ein Ereignis im Mittel eintritt (hier je 1/6)</dd>
+  </dl>
+ </details>
+
+ <!-- R-Aufgaben -->
+ <div class="only-R">
+  <div class="task">
+   <p class="q"><b class="nr">3.1</b>Öffne Reiter 3, Variante A. Tippe auf ein Startfeld und würfle 20-mal (Knopf <i>20 ×</i>). Notiere den Abstand vom Start. Tippe dann auf <i>Neue Runde</i>. Spiele insgesamt fünf Runden.</p>
+   <div class="anim"><a class="btn small" href="diffusion.html#zufallsweg" target="_blank" rel="noopener">Animation: Würfelspiel</a></div>
+   <div class="tblwrap"><table class="tb"><tr><th>Runde</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+    <tr><th>Abstand nach 20 Würfen (Felder)</th><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td></tr></table></div>
+  </div>
+  <div class="task chk">
+   <p class="q"><b class="nr">3.2</b>Kreuze an: Was stellst du fest?</p>
+   <div class="mc" data-ans="b">
+    <label><input type="radio" name="r32" value="a"> Jede Runde endet gleich weit vom Start entfernt.</label>
+    <label><input type="radio" name="r32" value="c"> Die Figur landet immer wieder auf dem Startfeld.</label>
+    <label><input type="radio" name="r32" value="b"> Die Abstände sind unterschiedlich. Man kann sie nicht vorhersagen.</label>
+    <label><input type="radio" name="r32" value="d"> Die Figur kommt immer 20 Felder weit.</label>
+   </div>
+   <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
+  </div>
+  <div class="task chk">
+   <p class="q"><b class="nr">3.3</b><span class="op">Ordne</span> zu: Was im Spiel entspricht was bei den Teilchen?</p>
+   <table class="rf">
+    <tr><td>die Spielfigur</td><td class="c"><select class="gap" data-ans="b"><option value="">…</option><option value="c">die Zeit</option><option value="a">ein Zusammenstoß mit einem Wasserteilchen</option><option value="d">das Wasser im Becherglas</option><option value="b">ein Farbstoffteilchen</option></select></td></tr>
+    <tr><td>ein Wurf</td><td class="c"><select class="gap" data-ans="a"><option value="">…</option><option value="b">ein Farbstoffteilchen</option><option value="d">das Wasser im Becherglas</option><option value="a">ein Zusammenstoß mit einem Wasserteilchen</option><option value="c">die Zeit</option></select></td></tr>
+    <tr><td>die Anzahl der Würfe</td><td class="c"><select class="gap" data-ans="c"><option value="">…</option><option value="d">das Wasser im Becherglas</option><option value="c">die Zeit</option><option value="b">ein Farbstoffteilchen</option><option value="a">ein Zusammenstoß mit einem Wasserteilchen</option></select></td></tr>
+    <tr><td>das Spielfeld</td><td class="c"><select class="gap" data-ans="d"><option value="">…</option><option value="a">ein Zusammenstoß mit einem Wasserteilchen</option><option value="b">ein Farbstoffteilchen</option><option value="c">die Zeit</option><option value="d">das Wasser im Becherglas</option></select></td></tr>
+   </table>
+   <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">3.4</b>Stelle das Tempo auf <i>sofort</i> und würfle dreimal je 100-mal (jeweils <i>Neue Runde</i>). Kommt die Figur mit 100 Würfen 100 Felder weit? <span class="op">Beschreibe</span> dein Ergebnis und <span class="op">erkläre</span> es.</p>
+   <textarea></textarea>
+   <details class="help"><summary>Hilfe: Satzanfänge</summary><ul><li>Nach 100 Würfen war die Figur nur … Felder entfernt.</li><li>Die Figur kommt nicht 100 Felder weit, weil sie …</li><li>Viele Schritte heben sich auf, zum Beispiel …</li></ul></details>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Nach 100 Würfen ist die Figur meistens nur etwa 5 bis 15 Felder vom Start entfernt, nie 100 Felder. Die Figur zieht nicht immer in dieselbe Richtung, sondern in zufällige Richtungen. Viele Schritte heben sich gegenseitig auf, zum Beispiel ein Schritt nach links (5) und danach einer nach rechts (2). Deshalb bewegt sich die Figur auf einem Zickzackweg und kommt nur langsam vom Start weg.</p></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">3.5</b>Öffne Variante B (100 Spielfiguren, 100 Würfe). <span class="op">Beschreibe</span>, wie die Figuren am Anfang, nach etwa 20 Würfen und nach 100 Würfen verteilt sind. <span class="op">Vergleiche</span> mit dem Kaliumpermanganat-Kristall aus Station 1.</p>
+   <div class="anim"><a class="btn small" href="diffusion.html#tropfen" target="_blank" rel="noopener">Animation: Viele Spielfiguren</a></div>
+   <textarea></textarea>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Am Anfang stehen alle Figuren auf dem Startfeld. Nach etwa 20 Würfen sind sie in einem kleinen Bereich um den Start verteilt; in der Mitte stehen noch viele Figuren. Nach 100 Würfen sind sie über eine große Fläche verteilt, außen stehen nur wenige. Das ist wie beim Kristall: Am Anfang ist der Farbstoff an einem Ort (hohe Konzentration), danach verteilt er sich immer weiter im Wasser.</p></div>
+  </div>
+  <div class="task chk">
+   <p class="q"><b class="nr">3.6</b>Ergänze den Lückentext.</p>
+   <p>Am Anfang stehen alle Figuren auf <select class="gap" data-ans="einem Feld"><option value="">…</option><option>dem ganzen Spielfeld</option><option>einem Feld</option><option>dem Rand</option></select>. Jede Figur zieht in eine <select class="gap" data-ans="zufällige"><option value="">…</option><option>feste</option><option>zufällige</option><option>gleiche</option></select> Richtung. Mit der Zeit verteilen sich die Figuren <select class="gap" data-ans="immer weiter"><option value="">…</option><option>immer weiter</option><option>gar nicht</option><option>nur nach rechts</option></select>. Mit viermal so vielen Würfen kommt man im Mittel etwa <select class="gap" data-ans="doppelt"><option value="">…</option><option>viermal</option><option>genauso</option><option>doppelt</option></select> so weit.</p>
+   <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">3.7</b>Zusatz (zu zweit, auf Papier): Druckt das Spielfeld aus. Würfelt mit einem echten Würfel 20-mal und zeichnet den Weg mit Bleistift ein. <span class="op">Vergleicht</span> euren Weg mit den Wegen in der App.</p>
+   <textarea></textarea>
+  </div>
+ </div>
+
+ <!-- G-Aufgaben -->
+ <div class="only-G">
+  <div class="task">
+   <p class="q"><b class="nr">3.1</b><span class="afb">AFB II</span>Stelle eine <span class="op">Hypothese</span> auf: Wie viele Felder ist eine Spielfigur nach 100 Würfen im Mittel vom Start entfernt? <span class="op">Begründe</span> deine Schätzung.</p>
+   <textarea></textarea>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">3.2</b><span class="afb">AFB I/II</span>Öffne Reiter 3, Variante A. Spiele fünf Runden mit je 100 Würfen (Tempo <i>sofort</i>, nach jeder Runde <i>Neue Runde</i>). <span class="op">Protokolliere</span> die Abstände, <span class="op">berechne</span> den Mittelwert und <span class="op">prüfe</span> deine Hypothese.</p>
+   <div class="anim"><a class="btn small" href="diffusion.html#zufallsweg" target="_blank" rel="noopener">Animation: Würfelspiel</a></div>
+   <div class="tblwrap"><table class="tb"><tr><th>Runde</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>Mittelwert</th></tr>
+    <tr><th>Abstand nach 100 Würfen</th><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="numeric"></td><td><input class="val" inputmode="decimal"></td></tr></table></div>
+   <textarea placeholder="Prüfung der Hypothese …"></textarea>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Die Einzelwerte streuen stark (typisch etwa 3 bis 18 Felder); der Mittelwert liegt meist bei etwa 10 Feldern – also weit unter 100. Viele Schülerinnen und Schüler schätzen zunächst deutlich größere Werte. Grund: Die Schritte erfolgen in zufällige Richtungen und heben sich teilweise auf; nur ein kleiner Teil der Schritte trägt im Mittel zur Entfernung bei. Bei nur fünf Runden ist der Mittelwert noch unsicher.</p></div>
+  </div>
+  <div class="task chk">
+   <p class="q"><b class="nr">3.3</b><span class="afb">AFB II</span>Öffne Variante B mit 2000 Spielfiguren. Stelle nacheinander 20, 50, 100 und 200 Würfe je Figur ein, starte jeweils und lies am Ende den mittleren Abstand ab. <span class="op">Berechne</span> d/√n und <span class="op">leite</span> den Zusammenhang <span class="op">ab</span>.</p>
+   <div class="anim"><a class="btn small" href="diffusion.html#tropfen" target="_blank" rel="noopener">Animation: Viele Spielfiguren</a></div>
+   <div class="tblwrap"><table class="tb"><tr><th>Würfe n</th><th>20</th><th>50</th><th>100</th><th>200</th></tr>
+    <tr><th>mittlerer Abstand d</th><td><input class="val" inputmode="decimal"></td><td><input class="val" inputmode="decimal"></td><td><input class="val" inputmode="decimal"></td><td><input class="val" inputmode="decimal"></td></tr>
+    <tr><th>√n</th><td>4,5</td><td>7,1</td><td>10</td><td>14,1</td></tr>
+    <tr><th>d / √n</th><td><input class="val" inputmode="decimal"></td><td><input class="val" inputmode="decimal"></td><td><input class="val" inputmode="decimal"></td><td><input class="val" inputmode="decimal"></td></tr></table></div>
+   <p>Für den mittleren Abstand gilt näherungsweise: d ≈ <select class="gap" data-ans="w"><option value="">…</option><option value="n">n</option><option value="h">n/2</option><option value="w">√n</option><option value="q">n²</option></select></p>
+   <p>Für den doppelten mittleren Abstand benötigt man etwa <select class="gap" data-ans="4"><option value="">…</option><option value="2">doppelt so viele</option><option value="4">viermal so viele</option><option value="s">√2-mal so viele</option><option value="8">achtmal so viele</option></select> Würfe.</p>
+   <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">3.4</b><span class="afb">AFB II</span><span class="op">Erkläre</span>, warum sich die Spielfiguren in Variante B nach außen verteilen, obwohl jede Richtung gleich wahrscheinlich ist und keine Figur eine Vorzugsrichtung hat.</p>
+   <textarea></textarea>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Zu Beginn stehen alle Figuren auf dem Startfeld, auf den Nachbarfeldern keine. Jede Figur, die das Startfeld verlässt, gelangt nach außen; von außen kann zunächst keine Figur auf das Startfeld zurückkehren, weil dort keine Figuren stehen. Auch später gilt für jede gedachte Grenze: Von der Seite mit mehr Figuren gelangen im Mittel mehr Figuren über die Grenze als von der Seite mit weniger Figuren. So entsteht eine Nettobewegung vom Ort hoher zum Ort niedriger „Konzentration“, obwohl jede einzelne Figur völlig ungerichtet zieht. Die Nettobewegung ist ein statistischer Effekt vieler Figuren.</p></div>
+  </div>
+  <div class="task chk">
+   <p class="q"><b class="nr">3.5</b><span class="afb">AFB III</span>Ein Zuckerteilchen benötigt in Wasser bei Raumtemperatur für eine typische Strecke von 0,1 mm etwa 10 s (Größenordnung). <span class="op">Leite</span> mithilfe deiner Ergebnisse aus 3.3 <span class="op">ab</span>, wie lange es für 1 mm und für 1 cm etwa braucht, und <span class="op">beurteile</span> die Bedeutung für Lebewesen.</p>
+   <p>1 mm: <input class="num" data-ans="1000" data-tol="1" inputmode="decimal"> s &nbsp; 1 cm: <input class="num" data-ans="100000" data-tol="10" inputmode="decimal"> s</p>
+   <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
+   <textarea placeholder="Beurteilung …"></textarea>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Da d ~ √t, gilt t ~ d². 1 mm ist das 10-Fache von 0,1 mm → 10² = 100-fache Zeit: ca. 1000 s (≈ 17 min). 1 cm ist das 100-Fache → 100² = 10 000-fache Zeit: ca. 100 000 s (≈ 28 h). Beurteilung: Über Zellabstände (Mikrometer) ist Diffusion sehr schnell und reicht für den Stofftransport aus; über Millimeter bis Zentimeter ist sie viel zu langsam. Größere Lebewesen benötigen daher Transportsysteme (Blutkreislauf, Leitbündel); vgl. Station 4.</p></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">3.6</b><span class="afb">AFB III</span><span class="op">Beurteile</span> das Würfelspiel als Modell für die Diffusion. Nenne zwei Gemeinsamkeiten mit der realen Teilchenbewegung und drei Grenzen des Modells.</p>
+   <textarea></textarea>
+   <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
+   <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p><b>Gemeinsamkeiten:</b> zufällige, voneinander unabhängige Richtungsänderungen; Zickzackweg; Nettobewegung vieler Teilchen vom Ort hoher zum Ort niedriger Konzentration; Abstand wächst mit √t.</p><p><b>Grenzen:</b> nur sechs Richtungen und zwei Dimensionen (real: beliebige Richtungen im Raum); alle Schritte gleich lang und gleich schnell (real: Weglängen und Geschwindigkeiten verteilt, abhängig von der Temperatur); Figuren behindern sich nicht gegenseitig; keine Wasserteilchen dargestellt; ein Wurf entspricht nicht genau einem Stoß (real: extrem viele Stöße pro Sekunde). Für die qualitative Erklärung und den √t-Zusammenhang ist das Modell dennoch gut geeignet.</p></div>
+  </div>
+  <div class="task">
+   <p class="q"><b class="nr">3.7</b>Zusatz (zu zweit, auf Papier): Druckt das Spielfeld aus, würfelt mit einem echten Würfel 20-mal und zeichnet den Weg ein. Sammelt die Endabstände der ganzen Klasse und <span class="op">vergleicht</span> den Mittelwert mit √20 ≈ 4,5.</p>
+   <textarea></textarea>
+  </div>
+ </div>
+</section>
+
+
+<!-- ============================ STATION 4 ============================ -->
+<section class="st" id="s4">
+ <span class="kicker">Station 4</span>
  <h2>Oberfläche und Diffusionsgeschwindigkeit</h2>
 
  <div class="text only-R">
@@ -436,7 +581,7 @@ footer{margin-top:40px;color:var(--mute);font-size:14px;border-top:1px solid var
   <p>Für Lebewesen hat dies weitreichende Folgen: Der Stoffbedarf einer Zelle wächst mit ihrem Volumen, die Aufnahme erfolgt über ihre Oberfläche. Diffusion ist nur über kurze Strecken effektiv. Zellen bleiben daher klein, und Organe des Stoffaustauschs besitzen eine stark vergrößerte Oberfläche bei geringer Diffusionsstrecke (Lungenbläschen, Darmzotten und Mikrovilli, Wurzelhaare, Kiemenblättchen). Große Vielzeller benötigen zusätzlich Transportsysteme wie den Blutkreislauf oder die Leitbündel der Pflanzen, die Stoffe über große Entfernungen durch Strömung befördern.</p>
  </div>
 
- <details class="wort"><summary>Wortspeicher Station 3</summary>
+ <details class="wort"><summary>Wortspeicher Station 4</summary>
   <dl class="ws">
    <dt>die Oberfläche, die Oberflächen</dt><dd>Summe aller Außenflächen eines Körpers; Würfel: A = 6 · a²</dd>
    <dt>das Volumen, die Volumina</dt><dd>Rauminhalt eines Körpers; Würfel: V = a³</dd>
@@ -452,7 +597,7 @@ footer{margin-top:40px;color:var(--mute);font-size:14px;border-top:1px solid var
  <!-- R-Aufgaben -->
  <div class="only-R">
   <div class="task chk">
-   <p class="q"><b class="nr">3.1</b>Öffne Reiter 3, Variante A. Starte die Animation und beobachte das Diagramm. Kreuze an.</p>
+   <p class="q"><b class="nr">4.1</b>Öffne Reiter 4, Variante A. Starte die Animation und beobachte das Diagramm. Kreuze an.</p>
    <div class="anim"><a class="btn small" href="diffusion.html#kontaktflaeche" target="_blank" rel="noopener">Animation: Kontaktfläche</a></div>
    <div class="mc" data-ans="a">
     <label><input type="radio" name="r31" value="b"> In beiden Kammern geht der Ausgleich gleich schnell.</label>
@@ -462,12 +607,12 @@ footer{margin-top:40px;color:var(--mute);font-size:14px;border-top:1px solid var
    <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
   </div>
   <div class="task chk">
-   <p class="q"><b class="nr">3.2</b>Ergänze die Je-desto-Aussage.</p>
+   <p class="q"><b class="nr">4.2</b>Ergänze die Je-desto-Aussage.</p>
    <p>Je <select class="gap" data-ans="größer"><option value="">…</option><option>kleiner</option><option>größer</option></select> die Kontaktfläche, desto <select class="gap" data-ans="mehr"><option value="">…</option><option>weniger</option><option>mehr</option></select> Teilchen gelangen pro Zeiteinheit hindurch.</p>
    <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
   </div>
   <div class="task chk">
-   <p class="q"><b class="nr">3.3</b><span class="op">Berechne</span> Oberfläche, Volumen und das Verhältnis A/V. Die erste Zeile ist ein Beispiel. Formeln: A = 6 · a², V = a³.</p>
+   <p class="q"><b class="nr">4.3</b><span class="op">Berechne</span> Oberfläche, Volumen und das Verhältnis A/V. Die erste Zeile ist ein Beispiel. Formeln: A = 6 · a², V = a³.</p>
    <div class="tblwrap"><table class="tb"><tr><th>Kantenlänge a</th><th>Oberfläche A in cm²</th><th>Volumen V in cm³</th><th>A/V in cm⁻¹</th></tr>
     <tr><td>1 cm</td><td>6</td><td>1</td><td>6</td></tr>
     <tr><td>2 cm</td><td><input class="num" data-ans="24" inputmode="decimal"></td><td><input class="num" data-ans="8" inputmode="decimal"></td><td><input class="num" data-ans="3" inputmode="decimal"></td></tr>
@@ -476,7 +621,7 @@ footer{margin-top:40px;color:var(--mute);font-size:14px;border-top:1px solid var
    <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
   </div>
   <div class="task">
-   <p class="q"><b class="nr">3.4</b>Öffne Reiter 3, Variante B, und starte den Würfelversuch. <span class="op">Nenne</span> den Würfel, der zuerst vollständig gefärbt ist, und <span class="op">erkläre</span> mit deiner Tabelle aus 3.3.</p>
+   <p class="q"><b class="nr">4.4</b>Öffne Reiter 4, Variante B, und starte den Würfelversuch. <span class="op">Nenne</span> den Würfel, der zuerst vollständig gefärbt ist, und <span class="op">erkläre</span> mit deiner Tabelle aus 4.3.</p>
    <div class="anim"><a class="btn small" href="diffusion.html#wuerfel" target="_blank" rel="noopener">Animation: Würfelversuch</a></div>
    <textarea></textarea>
    <details class="help"><summary>Hilfe: Satzanfänge</summary><ul><li>Zuerst vollständig gefärbt ist der Würfel mit …</li><li>Die Farbe dringt in alle Würfel …</li><li>Der kleine Würfel hat im Verhältnis zu seinem Volumen …</li></ul></details>
@@ -484,7 +629,7 @@ footer{margin-top:40px;color:var(--mute);font-size:14px;border-top:1px solid var
    <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Zuerst vollständig gefärbt ist der Würfel mit a = 1 cm. Die Farbe dringt in alle Würfel gleich tief ein. Der kleine Würfel hat im Verhältnis zu seinem Volumen die größte Oberfläche (A/V = 6 cm⁻¹, beim großen Würfel nur 2 cm⁻¹). Außerdem ist der Weg bis zur Mitte am kürzesten. Deshalb ist er am schnellsten durchgefärbt.</p></div>
   </div>
   <div class="task chk">
-   <p class="q"><b class="nr">3.5</b><span class="op">Ordne</span> die Austauschflächen dem richtigen Organ <span class="op">zu</span>.</p>
+   <p class="q"><b class="nr">4.5</b><span class="op">Ordne</span> die Austauschflächen dem richtigen Organ <span class="op">zu</span>.</p>
    <table class="rf">
     <tr><td>Lungenbläschen</td><td class="c"><select class="gap" data-ans="Lunge"><option value="">…</option><option>Pflanzenwurzel</option><option>Dünndarm</option><option>Lunge</option></select></td></tr>
     <tr><td>Darmzotten</td><td class="c"><select class="gap" data-ans="Dünndarm"><option value="">…</option><option>Lunge</option><option>Pflanzenwurzel</option><option>Dünndarm</option></select></td></tr>
@@ -497,14 +642,14 @@ footer{margin-top:40px;color:var(--mute);font-size:14px;border-top:1px solid var
  <!-- G-Aufgaben -->
  <div class="only-G">
   <div class="task">
-   <p class="q"><b class="nr">3.1</b><span class="afb">AFB II</span>Öffne Reiter 3, Variante A. Stelle vor dem Start eine <span class="op">Hypothese</span> zum Verlauf der beiden Kurven auf. Starte dann die Simulation und <span class="op">prüfe</span> deine Hypothese. Variiere anschließend die Öffnungen.</p>
+   <p class="q"><b class="nr">4.1</b><span class="afb">AFB II</span>Öffne Reiter 4, Variante A. Stelle vor dem Start eine <span class="op">Hypothese</span> zum Verlauf der beiden Kurven auf. Starte dann die Simulation und <span class="op">prüfe</span> deine Hypothese. Variiere anschließend die Öffnungen.</p>
    <div class="anim"><a class="btn small" href="diffusion.html#kontaktflaeche" target="_blank" rel="noopener">Animation: Kontaktfläche</a></div>
    <textarea></textarea>
    <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
    <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Hypothese: In Kammer 2 (große Öffnung) steigt der Anteil der Farbstoffteilchen rechts schneller an, weil pro Zeiteinheit mehr Teilchen die Öffnung passieren können; beide Kurven nähern sich langfristig 50 %. Beobachtung: Die Kurve von Kammer 2 steigt deutlich steiler und erreicht die 50 %-Linie früher; Kammer 1 steigt nur langsam. Bei gleichen Öffnungen verlaufen beide Kurven (bis auf Zufallsschwankungen) gleich. Die Hypothese wird bestätigt; dies entspricht der Proportionalität J ~ A.</p></div>
   </div>
   <div class="task chk">
-   <p class="q"><b class="nr">3.2</b><span class="afb">AFB I/II</span><span class="op">Berechne</span> Oberfläche, Volumen und A/V. <span class="op">Leite</span> anschließend eine allgemeine Formel für A/V <span class="op">ab</span>.</p>
+   <p class="q"><b class="nr">4.2</b><span class="afb">AFB I/II</span><span class="op">Berechne</span> Oberfläche, Volumen und A/V. <span class="op">Leite</span> anschließend eine allgemeine Formel für A/V <span class="op">ab</span>.</p>
    <div class="tblwrap"><table class="tb"><tr><th>a in cm</th><th>A in cm²</th><th>V in cm³</th><th>A/V in cm⁻¹</th></tr>
     <tr><td>0,5</td><td><input class="num" data-ans="1.5" inputmode="decimal"></td><td><input class="num" data-ans="0.125" data-tol="0.002" inputmode="decimal"></td><td><input class="num" data-ans="12" inputmode="decimal"></td></tr>
     <tr><td>1</td><td><input class="num" data-ans="6" inputmode="decimal"></td><td><input class="num" data-ans="1" inputmode="decimal"></td><td><input class="num" data-ans="6" inputmode="decimal"></td></tr>
@@ -515,7 +660,7 @@ footer{margin-top:40px;color:var(--mute);font-size:14px;border-top:1px solid var
    <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
   </div>
   <div class="task chk">
-   <p class="q"><b class="nr">3.3</b><span class="afb">AFB II</span>Öffne Variante B (drei Würfelgrößen) und lies in der Tabelle die Zeiten bis 90 % Aufnahme ab. <span class="op">Berechne</span> die Verhältnisse und <span class="op">leite</span> den Zusammenhang <span class="op">ab</span>.</p>
+   <p class="q"><b class="nr">4.3</b><span class="afb">AFB II</span>Öffne Variante B (drei Würfelgrößen) und lies in der Tabelle die Zeiten bis 90 % Aufnahme ab. <span class="op">Berechne</span> die Verhältnisse und <span class="op">leite</span> den Zusammenhang <span class="op">ab</span>.</p>
    <div class="anim"><a class="btn small" href="diffusion.html#wuerfel" target="_blank" rel="noopener">Animation: Würfelversuch</a></div>
    <div class="tblwrap"><table class="tb"><tr><th>a</th><th>t<sub>90</sub> in min (ablesen)</th><th>t<sub>90</sub>(a) : t<sub>90</sub>(1 cm)</th></tr>
     <tr><td>1 cm</td><td><input class="num" data-ans="7.1" data-tol="0.15" inputmode="decimal"></td><td>1</td></tr>
@@ -525,19 +670,19 @@ footer{margin-top:40px;color:var(--mute);font-size:14px;border-top:1px solid var
    <div class="row"><button class="btn small chkbtn">Prüfen</button><span class="res"></span></div>
   </div>
   <div class="task">
-   <p class="q"><b class="nr">3.4</b><span class="afb">AFB II</span>Wähle in Variante B den Versuch <i>Gleiches Volumen</i>. <span class="op">Vergleiche</span> einen Würfel (a = 2 cm) mit acht Würfeln (a = 1 cm) und <span class="op">erkläre</span> das Ergebnis.</p>
+   <p class="q"><b class="nr">4.4</b><span class="afb">AFB II</span>Wähle in Variante B den Versuch <i>Gleiches Volumen</i>. <span class="op">Vergleiche</span> einen Würfel (a = 2 cm) mit acht Würfeln (a = 1 cm) und <span class="op">erkläre</span> das Ergebnis.</p>
    <textarea></textarea>
    <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
    <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Beide Proben haben das gleiche Gesamtvolumen (8 cm³). Die acht kleinen Würfel haben zusammen die doppelte Oberfläche (48 cm² statt 24 cm²), A/V = 6 cm⁻¹ statt 3 cm⁻¹. Zudem ist die maximale Diffusionsstrecke zur Würfelmitte halbiert (0,5 cm statt 1 cm). Die kleinen Würfel sind daher schneller gefärbt (t₉₀ ≈ 7 min statt ≈ 28 min, Modellwerte). Durch Zerteilen wird die Austauschfläche vergrößert und die Diffusionsstrecke verkürzt.</p></div>
   </div>
   <div class="task">
-   <p class="q"><b class="nr">3.5</b><span class="afb">AFB III</span><span class="op">Begründe</span>, warum Zellen nicht beliebig groß werden können und warum große Vielzeller Transportsysteme benötigen.</p>
+   <p class="q"><b class="nr">4.5</b><span class="afb">AFB III</span><span class="op">Begründe</span>, warum Zellen nicht beliebig groß werden können und warum große Vielzeller Transportsysteme benötigen.</p>
    <textarea></textarea>
    <div class="row"><button class="btn small solbtn">Lösungsvorschlag</button></div>
    <div class="sol" hidden><span class="t">Lösungsvorschlag</span><p>Der Stoffbedarf einer Zelle (z. B. Sauerstoff, Glucose) wächst mit ihrem Volumen (~a³), die Aufnahme erfolgt jedoch über die Oberfläche (~a²). Mit zunehmender Größe sinkt das A/V-Verhältnis (~1/a), sodass die Versorgung pro Volumen schlechter wird. Zudem wächst die Diffusionszeit mit dem Quadrat der Strecke; über große Distanzen ist Diffusion zu langsam. Zellen teilen sich daher, statt immer größer zu werden. Große Vielzeller haben Zellen, die weit von der Körperoberfläche entfernt liegen; Diffusion allein reicht nicht aus. Transportsysteme (Blutkreislauf, Leitbündel) befördern Stoffe durch Strömung über große Strecken; Diffusion findet dann nur noch über kurze Strecken statt (z. B. Kapillare → Zelle).</p></div>
   </div>
   <div class="task chk">
-   <p class="q"><b class="nr">3.6</b><span class="afb">AFB I</span><span class="op">Ordne</span> den Strukturen ihre Funktion <span class="op">zu</span>.</p>
+   <p class="q"><b class="nr">4.6</b><span class="afb">AFB I</span><span class="op">Ordne</span> den Strukturen ihre Funktion <span class="op">zu</span>.</p>
    <table class="rf">
     <tr><td>Lungenbläschen</td><td class="c"><select class="gap" data-ans="a"><option value="">…</option><option value="c">Aufnahme von Wasser und Mineralstoffen</option><option value="b">Aufnahme von Nährstoffen</option><option value="d">Gasaustausch im Wasser</option><option value="a">Gasaustausch zwischen Luft und Blut</option></select></td></tr>
     <tr><td>Darmzotten</td><td class="c"><select class="gap" data-ans="b"><option value="">…</option><option value="d">Gasaustausch im Wasser</option><option value="a">Gasaustausch zwischen Luft und Blut</option><option value="c">Aufnahme von Wasser und Mineralstoffen</option><option value="b">Aufnahme von Nährstoffen</option></select></td></tr>
@@ -596,6 +741,19 @@ footer{margin-top:40px;color:var(--mute);font-size:14px;border-top:1px solid var
     <label><input type="checkbox" data-pts="1"> Am Parfüm ist die Konzentration der Duftteilchen hoch, im übrigen Raum niedrig.</label>
     <label><input type="checkbox" data-pts="1"> Deshalb gelangen mehr Duftteilchen in den Raum als zurück, bis sie überall verteilt sind.</label>
    </div></div>
+ <div class="task"><p class="q"><b class="nr">T8</b>Beim Würfelspiel würfelt man 100-mal. Wie weit ist die Figur danach vom Startfeld entfernt?<span class="pts">1 P.</span></p>
+   <div class="mc" data-ans="c">
+    <label><input type="radio" name="tr8" value="a"> immer genau 100 Felder</label>
+    <label><input type="radio" name="tr8" value="d"> immer genau 10 Felder</label>
+    <label><input type="radio" name="tr8" value="c"> Das ist zufällig. Im Mittel sind es etwa 10 Felder.</label>
+    <label><input type="radio" name="tr8" value="b"> immer 0 Felder, weil sich alles aufhebt</label>
+   </div></div>
+  <div class="task"><p class="q"><b class="nr">T9</b>Ein Wurf im Würfelspiel entspricht bei den Teilchen …<span class="pts">1 P.</span></p>
+   <div class="mc" data-ans="b">
+    <label><input type="radio" name="tr9" value="a"> … dem Lösen des Kristalls.</label>
+    <label><input type="radio" name="tr9" value="c"> … dem Erwärmen des Wassers.</label>
+    <label><input type="radio" name="tr9" value="b"> … einem Zusammenstoß, nach dem sich die Richtung zufällig ändert.</label>
+   </div></div>
  </div>
 
  <!-- ---------- G-Test ---------- -->
@@ -640,7 +798,19 @@ footer{margin-top:40px;color:var(--mute);font-size:14px;border-top:1px solid var
     <label><input type="checkbox" data-pts="1"> Bei höherer Temperatur ist die mittlere Geschwindigkeit (kinetische Energie) der Teilchen größer.</label>
     <label><input type="checkbox" data-pts="1"> Dadurch werden pro Zeiteinheit größere Strecken zurückgelegt / mehr Teilchen gelangen in Bereiche niedriger Konzentration (ggf. geringere Viskosität).</label>
    </div></div>
-  <div class="task open-t"><p class="q"><b class="nr">T8</b><span class="afb">AFB III</span>Amöben sind Einzeller, die Sauerstoff nur durch Diffusion über ihre Zellmembran aufnehmen. <span class="op">Begründe</span>, warum es keine Amöben mit einem Durchmesser von 10 cm gibt.<span class="pts">4 P.</span></p>
+  <div class="task"><p class="q"><b class="nr">T8</b>Im Würfelspiel ist eine Figur nach 25 Würfen im Mittel etwa 5 Felder vom Start entfernt. Nach wie vielen Würfen ist sie im Mittel etwa 15 Felder entfernt?<span class="pts">1 P.</span></p>
+   <div class="mc" data-ans="c">
+    <label><input type="radio" name="tg8" value="a"> nach etwa 75 Würfen</label>
+    <label><input type="radio" name="tg8" value="b"> nach etwa 150 Würfen</label>
+    <label><input type="radio" name="tg8" value="c"> nach etwa 225 Würfen</label>
+    <label><input type="radio" name="tg8" value="d"> nach etwa 3375 Würfen</label>
+   </div></div>
+  <div class="task"><p class="q"><b class="nr">T9</b>Richtig oder falsch?<span class="pts">2 P.</span></p>
+   <table class="rf">
+    <tr><td>Den Weg einer einzelnen Spielfigur kann man vorhersagen, wenn man die Wahrscheinlichkeiten kennt.</td><td class="c"><div class="mc mcrow" data-ans="f"><label><input type="radio" name="tg9a" value="r">richtig</label><label><input type="radio" name="tg9a" value="f">falsch</label></div></td></tr>
+    <tr><td>Die mittlere Verschiebung (mit Richtung) vieler Figuren ist null, ihr mittlerer Abstand vom Start wächst trotzdem.</td><td class="c"><div class="mc mcrow" data-ans="r"><label><input type="radio" name="tg9b" value="r">richtig</label><label><input type="radio" name="tg9b" value="f">falsch</label></div></td></tr>
+   </table></div>
+  <div class="task open-t"><p class="q"><b class="nr">T10</b><span class="afb">AFB III</span>Amöben sind Einzeller, die Sauerstoff nur durch Diffusion über ihre Zellmembran aufnehmen. <span class="op">Begründe</span>, warum es keine Amöben mit einem Durchmesser von 10 cm gibt.<span class="pts">4 P.</span></p>
    <textarea></textarea>
    <div class="crit" hidden><b>Kriterien – hake ab, was in deiner Antwort steht:</b>
     <label><input type="checkbox" data-pts="1"> Der Sauerstoffbedarf wächst mit dem Volumen, die Aufnahme erfolgt über die Oberfläche.</label>
@@ -669,13 +839,15 @@ let NIV=load('niv')||'G';
 function setNiv(n){NIV=n;document.body.dataset.niveau=n;store('niv',n);
  $$('.seg button').forEach(b=>{b.classList.toggle('on',b.dataset.niv===n);b.setAttribute('aria-checked',b.dataset.niv===n);});updateScore();}
 $$('.seg button').forEach(b=>b.onclick=()=>setNiv(b.dataset.niv));
+const NIVOF=el=>{const r=el.closest('.only-R,.only-G');return r?(r.classList.contains('only-R')?'R':'G'):'x';};
 const active=el=>{const r=el.closest('.only-R,.only-G');return !r||r.classList.contains('only-'+NIV);};
 
 /* ---------- Speichern aller Eingaben ---------- */
-let fi=0;
+const secCount={};
 $$('input,select,textarea').forEach(el=>{
  if(el.type==='radio'){const k='r:'+el.name;if(load(k)===el.value)el.checked=true;el.addEventListener('change',()=>store(k,el.value));return;}
- const k=el.id?('id:'+el.id):('f'+(fi++));el.dataset.k=k;const v=load(k);
+ const sec=(el.closest('section.st')||{}).id||'top';secCount[sec]=(secCount[sec]||0)+1;
+ const k=el.id?('id:'+el.id):(sec+':'+NIVOF(el)+':'+secCount[sec]);el.dataset.k=k;const v=load(k);
  if(el.type==='checkbox'){if(v==='1')el.checked=true;el.addEventListener('change',()=>{store(k,el.checked?'1':'0');updateScore();});return;}
  if(v!=null)el.value=v;el.addEventListener('input',()=>store(k,el.value));el.addEventListener('change',()=>store(k,el.value));});
 $('#clearBtn').onclick=()=>{if(!confirm('Wirklich alle Eingaben auf diesem Gerät löschen?'))return;
@@ -730,6 +902,29 @@ $('#testReset').onclick=()=>{const root=testRoot();
  store('tested:'+NIV,'0');updateScore();};
 $$('.tst').forEach(t=>t.addEventListener('change',e=>{if(load('tested:'+NIV)==='1'&&!e.target.closest('.crit'))updateScore();}));
 
+
+/* ---------- Spielfeld (Papier) zum Ausdrucken ---------- */
+function hexPaperHTML(){const S3=Math.sqrt(3),R=8,sz=6.1,cx=95,cy=8+sz*(1.5*R+1);
+ const hp=(x,y,s)=>Array.from({length:6},(_,k)=>{const a=Math.PI/180*(60*k-30);return (x+s*Math.cos(a)).toFixed(2)+','+(y+s*Math.sin(a)).toFixed(2);}).join(' ');
+ let g='';for(let q=-R;q<=R;q++)for(let r=Math.max(-R,-q-R);r<=Math.min(R,-q+R);r++){const x=cx+sz*S3*(q+r/2),y=cy+sz*1.5*r;
+  g+=`<polygon points="${hp(x,y,sz*0.98)}" fill="${q===0&&r===0?'#ddd':'none'}" stroke="#555" stroke-width="0.25"/>`;}
+ g+=`<text x="${cx}" y="${cy+1.6}" font-size="5" text-anchor="middle" font-weight="700">S</text>`;
+ const H=cy+sz*(1.5*R+1)+6;const D=[null,[1,-1],[1,0],[0,1],[-1,1],[-1,0],[0,-1]];let rose='';const rx=32,ry=H+22,rs=7;
+ rose+=`<polygon points="${hp(rx,ry,rs*0.98)}" fill="#ddd" stroke="#555" stroke-width="0.3"/>`;
+ for(let n=1;n<=6;n++){const x=rx+rs*S3*(D[n][0]+D[n][1]/2),y=ry+rs*1.5*D[n][1];rose+=`<polygon points="${hp(x,y,rs*0.98)}" fill="none" stroke="#555" stroke-width="0.3"/><text x="${x}" y="${y+2}" font-size="6" text-anchor="middle" font-weight="700">${n}</text>`;}
+ let tb='';for(let i=0;i<20;i++){const col=i%10,row=Math.floor(i/10);const x=70+col*12,y=H+12+row*20;
+  tb+=`<rect x="${x}" y="${y}" width="12" height="7" fill="#eee" stroke="#555" stroke-width="0.3"/><text x="${x+6}" y="${y+5}" font-size="4" text-anchor="middle">${i+1}</text><rect x="${x}" y="${y+7}" width="12" height="9" fill="none" stroke="#555" stroke-width="0.3"/>`;}
+ return `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>Spielfeld Zufallsweg</title><style>@page{size:A4;margin:10mm}body{margin:0;font-family:Aptos,'Atkinson Hyperlegible',Arial,sans-serif}
+ .hd{display:flex;border:1px solid #555;font-size:11pt}.hd div{padding:4px 8px;border-right:1px solid #555;background:#e6e6e6}.hd div:last-child{flex:1;border-right:0}
+ .t{background:#222;color:#fff;padding:5px 8px;font-weight:700;font-size:12pt}p{font-size:10.5pt;margin:6px 0}</style></head><body>
+ <div class="hd"><div>Chemie/Biologie</div><div>Klasse</div><div>Name:</div><div style="text-align:right">Datum:</div></div>
+ <div class="t">Zufallsweg – Diffusion auswürfeln (Spielfeld)</div>
+ <p>Setze die Spielfigur auf S. Würfle und ziehe ein Feld in die Richtung der Augenzahl (siehe Richtungsrose). Zeichne den Weg mit Bleistift ein und notiere jede Augenzahl. Zähle am Ende den Abstand zu S in Feldern.</p>
+ <svg xmlns="http://www.w3.org/2000/svg" width="190mm" height="${(H+66).toFixed(0)}mm" viewBox="0 0 190 ${(H+66).toFixed(0)}">${g}${rose}
+ <text x="${rx}" y="${ry+19}" font-size="3.8" text-anchor="middle">Richtungsrose</text>${tb}
+ <text x="70" y="${H+8}" font-size="4" font-weight="700">Augenzahlen der Würfe 1–20:</text><text x="70" y="${H+60}" font-size="4.2">Abstand von S nach 20 Würfen: ______ Felder</text></svg>
+ <script>window.onload=()=>setTimeout(()=>window.print(),300)<\/script></body></html>`;}
+$('#paperBtn').onclick=()=>{const url=URL.createObjectURL(new Blob([hexPaperHTML()],{type:'text/html'}));const w=window.open(url,'_blank');if(!w)location.href=url;};
 setNiv(NIV);
 </script>
 </body>
