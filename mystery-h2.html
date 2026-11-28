@@ -138,6 +138,7 @@ table.cmp th{background:#eaf2ff}
 .bookrow{margin-top:0;margin-bottom:6px}
 @media(max-width:600px){.toc{display:none}.tocsel{display:block!important}.bookc{border-left-width:8px}.page{padding:10px 12px}}
 .tocsel{display:none;width:calc(100% - 100px);margin-bottom:10px;font-size:14px}
+.erkl{background:#e9f7ee;border-left-color:#1d8a4b}.erkl ul{margin:4px 0 0 0;padding-left:20px}.erkl li{margin:3px 0}.erklh{font:700 13px 'Silkscreen',monospace;color:#1d6b3b}
 .chip.wsp{display:flex;flex-direction:column;gap:1px;max-width:260px;text-align:left}.chip.wsp small{font-weight:400;font-size:12px;color:#5a4a36}
 .vis.half{max-width:270px;margin:4px}
 .atoms.pics{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}.atoms.pics .vis{margin:0;max-width:none}
@@ -894,7 +895,7 @@ PUZ2.p1=()=>{
  const M=[['H₂','H','H'],['Cl₂','Cl','Cl'],['HCl','H','Cl'],['O₂','O','O']];
  openPanel(`<h2>Teil 2 – Rätsel 7: Das Smartboard</h2>
  <div class="story">Das Smartboard funktioniert endlich und zeigt: „Die Elektronegativität (EN) ist ein Maß dafür, wie stark ein Atom in einer Bindung das bindende Elektronenpaar anzieht. Die Waage ist ein Modell: Sie neigt sich zu dem Atom, zu dem das bindende Elektronenpaar verschoben ist.“</div>
- <table class="pse"><tr>${Object.keys(EN).map(k=>`<th>${k}</th>`).join('')}</tr><tr>${Object.values(EN).map(v=>`<td>${String(v).replace('.',',')}</td>`).join('')}</tr></table>
+ <table class="pse"><tr>${Object.keys(EN).map(k=>`<th>${k}</th>`).join('')}</tr><tr>${Object.values(EN).map(v=>`<td>${v.toFixed(1).replace('.',',')}</td>`).join('')}</tr></table>
  <p class="small" style="text-align:center">EN-Werte nach Pauling, gerundet. In manchen Schulbüchern weichen die Werte leicht ab.</p>
  <div class="task"><b>Aufgabe 1:</b> Lege die Moleküle auf die digitale Waage und beobachte.</div>
  <div class="row balance-btns" style="justify-content:center">${M.map((m,i)=>`<button class="btn ghost" data-m="${i}">${m[0]}</button>`).join('')}</div>
@@ -910,8 +911,8 @@ PUZ2.p1=()=>{
    let s=`<rect width="320" height="170" fill="#f6f4ec"/><rect x="130" y="150" width="60" height="10" fill="#555"/><rect x="156" y="60" width="8" height="92" fill="#777"/>`;
    s+=`<g transform="rotate(${ang} 160 60)"><rect x="50" y="56" width="220" height="8" fill="#999" stroke="#333"/>`;
    s+=`<line x1="60" y1="60" x2="60" y2="96" stroke="#333"/><line x1="260" y1="60" x2="260" y2="96" stroke="#333"/>`;
-   s+=`<g transform="rotate(${-ang} 60 96)"><rect x="30" y="96" width="60" height="6" fill="#c9a227" stroke="#333"/><circle cx="60" cy="82" r="13" fill="#e4572e" stroke="#000"/><text x="60" y="86" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="monospace">${m[1]}</text><text x="60" y="118" text-anchor="middle" font-size="11" font-family="sans-serif">EN ${String(a).replace('.',',')}</text></g>`;
-   s+=`<g transform="rotate(${-ang} 260 96)"><rect x="230" y="96" width="60" height="6" fill="#c9a227" stroke="#333"/><circle cx="260" cy="82" r="13" fill="#e4572e" stroke="#000"/><text x="260" y="86" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="monospace">${m[2]}</text><text x="260" y="118" text-anchor="middle" font-size="11" font-family="sans-serif">EN ${String(b).replace('.',',')}</text></g>`;
+   s+=`<g transform="rotate(${-ang} 60 96)"><rect x="30" y="96" width="60" height="6" fill="#c9a227" stroke="#333"/><circle cx="60" cy="82" r="13" fill="#e4572e" stroke="#000"/><text x="60" y="86" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="monospace">${m[1]}</text><text x="60" y="118" text-anchor="middle" font-size="11" font-family="sans-serif">EN ${a.toFixed(1).replace('.',',')}</text></g>`;
+   s+=`<g transform="rotate(${-ang} 260 96)"><rect x="230" y="96" width="60" height="6" fill="#c9a227" stroke="#333"/><circle cx="260" cy="82" r="13" fill="#e4572e" stroke="#000"/><text x="260" y="86" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="monospace">${m[2]}</text><text x="260" y="118" text-anchor="middle" font-size="11" font-family="sans-serif">EN ${b.toFixed(1).replace('.',',')}</text></g>`;
    s+=`<circle cx="${ex-5}" cy="48" r="4" fill="#ffb703" stroke="#000"/><circle cx="${ex+5}" cy="48" r="4" fill="#ffb703" stroke="#000"/></g>`;
    s+=`<text x="160" y="20" text-anchor="middle" font-size="12" font-family="sans-serif" font-weight="700">${m[0]}: ${Math.abs(d)<.01?'Das Elektronenpaar liegt in der Mitte.':'Das Elektronenpaar ist zum '+(d>0?m[2]:m[1])+'-Atom verschoben.'}</text>`;
    svg.innerHTML=s}
@@ -1225,7 +1226,13 @@ for(const k in PUZ){const f=PUZ[k];PUZ[k]=()=>{bookCtx=k;f()}}
 for(const k in PUZX){const f=PUZX[k];PUZX[k]=()=>{bookCtx=k;f()}}
 {const f=openLock;openLock=()=>{bookCtx='lock';f()}}
 {const f=openFinal;openFinal=()=>{bookCtx='final';f()}}
-for(const k in PUZ2){const f=PUZ2[k];PUZ2[k]=()=>{bookCtx=k;f()}}
+const ERKL2=`<div class="story erkl"><b class="erklh">Kurz erklärt</b><ul>
+<li><b>Elektronegativität (EN):</b> Maß dafür, wie stark ein Atom in einer Bindung das bindende Elektronenpaar anzieht. Je größer der EN-Wert, desto stärker die Anziehung. Beispiele: H 2,2 · Cl 3,2 · O 3,4.</li>
+<li><b>ΔEN:</b> Elektronegativitätsdifferenz = größerer EN-Wert minus kleinerer EN-Wert.</li>
+<li><b>Teilladung:</b> Zieht ein Atom das bindende Elektronenpaar stärker an, ist das Elektronenpaar zu ihm hin verschoben. Dieses Atom trägt dann eine kleine negative Ladung, das andere Atom eine kleine positive Ladung. Teilladungen sind kleiner als die Ladung eines Ions.</li>
+<li><b>Symbol δ</b> (griechischer Buchstabe „delta“): <b>δ−</b> (gesprochen „delta minus“) am Atom mit der größeren EN, <b>δ+</b> („delta plus“) am anderen Atom. Beispiel: <span class="mono" style="font-size:17px"><sup>δ+</sup>H–Cl<sup>δ−</sup></span></li></ul></div>`;
+function injectErkl(){const anchor=pBody.querySelector('.bookrow')||pBody.querySelector('h2');if(anchor&&!pBody.querySelector('.erkl'))anchor.insertAdjacentHTML('afterend',ERKL2)}
+for(const k in PUZ2){const f=PUZ2[k];PUZ2[k]=()=>{bookCtx=k;f();injectErkl()}}
 {const f=openFinal2;openFinal2=()=>{bookCtx='final2';f()}}
 document.getElementById('bBook').onclick=()=>openBook(BOOKCTX[qStep()]||'k1');
 
