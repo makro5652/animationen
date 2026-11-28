@@ -138,6 +138,7 @@ table.cmp th{background:#eaf2ff}
 .bookrow{margin-top:0;margin-bottom:6px}
 @media(max-width:600px){.toc{display:none}.tocsel{display:block!important}.bookc{border-left-width:8px}.page{padding:10px 12px}}
 .tocsel{display:none;width:calc(100% - 100px);margin-bottom:10px;font-size:14px}
+.chip.wsp{display:flex;flex-direction:column;gap:1px;max-width:260px;text-align:left}.chip.wsp small{font-weight:400;font-size:12px;color:#5a4a36}
 .vis.half{max-width:270px;margin:4px}
 .atoms.pics{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}.atoms.pics .vis{margin:0;max-width:none}
 #bBook{background:#cfe2ff;border-color:#2f6fd6;box-shadow:0 3px 0 #1d4f9e;color:#12336e}
@@ -392,7 +393,7 @@ plant('plant3',-1,11);
 ent('lockers','Spinde',[[-8,16],[-7,16],[-6,16],[-5,16],[-4,16],[-3,16],[-2,16],[10,16],[11,16],[12,16],[13,16],[14,16]],g=>{const cols=['#2f6fd6','#d9483b','#f2c12e','#3aa36b'];
  [[-8,-1],[10,15]].forEach(r=>{for(let x=r[0];x<r[1];x+=.5){const c=cols[(((x*2)|0)+40)%4];B(g,.48,1.85,.6,x+.25,0,16.6,c);for(let v=0;v<3;v++)B(g,.3,.03,.02,x+.25,1.5+v*.07,16.29,shadeHex(c,.7));B(g,.04,.12,.03,x+.4,1.0,16.29,'#ddd')}})},{mk:null});
 ent('bin','Papierkorb',[[5,13]],g=>{B(g,.5,.62,.5,5.5,0,13.5,'#5f6b78');B(g,.42,.02,.42,5.5,.6,13.5,'#2b3038');if(!S.solved.r6){B(g,.22,.2,.2,5.45,.52,13.45,'#f2f2f2');B(g,.16,.16,.16,5.62,.58,13.58,'#e8e3d3')}},{mk:[5.5,1.7,13.5]});
-ent('water','Wasserspender',[[15,13]],g=>{B(g,.5,1.05,.45,15.5,0,13.5,'#e9eef2');cyl(g,.17,.45,15.5,1.05,13.5,'#7fc7f2');B(g,.1,.06,.1,15.5,.75,13.27,'#2f6fd6')},{mk:null});
+ent('water','Wasserspender',[[15,13]],g=>{B(g,.5,1.05,.45,15.5,0,13.5,'#e9eef2');cyl(g,.17,.45,15.5,1.05,13.5,'#7fc7f2');B(g,.1,.06,.1,15.5,.75,13.27,'#2f6fd6')},{mk:[15.5,2.3,13.5]});
 ent('fbench','Bank',[[11,14],[12,14]],g=>{B(g,1.9,.08,.45,12,.42,14.5,'#a8743f');B(g,.08,.42,.4,11.15,0,14.5,'#5a3a20');B(g,.08,.42,.4,12.85,0,14.5,'#5a3a20');B(g,.3,.25,.2,11.6,.5,14.5,'#3d7dd8')},{mk:null});
 plant('plant4',-9,12);
 
@@ -429,7 +430,7 @@ function update(dt){
 }
 let zoom=1;
 const camT=new THREE.Vector3(pl.x,0,pl.z);
-function updCam(dt){const k=Math.min(1,dt*4);camT.x+=(pl.x-camT.x)*k;camT.z+=(pl.z-camT.z)*k;const portrait=camera.aspect<.85;const f=zoom*(portrait?1.75:1);
+function updCam(dt){const k=Math.min(1,dt*4);camT.x+=(pl.x-camT.x)*k;camT.z+=(Math.min(pl.z,camera.aspect<.85?12.8:14.5)-camT.z)*k;const portrait=camera.aspect<.85;const f=zoom*(portrait?1.75:1);
  camera.position.set(camT.x,9.2*f,camT.z+7.6*f);camera.lookAt(camT.x,.5,camT.z-1.0)}
 function fit(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
 window.addEventListener('resize',fit);fit();
@@ -502,10 +503,10 @@ function solve(id){
 
 
 /* ================= Interaktion ================= */
-const STATION_ENT={intro:'kamau',r1:'pse',r2:'gasrack',r3:'baukasten',r4:'board',r5:'scale',r6:'bin',lock:'cab',final:'cab',p1:'smart',p2:'abzug',final2:'desk'};
+const STATION_ENT={intro:'kamau',r1:'pse',r2:'gasrack',r3:'baukasten',r4:'board',r5:'scale',r6:'bin',lock:'cab',final:'cab',p1:'smart',p2:'abzug',p3:'water',final2:'desk'};
 const STNAME={r1:'das Periodensystem vorne links',r2:'die Leuchtröhren in der Chemiesammlung',r3:'den Molekülbaukasten auf dem Experimentiertisch',r4:'die Tafel',r5:'die Waage am Fenster',r6:'den Papierkorb im Flur',lock:'den Schrank von Herrn Kronsbein'};
 const QUEST={intro:'Geh in den Chemieraum und sprich mit Herrn Kronsbein (vorne an der Tafel).',r1:'Untersuche das Periodensystem an der Wand vorne links.',r2:'Geh in die Chemiesammlung (Tür links im Chemieraum) und sieh dir die Leuchtröhren an.',r3:'Probiere den Molekülbaukasten auf dem Experimentiertisch aus.',r4:'Löse die Aufgabe an der Tafel.',r5:'Untersuche die Waage und die Elektronenwolken am Fenster (rechts).',r6:'Tims Hausaufgabe liegt im Papierkorb im Flur ...',lock:'Öffne Herrn Kronsbeins Schrank (vorne rechts) mit dem Code aus dem Notizbuch.',final:'Schreibt euren Erklärtext (Schrank antippen).',
- p1:'Teil 2: Das Smartboard funktioniert endlich! Sieh es dir an (vorne rechts).',p2:'Teil 2: Untersuche die Salzsäure im Abzug (vorne links).',final2:'Teil 2: Schreibauftrag am Pult von Herrn Kronsbein (rechts).'};
+ p1:'Teil 2: Das Smartboard funktioniert endlich! Sieh es dir an (vorne rechts).',p2:'Teil 2: Untersuche die Salzsäure im Abzug (vorne links).',p3:'Teil 2: Vergleiche am Wasserspender im Flur polare und unpolare Bindungen.',final2:'Teil 2: Schreibauftrag am Pult von Herrn Kronsbein (rechts).'};
 const HINTS={
  r1:['Psst: Die Nummer der Hauptgruppe verrät die Zahl der Valenzelektronen.','Chlor steht in der VII. Hauptgruppe. Mehr sag ich nicht.','Im Schulbuch steht das auf Seite 108. Hab ich gehört.'],
  r2:['Die Leuchtröhren stehen in der Chemiesammlung. Die Tür ist links. Herr Odhiambo beißt nicht.','Zähl mal die Elektronen auf der äußersten Schale von Neon.','Edelgase sind die Einzigen hier, die wirklich entspannt sind.'],
@@ -517,6 +518,7 @@ const HINTS={
  final:['Nutzt die Satzanfänge, die helfen wirklich.','Erst Valenzelektronen, dann Elektronenpaar, dann Edelgaskonfiguration, dann die gleichmäßige Elektronenwolke.','Mindestens 80 Wörter. Ich hab schon 12. Davon sind 6 „äh“.'],
  p1:['Das Smartboard geht! Ich musste mich erst mal setzen.','ΔEN heißt: größerer EN-Wert minus kleinerer EN-Wert.','Fluor hat die höchste Elektronegativität. Fluor ist der Streber unter den Elementen.'],
  p2:['Im Abzug steht die Salzsäure. Nur anschauen!','Das Atom mit der größeren EN bekommt δ−.','Elektronen „wollen“ nichts. Es kommt auf die Anziehung durch den Kern an, sagt Herr Kronsbein immer.'],
+ p3:['Wasser ist H₂O. Wie polar ist eigentlich die O–H-Bindung?','C–H ist fast unpolar. Deshalb mischt sich Öl nicht mit Wasser.','Je größer ΔEN, desto polarer die Bindung.'],
  final2:['Der Schreibauftrag für Teil 2 liegt am Pult.','Vergleicht H₂ und HCl. Das ist der ganze Trick.','Teilladung schreibt man mit δ+ und δ−. Das δ ist ein kleines Delta.']
 };
 const FLAVOR={
@@ -547,7 +549,7 @@ const SMARTGAG=[[['Smartboard','Update wird installiert: {p} %. Bitte nicht auss
  [['Smartboard','Update wird installiert: {p} %. Neustart erforderlich. Neustart abgebrochen. Neustart erforderlich.'],['Njeri','Es ist in einer Zeitschleife. Wie ich jeden Montag.']]];
 const GATE=['Das sieht spannend aus. Aber erst muss ich {s} untersuchen.','Moment. Herr Kronsbein hat gesagt: der Reihe nach. Zuerst {s}.','Später! Erst kommt {s} dran. Sonst verstehe ich das hier nicht.'];
 const CABWAIT=['Ein Zahlenschloss mit 6 Stellen. Mir fehlen noch Hinweise: {n} von 6 gefunden.','Ich habe erst {n} von 6 Ziffern. Raten ist bei einer Million Möglichkeiten eher schlecht.','Der Schrank bleibt zu. {n} von 6 Hinweisen – das reicht noch nicht.'];
-function step2(){if(!S.part2)return null;if(!S.sol2.p1)return'p1';if(!S.sol2.p2)return'p2';return'final2'}
+function step2(){if(!S.part2)return null;if(!S.sol2.p1)return'p1';if(!S.sol2.p2)return'p2';if(!S.sol2.p3)return'p3';return'final2'}
 function qStep(){if(S.part2){const s=step2();if(s!=='final2'||!S.done2)return s}return step()}
 function interact(e){
  const st=step();
@@ -563,7 +565,8 @@ function interact(e){
  if(e.id==='book')return openBook(BOOKCTX[qStep()]||'k1');
  if(e.id==='smart'){if(S.part2)return PUZ2.p1();S.smart=Math.min(99,S.smart+1);save();redraw(smartTex);const g=vary('smart',SMARTGAG);return talk(g.map(l=>[l[0],l[1].replace('{p}',S.smart)]))}
  if(e.id==='abzug'&&S.part2){if(!S.sol2.p1)return talk([['Du','Auf der Salzsäure klebt ein Zettel: „Erst das Smartboard!“']]);return PUZ2.p2()}
- if(e.id==='desk'&&S.part2&&S.sol2.p1&&S.sol2.p2)return openFinal2();
+ if(e.id==='desk'&&S.part2&&S.sol2.p1&&S.sol2.p2&&S.sol2.p3)return openFinal2();
+ if(e.id==='water'&&S.part2){if(!S.sol2.p2)return talk([['Du','Am Wasserspender klebt ein Zettel: „Teil 2 – erst Smartboard und Abzug!“']]);return PUZ2.p3()}
  if(FLAVOR[e.id])return talk(vary(e.id,FLAVOR[e.id]));
  if(!S.intro)return talk([['Du','Vielleicht sollte ich zuerst mit Herrn Kronsbein sprechen. Er steht im Chemieraum vorne an der Tafel.']]);
  const exMap={saltshelf:'e1',cond:'e2',lattice:'e3'};
@@ -596,19 +599,20 @@ function teacherTalk(){
 }
 function kamauJ(){const k=npcs.kamau;return k.jokes[k.jokeI++%k.jokes.length]}
 function onSolved(id){if(id==='r4')redraw(boardTex);if(id==='r6')rebuild('bin')}
-const PW2='polare elektronenpaarbindung';
+const PW2='unpolar';
 function tryUnlock(v){if((v||'').trim().toLowerCase().replace(/\s+/g,' ')!==PW2)return false;
  S.part2=true;save();redraw(smartTex);updHud();closePanel();
  talk([['Herr Kronsbein','Gute Nachrichten: Das Smartboard hat sein Update geschafft. 100 %!'],['Amani','Und wir sind trotzdem noch nicht in der Oberstufe.'],
   ['Herr Kronsbein','Bisher hattet ihr Moleküle aus zwei <b>gleichen</b> Atomen. Jetzt geht es um Bindungen zwischen <b>verschiedenen</b> Atomen – zum Beispiel im Chlorwasserstoff-Molekül HCl.'],
-  ['Herr Kronsbein','<b>Teil 2: Die polare Elektronenpaarbindung.</b> Geht zuerst zum Smartboard, dann zum Abzug. Den Schreibauftrag findet ihr an meinem Pult. Im Schulbuch sind jetzt auch neue Kapitel freigeschaltet.','Los geht’s']]);
+  ['Herr Kronsbein','<b>Teil 2: Die polare Elektronenpaarbindung.</b> Geht zuerst zum Smartboard, dann zum Abzug und danach zum Wasserspender im Flur. Den Schreibauftrag findet ihr an meinem Pult. Im Schulbuch sind jetzt auch neue Kapitel freigeschaltet.','Los geht’s']]);
  return true}
 const CARDS2={
  p1:{t:'Hinweis 7: Elektronegativität',x:'Die Elektronegativität (EN) ist ein Maß dafür, wie stark ein Atom in einer Bindung das bindende Elektronenpaar anzieht. Bei gleichen Atomen ist ΔEN = 0: Das Elektronenpaar ist symmetrisch verteilt, die Bindung ist unpolar (H₂, Cl₂, O₂). Bei HCl ist ΔEN ≈ 1,0: Die Bindung ist polar.'},
+ p3:{t:'Hinweis 9: Polar, unpolar – oder dazwischen?',x:'Je größer die Elektronegativitätsdifferenz ΔEN, desto stärker ist das bindende Elektronenpaar verschoben und desto polarer ist die Bindung. Faustregel: ΔEN unter etwa 0,5 → (nahezu) unpolar (H–H, Cl–Cl, C–H); ΔEN zwischen etwa 0,5 und 1,7 → polar (N–H, H–Cl, O–H). Im Wasser-Molekül sind beide O–H-Bindungen polar: Das O-Atom trägt δ−, die H-Atome tragen δ+.'},
  p2:{t:'Hinweis 8: Die polare Bindung im HCl-Molekül',x:'Im HCl-Molekül zieht der Kern des Cl-Atoms das bindende Elektronenpaar stärker an als der Kern des H-Atoms (größere EN). Die Elektronenwolke ist zum Cl-Atom hin verschoben. Das Cl-Atom erhält eine negative Teilladung (δ−), das H-Atom eine positive Teilladung (δ+). Es werden aber keine Elektronen vollständig übertragen – sonst wäre es eine Ionenbindung.'}
 };
 function solve2(id){S.sol2[id]=true;save();closePanel();updHud();const c=CARDS2[id];
- openPanel(`<h2>Neue Hinweiskarte (Teil 2)</h2><div class="cardx"><h4>${c.t}</h4><p>${c.x}</p></div><p class="small">Die Karte steht jetzt in eurem Notizbuch.</p><div class="row"><button class="btn" id="ok">Weiter</button></div>`,r=>{$$(r,'#ok').onclick=closePanel},()=>setTimeout(()=>bubble(id==='p1'?'njeri':'leyla',id==='p1'?'Das Smartboard hat uns etwas beigebracht. Ich bin verwirrt.':'δ+ und δ−. Klingt wie meine Laune vor und nach der Pause.',5),300))}
+ openPanel(`<h2>Neue Hinweiskarte (Teil 2)</h2><div class="cardx"><h4>${c.t}</h4><p>${c.x}</p></div><p class="small">Die Karte steht jetzt in eurem Notizbuch.</p><div class="row"><button class="btn" id="ok">Weiter</button></div>`,r=>{$$(r,'#ok').onclick=closePanel},()=>setTimeout(()=>bubble(id==='p1'?'njeri':id==='p2'?'leyla':'kofi',id==='p1'?'Das Smartboard hat uns etwas beigebracht. Ich bin verwirrt.':id==='p2'?'δ+ und δ−. Klingt wie meine Laune vor und nach der Pause.':'Wasser ist polar. Ich wusste immer, dass es etwas gegen mich hat.',5),300))}
 
 /* ================= Expertenaufgaben ================= */
 const EXCARDS={
@@ -844,7 +848,7 @@ function cloudSVG(sa,sb,sh,o){o=o||{};const id='cg'+(cloudN++),h=o.h||140,cy=h/2
   s+=`<circle cx="70" cy="${cy}" r="9" fill="#e4572e" stroke="#000"/><circle cx="250" cy="${cy}" r="9" fill="#e4572e" stroke="#000"/><text x="70" y="${cy+4}" text-anchor="middle" font-size="11" fill="#fff" font-weight="700" font-family="monospace">${sa}</text><text x="250" y="${cy+4}" text-anchor="middle" font-size="11" fill="#fff" font-weight="700" font-family="monospace">${sb}</text><circle cx="96" cy="${cy}" r="4" fill="#f2c12e" stroke="#000"/><circle cx="224" cy="${cy}" r="4" fill="#f2c12e" stroke="#000"/>`}
  else{s+=`<ellipse cx="${xa}" cy="${cy}" rx="${ra}" ry="${ra*.92}" fill="url(#${id}a)"/><ellipse cx="${xb}" cy="${cy}" rx="${rb}" ry="${rb*.92}" fill="url(#${id}a)"/><ellipse cx="${px}" cy="${cy}" rx="${22+Math.abs(sh)*4}" ry="${26}" fill="#3a6fd8" opacity=".35"/>`;
   s+=`<circle cx="${xa}" cy="${cy}" r="9" fill="#e4572e" stroke="#000"/><circle cx="${xb}" cy="${cy}" r="9" fill="#e4572e" stroke="#000"/><text x="${xa}" y="${cy+4}" text-anchor="middle" font-size="11" fill="#fff" font-weight="700" font-family="monospace">${sa}</text><text x="${xb}" y="${cy+4}" text-anchor="middle" font-size="11" fill="#fff" font-weight="700" font-family="monospace">${sb}</text><circle cx="${px}" cy="${cy-6}" r="4" fill="#f2c12e" stroke="#000"/><circle cx="${px}" cy="${cy+6}" r="4" fill="#f2c12e" stroke="#000"/>`;
-  if(o.d)s+=`<text x="${xa}" y="${cy-ra*.92-4}" text-anchor="middle" font-size="13" fill="#c0392b" font-family="sans-serif">${o.d[0]}</text><text x="${xb}" y="${cy-rb*.92-4}" text-anchor="middle" font-size="13" fill="#2f6fd6" font-family="sans-serif">${o.d[1]}</text>`}
+  if(o.d)s+=`<text x="${xa}" y="${Math.max(14,cy-ra*.92-4)}" text-anchor="middle" font-size="13" fill="#c0392b" font-family="sans-serif">${o.d[0]}</text><text x="${xb}" y="${Math.max(14,cy-rb*.92-4)}" text-anchor="middle" font-size="13" fill="#2f6fd6" font-family="sans-serif">${o.d[1]}</text>`}
  if(o.cap)s+=`<text x="160" y="${h-6}" text-anchor="middle" font-size="11" font-family="sans-serif">${o.cap}</text>`;
  return s+'</svg>'}
 function balanceSVG(a,b,qa,qb,tilt){const ang=tilt||0;return`<svg class="vis" viewBox="0 0 320 150" role="img" aria-label="Waagenmodell"><rect width="320" height="150" fill="#fffdf6"/><rect x="132" y="132" width="56" height="9" fill="#555"/><rect x="156" y="52" width="8" height="82" fill="#777"/>
@@ -939,11 +943,33 @@ PUZ2.p2=()=>{
    const fb=$$(r,'#fb');if(!err){fb.innerHTML='<span class="okt">Alles richtig!</span>';setTimeout(()=>solve2('p2'),1000)}else fb.innerHTML=`<span class="badt">${err} Angabe(n) falsch.</span>`};
  });
 };
+
+PUZ2.p3=()=>{
+ const EN={H:2.2,C:2.6,N:3.0,O:3.4,Cl:3.2};
+ const BD=[['H–H','H','H','0','unpolar'],['C–H','C','H','0,4','unpolar'],['N–H','N','H','0,8','polar'],['H–Cl','H','Cl','1,0','polar'],['O–H','O','H','1,2','polar'],['Cl–Cl','Cl','Cl','0','unpolar']];
+ openPanel(`<h2>Teil 2 – Rätsel 9: Der Wasserspender</h2>
+ <div class="story">Am Wasserspender im Flur hängt ein Zettel von Herrn Kronsbein: „Wasser ist H₂O. Sind die Bindungen darin polar oder unpolar? Vergleicht verschiedene Bindungen – und ordnet sie.“ EN-Werte: H 2,2 · C 2,6 · N 3,0 · Cl 3,2 · O 3,4.</div>
+ <div class="task"><b>Aufgabe 1:</b> Bestimme für jede Bindung ΔEN und entscheide nach der Faustregel: ΔEN unter etwa 0,5 → (nahezu) unpolar, darüber → polar.</div>
+ ${BD.map((b,i)=>`<div class="row"><b style="min-width:62px">${b[0]}</b> ΔEN = <select id="d${i}">${opts(['0','0,4','0,8','1,0','1,2'])}</select><select id="k${i}">${opts(['unpolar','polar'])}</select></div>`).join('')}
+ <div class="task"><b>Aufgabe 2:</b> Ordne die Bindungen nach zunehmender Polarität.</div>
+ <div class="row">am wenigsten polar: <select id="o1">${opts(['O–H','N–H','C–H','H–Cl'])}</select> &lt; <select id="o2">${opts(['O–H','N–H','C–H','H–Cl'])}</select> &lt; <select id="o3">${opts(['O–H','N–H','C–H','H–Cl'])}</select> &lt; <select id="o4">${opts(['O–H','N–H','C–H','H–Cl'])}</select> am stärksten polar</div>
+ <div class="task"><b>Aufgabe 3:</b> Das Wasser-Molekül H₂O. ${cloudSVG('O','H',-.55,{h:110,d:['δ−','δ+'],cap:'Ausschnitt: eine O–H-Bindung'})}
+ <div class="row">Teilladung am O-Atom: <select id="tO">${opts(['δ+','δ−'])}</select> Teilladung an den H-Atomen: <select id="tH">${opts(['δ−','δ+'])}</select></div></div>
+ ${mcHTML('q1','Warum sind die Bindungen im Wasser-Molekül polar, die Bindung im Wasserstoff-Molekül aber unpolar?',['Im Wasser-Molekül sind verschiedene Atome verbunden: Der Kern des O-Atoms zieht das bindende Elektronenpaar stärker an als der Kern des H-Atoms (ΔEN = 1,2). Im H₂-Molekül sind beide Atome gleich (ΔEN = 0).','Im Wasser-Molekül gibt das H-Atom sein Elektron vollständig an das O-Atom ab.','Wasser ist flüssig, Wasserstoff ist gasförmig. Deshalb ist Wasser polar.'])}
+ <div class="row"><button class="btn" id="chk">Prüfen</button><button class="btn ghost tipb">Tipp</button>${speakBtn}</div><div class="tipbox"></div><div class="fb" id="fb"></div>
+ <p class="small">Hinweis: Die Grenze 0,5 ist eine Faustregel. In manchen Schulbüchern wird 0,4 verwendet; C–H gilt dort ebenfalls als (nahezu) unpolar.</p>`,r=>{
+  tipper(r,['ΔEN = größerer EN-Wert minus kleinerer EN-Wert. Beispiel O–H: 3,4 − 2,2 = 1,2.','Je größer ΔEN, desto polarer die Bindung.','Das Atom mit der größeren Elektronegativität erhält die negative Teilladung.']);
+  $$(r,'#chk').onclick=()=>{const m={};BD.forEach((b,i)=>{m['d'+i]=b[3];m['k'+i]=b[4]});Object.assign(m,{o1:'C–H',o2:'N–H',o3:'H–Cl',o4:'O–H',tO:'δ−',tH:'δ+'});
+   let err=0;for(const k in m){const el=$$(r,'#'+k),ok=el.value===m[k];el.style.background=ok?'#d6f5e4':'#ffe0df';if(!ok)err++}
+   if(!mcCheck(r,'q1',0,['Genau: unterschiedliche Elektronegativität, verschobenes Elektronenpaar.','Eine vollständige Elektronenübertragung gibt es hier nicht – sonst lägen Ionen vor.','Der Aggregatzustand erklärt die Polarität der Bindung nicht.']))err++;
+   const fb=$$(r,'#fb');if(!err){fb.innerHTML='<span class="okt">Alles richtig!</span>';setTimeout(()=>solve2('p3'),1000)}else fb.innerHTML=`<span class="badt">${err} Angabe(n) falsch</span> (rot markiert).`};
+ });
+};
 const GAPS2=['verschiedene','Elektronegativität','stärker','1,0','verschoben','Teilladung','positive','polar','null','unpolar'];
 const BANK2=['unpolar','Teilladung','gleiche','stärker','null','polar','verschiedene','schwächer','verschoben','1,0','positive','Elektronegativität'];
 const GTEXT2='Im HCl-Molekül sind zwei {0} Atome durch ein gemeinsames Elektronenpaar verbunden. Das Chlor-Atom hat die größere {1}. Sein Atomkern zieht das bindende Elektronenpaar {2} an als der Kern des Wasserstoff-Atoms. Die Differenz ΔEN beträgt etwa {3}. Das bindende Elektronenpaar ist deshalb zum Chlor-Atom hin {4}. Das Chlor-Atom erhält eine negative {5} (δ−), das Wasserstoff-Atom eine {6} Teilladung (δ+). Die Bindung ist {7}. Im H₂-Molekül beträgt ΔEN dagegen {8}; die Bindung ist {9}.';
-const STARTS2=['Im HCl-Molekül ...','Das Chlor-Atom hat ...','Deshalb zieht der Kern des Chlor-Atoms ...','Das bindende Elektronenpaar ist ...','Dadurch entsteht ...','Im Gegensatz dazu ist im H₂-Molekül ...','Die Bindung im HCl-Molekül ist polar, weil ...'];
-const WORDS2=['die Elektronegativität (EN)','die Differenz ΔEN','polar','unpolar','die Teilladung, die Teilladungen','δ+ / δ−','verschoben','stärker anziehen','das bindende Elektronenpaar','die Elektronenwolke'];
+const STARTS2=['Im HCl-Molekül ...','Das Chlor-Atom hat ...','Deshalb zieht der Kern des Chlor-Atoms ...','Das bindende Elektronenpaar ist ...','Dadurch entsteht ...','Im Gegensatz dazu ist im H₂-Molekül ...','Die Bindung im HCl-Molekül ist polar, weil ...','Auch im Wasser-Molekül ...'];
+const WORDS2=[['die Elektronegativität (EN)','Maß dafür, wie stark ein Atom das bindende Elektronenpaar anzieht'],['die Differenz ΔEN','größerer EN-Wert minus kleinerer EN-Wert'],['polar','Elektronenpaar ist zu einem Atom verschoben'],['unpolar','Elektronenpaar ist gleichmäßig verteilt'],['die Teilladung, die Teilladungen','kleine Ladung δ+ oder δ− an einem Atom'],['δ+ / δ−','Zeichen für positive bzw. negative Teilladung'],['verschoben','nicht mehr in der Mitte zwischen den Kernen'],['stärker anziehen','zieht an, hat angezogen: mit größerer Kraft anziehen'],['das bindende Elektronenpaar','Elektronenpaar zwischen zwei Atomkernen'],['die Elektronenwolke','Raum, in dem die Elektronen wahrscheinlich anzutreffen sind']];
 const CHECKS2=[['Elektronegativität',/elektronegativ|\bEN\b/i],['ΔEN',/ΔEN|differenz/i],['stärkere Anziehung',/stärker/i],['verschoben',/verschoben|verschiebung/i],['Teilladung / δ',/teilladung|δ/i],['polar',/(^|[^n])polar/i],['Vergleich mit H₂ (unpolar)',/unpolar/i]];
 function openFinal2(){
  const gapHtml=GTEXT2.replace(/\{(\d)\}/g,(m,i)=>`<span class="gap" data-g="${i}"><select>${opts(BANK2,'…')}</select></span>`);
@@ -956,7 +982,7 @@ function openFinal2(){
  <h3>Teil B: Euer Erklärtext</h3>
  <div class="task"><b>Aufgabe:</b> Beantwortet die Leitfrage in einem zusammenhängenden Text (mindestens 80 Wörter). Vergleicht HCl mit H₂. Tippt auf einen Satzanfang oder ein Wort, um es einzufügen.</div>
  <p class="small">Satzanfänge:</p><div class="bank">${STARTS2.map(w=>`<span class="chip" data-ins="${w.replace(/ \.\.\.$/,' ')}">${w}</span>`).join('')}</div>
- <p class="small">Wortspeicher mit Artikel:</p><div class="bank">${WORDS2.map(w=>`<span class="chip art" data-ins="${w} ">${w}</span>`).join('')}</div>
+ <p class="small">Wortspeicher (antippen zum Einfügen):</p><div class="bank">${WORDS2.map(w=>`<span class="chip art wsp" data-ins="${w[0].split(',')[0]} "><b>${w[0]}</b><small>${w[1]}</small></span>`).join('')}</div>
  <textarea id="tx" placeholder="Schreibt hier euren Erklärtext zu Teil 2 ..."></textarea>
  <div class="row small"><span id="wc">0 Wörter</span></div><div class="checks" id="cks"></div>
  <div class="row"><button class="btn" id="copy">Text kopieren (zum Abgeben)</button><span class="small" id="cpfb"></span></div>`,r=>{
@@ -1013,7 +1039,7 @@ const GAPS=['ein','Elektronenpaar','Atomkernen','Molekül','zwei','Edelgaskonfig
 const BANK=['unpolar','Atomkernen','gleich stark','zwei','abgegeben','gleich','ein','symmetrisch','Molekül','verschoben','Edelgaskonfiguration','Elektronenpaar'];
 const GTEXT='Ein Wasserstoff-Atom besitzt {0} Valenzelektron. Nähern sich zwei Wasserstoff-Atome an, entsteht ein gemeinsames, bindendes {1}. Es befindet sich zwischen den beiden {2}. Die Anziehung zwischen den positiv geladenen Kernen und dem negativ geladenen Elektronenpaar hält das {3} zusammen. Jedem H-Atom werden nun {4} Elektronen zugeordnet. Damit hat jedes H-Atom die {5} des Edelgases Helium. Die beiden Atome im H₂-Molekül sind {6} gebaut. Ihre Atomkerne ziehen das bindende Elektronenpaar deshalb {7} an. Die Elektronenwolke ist auf beiden Seiten gleich groß: Das bindende Elektronenpaar ist {8} zwischen den Kernen verteilt. Die Elektronenpaarbindung im H₂-Molekül ist {9}.';
 const STARTS=['Ein Wasserstoff-Atom besitzt ...','Wenn sich zwei H-Atome annähern, ...','Dabei entsteht ...','Das bindende Elektronenpaar befindet sich ...','Die Atome werden zusammengehalten, weil ...','Jedem H-Atom werden ... zugeordnet. Dadurch ...','Die Bindung ist unpolar, da ...','Deshalb kommt Wasserstoff als ... vor.'];
-const WORDS=['die Elektronenwolke','unpolar','das Valenzelektron','der Atomkern','symmetrisch','die Edelgaskonfiguration','das bindende Elektronenpaar','die Anziehung','gleich stark anziehen','das Molekül','zuordnen','die Duettregel','gleichmäßig verteilt'];
+const WORDS=[['die Elektronenwolke','Raum, in dem die Elektronen wahrscheinlich anzutreffen sind'],['unpolar','Elektronenpaar ist gleichmäßig verteilt'],['das Valenzelektron, die Valenzelektronen','Elektron auf der äußersten Schale'],['der Atomkern, die Atomkerne','positiv geladener Mittelpunkt des Atoms'],['symmetrisch','auf beiden Seiten gleich'],['die Edelgaskonfiguration','voll besetzte Außenschale wie bei einem Edelgas'],['das bindende Elektronenpaar','Elektronenpaar zwischen zwei Atomkernen'],['die Anziehung','positive und negative Ladungen ziehen sich an'],['gleich stark anziehen','zieht an, hat angezogen: mit gleicher Kraft anziehen'],['das Molekül, die Moleküle','Teilchen aus zwei oder mehr verbundenen Atomen'],['zuordnen','ordnet zu, hat zugeordnet: einem Atom zurechnen'],['die Duettregel','H-Atome sind in Verbindungen von 2 Elektronen umgeben'],['gleichmäßig verteilt','überall gleich viel']];
 const CHECKS=[['Valenzelektron',/valenzelektron|au(ß|ss)enelektron/i],['Elektronenpaar',/elektronenpaar/i],['Atomkern(e)',/kern/i],['Anziehung',/anzieh|ziehen\s.*an|zieht\s.*an/i],['Edelgaskonfiguration / Duett',/edelgas|duett/i],['gleich starke Anziehung',/gleich stark/i],['gleichmäßig / symmetrisch',/symmetr|gleichmäßig/i],['unpolar',/unpolar/i]];
 function openFinal(){
  let g=0;const gapHtml=GTEXT.replace(/\{(\d)\}/g,(m,i)=>`<span class="gap" data-g="${i}"><select>${opts(BANK,'…')}</select></span>`);
@@ -1026,7 +1052,7 @@ function openFinal(){
  <h3>Teil B: Euer Erklärtext</h3>
  <div class="task"><b>Aufgabe:</b> Beantwortet die Leitfrage in einem zusammenhängenden Text (mindestens 80 Wörter). Verwendet die Fachbegriffe. Tippt auf einen Satzanfang oder ein Wort, um es einzufügen.</div>
  <p class="small">Satzanfänge:</p><div class="bank">${STARTS.map(w=>`<span class="chip" data-ins="${w.replace(/ \.\.\.$/,' ')}">${w}</span>`).join('')}</div>
- <p class="small">Wortspeicher mit Artikel:</p><div class="bank">${WORDS.map(w=>`<span class="chip art" data-ins="${w} ">${w}</span>`).join('')}</div>
+ <p class="small">Wortspeicher (antippen zum Einfügen):</p><div class="bank">${WORDS.map(w=>`<span class="chip art wsp" data-ins="${w[0].split(',')[0]} "><b>${w[0]}</b><small>${w[1]}</small></span>`).join('')}</div>
  <textarea id="tx" placeholder="Schreibt hier euren Erklärtext ..."></textarea>
  <div class="row small"><span id="wc">0 Wörter</span></div>
  <div class="checks" id="cks"></div>
@@ -1176,7 +1202,7 @@ const BOOK=[
  <div class="merke"><b>Merke:</b> Je größer ΔEN, desto stärker ist das bindende Elektronenpaar zu einem Atom verschoben. Bei sehr großem ΔEN liegt eine Elektronenübertragung vor: Es entstehen Ionen.</div>`,
  words:['die Bindungsart, die Bindungsarten','die Faustregel','fließend','der Übergang, die Übergänge']}
 ];
-const BOOKCTX={r1:'k1',r2:'k2',r3:'k3',r4:'k4',r5:'k5u',r6:'k3',e1:'k6',e2:'k6',e3:'k6',final:'k5u',lock:'k3',p1:'k5',p2:'k5',final2:'k5'};
+const BOOKCTX={r1:'k1',r2:'k2',r3:'k3',r4:'k4',r5:'k5u',r6:'k3',e1:'k6',e2:'k6',e3:'k6',final:'k5u',lock:'k3',p1:'k5',p2:'k5',p3:'k5',final2:'k5'};
 let bookCtx=null,bookCur='k1';
 const mBook=document.getElementById('mBook'),bkBody=document.getElementById('bkBody');
 function openBook(ch){bookCur=ch||bookCur||'k1';renderBook();mBook.classList.add('open');document.getElementById('bkCard').scrollTop=0}
@@ -1207,16 +1233,16 @@ document.getElementById('bBook').onclick=()=>openBook(BOOKCTX[qStep()]||'k1');
 const unlockHTML=()=>S.part2?'':`<div class="teacher"><b>Teil 2 freischalten</b><p class="small">Euer Lehrer nennt euch das Passwort, wenn Teil 2 beginnt.</p><div class="row"><input type="text" id="pw2" placeholder="Passwort" style="flex:1;min-width:180px" autocomplete="off"><button class="btn" id="pw2b">Freischalten</button></div><div id="pw2fb" class="fb"></div></div>`;
 function bindUnlock(r){const b=$$(r,'#pw2b');if(!b)return;const go=()=>{if(!tryUnlock($$(r,'#pw2').value))$$(r,'#pw2fb').innerHTML='<span class="badt">falsch</span> – Das Passwort stimmt nicht.'};b.onclick=go;$$(r,'#pw2').onkeydown=e=>{if(e.key==='Enter')go()}}
 function openNotebook(fromLock){
- const cs=ORDER.filter(r=>S.solved[r]),xs=EXS.filter(r=>S.ex[r]),c2=['p1','p2'].filter(r=>S.sol2[r]);
+ const cs=ORDER.filter(r=>S.solved[r]),xs=EXS.filter(r=>S.ex[r]),c2=['p1','p2','p3'].filter(r=>S.sol2[r]);
  openPanel(`<h2>Notizbuch</h2>
  <div class="story"><b>Leitfrage Teil 1:</b> Warum besteht Wasserstoff aus H₂-Molekülen und nicht aus einzelnen H-Atomen? Und warum ist die Bindung im H₂-Molekül unpolar?${S.part2?'<br><b>Leitfrage Teil 2:</b> Warum ist die Bindung im HCl-Molekül polar?':''}</div>
  <p><b>Code:</b> ${ORDER.map(r=>S.solved[r]?`<span class="digit">${CARDS[r].d}</span>`:'<span class="digit">_</span>').join('')}</p>
  <h3>Hinweiskarten Teil 1 (${cs.length}/6)</h3>
  ${cs.length?cs.map(r=>`<div class="cardx"><h4>${CARDS[r].t}</h4><p>${CARDS[r].x}</p><p><b>Ziffer:</b> ${CARDS[r].d}</p></div>`).join(''):'<p>Noch keine Hinweise gefunden.</p>'}
- ${S.part2?`<h3>Hinweiskarten Teil 2 (${c2.length}/2)</h3>${c2.length?c2.map(r=>`<div class="cardx"><h4>${CARDS2[r].t}</h4><p>${CARDS2[r].x}</p></div>`).join(''):'<p>Noch keine Hinweise zu Teil 2.</p>'}`:''}
+ ${S.part2?`<h3>Hinweiskarten Teil 2 (${c2.length}/3)</h3>${c2.length?c2.map(r=>`<div class="cardx"><h4>${CARDS2[r].t}</h4><p>${CARDS2[r].x}</p></div>`).join(''):'<p>Noch keine Hinweise zu Teil 2.</p>'}`:''}
  <h3>Expertenkarten (${xs.length}/3)</h3>
  ${xs.length?xs.map(r=>`<div class="cardx ex"><h4>${EXCARDS[r].t}</h4><p>${EXCARDS[r].x}</p></div>`).join(''):'<p class="small">Freiwillig: Blaue Sterne in der Chemiesammlung.</p>'}
- <div class="row">${S.lock?'<button class="btn" id="fin">Zum Schreibauftrag Teil 1</button>':''}${S.part2&&S.sol2.p1&&S.sol2.p2?'<button class="btn" id="fin2">Zum Schreibauftrag Teil 2</button>':''}${fromLock?'<button class="btn ghost" id="back">Zurück zum Schloss</button>':''}</div>
+ <div class="row">${S.lock?'<button class="btn" id="fin">Zum Schreibauftrag Teil 1</button>':''}${S.part2&&S.sol2.p1&&S.sol2.p2&&S.sol2.p3?'<button class="btn" id="fin2">Zum Schreibauftrag Teil 2</button>':''}${fromLock?'<button class="btn ghost" id="back">Zurück zum Schloss</button>':''}</div>
  ${unlockHTML()}`,r=>{
   const f=$$(r,'#fin');if(f)f.onclick=()=>{closePanel();openFinal()};const f2=$$(r,'#fin2');if(f2)f2.onclick=()=>{closePanel();openFinal2()};const b=$$(r,'#back');if(b)b.onclick=()=>{closePanel();openLock()};bindUnlock(r);
  });
@@ -1226,14 +1252,14 @@ function openHelp(){
  <div class="hint"><b>Steuerung:</b> Tippe auf den Boden, um zu laufen. Tippe auf Personen oder Gegenstände, um sie zu untersuchen. Das gelbe <b>!</b> zeigt das nächste Ziel, blaue Sterne markieren freiwillige Expertenaufgaben. „Hinlaufen“ bringt dich direkt zum nächsten Ziel. Mit + und − (oder dem Mausrad) zoomst du. Pfeiltasten gehen auch.</div>
  <div class="hint"><b>Räume:</b> Chemieraum (Mitte), Chemiesammlung (Tür links), Flur (unten).</div>
  <div class="hint"><b>Tipps:</b> Mitschüler:innen antippen – sie machen Witze, geben aber auch Hinweise. In jedem Rätsel gibt es einen Tipp-Knopf, einen Vorlesen-Knopf und den Knopf „Im Schulbuch nachschlagen“. Das Schulbuch (oben links oder auf dem Labortisch) ist immer erreichbar.</div>
- <p>Team: <b>${team()}</b> · Teil 1: ${nSolved()}/6 · ${S.part2?'Teil 2: '+['p1','p2'].filter(k=>S.sol2[k]).length+'/2 · ':''}Expertenaufgaben: ${nEx()}/3 ${S.joker?'· Joker genutzt: '+S.joker:''}</p>
+ <p>Team: <b>${team()}</b> · Teil 1: ${nSolved()}/6 · ${S.part2?'Teil 2: '+['p1','p2','p3'].filter(k=>S.sol2[k]).length+'/3 · ':''}Expertenaufgaben: ${nEx()}/3 ${S.joker?'· Joker genutzt: '+S.joker:''}</p>
  ${unlockHTML()}
  <div class="teacher"><b>Für Lehrkräfte</b><div class="row"><input type="text" id="tc" placeholder="Lehrkraft-Code" style="width:160px" autocomplete="off"><button class="btn ghost" id="tcb">Freischalten</button></div><div id="tarea"></div></div>`,r=>{
   bindUnlock(r);
   $$(r,'#tcb').onclick=()=>{if($$(r,'#tc').value.trim().toLowerCase()!=='kronsbein'){$$(r,'#tarea').innerHTML='<p class="badt">falsch</p>';return}
    const st=step(),s2=step2();
-   $$(r,'#tarea').innerHTML=`<p class="small">Schrankcode: <b class="mono">${CODE}</b> · Teil 1: ${QUEST[st]} · ${S.part2?QUEST[s2]:'noch gesperrt (Passwort: „polare Elektronenpaarbindung“)'} · Expertenaufgaben: ${EXS.map(k=>k.toUpperCase()+(S.ex[k]?' gelöst':' offen')).join(', ')}</p>
-   <div class="row"><button class="btn" id="jok" ${ORDER.includes(st)?'':'disabled'}>Joker Teil 1</button><button class="btn" id="jok2" ${S.part2&&(s2==='p1'||s2==='p2')?'':'disabled'}>Joker Teil 2</button><button class="btn ghost" id="ms">Musterlösungen</button><button class="btn ghost" id="rs">Spiel zurücksetzen</button></div><div id="tout"></div>`;
+   $$(r,'#tarea').innerHTML=`<p class="small">Schrankcode: <b class="mono">${CODE}</b> · Teil 1: ${QUEST[st]} · ${S.part2?QUEST[s2]:'noch gesperrt (Passwort: „unpolar“)'} · Expertenaufgaben: ${EXS.map(k=>k.toUpperCase()+(S.ex[k]?' gelöst':' offen')).join(', ')}</p>
+   <div class="row"><button class="btn" id="jok" ${ORDER.includes(st)?'':'disabled'}>Joker Teil 1</button><button class="btn" id="jok2" ${S.part2&&(s2==='p1'||s2==='p2'||s2==='p3')?'':'disabled'}>Joker Teil 2</button><button class="btn ghost" id="ms">Musterlösungen</button><button class="btn ghost" id="rs">Spiel zurücksetzen</button></div><div id="tout"></div>`;
    $$(r,'#jok').onclick=()=>{S.joker++;solve(st)};
    $$(r,'#jok2').onclick=()=>{S.joker++;solve2(s2)};
    $$(r,'#ms').onclick=()=>{$$(r,'#tout').innerHTML=`<div class="cardx"><h4>Musterlösung Teil 1 (unpolar, ohne EN)</h4><p>${MUSTER}</p><h4>Lückentext Teil 1</h4><p>${GAPS.join(' · ')}</p><h4>Musterlösung Teil 2 (polar)</h4><p>${MUSTER2}</p><h4>Lückentext Teil 2</h4><p>${GAPS2.join(' · ')}</p></div>`};
@@ -1248,7 +1274,7 @@ document.getElementById('bGo').onclick=()=>{if(anyOpen())return;const e=byId[STA
 let qOpen=true;document.getElementById('qHead').onclick=()=>{qOpen=!qOpen;document.getElementById('qBody').classList.toggle('hide',!qOpen);document.getElementById('qArrow').innerHTML=qOpen?'&#9662;':'&#9656;'};
 
 /* ================= HUD ================= */
-function updHud(){document.getElementById('prog').textContent='Teil 1: '+nSolved()+'/6'+(S.part2?' · Teil 2: '+['p1','p2'].filter(k=>S.sol2[k]).length+'/2':'');document.getElementById('stars').textContent='Expertenaufgaben '+nEx()+'/3';document.getElementById('qtext').textContent=QUEST[qStep()]}
+function updHud(){document.getElementById('prog').textContent='Teil 1: '+nSolved()+'/6'+(S.part2?' · Teil 2: '+['p1','p2','p3'].filter(k=>S.sol2[k]).length+'/3':'');document.getElementById('stars').textContent='Expertenaufgaben '+nEx()+'/3';document.getElementById('qtext').textContent=QUEST[qStep()]}
 
 /* ================= Start ================= */
 const mStart=document.getElementById('mStart');
